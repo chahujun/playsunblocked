@@ -2119,6 +2119,13 @@ function startWave(w) {
   wave = w;
   waveActive = true;
 
+  // 清理上一波可能残留的所有实体
+  spawnTelegraphs = [];
+  poisonPools = [];
+  poisonProjectiles = [];
+  firePools = [];
+  damageNumbers = [];
+
   // Determine wave type: every 5th wave is boss, every 3rd is horde, every 7th is silent
   if (w % 7 === 0) waveType = 'silent';
   else if (w % 5 === 0) waveType = 'boss';
@@ -4468,9 +4475,13 @@ function updateWaveSystem(dt) {
     }
   }
 
-  // Check wave clear（BOSS波需BOSS死亡）
-  if (spawnQueue.length === 0 && zombies.length === 0 && !boss) {
+  // Check wave clear（BOSS波需BOSS死亡，且需所有telegraph完成）
+  if (spawnQueue.length === 0 && zombies.length === 0 && spawnTelegraphs.length === 0 && !boss) {
     waveActive = false;
+    // 清理波次间残留的毒液池和毒液弹
+    poisonPools = [];
+    poisonProjectiles = [];
+    firePools = [];
     // 触发波间升级（第1波后开始）
     if (wave >= 1 && state === GameState.PLAYING) {
       showUpgradeSelect();
@@ -7224,7 +7235,7 @@ function updateHUD() {
   if (!waveActive && state === GameState.PLAYING) {
     cdEl.textContent = t('nextWave') + Math.ceil(waveCountdown) + 's';
   } else if (waveActive) {
-    const remaining = zombies.length + spawnQueue.length;
+    const remaining = zombies.length + spawnQueue.length + spawnTelegraphs.length;
     cdEl.textContent = remaining + t('zombiesLeft');
   } else {
     cdEl.textContent = '';
