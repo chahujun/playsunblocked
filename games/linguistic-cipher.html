@@ -1477,6 +1477,8 @@ const state = {
   stats: { bestRound: 1, wins: 0 },
   achievements: new Set()
 };
+state.lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (state.lang === 'cn') state.lang = 'zh';
 
 const $ = id => document.getElementById(id);
 
@@ -2260,7 +2262,7 @@ function init() {
   const saved = loadState();
   let firstTime = true;
   if (saved) {
-    state.lang = saved.lang || 'en';
+    if (saved.lang) state.lang = saved.lang;
     state.dictionary = saved.dictionary || {};
     state.stats = saved.stats || { bestRound: 1, wins: 0 };
     state.achievements = new Set(saved.achievements || []);

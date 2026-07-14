@@ -1645,6 +1645,7 @@ const AudioEngine = {
 // ===== 国际化系统(i18n) =====
 // 默认英文(海外玩家),可切换中文
 let currentLang = new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('ah_game_lang') || 'zh';
+if (currentLang === 'cn') currentLang = 'zh';
 
 // UI 静态文本字典
 const STRINGS = {

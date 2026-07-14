@@ -333,7 +333,8 @@ const I18N = {
     fbNoBeat: "没踩上节拍"
   }
 };
-let lang = 'en';
+let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (lang === 'cn') lang = 'zh';
 function t(key) { return I18N[lang][key]; }
 function applyI18n() {
   document.getElementById('title').textContent = t('title');

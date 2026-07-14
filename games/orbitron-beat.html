@@ -337,7 +337,8 @@ const I18N = {
     best: '最高连击: '
   }
 };
-let lang = 'en';
+let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (lang === 'cn') lang = 'zh';
 function applyI18n() {
   const t = I18N[lang];
   document.getElementById('titleText').textContent = t.title;

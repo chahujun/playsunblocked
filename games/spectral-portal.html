@@ -419,7 +419,8 @@ const I18N = {
     objHint: "顺着箭头找"
   }
 };
-let lang = 'en';
+let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (lang === 'cn') lang = 'zh';
 function t(key){ return I18N[lang][key]; }
 
 // ========== 2. 音频系统 (Web Audio API) ==========

@@ -829,6 +829,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     <div class="instrRow">越靠近地图外侧角落，敌人越凶猛，甚至会出现 <b>轨道 Boss</b></div>
   </div>
   <button class="startBtn" id="startBtn">开 始 游 戏</button>
+  <button id="btnLang" style="position:absolute;top:12px;right:12px;background:rgba(20,30,50,0.8);color:#8cf;border:1px solid #48a;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;z-index:10;">EN</button>
   <div class="versionTag">v2.0 · BUBBLE EVOLUTION</div>
 </div>
 
@@ -2149,34 +2150,32 @@ class Tank {
     } else if (this.enemyType === 'healer') {
       // 治疗者：远离玩家，持续恢复附近敌人 HP
       this.angle = angleLerp(this.angle, targetAngle, 0.05);
-      // 保持远距离（500px），被接近时快速逃跑
-      const idealRange = 500;
+      // 保持中距离（350px），被接近时逃跑
+      const idealRange = 350;
       if (d < idealRange) {
-        // 逃跑（速度加成）
-        this.vx -= (dx / d) * this.accel * 1.4;
-        this.vy -= (dy / d) * this.accel * 1.4;
+        // 逃跑（无速度加成，容易被追上）
+        this.vx -= (dx / d) * this.accel * 0.8;
+        this.vy -= (dy / d) * this.accel * 0.8;
       } else {
         // 远距离侧向游走
         this.vx += -(dy / d) * this.accel * 0.4;
         this.vy += (dx / d) * this.accel * 0.4;
       }
-      // 治疗 pulse：每 60 帧（约 1 秒）治疗 300px 内的友军
+      // 治疗 pulse：每 120 帧（约 2 秒）治疗 200px 内的友军
       this.healPulse = (this.healPulse || 0) + 1;
-      if (this.healPulse >= 60) {
+      if (this.healPulse >= 120) {
         this.healPulse = 0;
         let healed = false;
         for (const e of enemies) {
           if (e === this || !e.alive) continue;
           const edx = e.x - this.x, edy = e.y - this.y;
           const ed = Math.hypot(edx, edy);
-          if (ed < 300) {
-            // 恢复核心 HP + 1 个脱落的子泡
+          if (ed < 200) {
+            // 仅恢复核心 HP，不再复活已死子泡
             if (e.coreHp < e.coreMaxHp) {
               e.coreHp = Math.min(e.coreMaxHp, e.coreHp + 1);
               healed = true;
             }
-            const deadSub = e.bubbles.find(b => b.type !== 'core' && !b.alive);
-            if (deadSub) { deadSub.alive = true; healed = true; }
             // 治疗视觉：连接线
             if (healed) {
               particles.push({
@@ -4819,7 +4818,7 @@ function spawnEnemyAt(x, y, type) {
       break;
     case 'healer':
       // 治疗者：远离玩家，持续恢复附近敌人 HP，自身脆弱
-      cfg = { level: 2, maxSpeed: 2.0, accel: 0.12, fireRate: 99999, bulletSpeed: 0, bulletDamage: 0, color: 'rgba(255,180,255,0.85)', coreColor: '#ff60ff', xpValue: 18, enemyType: 'healer' };
+      cfg = { level: 2, maxSpeed: 1.5, accel: 0.10, fireRate: 99999, bulletSpeed: 0, bulletDamage: 0, color: 'rgba(255,180,255,0.85)', coreColor: '#ff60ff', xpValue: 18, enemyType: 'healer' };
       break;
     case 'boss':
       cfg = { level: 4, maxSpeed: 1.4, accel: 0.10, fireRate: Math.floor(1300 / diffMul), bulletSpeed: 7 * speedMul, bulletDamage: 2 + Math.floor(dmgBonus), color: 'rgba(255,80,200,0.85)', coreColor: '#ff2090', xpValue: 40, enemyType: 'boss', isBoss: true };
@@ -5659,6 +5658,12 @@ buildRadar();
 updateRadar();
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('restartBtn').addEventListener('click', startGame);
+document.getElementById('btnLang').addEventListener('click', function(){
+  var u = new URL(window.location.href);
+  var c = u.searchParams.get('lang') || 'zh';
+  u.searchParams.set('lang', c === 'en' ? 'zh' : 'en');
+  window.location.href = u.toString();
+});
 
 requestAnimationFrame(loop);
 </script>

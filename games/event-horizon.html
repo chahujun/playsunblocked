@@ -108,6 +108,7 @@
       }
     });
   });
+  window._i18nObserver = observer;
   if (document.body) {
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   } else {
@@ -632,7 +633,8 @@ const I18N = {
     hint2: '[ 空格 ] · [ 点击 ] · [ 按钮 ]'
   }
 };
-let lang = 'en';
+let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (lang === 'cn') lang = 'zh';
 
 // ==================== Game State ====================
 const game = {
@@ -885,6 +887,10 @@ function applyI18n() {
 }
 function toggleLang() {
   lang = lang === 'en' ? 'zh' : 'en';
+  // 禁用头部 i18n-script 的 MutationObserver（如果存在）
+  if (lang === 'zh' && window._i18nObserver) {
+    window._i18nObserver.disconnect();
+  }
   applyI18n();
   saveGame();
 }

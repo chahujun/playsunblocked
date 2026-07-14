@@ -8,37 +8,37 @@
 
   var T = {
     '半卷山水 · Half a Scroll': 'Half a Scroll',
-    '點墨於紙，氤氳成畫。': 'Tap the paper. Watch the ink bloom.',
-    '墨跡所觸，山水甦醒，禪意自生。': 'Where it touches, a mountain wakes up.',
-    '點一下紙面，墨就落下了。': 'Tap the paper. Watch the ink bloom.',
-    '它會自己暈開，碰到哪裡，那裡的山就醒過來。': 'Where it touches, a mountain wakes up.',
-    '墨暈開更快，也分出更多枝丫': 'Ink blooms faster, splits more',
-    '多一種顏色，所得翻倍': 'Add a hue, double what you earn',
-    '硯台自己按節奏滴墨': 'Ink drops on its own, in rhythm',
-    '重畫一張，換取加成': 'Reset for a multiplier',
-    '重畫一張，留住心得': 'Reset, keep the lessons',
-    '點擊畫布滴墨': 'Tap the paper to drop ink',
-    '點一下紙面，墨就落下': 'Tap the paper to drop ink',
-    '水墨滲透率': 'Permeability',
-    '每滴墨擴散得更遠': 'Each drop spreads further',
-    '墨跡洇染度': 'Capillary Flow',
+    '点墨于纸，氤氲成画。': 'Tap the paper. Watch the ink bloom.',
+    '墨迹所触，山水苏醒，禅意自生。': 'Where it touches, a mountain wakes up.',
+    '点一下纸面，墨就落下了。': 'Tap the paper. Watch the ink bloom.',
+    '它会自己晕开，碰到哪里，那里的山就醒过来。': 'Where it touches, a mountain wakes up.',
+    '墨晕开更快，也分出更多枝丫': 'Ink blooms faster, splits more',
+    '多一种颜色，所得翻倍': 'Add a hue, double what you earn',
+    '砚台自己按节奏滴墨': 'Ink drops on its own, in rhythm',
+    '重画一张，换取加成': 'Reset for a multiplier',
+    '重画一张，留住心得': 'Reset, keep the lessons',
+    '点击画布滴墨': 'Tap the paper to drop ink',
+    '点一下纸面，墨就落下': 'Tap the paper to drop ink',
+    '水墨渗透率': 'Permeability',
+    '每滴墨扩散得更远': 'Each drop spreads further',
+    '墨迹洇染度': 'Capillary Flow',
     '五色墨': 'Five-Color Ink',
-    '自動行筆': 'Golden Brush',
-    '積墨重疊': 'Layered Wash',
-    '畫卷開悟': "Painting's Awakening",
-    '禪意點數: ': 'Zen Focus: ',
-    '禪意點數': 'Zen Focus',
-    '積墨層': 'Shading Layers',
+    '自动行笔': 'Golden Brush',
+    '积墨重叠': 'Layered Wash',
+    '画卷开悟': "Painting's Awakening",
+    '禅意点数: ': 'Zen Focus: ',
+    '禅意点数': 'Zen Focus',
+    '积墨层': 'Shading Layers',
     '已臻化境': 'Mastered',
-    '還差 ': 'Needs ',
+    '还差 ': 'Needs ',
     '消耗 ': 'Costs ',
-    '靈感': 'Inspiration',
+    '灵感': 'Inspiration',
     '修行': 'Practice',
     '半卷山水': 'Half a Scroll',
     '入 境': 'E N T E R',
     ' / 秒': '/s',
-    ' 層': ' layers',
-    ' 禪意': ' Zen'
+    ' 层': ' layers',
+    ' 禅意': ' Zen'
   };
 
   function tr(text) {
@@ -245,34 +245,34 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
   <div id="intro">
     <h1>半卷山水</h1>
     <div class="en">H A L F &nbsp; A &nbsp; S C R O L L</div>
-    <p id="introText">點墨於紙，氤氳成畫。<br>墨跡所觸，山水甦醒，禪意自生。</p>
+    <p id="introText">点墨于纸，氤氲成画。<br>墨迹所触，山水苏醒，禅意自生。</p>
     <button id="startBtn">入 境</button>
   </div>
   <div id="topbar">
     <div id="titleWrap">
-      <div id="seal">禪</div>
+      <div id="seal">禅</div>
       <div><div id="titleVert">半卷山水</div></div>
     </div>
     <div id="topCtrl">
       <button class="ctrlBtn" id="muteBtn">♪</button>
-      <button class="ctrlBtn" id="langBtn">EN / 繁中</button>
+      <button class="ctrlBtn" id="langBtn">EN / 简中</button>
     </div>
   </div>
   <div id="zenBox">
     <div id="zenVal">0</div>
-    <div id="zenLab">禪意點數</div>
+    <div id="zenLab">禅意点数</div>
     <div id="zenRate">+0 / s</div>
     <div id="inspBox">
       <div id="inspVal">0</div>
-      <div id="inspLab">靈感</div>
+      <div id="inspLab">灵感</div>
     </div>
     <div id="shadBox">
       <div id="shadVal">0</div>
-      <div id="shadLab">積墨層</div>
+      <div id="shadLab">积墨层</div>
     </div>
   </div>
   <div id="panel">
-    <div id="panelHead"><span id="panelTitle">修行</span><span id="panelHint">點擊畫布滴墨</span></div>
+    <div id="panelHead"><span id="panelTitle">修行</span><span id="panelHint">点击画布滴墨</span></div>
     <div class="upg" data-key="permeate"></div>
     <div class="upg" data-key="flow"></div>
     <div class="upg" data-key="color"></div>
@@ -308,24 +308,25 @@ const I18N = {
   },
   zh:{
     title:"半卷山水",
-    zen:"禪意點數: ", insp:"靈感", shad:"積墨層",
+    zen:"禅意点数: ", insp:"灵感", shad:"积墨层",
     rate:"+{0} / 秒",
-    panel:"修行", hint:"點一下紙面，墨就落下",
-    permeate:["水墨滲透率","每滴墨擴散得更遠"],
-    flow:["墨跡洇染度","墨暈開更快，也分出更多枝丫"],
-    color:["五色墨","多一種顏色，所得翻倍"],
-    brush:["自動行筆","硯台自己按節奏滴墨"],
-    shading:["積墨重疊","重畫一張，換取加成"],
-    ascend:["畫卷開悟","重畫一張，留住心得"],
+    panel:"修行", hint:"点一下纸面，墨就落下",
+    permeate:["水墨渗透率","每滴墨扩散得更远"],
+    flow:["墨迹洇染度","墨晕开更快，也分出更多枝丫"],
+    color:["五色墨","多一种颜色，所得翻倍"],
+    brush:["自动行笔","砚台自己按节奏滴墨"],
+    shading:["积墨重叠","重画一张，换取加成"],
+    ascend:["画卷开悟","重画一张，留住心得"],
     cost:"消耗 {0}",
     max:"已臻化境",
-    shadeGain:"+{0} 層", ascGain:"+{0} 靈感",
-    needZen:"還差 {0} 禪意",
-    intro:["點一下紙面，墨就落下了。","它會自己暈開，碰到哪裡，那裡的山就醒過來。"],
+    shadeGain:"+{0} 层", ascGain:"+{0} 灵感",
+    needZen:"还差 {0} 禅意",
+    intro:["点一下纸面，墨就落下了。","它会自己晕开，碰到哪里，那里的山就醒过来。"],
     start:"入 境"
   }
 };
-let LANG = "zh";
+let LANG = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (LANG === 'cn') LANG = 'zh';
 const t = (k,...a)=>{ let s=I18N[LANG][k]||k; a.forEach((v,i)=>s=s.replace('{'+i+'}',v)); return s; };
 
 /* ---------- Audio (Web Audio API) ---------- */
@@ -542,7 +543,7 @@ function paintDrop(g,x,y,r,color,alpha){
   g.beginPath(); g.arc(x,y,r*0.3,0,Math.PI*2); g.fill();
   g.restore();
 }
-/* ---------- scenery points (意境點) ---------- */
+/* ---------- scenery points (意境点) ---------- */
 const SCENERY_DEFS = [
   {x:0.16,y:0.26,type:'mountain',rate:0.6,need:34,size:130},
   {x:0.46,y:0.22,type:'mountain',rate:0.7,need:44,size:160},
@@ -733,14 +734,14 @@ function doShade(){
   if(state.totalZen < shadeReq()) return;
   const g = shadeGain(); if(g<=0) return;
   state.shad += g; resetRun();
-  toast(LANG==='zh'?('+'+g+' 積墨層'):('+'+g+' layers'));
+  toast(LANG==='zh'?('+'+g+' 积墨层'):('+'+g+' layers'));
   Audio.prestige(); refreshPanel(); save();
 }
 function doAscend(){
   if(state.totalZen < ascReq()) return;
   const g = ascGain(); if(g<=0) return;
   state.insp += g; state.asc++; state.autoBrush = true; resetRun();
-  toast(LANG==='zh'?('+'+g+' 靈感'):('+'+g+' inspiration'));
+  toast(LANG==='zh'?('+'+g+' 灵感'):('+'+g+' inspiration'));
   Audio.prestige(); refreshPanel(); save();
 }
 function resetRun(){
@@ -989,6 +990,7 @@ document.getElementById('langBtn').addEventListener('click', function(){
   document.querySelector('#intro .en').textContent = LANG==='en'?'H A L F   A   S C R O L L':'';
   document.getElementById('startBtn').textContent = I18N[LANG].start;
   document.getElementById('titleVert').textContent = I18N[LANG].title;
+  document.getElementById('langBtn').textContent = LANG === 'en' ? 'EN / 简中' : '简中 / EN';
 });
 
 /* ---------- mute ---------- */

@@ -486,6 +486,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     <div class="topbtns">
       <button id="btnMute" title="静音 (M)">🔊</button>
       <button id="btnPause" title="暂停 (P)">⏸</button>
+      <button id="btnLang" title="切换语言" style="font-size:10px;width:auto;padding:0 6px;">EN</button>
     </div>
 
     <div class="overlay show" id="ovStart">
@@ -2382,6 +2383,12 @@ function toggleMute(){
 }
 document.getElementById('btnStart').onclick=()=>{ensureAudio();startGame();};
 document.getElementById('btnRestart').onclick=startGame;
+document.getElementById('btnLang').onclick=function(){
+  var u=new URL(window.location.href);
+  var c=u.searchParams.get('lang')||'zh';
+  u.searchParams.set('lang',c==='en'?'zh':'en');
+  window.location.href=u.toString();
+};
 // 初始化职业和难度选择
 (function initStartScreen(){
   const cp=document.getElementById('classPick');

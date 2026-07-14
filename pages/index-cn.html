@@ -571,16 +571,13 @@
       <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
         <div class="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
           <span class="font-display shrink-0" style="font-weight: var(--weight-extrabold); font-size: var(--text-base); color: var(--color-text); letter-spacing: -0.01em;">分类</span>
-          <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0" role="group" aria-label="游戏分类">
-            <button type="button" class="category-pill shrink-0" data-active="true">全部</button>
-            <button type="button" class="category-pill shrink-0">动作</button>
-            <button type="button" class="category-pill shrink-0">益智</button>
-            <button type="button" class="category-pill shrink-0">赛车</button>
-            <button type="button" class="category-pill shrink-0">街机</button>
-            <button type="button" class="category-pill shrink-0">策略</button>
-            <button type="button" class="category-pill shrink-0">体育</button>
-            <button type="button" class="category-pill shrink-0">冒险</button>
-            <button type="button" class="category-pill shrink-0">多人</button>
+          <div id="category-pills" class="flex gap-2 overflow-x-auto no-scrollbar pb-2 md:pb-0" role="group" aria-label="游戏分类">
+            <button type="button" class="category-pill shrink-0" data-category="All" data-active="true">全部</button>
+            <button type="button" class="category-pill shrink-0" data-category="Action">动作</button>
+            <button type="button" class="category-pill shrink-0" data-category="Puzzle">益智</button>
+            <button type="button" class="category-pill shrink-0" data-category="Arcade">街机</button>
+            <button type="button" class="category-pill shrink-0" data-category="Strategy">策略</button>
+            <button type="button" class="category-pill shrink-0" data-category="Adventure">冒险</button>
           </div>
         </div>
       </div>
@@ -891,6 +888,9 @@
 
       var CAT_CN = { 'Action': '动作', 'Puzzle': '益智', 'Arcade': '街机', 'Strategy': '策略', 'Adventure': '冒险' };
 
+      var currentCategory = 'All';
+      var currentSearch = '';
+
       function playsToCn(plays) {
         if (plays.indexOf('M') > -1) return Math.round(parseFloat(plays) * 100) + '万次';
         if (plays.indexOf('K') > -1) return Math.round(parseFloat(plays) / 10) + '万次';
@@ -901,6 +901,7 @@
         var catCn = CAT_CN[g.category] || g.category;
         var coverGrad = 'background: linear-gradient(135deg, ' + g.gradient[0] + ' 0%, ' + g.gradient[1] + ' 100%);';
         return '<article class="brutalist-card overflow-hidden flex flex-col" style="border-radius: var(--radius-lg);">' +
+          '<a href="game-detail-cn.html?slug=' + g.slug + '" style="text-decoration:none;color:inherit;display:block;">' +
           '<div class="relative" style="border-bottom: 2px solid var(--color-border); aspect-ratio: 1/1; overflow: hidden;">' +
             '<div class="game-cover" style="' + coverGrad + '">' +
               '<div class="game-cover-inner">' +
@@ -918,34 +919,94 @@
               '</div>' +
               '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-secondary);">' + g.rating + '</span>' +
             '</div>' +
-            '<div class="flex items-center justify-between gap-2 mt-auto pt-2">' +
-              '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">' + playsToCn(g.plays) + '</span>' +
-              '<a href="game-detail-cn.html?slug=' + g.slug + '" class="play-btn" aria-label="开始游戏 ' + g.title.cn + '">' +
-                '<i data-lucide="play" style="width:12px;height:12px;" aria-hidden="true"></i>开始' +
-              '</a>' +
-            '</div>' +
+          '</div>' +
+          '</a>' +
+          '<div class="flex items-center justify-between gap-2 px-4 pb-4 pt-0">' +
+            '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">' + playsToCn(g.plays) + '</span>' +
+            '<a href="../games/' + g.slug + '.html?lang=zh" class="play-btn" aria-label="开始游戏 ' + g.title.cn + '" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:6px 16px;">' +
+              '<i data-lucide="play" style="width:12px;height:12px;" aria-hidden="true"></i>开始' +
+            '</a>' +
           '</div>' +
         '</article>';
       }
 
-      var featured = document.getElementById('featured-grid');
-      if (featured) {
-        var featGames = PLAYSUNBLOCKED_GAMES.featured.slice(0, 4);
-        featured.innerHTML = featGames.map(makeHomeCard).join('');
+      function filterGames(games) {
+        return games.filter(function(g) {
+          var matchCat = (currentCategory === 'All') || (g.category === currentCategory);
+          var matchSearch = !currentSearch ||
+            g.title.cn.indexOf(currentSearch) !== -1 ||
+            g.title.en.toLowerCase().indexOf(currentSearch) !== -1 ||
+            g.subtitle.cn.indexOf(currentSearch) !== -1 ||
+            g.category.toLowerCase().indexOf(currentSearch) !== -1;
+          return matchCat && matchSearch;
+        });
       }
 
-      var trending = document.getElementById('trending-grid');
-      if (trending) {
-        var trendGames = PLAYSUNBLOCKED_GAMES.trending.slice(0, 4);
-        trending.innerHTML = trendGames.map(makeHomeCard).join('');
+      function renderGrids() {
+        var filteredFeatured = filterGames(PLAYSUNBLOCKED_GAMES.featured);
+        var filteredTrending = filterGames(PLAYSUNBLOCKED_GAMES.trending);
+
+        var featured = document.getElementById('featured-grid');
+        if (featured) {
+          var featGames = filteredFeatured.slice(0, 8);
+          if (featGames.length === 0) {
+            featured.innerHTML = '<p class="font-sans" style="font-size:var(--text-sm);color:var(--color-text-tertiary);grid-column:1/-1;">没有符合条件的精选游戏。</p>';
+          } else {
+            featured.innerHTML = featGames.map(makeHomeCard).join('');
+          }
+        }
+
+        var trending = document.getElementById('trending-grid');
+        if (trending) {
+          var trendGames = filteredTrending.slice(0, 8);
+          if (trendGames.length === 0) {
+            trending.innerHTML = '<p class="font-sans" style="font-size:var(--text-sm);color:var(--color-text-tertiary);grid-column:1/-1;">没有符合条件的热门游戏。</p>';
+          } else {
+            trending.innerHTML = trendGames.map(makeHomeCard).join('');
+          }
+        }
+
+        if (window.lucide) lucide.createIcons();
       }
 
+      // Initial render
+      renderGrids();
+
+      // Category pill filtering
+      var pillContainer = document.getElementById('category-pills');
+      if (pillContainer) {
+        pillContainer.addEventListener('click', function(e) {
+          var btn = e.target.closest('.category-pill');
+          if (!btn) return;
+          currentCategory = btn.getAttribute('data-category') || 'All';
+          pillContainer.querySelectorAll('.category-pill').forEach(function(p) {
+            p.setAttribute('data-active', 'false');
+          });
+          btn.setAttribute('data-active', 'true');
+          renderGrids();
+        });
+      }
+
+      // Search box
+      var searchInput = document.querySelector('.gh-search-input');
+      if (searchInput) {
+        var searchTimeout = null;
+        searchInput.addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(function() {
+            currentSearch = searchInput.value.trim();
+            renderGrids();
+          }, 200);
+        });
+      }
+
+      // Surprise Me
       var surpriseBtn = document.querySelector('[data-dom-id="cta-surprise-me"]');
       if (surpriseBtn) {
         surpriseBtn.addEventListener('click', function() {
           var games = PLAYSUNBLOCKED_GAMES.all;
           var random = games[Math.floor(Math.random() * games.length)];
-          window.location.href = 'game-detail-cn.html?slug=' + random.slug;
+          window.location.href = '../games/' + random.slug + '.html?lang=zh';
         });
       }
 

@@ -885,7 +885,7 @@
         var iframe = document.getElementById('game-iframe');
         if (overlay && iframe) {
           overlay.addEventListener('click', function() {
-            iframe.src = '../games/' + slug + '.html?lang=cn';
+            iframe.src = '../games/' + slug + '.html?lang=zh';
             iframe.style.display = 'block';
             overlay.style.display = 'none';
           });
@@ -934,7 +934,7 @@
                 '<span class="font-mono" style="font-size:var(--text-xs);font-weight:var(--weight-bold);color:var(--color-text);">' + g.rating + '</span>' +
                 '<span class="font-sans" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">· ' + playsToCn(g.plays) + '</span>' +
               '</div>' +
-              '<a href="game-detail-cn.html?slug=' + g.slug + '" class="play-btn mt-1 self-start" style="text-decoration:none;">' +
+              '<a href="../games/' + g.slug + '.html?lang=zh" class="play-btn mt-1 self-start" style="text-decoration:none;">' +
                 '<i data-lucide="play" style="width:13px;height:13px;fill:currentColor;" aria-hidden="true"></i>开始' +
               '</a>' +
             '</div>' +

@@ -778,7 +778,8 @@ const I18N = {
     stageNames: ['初见','岔路','三重门','终局']
   }
 };
-let lang = 'zh';
+let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (lang === 'cn') lang = 'zh';
 function t(key){ return I18N[lang][key]; }
 function condLabel(c){ return c==='spikes'?t('ifSpikes'):c==='water'?t('ifWater'):c==='elec'?t('ifElec'):t('ifBeam'); }
 function actLabel(a){ return a==='walk'?t('thenWalk'):a==='jump'?t('thenJump'):a==='slide'?t('thenSlide'):a==='stop'?t('thenStop'):t('thenDuck'); }
@@ -1915,6 +1916,7 @@ function loop(){
 }
 
 // ============ Init ============
+setLang(lang);
 fitCanvas();
 loop();
 showStageOverlay('start');

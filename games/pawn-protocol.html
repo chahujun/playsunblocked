@@ -179,8 +179,8 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 <canvas id="game"></canvas>
 <div id="langPanel">
   <span class="lbl">LANG</span>
-  <button id="btnEN" class="active">EN</button>
-  <button id="btnZH">简中</button>
+  <button id="btnEN">EN</button>
+  <button id="btnZH" class="active">简中</button>
 </div>
 <div id="hint"></div>
 
@@ -254,7 +254,8 @@ const I18N = {
     floor: "层数"
   }
 };
-let LANG = "en";
+let LANG = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (LANG === 'cn') LANG = 'zh';
 const t = (k) => (I18N[LANG][k] !== undefined ? I18N[LANG][k] : k);
 
 /* ---------- 2. Canvas 与画布尺寸 ---------- */
@@ -1184,7 +1185,7 @@ function draw() {
       ctx.fillStyle = "#ffaaaa";
       ctx.font = "10px Courier New";
       ctx.textAlign = "center";
-      ctx.fillText("LOCK", d.x + d.w/2, d.y + d.h/2 + 3);
+      ctx.fillText(LANG === "en" ? "LOCK" : "锁", d.x + d.w/2, d.y + d.h/2 + 3);
     }
   });
 
@@ -1656,6 +1657,7 @@ document.getElementById("btnZH").addEventListener("click", () => setLang("zh"));
 /* ---------- 23. 启动 ---------- */
 MATRIX.init();
 window.addEventListener("resize", () => MATRIX.init());
+setLang(LANG);
 requestAnimationFrame(loop);
 </script>
 </body>

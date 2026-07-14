@@ -539,7 +539,8 @@ const I18N = {
     burning:"燃烧中", shocked:"触电中", melted:"腐蚀中"
   }
 };
-let LANG = "zh";
+let LANG = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (LANG === 'cn') LANG = 'zh';
 function t(k){ return (I18N[LANG][k]!==undefined)?I18N[LANG][k]:k; }
 
 /* ---------- 2. 全局常量与画布 ---------- */
@@ -1525,16 +1526,16 @@ function drawPass(p){
   ctx.fillStyle='#fbbf24'; ctx.fillRect(sx-6,sy-4+bob,12,8);
   ctx.fillStyle='#92611f'; ctx.fillRect(sx-6,sy-2+bob,12,2);
   ctx.fillStyle='#fde68a'; ctx.font='8px Share Tech Mono'; ctx.textAlign='center';
-  ctx.fillText('PASS',sx,sy+bob+1);
+  ctx.fillText(LANG==='zh'?'通行':'PASS',sx,sy+bob+1);
 }
 function drawVend(v){
   const sx=v.x*TILE-CAM.x+TILE/2, sy=v.y*TILE-CAM.y+TILE/2;
   ctx.fillStyle='#1e3a2a'; ctx.fillRect(sx-11,sy-14,22,28);
   ctx.fillStyle='#2d5a3f'; ctx.fillRect(sx-9,sy-12,18,24);
   ctx.fillStyle='#fbbf24'; ctx.font='10px VT323'; ctx.textAlign='center';
-  ctx.fillText('VEND',sx,sy-2);
+  ctx.fillText(LANG==='zh'?'售货':'VEND',sx,sy-2);
   ctx.fillStyle='#7ee08a'; ctx.font='7px Share Tech Mono';
-  ctx.fillText('SHOP',sx,sy+6);
+  ctx.fillText(LANG==='zh'?'商店':'SHOP',sx,sy+6);
   // 提示光
   if(Math.sin(Date.now()/300)>0){
     ctx.fillStyle='rgba(126,224,138,0.2)';
@@ -1549,7 +1550,7 @@ function drawDoor(d){
   ctx.lineWidth=2; ctx.strokeRect(sx-12,sy-17,24,34);
   ctx.fillStyle=passPicked?'#4ade80':'#ef4444';
   ctx.font='9px Share Tech Mono'; ctx.textAlign='center';
-  ctx.fillText(passPicked?'OPEN':'LOCK',sx,sy+2);
+  ctx.fillText(passPicked?(LANG==='zh'?'开':'OPEN'):(LANG==='zh'?'锁':'LOCK'),sx,sy+2);
 }
 function drawProj(p){
   const sx=p.x-CAM.x, sy=p.y-CAM.y;

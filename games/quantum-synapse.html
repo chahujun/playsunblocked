@@ -822,7 +822,8 @@ const I18N = {
         statsHeader: '数据面板',
     }
 };
-let lang = 'en';
+let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (lang === 'cn') lang = 'zh';
 const t = k => (I18N[lang][k] !== undefined ? I18N[lang][k] : k);
 
 // ===== AUDIO (Web Audio API) =====

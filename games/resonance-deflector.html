@@ -357,7 +357,7 @@ const I18N = {
         getReady: 'GET READY',
         langLabel: '中文',
     },
-    cn: {
+    zh: {
         title: '节拍弹弹',
         subtitle: '踩着节拍把它们弹回去',
         help: '鼠标或方向键瞄准飞来的音符，到节拍上时按空格击碎它。',
@@ -374,7 +374,8 @@ const I18N = {
         langLabel: 'EN',
     }
 };
-let lang = 'en';
+let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
+if (lang === 'cn') lang = 'zh';
 function t(key) { return I18N[lang][key]; }
 function applyI18n() {
     document.getElementById('overlayTitle').textContent = t('title');
@@ -763,7 +764,7 @@ function setupInput() {
 
     document.getElementById('langBtn').addEventListener('click', (e) => {
         e.stopPropagation();
-        lang = (lang === 'en') ? 'cn' : 'en';
+        lang = (lang === 'en') ? 'zh' : 'en';
         applyI18n();
     });
 
@@ -947,7 +948,7 @@ function handleHit(note, isPerfect) {
     const pos = getNotePos(note, audioCtx.currentTime);
     const color = isPerfect ? '#ffdd00' : (note.color === 'red' ? '#ff4488' : '#44aaff');
     spawnParticles(pos.x, pos.y, color, isPerfect ? 22 : 12);
-    spawnFloatingText(pos.x, pos.y - 20, isPerfect ? 'PERFECT!' : 'GOOD!', isPerfect ? '#ffdd00' : '#00ffcc');
+    spawnFloatingText(pos.x, pos.y - 20, isPerfect ? (lang==='zh'?'完美!':'PERFECT!') : (lang==='zh'?'不错!':'GOOD!'), isPerfect ? '#ffdd00' : '#00ffcc');
 
     shakeIntensity = Math.min(4 + combo * 0.4, 18);
     ripples.push({ x: pos.x, y: pos.y, radius: 5, maxRadius: 60, life: 1, color: color });
@@ -968,7 +969,7 @@ function handleMiss(note, pressed) {
 
     const pos = getNotePos(note, audioCtx.currentTime);
     spawnParticles(pos.x, pos.y, '#ff3344', 8);
-    spawnFloatingText(pos.x, pos.y - 20, 'MISS!', '#ff3344');
+    spawnFloatingText(pos.x, pos.y - 20, lang==='zh'?'失误!':'MISS!', '#ff3344');
 
     shakeIntensity = 6;
     flashAlpha = 0.3;
