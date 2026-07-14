@@ -1,5 +1,6 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <!-- Homepage -->
   <url>
     <loc>https://playsunblocked.com/pages/index-en.html</loc>
     <priority>1.0</priority>
@@ -8,100 +9,20 @@
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/index-cn.html"/>
   </url>
   <url>
-    <loc>https://playsunblocked.com/pages/games-en.html</loc>
-    <priority>0.9</priority>
-    <changefreq>weekly</changefreq>
-    <xhtml:link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/games-en.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/games-cn.html"/>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html</loc>
-    <priority>0.6</priority>
-    <changefreq>monthly</changefreq>
-    <xhtml:link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/game-detail-en.html"/>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/game-detail-cn.html"/>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=alchemic-pegs</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=bubble-tanks</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=void-shadow</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=zombie-crisis</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=event-horizon</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=zen-ink</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=quantum-synapse</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=linguistic-cipher</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=spectral-portal</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=paradox-editor</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=orbitron-beat</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=resonance-deflector</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=swing-tempo</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=pawn-protocol</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-en.html?slug=alchemical-leak</loc>
-    <priority>0.8</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
     <loc>https://playsunblocked.com/pages/index-cn.html</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
     <xhtml:link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/index-en.html"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/index-cn.html"/>
+  </url>
+
+  <!-- Games listing page -->
+  <url>
+    <loc>https://playsunblocked.com/pages/games-en.html</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/games-en.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/games-cn.html"/>
   </url>
   <url>
     <loc>https://playsunblocked.com/pages/games-cn.html</loc>
@@ -110,6 +31,32 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/games-en.html"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/games-cn.html"/>
   </url>
+
+  <!-- Game detail pages (EN) -->
+  <url>
+    <loc>https://playsunblocked.com/pages/game-detail-en.html</loc>
+    <priority>0.6</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/game-detail-en.html"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/game-detail-cn.html"/>
+  </url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=alchemic-pegs</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=bubble-tanks</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=void-shadow</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=zombie-crisis</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=event-horizon</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=zen-ink</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=quantum-synapse</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=linguistic-cipher</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=spectral-portal</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=paradox-editor</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=orbitron-beat</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=resonance-deflector</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=swing-tempo</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=pawn-protocol</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-en.html?slug=alchemical-leak</loc><priority>0.8</priority><changefreq>monthly</changefreq></url>
+
+  <!-- Game detail pages (CN) -->
   <url>
     <loc>https://playsunblocked.com/pages/game-detail-cn.html</loc>
     <priority>0.5</priority>
@@ -117,79 +64,36 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/game-detail-en.html"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/game-detail-cn.html"/>
   </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=alchemic-pegs</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=bubble-tanks</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=void-shadow</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=zombie-crisis</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=event-horizon</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=zen-ink</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=quantum-synapse</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=linguistic-cipher</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=spectral-portal</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=paradox-editor</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=orbitron-beat</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=resonance-deflector</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=swing-tempo</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=pawn-protocol</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
-  <url>
-    <loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=alchemical-leak</loc>
-    <priority>0.7</priority>
-    <changefreq>monthly</changefreq>
-  </url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=alchemic-pegs</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=bubble-tanks</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=void-shadow</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=zombie-crisis</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=event-horizon</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=zen-ink</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=quantum-synapse</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=linguistic-cipher</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=spectral-portal</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=paradox-editor</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=orbitron-beat</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=resonance-deflector</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=swing-tempo</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=pawn-protocol</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/pages/game-detail-cn.html?slug=alchemical-leak</loc><priority>0.7</priority><changefreq>monthly</changefreq></url>
+
+  <!-- Direct game pages (playable HTML files) -->
+  <url><loc>https://playsunblocked.com/games/alchemic-pegs.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/bubble-tanks.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/void-shadow.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/zombie-crisis.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/event-horizon.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/zen-ink.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/quantum-synapse.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/linguistic-cipher.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/spectral-portal.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/paradox-editor.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/orbitron-beat.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/resonance-deflector.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/swing-tempo.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/pawn-protocol.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://playsunblocked.com/games/alchemical-leak.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
 </urlset>
