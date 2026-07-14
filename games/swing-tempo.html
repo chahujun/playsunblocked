@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    'HOOKBEAT · 钩与拍': 'HOOKBEAT',
+    '钩与拍': 'HOOKBEAT'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    var result = text;
+    if (T[text.trim()]) return T[text.trim()];
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  function applyInternalLang() {
+    try { if (typeof lang !== 'undefined') lang = 'en'; } catch(e) {}
+    try { if (typeof applyI18n === 'function') applyI18n(); } catch(e) {}
+    init();
+  }
+  if (document.readyState !== 'loading') setTimeout(applyInternalLang, 0);
+  else document.addEventListener('DOMContentLoaded', function() { setTimeout(applyInternalLang, 0); });
+  setTimeout(applyInternalLang, 100);
+  setTimeout(applyInternalLang, 500);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HOOKBEAT · 钩与拍</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+  body {
+    font-family: 'Courier New', 'Consolas', monospace;
+    cursor: crosshair;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  #game { display: block; position: absolute; top: 0; left: 0; }
+
+  .overlay {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  #hud {
+    position: absolute; top: 24px; left: 28px;
+    color: #6df; font-size: 13px; letter-spacing: 3px;
+    text-shadow: 0 0 10px #0af;
+    line-height: 1.9;
+  }
+
+  #langBtn {
+    position: absolute; top: 24px; right: 28px;
+    background: rgba(0, 25, 55, 0.65);
+    border: 1px solid #0cf;
+    color: #0cf; padding: 9px 16px;
+    font-family: inherit; font-size: 12px; letter-spacing: 2px;
+    cursor: pointer; pointer-events: auto;
+    border-radius: 2px;
+    transition: all 0.2s;
+    backdrop-filter: blur(4px);
+  }
+  #langBtn:hover {
+    background: rgba(0, 90, 160, 0.7);
+    box-shadow: 0 0 14px #0cf;
+    color: #fff;
+  }
+
+  #startScreen, #gameOverScreen {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    pointer-events: auto;
+    background: radial-gradient(ellipse at center, rgba(8, 14, 38, 0.55), rgba(0,0,0,0.9));
+  }
+
+  #title {
+    font-size: 78px; letter-spacing: 14px;
+    color: #0ef;
+    text-shadow: 0 0 25px #0bf, 0 0 50px #08e, 0 0 80px #06c;
+    margin-bottom: 6px; font-weight: bold;
+    animation: titlePulse 3s ease-in-out infinite;
+  }
+  @keyframes titlePulse {
+    0%, 100% { text-shadow: 0 0 25px #0bf, 0 0 50px #08e, 0 0 80px #06c; }
+    50% { text-shadow: 0 0 35px #0cf, 0 0 70px #0af, 0 0 100px #08f; }
+  }
+
+  #subtitle {
+    font-size: 13px; color: #6af; letter-spacing: 5px;
+    margin-bottom: 56px; opacity: 0.75;
+  }
+
+  .btn {
+    background: transparent;
+    border: 1px solid #0cf; color: #0ef;
+    padding: 15px 44px; font-family: inherit;
+    font-size: 17px; letter-spacing: 5px;
+    cursor: pointer; transition: all 0.3s;
+    pointer-events: auto;
+  }
+  .btn:hover {
+    background: rgba(0, 200, 255, 0.12);
+    box-shadow: 0 0 22px #0cf, inset 0 0 22px rgba(0, 200, 255, 0.18);
+    letter-spacing: 7px;
+    color: #fff;
+  }
+
+  #instructions {
+    color: #6af; font-size: 11px; letter-spacing: 2px;
+    margin-top: 44px; opacity: 0.55; text-align: center;
+    line-height: 2.1;
+    white-space: pre-line;
+  }
+
+  #gameOverScreen { display: none; }
+  #goTitle {
+    font-size: 52px; color: #f47; letter-spacing: 10px;
+    text-shadow: 0 0 28px #f04, 0 0 50px #c02;
+    margin-bottom: 24px; font-weight: bold;
+  }
+  #goStats {
+    color: #fb7; font-size: 15px; letter-spacing: 3px;
+    margin-bottom: 44px; line-height: 2.1;
+    text-align: center;
+  }
+  #goStats .val { color: #0ef; font-weight: bold; }
+
+  #perfectFlash {
+    position: absolute; top: 28%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 38px; color: #0ff; letter-spacing: 8px;
+    text-shadow: 0 0 20px #0ff, 0 0 40px #0af, 0 0 60px #08f;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.15s;
+    font-weight: bold;
+  }
+
+  #vignette {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    box-shadow: inset 0 0 200px rgba(0, 0, 0, 0.7);
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="vignette"></div>
+<div class="overlay">
+  <div id="hud" style="display:none;">
+    <div id="hudDist"></div>
+    <div id="hudSpeed"></div>
+    <div id="hudCombo"></div>
+  </div>
+  <button id="langBtn">中文</button>
+  <div id="startScreen">
+    <div id="title"></div>
+    <div id="subtitle"></div>
+    <button class="btn" id="startBtn"></button>
+    <div id="instructions"></div>
+  </div>
+  <div id="gameOverScreen">
+    <div id="goTitle"></div>
+    <div id="goStats"></div>
+    <button class="btn" id="resetBtn"></button>
+  </div>
+  <div id="perfectFlash"></div>
+</div>
+
+<script>
+'use strict';
+
+// =================== 中英双语 I18N 系统 ===================
+const I18N = {
+  en: {
+    title: "HOOKBEAT",
+    subtitle: "HOOK. SWING. RELEASE ON THE BEAT.",
+    start: "ENGAGE PROPULSION",
+    distance: "DISTANCE: ",
+    speed: "VELOCITY: ",
+    combo: "COMBO: ",
+    perfect: "TEMPO BOOST!",
+    failure: "CRASHED!",
+    reset: "RETRY",
+    instructions: "HOLD mouse  ->  grab the glowing anchor, swing like a pendulum\nRELEASE on the drum beat  ->  right at the lowest point of your swing\nNail the timing for a boost. Chain them to hit WARP SPEED.\nDodge the asteroids.",
+    langBtn: "中文",
+    statsDist: "DISTANCE TRAVELED",
+    statsSpeed: "PEAK VELOCITY",
+    statsCombo: "MAX COMBO",
+    rhythmLabel: "RELEASE ON SNARE",
+    hintHold: "HOLD MOUSE TO HOOK",
+    fbGood: "GOOD",
+    fbEarly: "TOO EARLY",
+    fbLate: "TOO LATE",
+    fbAngle: "OFF ANGLE",
+    fbNoBeat: "OFF BEAT"
+  },
+  zh: {
+    title: "钩与拍",
+    subtitle: "钩住 · 荡起 · 踩着鼓点松手",
+    start: "引擎点火",
+    distance: "探索距离: ",
+    speed: "星际速度: ",
+    combo: "连击: ",
+    perfect: "节拍弹射！",
+    failure: "坠毁在深空之中！",
+    reset: "重新重构",
+    instructions: "按住鼠标  ->  抓住发光的锚点 像钟摆一样荡起来\n鼓点敲响时  ->  在摆到最低点的那一下松开\n踩准节拍就能加速 连续命中冲进超光速\n小心躲开陨石",
+    langBtn: "EN",
+    statsDist: "探索距离",
+    statsSpeed: "最高速度",
+    statsCombo: "最高连击",
+    rhythmLabel: "鼓点松开",
+    hintHold: "按住鼠标 抓住锚点",
+    fbGood: "不错",
+    fbEarly: "太早了",
+    fbLate: "太晚了",
+    fbAngle: "角度不对",
+    fbNoBeat: "没踩上节拍"
+  }
+};
+let lang = 'en';
+function t(key) { return I18N[lang][key]; }
+function applyI18n() {
+  document.getElementById('title').textContent = t('title');
+  document.getElementById('subtitle').textContent = t('subtitle');
+  document.getElementById('startBtn').textContent = t('start');
+  document.getElementById('instructions').textContent = t('instructions');
+  document.getElementById('goTitle').textContent = t('failure');
+  document.getElementById('resetBtn').textContent = t('reset');
+  document.getElementById('langBtn').textContent = t('langBtn');
+  updateHUD();
+}
+
+// =================== Canvas 初始化 ===================
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// =================== 游戏状态机 ===================
+const STATE = { IDLE: 0, PLAYING: 1, GAMEOVER: 2 };
+let gameState = STATE.IDLE;
+
+// =================== Web Audio 音乐引擎 (130 BPM) ===================
+let audioCtx = null;
+let masterGain, bassFilter;
+let audioStarted = false;
+let schedulerTimer = null;
+const BPM = 130;
+const BEAT_INTERVAL = 60 / BPM;          // 单拍间隔 ≈ 0.4615s
+let nextBeatTime = 0;
+let beatCount = 0;
+let snareTimes = [];                     // 已播放的军鼓时间戳（用于节拍判定）
+let lastSnareTime = 0;                   // 最近一次军鼓时间（用于视觉闪烁）
+let musicMasterTarget = 0.55;
+
+function initAudio() {
+  if (audioStarted) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.55;
+  masterGain.connect(audioCtx.destination);
+
+  // 低通滤波器 — cutoff 随速度打开
+  bassFilter = audioCtx.createBiquadFilter();
+  bassFilter.type = 'lowpass';
+  bassFilter.frequency.value = 350;
+  bassFilter.Q.value = 6;
+  bassFilter.connect(masterGain);
+
+  audioStarted = true;
+  nextBeatTime = audioCtx.currentTime + 0.08;
+  beatCount = 0;
+  snareTimes = [];
+  lastSnareTime = 0;
+}
+
+function startScheduler() {
+  if (schedulerTimer) clearInterval(schedulerTimer);
+  schedulerTimer = setInterval(scheduler, 25);
+}
+
+// 前瞻调度器：提前安排音符
+function scheduler() {
+  if (!audioStarted) return;
+  while (nextBeatTime < audioCtx.currentTime + 0.18) {
+    scheduleBass(nextBeatTime, beatCount);
+    // 军鼓落在第 2、4 拍（backbeat），即 beatCount % 2 === 1
+    if (beatCount % 2 === 1) {
+      scheduleSnare(nextBeatTime);
+      snareTimes.push(nextBeatTime);
+      if (snareTimes.length > 12) snareTimes.shift();
+      lastSnareTime = nextBeatTime;
+    }
+    nextBeatTime += BEAT_INTERVAL;
+    beatCount++;
+  }
+}
+
+// 三角波低音线 — A 小调驱动 bassline
+function scheduleBass(time, count) {
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  // A1, A1, E2, G1 — 律动模式
+  const notes = [55, 55, 82.41, 49];
+  osc.frequency.value = notes[count % notes.length];
+  osc.connect(gain);
+  gain.gain.setValueAtTime(0, time);
+  gain.gain.linearRampToValueAtTime(0.4, time + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + BEAT_INTERVAL * 0.9);
+  gain.connect(bassFilter);
+  osc.start(time);
+  osc.stop(time + BEAT_INTERVAL);
+}
+
+// 军鼓 — 噪声爆发 + 三角波音色身体
+function scheduleSnare(time) {
+  const bufferSize = Math.floor(audioCtx.sampleRate * 0.18);
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const hp = audioCtx.createBiquadFilter();
+  hp.type = 'highpass';
+  hp.frequency.value = 1200;
+  const bp = audioCtx.createBiquadFilter();
+  bp.type = 'bandpass';
+  bp.frequency.value = 3000;
+  bp.Q.value = 2;
+  const gain = audioCtx.createGain();
+  gain.gain.setValueAtTime(0.5, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
+  noise.connect(hp);
+  hp.connect(bp);
+  bp.connect(gain);
+  gain.connect(masterGain);
+  noise.start(time);
+  noise.stop(time + 0.2);
+  // 音调身体
+  const osc = audioCtx.createOscillator();
+  const og = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(220, time);
+  osc.frequency.exponentialRampToValueAtTime(180, time + 0.08);
+  og.gain.setValueAtTime(0.2, time);
+  og.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+  osc.connect(og);
+  og.connect(masterGain);
+  osc.start(time);
+  osc.stop(time + 0.12);
+}
+
+// 坠毁音效 — 金属撕裂降频啸叫 2000Hz → 20Hz 扫频
+function playCrashSound() {
+  if (!audioStarted) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(2000, now);
+  osc.frequency.exponentialRampToValueAtTime(20, now + 1.6);
+  gain.gain.setValueAtTime(0.5, now);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+  // 失真塑形
+  const dist = audioCtx.createWaveShaper();
+  const curve = new Float32Array(256);
+  for (let i = 0; i < 256; i++) {
+    const x = (i / 128) - 1;
+    curve[i] = Math.tanh(x * 4);
+  }
+  dist.curve = curve;
+  osc.connect(dist);
+  dist.connect(gain);
+  gain.connect(masterGain);
+  osc.start(now);
+  osc.stop(now + 1.6);
+  // 噪声爆发
+  const bufferSize = Math.floor(audioCtx.sampleRate * 0.8);
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const ng = audioCtx.createGain();
+  ng.gain.setValueAtTime(0.4, now);
+  ng.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+  noise.connect(ng);
+  ng.connect(masterGain);
+  noise.start(now);
+  noise.stop(now + 0.8);
+}
+
+// 速度驱动的动态变频 — 低通 cutoff 随速度打开
+function updateAudioForSpeed(speed) {
+  if (!audioStarted) return;
+  const norm = Math.min(speed / 22, 1);
+  const cutoff = 350 + norm * 2200;
+  bassFilter.frequency.setTargetAtTime(cutoff, audioCtx.currentTime, 0.08);
+  musicMasterTarget = 0.55 + norm * 0.12;
+}
+
+// =================== 物理常量 ===================
+const GRAVITY = 0.42;            // 悬挂时重力（单摆驱动）
+const RELEASE_GRAVITY = 0.12;    // 松开后重力（深空漂移感）
+const DRAG = 0.997;              // 松开后空气阻力
+const HOOK_RANGE = 420;          // 最大挂钩距离
+const PLAYER_R = 9;
+
+// =================== 游戏对象 ===================
+let player = null;
+let anchors = [];
+let asteroids = [];
+let stars = [];
+let nebulae = [];
+const particles = [];
+let trail = [];
+let worldRightEdge = 0;
+let cameraX = 0;
+let combo = 0;
+let maxCombo = 0;
+let maxSpeed = 0;
+let startX = 0;
+let shakeTime = 0;
+let shakeIntensity = 0;
+let warpEffect = 0;
+
+function resetGame() {
+  player = {
+    x: 200, y: H * 0.45,
+    vx: 4, vy: 0,
+    r: PLAYER_R,
+    hooked: false,
+    anchor: null,
+    ropeLength: 0
+  };
+  anchors = [];
+  asteroids = [];
+  particles.length = 0;
+  trail = [];
+  combo = 0;
+  maxCombo = 0;
+  maxSpeed = 0;
+  startX = player.x;
+  cameraX = 0;
+  worldRightEdge = 0;
+  shakeTime = 0;
+  shakeIntensity = 0;
+  warpEffect = 0;
+  firstHookDone = false;
+  hookTarget = null;
+  releaseFeedback = null;
+  // 初始锚点序列
+  for (let i = 0; i < 5; i++) {
+    spawnAnchor(320 + i * 280);
+  }
+  worldRightEdge = 320 + 4 * 280;
+}
+
+function spawnAnchor(x) {
+  anchors.push({
+    x: x,
+    y: 60 + Math.random() * 130,
+    pulse: Math.random() * Math.PI * 2,
+    radius: 6
+  });
+}
+
+function spawnAsteroid(x) {
+  const r = 22 + Math.random() * 28;
+  const points = [];
+  const n = 8 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const rad = r * (0.72 + Math.random() * 0.45);
+    points.push({ x: Math.cos(a) * rad, y: Math.sin(a) * rad });
+  }
+  asteroids.push({
+    x: x,
+    y: 220 + Math.random() * (H - 340),
+    r: r,
+    rot: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.025,
+    points: points
+  });
+}
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < 240; i++) {
+    stars.push({
+      x: Math.random() * 5000,
+      y: Math.random() * H,
+      z: 0.15 + Math.random() * 0.85,
+      size: 0.5 + Math.random() * 1.8,
+      tw: Math.random() * Math.PI * 2
+    });
+  }
+  nebulae = [];
+  for (let i = 0; i < 7; i++) {
+    nebulae.push({
+      x: Math.random() * 4000,
+      y: Math.random() * H,
+      r: 200 + Math.random() * 320,
+      hue: 195 + Math.random() * 85,
+      z: 0.1 + Math.random() * 0.3
+    });
+  }
+}
+initStars();
+
+// 程序化世界生成 — 随玩家前进无限生成，难度渐进
+function ensureWorldContent() {
+  const ahead = player.x + W * 1.2;
+  const progress = player.x - startX;
+  // 前 1300 单位为教学段，无陨石；之后陨石密度随进度上升
+  const asteroidChance = progress < 1300 ? 0
+    : Math.min((progress - 1300) / 5000, 1) * 0.6 + 0.1;
+  while (worldRightEdge < ahead) {
+    worldRightEdge += 200 + Math.random() * 180;
+    spawnAnchor(worldRightEdge);
+    if (Math.random() < asteroidChance) {
+      spawnAsteroid(worldRightEdge - 80 + Math.random() * 160);
+    }
+  }
+  const behind = player.x - W;
+  anchors = anchors.filter(a => a.x > behind);
+  asteroids = asteroids.filter(a => a.x > behind);
+}
+
+// =================== 输入处理 ===================
+let mouseX = 0, mouseY = 0;
+let hookTarget = null;          // 当前会挂钩的目标锚点（用于预览高亮）
+let firstHookDone = false;      // 是否已完成首次挂钩（用于隐藏新手提示）
+
+canvas.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+canvas.addEventListener('mousedown', e => {
+  if (e.button !== 0) return;
+  if (gameState === STATE.PLAYING) tryHook();
+});
+canvas.addEventListener('mouseup', e => {
+  if (e.button !== 0) return;
+  if (gameState === STATE.PLAYING) tryRelease();
+});
+// 触屏支持
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  mouseX = t.clientX; mouseY = t.clientY;
+  if (gameState === STATE.PLAYING) tryHook();
+}, { passive: false });
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  mouseX = t.clientX; mouseY = t.clientY;
+}, { passive: false });
+canvas.addEventListener('touchend', e => {
+  e.preventDefault();
+  if (gameState === STATE.PLAYING) tryRelease();
+}, { passive: false });
+
+// 计算挂钩目标：优先前方锚点，保证持续向前推进
+function getHookTarget() {
+  let best = null, bestD = HOOK_RANGE;
+  // 优先选择前方（玩家右侧附近）的锚点
+  for (const a of anchors) {
+    const dx = a.x - player.x;
+    const dy = a.y - player.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    if (d < bestD && a.x > player.x - 40) { bestD = d; best = a; }
+  }
+  // 没有前方锚点时，退而求其次选最近的任意锚点
+  if (!best) {
+    for (const a of anchors) {
+      const dx = a.x - player.x;
+      const dy = a.y - player.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < bestD) { bestD = d; best = a; }
+    }
+  }
+  return best;
+}
+
+// 挂钩：连接目标锚点
+function tryHook() {
+  if (player.hooked) return;
+  const best = getHookTarget();
+  if (best) {
+    player.hooked = true;
+    player.anchor = best;
+    player.ropeLength = Math.sqrt((best.x - player.x) ** 2 + (best.y - player.y) ** 2);
+    spawnParticles(best.x, best.y, 12, '00ccff', 4);
+    spawnParticles(player.x, player.y, 8, '00ddff', 3);
+    firstHookDone = true;
+  }
+}
+
+// 释放：分级判定节拍弹射
+function tryRelease() {
+  if (!player.hooked) return;
+  const result = evaluateRelease();
+  player.hooked = false;
+  player.anchor = null;
+  if (result.tier === 'perfect') {
+    applyBoost('perfect');
+    showPerfectFlash();
+  } else if (result.tier === 'good') {
+    applyBoost('good');
+    showReleaseFeedback(t('fbGood'), '#00ddff');
+  } else {
+    // 失败：给一点向前的推力避免停滞，但清空连击
+    player.vx += 1.5;
+    combo = 0;
+    let label;
+    if (result.reason === 'beat') {
+      label = result.timing === 'early' ? t('fbEarly') : t('fbLate');
+    } else if (result.reason === 'angle') {
+      label = t('fbAngle');
+    } else {
+      label = t('fbNoBeat');
+    }
+    showReleaseFeedback(label, '#8a99aa');
+    spawnParticles(player.x, player.y, 6, '0066aa', 2);
+  }
+}
+
+// 释放判定 — 返回 { tier, timing, reason }
+// tier: 'perfect' | 'good' | 'miss'
+// timing: 'early' | 'late' | 'on'
+// reason: 'beat' | 'angle' | 'none'（仅 miss 时有）
+function evaluateRelease() {
+  if (!audioStarted) return { tier: 'miss', timing: 'on', reason: 'none' };
+  const now = audioCtx.currentTime;
+  // 查找距离最近的军鼓时间（已播或即将播）
+  let minDiff = Infinity;
+  let nearestSnare = now;
+  for (const st of snareTimes) {
+    const d = Math.abs(st - now);
+    if (d < minDiff) { minDiff = d; nearestSnare = st; }
+  }
+  if (lastSnareTime > 0) {
+    let ns = lastSnareTime + 2 * BEAT_INTERVAL;
+    while (ns < now) ns += 2 * BEAT_INTERVAL;
+    const d = Math.abs(ns - now);
+    if (d < minDiff) { minDiff = d; nearestSnare = ns; }
+  }
+  const timing = now <= nearestSnare ? 'early' : 'late';
+
+  // 摆角垂直向下检测 — 玩家在锚点下方且接近正下方
+  const a = player.anchor;
+  const dx = player.x - a.x;
+  const dy = player.y - a.y;
+  let angleOk = false;
+  if (dy > 0) {
+    const angleFromDown = Math.atan2(Math.abs(dx), dy);
+    if (angleFromDown < 0.55) angleOk = true;
+  }
+  const moving = player.vx > 0.5;
+
+  // PERFECT：节拍 ±130ms + 角度达标 + 向前运动
+  if (minDiff <= 0.13 && angleOk && moving) {
+    return { tier: 'perfect', timing: 'on', reason: 'none' };
+  }
+  // GOOD：节拍 ±230ms + 角度达标 + 向前运动
+  if (minDiff <= 0.23 && angleOk && moving) {
+    return { tier: 'good', timing, reason: 'none' };
+  }
+  // MISS：判定失败原因
+  if (minDiff > 0.23) return { tier: 'miss', timing, reason: 'beat' };
+  if (!angleOk) return { tier: 'miss', timing, reason: 'angle' };
+  return { tier: 'miss', timing, reason: 'beat' };
+}
+
+// 极限推力 — 速度累计（按分级给予不同推力）
+function applyBoost(tier) {
+  const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+  let dirX, dirY;
+  if (speed > 0.1) {
+    dirX = player.vx / speed;
+    dirY = player.vy / speed;
+  } else {
+    dirX = 1; dirY = 0;
+  }
+  // 向前偏向
+  dirX = dirX * 0.7 + 0.3;
+  dirY *= 0.7;
+  const dlen = Math.sqrt(dirX * dirX + dirY * dirY);
+  dirX /= dlen; dirY /= dlen;
+
+  const boost = tier === 'perfect' ? (7 + combo * 1.2) : (4 + combo * 0.5);
+  player.vx += dirX * boost;
+  player.vy += dirY * boost;
+  combo++;
+  if (combo > maxCombo) maxCombo = combo;
+
+  if (tier === 'perfect') {
+    spawnParticles(player.x, player.y, 28, '00ffff', 9);
+    spawnParticles(player.x, player.y, 14, '00aaff', 5);
+    shakeTime = 12;
+    shakeIntensity = 3;
+  } else {
+    spawnParticles(player.x, player.y, 14, '00ddff', 6);
+    shakeTime = 6;
+    shakeIntensity = 1.5;
+  }
+}
+
+// 释放反馈文字（飘浮 + 渐隐）
+let releaseFeedback = null;
+function showReleaseFeedback(text, color) {
+  releaseFeedback = { text, color, time: 0, life: 55 };
+}
+function updateReleaseFeedback(dt) {
+  if (releaseFeedback) {
+    releaseFeedback.time += dt;
+    if (releaseFeedback.time > releaseFeedback.life) releaseFeedback = null;
+  }
+}
+function drawReleaseFeedback() {
+  if (!releaseFeedback || !player) return;
+  const rf = releaseFeedback;
+  const progress = rf.time / rf.life;
+  const alpha = progress < 0.65 ? 1 : (1 - (progress - 0.65) / 0.35);
+  const sx = player.x - cameraX;
+  const sy = player.y - 36 - rf.time * 0.9;
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, alpha);
+  ctx.font = 'bold 24px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = rf.color;
+  ctx.shadowColor = rf.color;
+  ctx.shadowBlur = 14;
+  ctx.fillText(rf.text, sx, sy);
+  ctx.restore();
+}
+
+function showPerfectFlash() {
+  const el = document.getElementById('perfectFlash');
+  el.textContent = t('perfect');
+  el.style.opacity = '1';
+  clearTimeout(showPerfectFlash._t);
+  showPerfectFlash._t = setTimeout(() => { el.style.opacity = '0'; }, 600);
+}
+
+// =================== 粒子系统 ===================
+function spawnParticles(x, y, count, colorHex, speed) {
+  for (let i = 0; i < count; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const s = Math.random() * speed;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * s,
+      vy: Math.sin(ang) * s,
+      life: 1,
+      decay: 0.015 + Math.random() * 0.025,
+      size: 1 + Math.random() * 3,
+      color: colorHex   // 6 位十六进制，如 '00ffff'
+    });
+  }
+}
+
+function updateParticles(dt) {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.vx *= 0.95;
+    p.vy *= 0.95;
+    p.life -= p.decay * dt;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+// =================== 物理更新（简谐振动 + 自由飞行）===================
+function updatePlayer(dt) {
+  if (player.hooked) {
+    // 单摆物理：重力 → 位置 → 圆约束 → 切向速度
+    player.vy += GRAVITY * dt;
+    player.x += player.vx * dt;
+    player.y += player.vy * dt;
+    // 圆弧约束（位置投影法）
+    const a = player.anchor;
+    const dx = player.x - a.x;
+    const dy = player.y - a.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > 0.001) {
+      const nx = dx / dist, ny = dy / dist;
+      player.x = a.x + nx * player.ropeLength;
+      player.y = a.y + ny * player.ropeLength;
+      // 移除径向速度分量，保留切向
+      const radial = player.vx * nx + player.vy * ny;
+      player.vx -= radial * nx;
+      player.vy -= radial * ny;
+    }
+    // 极轻空气阻力（保持摆动持久）
+    player.vx *= 0.9998;
+    player.vy *= 0.9998;
+  } else {
+    // 自由飞行 — 深空低重力漂移
+    player.vy += RELEASE_GRAVITY * dt;
+    player.x += player.vx * dt;
+    player.y += player.vy * dt;
+    player.vx *= Math.pow(DRAG, dt);
+    player.vy *= Math.pow(DRAG, dt);
+  }
+
+  // 轨迹
+  trail.push({ x: player.x, y: player.y });
+  if (trail.length > 22) trail.shift();
+
+  // 速度追踪
+  const sp = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+  if (sp > maxSpeed) maxSpeed = sp;
+
+  // 超光速变形系数
+  const warpTarget = Math.min(sp / 22, 1);
+  warpEffect += (warpTarget - warpEffect) * 0.05 * dt;
+
+  // 动态音频
+  updateAudioForSpeed(sp);
+
+  // 相机跟随
+  const targetCam = player.x - W * 0.32;
+  cameraX += (targetCam - cameraX) * 0.1 * dt;
+}
+
+// 碰撞检测
+function checkCollisions() {
+  for (const a of asteroids) {
+    const dx = player.x - a.x;
+    const dy = player.y - a.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    if (d < a.r + player.r * 0.7) {
+      crash();
+      return;
+    }
+  }
+  // 坠入深空
+  if (player.y > H + 80) {
+    crash();
+    return;
+  }
+  // 顶部回弹
+  if (player.y < -200) {
+    player.vy = Math.abs(player.vy) * 0.5;
+    player.y = -200;
+  }
+}
+
+function crash() {
+  if (gameState !== STATE.PLAYING) return;
+  gameState = STATE.GAMEOVER;
+  // 爆炸粒子
+  for (let i = 0; i < 60; i++) {
+    spawnParticles(player.x, player.y, 1, i % 2 ? 'ff6600' : 'ffaa00', 12);
+  }
+  spawnParticles(player.x, player.y, 20, 'ffffff', 8);
+  shakeTime = 30;
+  shakeIntensity = 12;
+  playCrashSound();
+  // 音乐衰减
+  if (audioStarted) masterGain.gain.setTargetAtTime(0.2, audioCtx.currentTime, 0.1);
+  setTimeout(showGameOver, 800);
+}
+
+function showGameOver() {
+  document.getElementById('hud').style.display = 'none';
+  const dist = Math.floor(player.x - startX);
+  const stats = document.getElementById('goStats');
+  stats.innerHTML =
+    t('statsDist') + ': <span class="val">' + dist + '</span><br>' +
+    t('statsSpeed') + ': <span class="val">' + maxSpeed.toFixed(1) + '</span><br>' +
+    t('statsCombo') + ': <span class="val">' + maxCombo + '</span>';
+  document.getElementById('gameOverScreen').style.display = 'flex';
+}
+
+// =================== 渲染 ===================
+function drawBackground() {
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#020410');
+  grad.addColorStop(0.5, '#050a1f');
+  grad.addColorStop(1, '#02050f');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 星云（视差）
+  for (const n of nebulae) {
+    const sx = n.x - cameraX * n.z;
+    const wrapX = ((sx % 4000) + 4000) % 4000;
+    const drawX = wrapX > 3000 ? wrapX - 4000 : wrapX;
+    if (drawX < -n.r || drawX > W + n.r) continue;
+    const g = ctx.createRadialGradient(drawX, n.y, 0, drawX, n.y, n.r);
+    g.addColorStop(0, 'hsla(' + n.hue + ', 70%, 40%, 0.15)');
+    g.addColorStop(1, 'hsla(' + n.hue + ', 70%, 40%, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(drawX - n.r, n.y - n.r, n.r * 2, n.r * 2);
+  }
+}
+
+// 星空 — 超光速时拉长为线条
+function drawStars() {
+  const sp = player ? Math.sqrt(player.vx * player.vx + player.vy * player.vy) : 0;
+  const stretch = (player ? warpEffect : 0) * 40;
+
+  for (const s of stars) {
+    const sx = s.x - cameraX * s.z;
+    const wrapX = ((sx % 5000) + 5000) % 5000;
+    let drawX = wrapX;
+    if (drawX > 4000) drawX -= 5000;
+    if (drawX < -50 || drawX > W + 50) continue;
+
+    s.tw += 0.03;
+    const twinkle = 0.7 + Math.sin(s.tw) * 0.3;
+
+    if (stretch > 2) {
+      const len = stretch * s.z;
+      ctx.strokeStyle = 'rgba(180, 220, 255, ' + (0.4 + s.z * 0.5) * twinkle + ')';
+      ctx.lineWidth = s.size;
+      ctx.beginPath();
+      ctx.moveTo(drawX, s.y);
+      ctx.lineTo(drawX + len, s.y);
+      ctx.stroke();
+    } else {
+      ctx.fillStyle = 'rgba(200, 230, 255, ' + (0.4 + s.z * 0.5) * twinkle + ')';
+      ctx.fillRect(drawX, s.y, s.size, s.size);
+    }
+  }
+}
+
+function drawAnchors() {
+  for (const a of anchors) {
+    const sx = a.x - cameraX;
+    if (sx < -40 || sx > W + 40) continue;
+    a.pulse += 0.06;
+    const pulse = 0.7 + Math.sin(a.pulse) * 0.3;
+
+    const dx = a.x - player.x;
+    const dy = a.y - player.y;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    const inRange = d < HOOK_RANGE && !player.hooked;
+    const isTarget = (a === hookTarget) && !player.hooked;
+
+    const r = a.radius + (inRange ? 2 : 0);
+
+    // 挂钩目标预览环 — 告诉玩家按下会抓哪个锚点
+    if (isTarget) {
+      const ringPulse = 0.5 + Math.sin(Date.now() * 0.008) * 0.3;
+      ctx.strokeStyle = 'rgba(0, 255, 200, ' + ringPulse + ')';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(sx, a.y, r * 3, 0, Math.PI * 2);
+      ctx.stroke();
+      // 牵引虚线（玩家到目标）
+      ctx.strokeStyle = 'rgba(0, 255, 200, 0.18)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 6]);
+      ctx.beginPath();
+      ctx.moveTo(player.x - cameraX, player.y);
+      ctx.lineTo(sx, a.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // 外发光
+    const g = ctx.createRadialGradient(sx, a.y, 0, sx, a.y, r * 4);
+    const intensity = isTarget ? 1.2 : (inRange ? 1 : 0.6);
+    g.addColorStop(0, 'rgba(80, 220, 255, ' + (0.5 * pulse * intensity) + ')');
+    g.addColorStop(1, 'rgba(80, 220, 255, 0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(sx - r * 4, a.y - r * 4, r * 8, r * 8);
+
+    // 核心
+    ctx.fillStyle = isTarget ? '#aaffe6' : (inRange ? '#bbeeff' : '#77ddff');
+    ctx.beginPath();
+    ctx.arc(sx, a.y, r * pulse, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 内亮点
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(sx, a.y, r * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// 挂钩粒子束闪电
+function drawHookBeam() {
+  if (!player.hooked) return;
+  const a = player.anchor;
+  const sx1 = player.x - cameraX;
+  const sy1 = player.y;
+  const sx2 = a.x - cameraX;
+  const sy2 = a.y;
+
+  const segments = 12;
+  const points = [{ x: sx1, y: sy1 }];
+  const dx = sx2 - sx1, dy = sy2 - sy1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len < 0.001) return;
+  const px = -dy / len, py = dx / len;
+  for (let i = 1; i < segments; i++) {
+    const tt = i / segments;
+    const baseX = sx1 + dx * tt;
+    const baseY = sy1 + dy * tt;
+    const off = (Math.random() - 0.5) * 12 * Math.sin(tt * Math.PI);
+    points.push({ x: baseX + px * off, y: baseY + py * off });
+  }
+  points.push({ x: sx2, y: sy2 });
+
+  // 外光晕
+  ctx.strokeStyle = 'rgba(60, 180, 255, 0.35)';
+  ctx.lineWidth = 7;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+  ctx.stroke();
+
+  // 中层
+  ctx.strokeStyle = 'rgba(140, 220, 255, 0.7)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+  ctx.stroke();
+
+  // 核心
+  ctx.strokeStyle = 'rgba(220, 245, 255, 0.95)';
+  ctx.lineWidth = 1.2;
+  ctx.beginPath();
+  ctx.moveTo(points[0].x, points[0].y);
+  for (let i = 1; i < points.length; i++) ctx.lineTo(points[i].x, points[i].y);
+  ctx.stroke();
+
+  // 摆动轨迹与甜区指示 — 让玩家看清该在哪松手
+  // 完整摆动弧（极淡）
+  ctx.strokeStyle = 'rgba(80, 160, 220, 0.07)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(sx2, sy2, player.ropeLength, 0, Math.PI * 2);
+  ctx.stroke();
+  // 底部甜区弧 — 释放有效区（垂直向下 ±31°）
+  const readyNow = isNearSwingBottom();
+  ctx.strokeStyle = readyNow ? 'rgba(0, 255, 170, 0.55)' : 'rgba(0, 220, 255, 0.22)';
+  ctx.lineWidth = readyNow ? 5 : 3;
+  ctx.beginPath();
+  ctx.arc(sx2, sy2, player.ropeLength, Math.PI / 2 - 0.55, Math.PI / 2 + 0.55);
+  ctx.stroke();
+}
+
+function drawAsteroids() {
+  for (const a of asteroids) {
+    const sx = a.x - cameraX;
+    if (sx < -80 || sx > W + 80) continue;
+    a.rot += a.rotSpeed;
+
+    ctx.save();
+    ctx.translate(sx, a.y);
+    ctx.rotate(a.rot);
+
+    ctx.fillStyle = '#3a2d28';
+    ctx.strokeStyle = '#7a5f4a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i < a.points.length; i++) {
+      const p = a.points[i];
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // 高光
+    ctx.fillStyle = 'rgba(180, 140, 100, 0.3)';
+    ctx.beginPath();
+    ctx.arc(-a.r * 0.3, -a.r * 0.3, a.r * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 陨石坑
+    ctx.fillStyle = '#241b16';
+    for (let i = 0; i < 3; i++) {
+      const ang = (i / 3) * Math.PI * 2 + 0.7;
+      ctx.beginPath();
+      ctx.arc(Math.cos(ang) * a.r * 0.35, Math.sin(ang) * a.r * 0.35, a.r * 0.16, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
+}
+
+function drawTrail() {
+  if (trail.length < 2) return;
+  ctx.lineCap = 'round';
+  for (let i = 1; i < trail.length; i++) {
+    const t0 = trail[i - 1];
+    const t1 = trail[i];
+    const alpha = (i / trail.length) * 0.6;
+    const width = (i / trail.length) * player.r * 1.5;
+    ctx.strokeStyle = 'rgba(0, 200, 255, ' + alpha + ')';
+    ctx.lineWidth = width;
+    ctx.beginPath();
+    ctx.moveTo(t0.x - cameraX, t0.y);
+    ctx.lineTo(t1.x - cameraX, t1.y);
+    ctx.stroke();
+  }
+}
+
+function isNearSwingBottom() {
+  if (!player.hooked) return false;
+  const a = player.anchor;
+  const dx = player.x - a.x;
+  const dy = player.y - a.y;
+  if (dy <= 0) return false;
+  const ang = Math.atan2(Math.abs(dx), dy);
+  return ang < 0.55;
+}
+
+function drawPlayer() {
+  const sx = player.x - cameraX;
+  const sy = player.y;
+  const sp = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+  const ready = isNearSwingBottom();
+  const color = ready ? '#00ffaa' : '#00eeff';
+
+  // 外发光
+  const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, player.r * 4);
+  g.addColorStop(0, ready ? 'rgba(0, 255, 170, 0.6)' : 'rgba(0, 230, 255, 0.6)');
+  g.addColorStop(1, 'rgba(0, 230, 255, 0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(sx - player.r * 4, sy - player.r * 4, player.r * 8, player.r * 8);
+
+  // 主体
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.arc(sx, sy, player.r, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 内核
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(sx, sy, player.r * 0.45, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 方向指示
+  if (sp > 0.5) {
+    const dirX = player.vx / sp;
+    const dirY = player.vy / sp;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.beginPath();
+    ctx.moveTo(sx + dirX * player.r * 1.5, sy + dirY * player.r * 1.5);
+    ctx.lineTo(sx + dirY * player.r * 0.6, sy - dirX * player.r * 0.6);
+    ctx.lineTo(sx - dirY * player.r * 0.6, sy + dirX * player.r * 0.6);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    const sx = p.x - cameraX;
+    if (sx < -20 || sx > W + 20) continue;
+    const r = parseInt(p.color.substr(0, 2), 16);
+    const gg = parseInt(p.color.substr(2, 2), 16);
+    const b = parseInt(p.color.substr(4, 2), 16);
+    ctx.fillStyle = 'rgba(' + r + ',' + gg + ',' + b + ',' + p.life + ')';
+    ctx.beginPath();
+    ctx.arc(sx, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// 超光速变形覆盖层
+function drawWarpOverlay() {
+  if (warpEffect < 0.3) return;
+  const numLines = Math.floor(warpEffect * 30);
+  ctx.strokeStyle = 'rgba(120, 200, 255, ' + (warpEffect * 0.3) + ')';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < numLines; i++) {
+    const y = (i / numLines) * H + (Math.random() * 40 - 20);
+    const x = Math.random() * W;
+    const len = 30 + warpEffect * 80;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + len, y);
+    ctx.stroke();
+  }
+  // 边缘蓝光
+  const alpha = warpEffect * 0.4;
+  const grad = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.7);
+  grad.addColorStop(0, 'rgba(0, 100, 200, 0)');
+  grad.addColorStop(1, 'rgba(0, 150, 255, ' + alpha + ')');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// 军鼓闪烁 — 节拍视觉提示
+function drawSnareFlash() {
+  if (!audioStarted || lastSnareTime <= 0) return;
+  const now = audioCtx.currentTime;
+  const since = now - lastSnareTime;
+  if (since >= 0 && since < 0.2) {
+    const alpha = (1 - since / 0.2) * 0.12;
+    ctx.fillStyle = 'rgba(0, 200, 255, ' + alpha + ')';
+    ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(0, 220, 255, ' + (alpha * 3) + ')';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(2, 2, W - 4, H - 4);
+  }
+}
+
+// 节拍指示条 — 顶部可视化节拍流，让玩家能预判强拍时机
+// 军鼓节点从右向左滚动，到达中央“现在”线时即为该松手的瞬间
+function drawRhythmBar() {
+  if (!audioStarted || gameState !== STATE.PLAYING) return;
+  const barW = 360;
+  const barH = 36;
+  const bx = (W - barW) / 2;
+  const by = 64;
+  const now = audioCtx.currentTime;
+  // 时间窗口：左侧显示已过去 0.6s，右侧显示未来 1.4s
+  const leftSec = -0.6;
+  const rightSec = 1.4;
+  const totalSec = rightSec - leftSec;
+  const secToPx = barW / totalSec;
+  // “现在”线位置（offset=0 落在 barW*0.3 处）
+  const nowX = bx + (-leftSec) / totalSec * barW;
+
+  // 背板
+  ctx.fillStyle = 'rgba(5, 16, 34, 0.7)';
+  ctx.fillRect(bx, by, barW, barH);
+  ctx.strokeStyle = 'rgba(0, 150, 200, 0.35)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(bx, by, barW, barH);
+
+  // GOOD 命中区（±0.23s）
+  ctx.fillStyle = 'rgba(0, 200, 255, 0.08)';
+  ctx.fillRect(nowX - 0.23 * secToPx, by, 0.46 * secToPx, barH);
+  // PERFECT 命中区（±0.13s）
+  ctx.fillStyle = 'rgba(0, 255, 170, 0.16)';
+  ctx.fillRect(nowX - 0.13 * secToPx, by, 0.26 * secToPx, barH);
+
+  // 普通拍刻度（每 BEAT_INTERVAL 一根细线）
+  if (lastSnareTime > 0) {
+    let b = lastSnareTime - 2 * BEAT_INTERVAL;
+    while (b < now + rightSec + BEAT_INTERVAL) {
+      const offset = b - now;
+      if (offset > leftSec && offset < rightSec) {
+        const x = nowX + offset * secToPx;
+        const isSnare = Math.abs((b - lastSnareTime) % (2 * BEAT_INTERVAL)) < 0.01;
+        if (!isSnare) {
+          ctx.strokeStyle = 'rgba(90, 140, 180, 0.25)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x, by + 6);
+          ctx.lineTo(x, by + barH - 6);
+          ctx.stroke();
+        }
+      }
+      b += BEAT_INTERVAL;
+    }
+  }
+
+  // 军鼓节点（从右向左滚动）
+  if (lastSnareTime > 0) {
+    let s = lastSnareTime;
+    while (s > now + leftSec - 2 * BEAT_INTERVAL) s -= 2 * BEAT_INTERVAL;
+    while (s < now + rightSec) {
+      const offset = s - now;
+      s += 2 * BEAT_INTERVAL;
+      if (offset < leftSec || offset > rightSec) continue;
+      const x = nowX + offset * secToPx;
+      const dist = Math.abs(offset);
+      const alpha = Math.max(0.25, 1 - dist / 1.4);
+      const isPast = offset < -0.05;
+      const isCurrent = Math.abs(offset) < 0.13;
+      // 节点
+      ctx.fillStyle = isCurrent
+        ? 'rgba(0, 255, 170, ' + alpha + ')'
+        : (isPast ? 'rgba(70, 110, 150, ' + alpha * 0.5 + ')' : 'rgba(0, 220, 255, ' + alpha + ')');
+      ctx.beginPath();
+      ctx.arc(x, by + barH / 2, isCurrent ? 9 : 7, 0, Math.PI * 2);
+      ctx.fill();
+      if (!isPast) {
+        ctx.strokeStyle = 'rgba(180, 240, 255, ' + alpha + ')';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(x, by + barH / 2, isCurrent ? 12 : 9, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // “现在”线
+  ctx.strokeStyle = '#00ffee';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(nowX, by - 5);
+  ctx.lineTo(nowX, by + barH + 5);
+  ctx.stroke();
+
+  // 标签
+  ctx.fillStyle = 'rgba(100, 200, 230, 0.6)';
+  ctx.font = '9px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(t('rhythmLabel'), bx + barW / 2, by + barH + 15);
+}
+
+// 新手提示 — 首次挂钩前引导
+function drawHint() {
+  if (firstHookDone || gameState !== STATE.PLAYING || !player) return;
+  const sx = player.x - cameraX;
+  const sy = player.y - 44;
+  ctx.save();
+  ctx.globalAlpha = 0.55 + Math.sin(Date.now() * 0.005) * 0.3;
+  ctx.fillStyle = '#00ddff';
+  ctx.font = 'bold 13px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.shadowColor = '#00ddff';
+  ctx.shadowBlur = 8;
+  ctx.fillText(t('hintHold'), sx, sy);
+  // 上指箭头
+  ctx.beginPath();
+  ctx.moveTo(sx, sy + 8);
+  ctx.lineTo(sx - 5, sy + 14);
+  ctx.lineTo(sx + 5, sy + 14);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function render() {
+  ctx.save();
+  // 屏幕震动
+  if (shakeTime > 0) {
+    const sx = (Math.random() - 0.5) * shakeIntensity;
+    const sy = (Math.random() - 0.5) * shakeIntensity;
+    ctx.translate(sx, sy);
+    shakeTime--;
+    if (shakeTime <= 0) shakeIntensity = 0;
+  }
+
+  drawBackground();
+  drawStars();
+  if (player) {
+    drawAnchors();
+    drawAsteroids();
+    drawHookBeam();
+    if (gameState !== STATE.GAMEOVER || shakeTime > 0) {
+      drawTrail();
+      drawPlayer();
+    }
+    drawParticles();
+    drawReleaseFeedback();
+    drawWarpOverlay();
+  }
+  drawRhythmBar();
+  drawHint();
+  drawSnareFlash();
+  ctx.restore();
+}
+
+// =================== HUD ===================
+function updateHUD() {
+  if (gameState !== STATE.PLAYING || !player) return;
+  const dist = Math.floor(player.x - startX);
+  const sp = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+  document.getElementById('hudDist').textContent = t('distance') + dist + ' ly';
+  document.getElementById('hudSpeed').textContent = t('speed') + sp.toFixed(2) + ' c';
+  document.getElementById('hudCombo').textContent = t('combo') + combo + 'x';
+}
+
+// =================== 游戏主循环 ===================
+let lastTime = 0;
+function loop(time) {
+  const dt = lastTime ? Math.min((time - lastTime) / 16.67, 2.5) : 1;
+  lastTime = time;
+
+  if (gameState === STATE.PLAYING) {
+    ensureWorldContent();
+    updatePlayer(dt);
+    hookTarget = player.hooked ? null : getHookTarget();
+    updateParticles(dt);
+    updateReleaseFeedback(dt);
+    checkCollisions();
+    updateHUD();
+    if (audioStarted) {
+      masterGain.gain.setTargetAtTime(musicMasterTarget, audioCtx.currentTime, 0.1);
+    }
+  } else if (gameState === STATE.GAMEOVER) {
+    updateParticles(dt);
+  }
+
+  render();
+  requestAnimationFrame(loop);
+}
+
+// =================== UI 事件绑定 ===================
+document.getElementById('langBtn').addEventListener('click', () => {
+  lang = lang === 'en' ? 'zh' : 'en';
+  applyI18n();
+});
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  initAudio();
+  startScheduler();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  resetGame();
+  gameState = STATE.PLAYING;
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('hud').style.display = 'block';
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (audioStarted) {
+    masterGain.gain.setTargetAtTime(0.55, audioCtx.currentTime, 0.1);
+  }
+  musicMasterTarget = 0.55;
+  resetGame();
+  gameState = STATE.PLAYING;
+  document.getElementById('gameOverScreen').style.display = 'none';
+  document.getElementById('hud').style.display = 'block';
+});
+
+// 初始化
+applyI18n();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

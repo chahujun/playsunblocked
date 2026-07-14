@@ -1,0 +1,344 @@
+{
+  "data": [
+    {
+      "id": "page-index-en",
+      "title": "首页 (EN)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index-en.html",
+        "interactions": [
+          {
+            "domId": "cta-browse-games",
+            "targetPageId": "page-games-en",
+            "hideEdge": false
+          },
+          {
+            "domId": "nav-games",
+            "targetPageId": "page-games-en",
+            "hideEdge": true
+          },
+          {
+            "domId": "lang-toggle",
+            "targetPageId": "page-index-cn",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-games-en",
+      "title": "游戏列表 (EN)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/games-en.html",
+        "interactions": [
+          {
+            "domId": "game-card-link",
+            "targetPageId": "page-game-detail-en",
+            "hideEdge": false
+          },
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index-en",
+            "hideEdge": true
+          },
+          {
+            "domId": "lang-toggle",
+            "targetPageId": "page-games-cn",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-game-detail-en",
+      "title": "游戏详情 (EN)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/game-detail-en.html",
+        "interactions": [
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index-en",
+            "hideEdge": true
+          },
+          {
+            "domId": "nav-games",
+            "targetPageId": "page-games-en",
+            "hideEdge": true
+          },
+          {
+            "domId": "lang-toggle",
+            "targetPageId": "page-game-detail-cn",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-index-cn",
+      "title": "首页 (中文)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 0,
+        "y": 1283,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/index-cn.html",
+        "interactions": [
+          {
+            "domId": "cta-browse-games",
+            "targetPageId": "page-games-cn",
+            "hideEdge": false
+          },
+          {
+            "domId": "nav-games",
+            "targetPageId": "page-games-cn",
+            "hideEdge": true
+          },
+          {
+            "domId": "lang-toggle",
+            "targetPageId": "page-index-en",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-games-cn",
+      "title": "游戏列表 (中文)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 620,
+        "y": 1283,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/games-cn.html",
+        "interactions": [
+          {
+            "domId": "game-card-link",
+            "targetPageId": "page-game-detail-cn",
+            "hideEdge": false
+          },
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index-cn",
+            "hideEdge": true
+          },
+          {
+            "domId": "lang-toggle",
+            "targetPageId": "page-games-en",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-game-detail-cn",
+      "title": "游戏详情 (中文)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 1240,
+        "y": 1283,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/game-detail-cn.html",
+        "interactions": [
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index-cn",
+            "hideEdge": true
+          },
+          {
+            "domId": "nav-games",
+            "targetPageId": "page-games-cn",
+            "hideEdge": true
+          },
+          {
+            "domId": "lang-toggle",
+            "targetPageId": "page-game-detail-en",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-404-en",
+      "title": "404 彩蛋页 (EN)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 0,
+        "y": 2518,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/404-en.html",
+        "interactions": [
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index-en",
+            "hideEdge": true
+          },
+          {
+            "domId": "nav-games",
+            "targetPageId": "page-games-en",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-404-cn",
+      "title": "404 彩蛋页 (中文)",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 620,
+        "y": 2518,
+        "group": 1
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/404-cn.html",
+        "interactions": [
+          {
+            "domId": "nav-home",
+            "targetPageId": "page-index-cn",
+            "hideEdge": true
+          },
+          {
+            "domId": "nav-games",
+            "targetPageId": "page-games-cn",
+            "hideEdge": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "image-001",
+      "title": "主视觉 — 游戏宇宙",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 0,
+        "y": 3007
+      },
+      "devMetadata": {
+        "imageSrc": "assets/hero-gaming.jpg"
+      }
+    },
+    {
+      "id": "image-002",
+      "title": "益智游戏缩略图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 620,
+        "y": 3007
+      },
+      "devMetadata": {
+        "imageSrc": "assets/game-puzzle.jpg"
+      }
+    },
+    {
+      "id": "image-003",
+      "title": "动作游戏缩略图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 1240,
+        "y": 3007
+      },
+      "devMetadata": {
+        "imageSrc": "assets/game-action.jpg"
+      }
+    },
+    {
+      "id": "image-004",
+      "title": "赛车游戏缩略图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 1860,
+        "y": 3007
+      },
+      "devMetadata": {
+        "imageSrc": "assets/game-racing.jpg"
+      }
+    },
+    {
+      "id": "image-005",
+      "title": "街机游戏缩略图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 2480,
+        "y": 3007
+      },
+      "devMetadata": {
+        "imageSrc": "assets/game-arcade.jpg"
+      }
+    },
+    {
+      "id": "image-006",
+      "title": "精选游戏截图",
+      "type": "image",
+      "version": 1,
+      "createdAt": 1720857600000,
+      "canvasData": {
+        "x": 3100,
+        "y": 3007
+      },
+      "devMetadata": {
+        "imageSrc": "assets/game-featured.jpg"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "playsunblocked — 海外小游戏集合站",
+    "showEdge": false,
+    "windowSize": {
+      "width": 800,
+      "height": 600
+    }
+  }
+}

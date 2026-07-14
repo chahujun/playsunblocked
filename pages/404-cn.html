@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="页面走丢了——但这页藏着一个小游戏。你能找到吗？">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>404 — 页面未找到 | playsunblocked</title>
+        <link rel="canonical" href="https://playsunblocked.com/pages/404-cn.html">
+    <link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/404-en.html">
+    <link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/404-cn.html">
+    <link rel="alternate" hreflang="x-default" href="https://playsunblocked.com/pages/404-en.html">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta property="og:site_name" content="playsunblocked">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://playsunblocked.com/pages/404-cn.html">
+    <meta property="og:title" content="404 — 页面未找到 | playsunblocked">
+    <meta property="og:description" content="页面未找到——但这个页面藏着一个隐藏游戏。你能找到它吗？">
+    <meta property="og:image" content="https://playsunblocked.com/assets/hero-gaming.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="404 — 页面未找到 | playsunblocked">
+    <meta name="twitter:description" content="页面未找到——但这个页面藏着一个隐藏游戏。你能找到它吗？">
+    <meta name="twitter:image" content="https://playsunblocked.com/assets/hero-gaming.jpg">
+    <link rel="stylesheet" href="../colors_and_type.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  
+  @layer base {
+    body { background: var(--gh-background); color: var(--gh-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    
+
+    <!-- Shell Styles -->
+    <link rel="stylesheet" href="../shell.css">
+
+    <!-- ========================== -->
+    <!-- START PAGE STYLES           -->
+    <!-- ========================== -->
+    <style>
+      /* ---- 404 Error Section: full-height centered layout ---- */
+      .error-section {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - var(--header-height));
+        padding: 64px 24px 96px;
+        overflow: hidden;
+        background: var(--color-bg);
+      }
+
+      /* ---- Giant 404 display ---- */
+      .error-404 {
+        font-family: var(--font-display);
+        font-weight: var(--weight-extrabold);
+        font-size: clamp(100px, 18vw, 200px);
+        line-height: 1;
+        letter-spacing: -0.05em;
+        color: var(--color-primary);
+        text-shadow: var(--brutalist-shadow-xl);
+        transform: rotate(-3deg);
+        display: flex;
+        align-items: center;
+        gap: 0;
+        user-select: none;
+        margin-bottom: 32px;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ---- Interactive middle "0" ---- */
+      .error-404-zero {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: clamp(80px, 15vw, 160px);
+        height: clamp(80px, 15vw, 160px);
+        background: var(--color-primary);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: 50%;
+        color: var(--color-text-inverse);
+        font-size: clamp(50px, 10vw, 110px);
+        line-height: 1;
+        cursor: pointer;
+        box-shadow: var(--brutalist-shadow-md);
+        transition: transform 0.12s cubic-bezier(.2,.8,.2,1), box-shadow 0.12s cubic-bezier(.2,.8,.2,1);
+        margin: 0 clamp(4px, 1vw, 12px);
+        font-family: var(--font-display);
+        font-weight: var(--weight-extrabold);
+        position: relative;
+      }
+      .error-404-zero:hover {
+        transform: scale(1.08) rotate(5deg);
+        box-shadow: var(--brutalist-shadow-lg);
+      }
+      .error-404-zero:active {
+        transform: scale(0.92);
+        box-shadow: var(--brutalist-shadow-sm);
+      }
+      .error-404-zero:focus-visible {
+        outline: 3px solid var(--color-text);
+        outline-offset: 4px;
+      }
+
+      /* ---- Headline ---- */
+      .error-headline {
+        font-family: var(--font-display);
+        font-weight: var(--weight-bold);
+        font-size: clamp(24px, 4vw, 36px);
+        line-height: var(--leading-tight);
+        letter-spacing: -0.02em;
+        color: var(--color-text);
+        text-align: center;
+        transform: rotate(1deg);
+        margin-bottom: 16px;
+        text-wrap: balance;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ---- Subtitle ---- */
+      .error-subtitle {
+        font-family: var(--font-sans);
+        font-size: var(--text-lg);
+        line-height: var(--leading-relaxed);
+        color: var(--color-text-secondary);
+        text-align: center;
+        max-width: 500px;
+        margin-bottom: 40px;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ---- Easter egg card ---- */
+      .easter-egg-card {
+        background: var(--color-surface);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--brutalist-shadow-md);
+        padding: 20px 24px;
+        max-width: 480px;
+        margin-bottom: 32px;
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .easter-egg-card-icon {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-primary-light);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: var(--radius-sm);
+        color: var(--color-primary);
+      }
+      .easter-egg-card-text {
+        font-family: var(--font-sans);
+        font-size: var(--text-sm);
+        line-height: var(--leading-normal);
+        color: var(--color-text-secondary);
+      }
+
+      /* ---- Action buttons ---- */
+      .error-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 48px;
+        position: relative;
+        z-index: 2;
+      }
+      .error-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        font-family: var(--font-display);
+        font-weight: var(--weight-bold);
+        font-size: var(--text-base);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: transform 0.12s cubic-bezier(.2,.8,.2,1), box-shadow 0.12s cubic-bezier(.2,.8,.2,1);
+      }
+      .error-btn-primary {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+        box-shadow: var(--brutalist-shadow-sm);
+      }
+      .error-btn-primary:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: var(--brutalist-shadow-md);
+      }
+      .error-btn-primary:active {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 var(--color-border);
+      }
+      .error-btn-primary:focus-visible {
+        outline: 3px solid var(--color-text);
+        outline-offset: 2px;
+      }
+      .error-btn-secondary {
+        background: var(--color-surface);
+        color: var(--color-text);
+        box-shadow: none;
+      }
+      .error-btn-secondary:hover {
+        transform: translate(-1px, -1px);
+        box-shadow: var(--brutalist-shadow-sm);
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+      }
+      .error-btn-secondary:active {
+        transform: translate(0, 0);
+        box-shadow: none;
+      }
+      .error-btn-secondary:focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      /* ---- Footer note ---- */
+      .error-footer-note {
+        font-family: var(--font-sans);
+        font-style: italic;
+        font-size: var(--text-sm);
+        color: var(--color-text-tertiary);
+        text-align: center;
+        position: relative;
+        z-index: 2;
+      }
+
+      /* ---- Decorative scattered shapes ---- */
+      .deco-shape {
+        position: absolute;
+        border: var(--border-width) solid var(--color-border);
+        z-index: 1;
+        pointer-events: none;
+      }
+      .deco-square {
+        background: var(--color-primary-light);
+        border-radius: 0;
+      }
+      .deco-circle {
+        background: var(--color-primary-lighter);
+        border-radius: 50%;
+      }
+
+      /* ---- Hidden pixel easter egg ---- */
+      .hidden-pixel {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: var(--color-primary);
+        cursor: pointer;
+        z-index: 3;
+        border: none;
+        padding: 0;
+        opacity: 0.35;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+      .hidden-pixel:hover {
+        opacity: 1;
+        transform: scale(2);
+      }
+      .hidden-pixel:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+        opacity: 1;
+      }
+
+      /* ---- Confetti ---- */
+      .confetti-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 100;
+        display: none;
+        overflow: hidden;
+      }
+      .confetti-container.active {
+        display: block;
+      }
+      .confetti-piece {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        top: -20px;
+        animation: confetti-fall 3s linear forwards;
+      }
+      @keyframes confetti-fall {
+        0% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(105vh) rotate(720deg);
+          opacity: 0;
+        }
+      }
+
+      /* ---- Reveal overlay ---- */
+      .reveal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--color-overlay);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+        padding: 24px;
+      }
+      .reveal-overlay.active {
+        display: flex;
+      }
+      .reveal-card {
+        background: var(--color-surface);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-modal);
+        padding: 40px 32px;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        animation: reveal-pop 0.32s cubic-bezier(.32,.72,0,1);
+      }
+      @keyframes reveal-pop {
+        0% { transform: scale(0.8) translateY(20px); opacity: 0; }
+        100% { transform: scale(1) translateY(0); opacity: 1; }
+      }
+      .reveal-card-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        background: var(--color-primary);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: 50%;
+        color: var(--color-text-inverse);
+        margin-bottom: 20px;
+        box-shadow: var(--brutalist-shadow-sm);
+      }
+      .reveal-card-title {
+        font-family: var(--font-display);
+        font-weight: var(--weight-extrabold);
+        font-size: var(--text-3xl);
+        line-height: var(--leading-tight);
+        letter-spacing: -0.02em;
+        color: var(--color-text);
+        margin-bottom: 12px;
+      }
+      .reveal-card-text {
+        font-family: var(--font-sans);
+        font-size: var(--text-base);
+        line-height: var(--leading-normal);
+        color: var(--color-text-secondary);
+        margin-bottom: 24px;
+      }
+      .reveal-card-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+        font-family: var(--font-display);
+        font-weight: var(--weight-bold);
+        font-size: var(--text-base);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: var(--radius-md);
+        box-shadow: var(--brutalist-shadow-sm);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: transform 0.12s cubic-bezier(.2,.8,.2,1), box-shadow 0.12s cubic-bezier(.2,.8,.2,1);
+      }
+      .reveal-card-link:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: var(--brutalist-shadow-md);
+      }
+      .reveal-card-link:active {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 var(--color-border);
+      }
+      .reveal-card-link:focus-visible {
+        outline: 3px solid var(--color-text);
+        outline-offset: 2px;
+      }
+      .reveal-close-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-surface);
+        border: var(--border-width) solid var(--color-border);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        color: var(--color-text);
+        transition: background 0.12s ease, color 0.12s ease;
+      }
+      .reveal-close-btn:hover {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+      }
+      .reveal-close-btn:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      /* ---- Reduced motion ---- */
+      @media (prefers-reduced-motion: reduce) {
+        .error-404 { transform: none !important; }
+        .error-headline { transform: none !important; }
+        .error-404-zero:hover { transform: none !important; }
+        .confetti-piece { animation: none !important; display: none !important; }
+        .reveal-card { animation: none !important; }
+        .error-btn, .error-btn-primary, .error-btn-secondary,
+        .reveal-card-link, .reveal-close-btn, .hidden-pixel {
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+    <!-- END PAGE STYLES -->
+
+    <!-- ========================== -->
+    <!-- START HEADER                -->
+    <!-- ========================== -->
+    <header id="site-header" data-dom-id="site-header" class="sticky top-0 z-50 w-full" style="height: var(--header-height); background: var(--color-bg); border-bottom: 2px solid var(--color-border); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+      <div class="mx-auto flex h-full items-center gap-4 px-6 lg:gap-6" style="max-width: var(--max-width);">
+        <a href="index-cn.html" data-dom-id="nav-logo" class="flex shrink-0 items-center gap-2" aria-label="playsunblocked 首页">
+          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="6" width="20" height="12" rx="4"/>
+              <line x1="6" y1="12" x2="10" y2="12"/>
+              <line x1="8" y1="10" x2="8" y2="14"/>
+              <circle cx="15" cy="11" r="0.8" fill="currentColor" stroke="none"/>
+              <circle cx="17.5" cy="13" r="0.8" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-2xl); letter-spacing: -0.02em;">playsunblocked</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-1" role="navigation" aria-label="主导航">
+          <a href="index-cn.html" data-nav-key="home" data-dom-id="nav-home" class="gh-nav-link">首页</a>
+          <a href="games-cn.html" data-nav-key="games" data-dom-id="nav-games" class="gh-nav-link">游戏</a>
+          <a href="games-cn.html" data-nav-key="categories" data-dom-id="nav-categories" class="gh-nav-link">分类</a>
+          <a href="index-cn.html" data-nav-key="about" data-dom-id="nav-about" class="gh-nav-link">关于</a>
+        </nav>
+        <div class="relative hidden sm:flex flex-1 items-center max-w-xs">
+          <i data-lucide="search" class="absolute left-3 pointer-events-none" style="width: 18px; height: 18px; color: var(--color-text-tertiary);" aria-hidden="true"></i>
+          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="搜索游戏..." aria-label="搜索游戏">
+        </div>
+        <div class="flex shrink-0 items-center gap-3">
+          <button type="button" data-dom-id="lang-toggle" class="gh-lang-btn flex items-center gap-1.5" style="height: 36px; padding: 0 12px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-surface); font-family: var(--font-display); font-size: var(--text-sm);" aria-label="切换语言">
+            <span class="gh-lang-en">EN</span>
+            <span style="color: var(--color-text-tertiary);">|</span>
+            <span class="gh-lang-cn">中文</span>
+          </button>
+          <button type="button" data-dom-id="user-avatar" class="gh-avatar-btn flex shrink-0 items-center justify-center" style="width: 36px; height: 36px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-primary-light); color: var(--color-primary);" aria-label="用户账户">
+            <i data-lucide="user" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- END HEADER -->
+
+    <!-- ========================== -->
+    <!-- START 404 CONTENT           -->
+    <!-- ========================== -->
+    <section class="error-section" aria-label="页面未找到">
+
+      <!-- Decorative scattered shapes (static, not interactive) -->
+      <div class="deco-shape deco-square" style="width: 40px; height: 40px; top: 12%; left: 8%; transform: rotate(15deg);"></div>
+      <div class="deco-shape deco-circle" style="width: 28px; height: 28px; top: 20%; right: 12%; transform: rotate(-8deg);"></div>
+      <div class="deco-shape deco-square" style="width: 24px; height: 24px; top: 65%; left: 6%; transform: rotate(-12deg); background: var(--color-primary-lighter);"></div>
+      <div class="deco-shape deco-circle" style="width: 36px; height: 36px; bottom: 15%; right: 8%; transform: rotate(20deg);"></div>
+      <div class="deco-shape deco-square" style="width: 20px; height: 20px; top: 40%; left: 4%; transform: rotate(35deg); background: var(--color-primary-lightest);"></div>
+      <div class="deco-shape deco-circle" style="width: 16px; height: 16px; top: 75%; right: 18%; transform: rotate(-15deg); background: var(--color-primary-lightest);"></div>
+      <div class="deco-shape deco-square" style="width: 32px; height: 32px; top: 8%; right: 22%; transform: rotate(-20deg); background: var(--color-primary-lightest);"></div>
+      <div class="deco-shape deco-circle" style="width: 22px; height: 22px; bottom: 25%; left: 14%; transform: rotate(10deg);"></div>
+
+      <!-- Hidden pixel easter egg (blended into bottom-right decorative area) -->
+      <button type="button" class="hidden-pixel" data-dom-id="easter-egg-pixel" aria-label="隐藏的秘密" style="bottom: 60px; right: 80px;"></button>
+
+      <!-- Giant 404 display with interactive middle "0" -->
+      <div class="error-404" role="img" aria-label="404 错误">
+        <span aria-hidden="true">4</span>
+        <button type="button" class="error-404-zero" data-dom-id="emoji-cycle" aria-label="点击切换游戏表情">0</button>
+        <span aria-hidden="true">4</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="error-headline">呃，这就尴尬了。</h1>
+
+      <!-- Subtitle -->
+      <p class="error-subtitle">这个页面好像请了病假。也可能躲在厕所里。反正，它不在这儿。</p>
+
+      <!-- Easter egg card -->
+      <div class="easter-egg-card">
+        <span class="easter-egg-card-icon">
+          <i data-lucide="sparkles" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+        </span>
+        <p class="easter-egg-card-text">无聊？在这页面到处点点看。藏着一个小秘密游戏。第一个找到的可以吹一年。</p>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="error-actions">
+        <a href="games-cn.html" data-dom-id="nav-games" class="error-btn error-btn-primary">
+          <i data-lucide="gamepad" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+          返回游戏
+        </a>
+        <a href="index-cn.html" data-dom-id="nav-home" class="error-btn error-btn-secondary">
+          <i data-lucide="home" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+          回首页
+        </a>
+        <a href="game-detail-cn.html" class="error-btn error-btn-secondary">
+          <i data-lucide="shuffle" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+          来个惊喜
+        </a>
+      </div>
+
+      <!-- Footer note -->
+      <p class="error-footer-note">错误代码：404。不过我们更喜欢叫它&ldquo;页面去度假了&rdquo;。</p>
+
+      <!-- Confetti container (hidden, shown when pixel is clicked) -->
+      <div class="confetti-container" id="confetti-container" aria-hidden="true">
+        <div class="confetti-piece" style="left: 4%; background: var(--color-primary); animation-delay: 0s;"></div>
+        <div class="confetti-piece" style="left: 8%; background: var(--color-text); animation-delay: 0.1s;"></div>
+        <div class="confetti-piece" style="left: 12%; background: var(--color-surface); animation-delay: 0.2s; border: 1px solid var(--color-border);"></div>
+        <div class="confetti-piece" style="left: 16%; background: var(--color-primary); animation-delay: 0.05s;"></div>
+        <div class="confetti-piece" style="left: 20%; background: var(--color-text); animation-delay: 0.3s;"></div>
+        <div class="confetti-piece" style="left: 24%; background: var(--color-primary-light); animation-delay: 0.15s;"></div>
+        <div class="confetti-piece" style="left: 28%; background: var(--color-primary); animation-delay: 0.4s;"></div>
+        <div class="confetti-piece" style="left: 32%; background: var(--color-surface); animation-delay: 0.25s; border: 1px solid var(--color-border);"></div>
+        <div class="confetti-piece" style="left: 36%; background: var(--color-text); animation-delay: 0.5s;"></div>
+        <div class="confetti-piece" style="left: 40%; background: var(--color-primary); animation-delay: 0.1s;"></div>
+        <div class="confetti-piece" style="left: 44%; background: var(--color-primary-light); animation-delay: 0.35s;"></div>
+        <div class="confetti-piece" style="left: 48%; background: var(--color-text); animation-delay: 0.6s;"></div>
+        <div class="confetti-piece" style="left: 52%; background: var(--color-primary); animation-delay: 0.2s;"></div>
+        <div class="confetti-piece" style="left: 56%; background: var(--color-surface); animation-delay: 0.45s; border: 1px solid var(--color-border);"></div>
+        <div class="confetti-piece" style="left: 60%; background: var(--color-text); animation-delay: 0.7s;"></div>
+        <div class="confetti-piece" style="left: 64%; background: var(--color-primary); animation-delay: 0.3s;"></div>
+        <div class="confetti-piece" style="left: 68%; background: var(--color-primary-light); animation-delay: 0.55s;"></div>
+        <div class="confetti-piece" style="left: 72%; background: var(--color-text); animation-delay: 0.15s;"></div>
+        <div class="confetti-piece" style="left: 76%; background: var(--color-primary); animation-delay: 0.65s;"></div>
+        <div class="confetti-piece" style="left: 80%; background: var(--color-surface); animation-delay: 0.4s; border: 1px solid var(--color-border);"></div>
+        <div class="confetti-piece" style="left: 84%; background: var(--color-text); animation-delay: 0.25s;"></div>
+        <div class="confetti-piece" style="left: 88%; background: var(--color-primary); animation-delay: 0.75s;"></div>
+        <div class="confetti-piece" style="left: 92%; background: var(--color-primary-light); animation-delay: 0.5s;"></div>
+        <div class="confetti-piece" style="left: 96%; background: var(--color-text); animation-delay: 0.35s;"></div>
+        <div class="confetti-piece" style="left: 50%; background: var(--color-primary); animation-delay: 0.8s;"></div>
+      </div>
+
+      <!-- Reveal overlay (hidden, shown when pixel is clicked) -->
+      <div class="reveal-overlay" id="reveal-overlay" role="dialog" aria-modal="true" aria-labelledby="reveal-title" aria-hidden="true">
+        <div class="reveal-card">
+          <button type="button" class="reveal-close-btn" data-dom-id="reveal-close" aria-label="关闭">
+            <i data-lucide="x" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+          </button>
+          <span class="reveal-card-icon">
+            <i data-lucide="trophy" style="width: 28px; height: 28px;" aria-hidden="true"></i>
+          </span>
+          <h2 class="reveal-card-title" id="reveal-title">找到了！</h2>
+          <p class="reveal-card-text">给你个随机游戏奖励：</p>
+          <a href="game-detail-cn.html" class="reveal-card-link" data-dom-id="reveal-game-link">
+            <i data-lucide="play" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+            立即游玩
+          </a>
+        </div>
+      </div>
+
+    </section>
+    <!-- END 404 CONTENT -->
+
+    <!-- ========================== -->
+    <!-- START FOOTER                -->
+    <!-- ========================== -->
+    <footer data-dom-id="site-footer" class="w-full" style="background: var(--color-text); color: var(--color-bg); border-top: 2px solid var(--color-primary);">
+      <div class="mx-auto px-6 py-12" style="max-width: var(--max-width);">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-2">
+              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--radius-md); color: var(--color-text-inverse);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="2" y="6" width="20" height="12" rx="4"/>
+                  <line x1="6" y1="12" x2="10" y2="12"/>
+                  <line x1="8" y1="10" x2="8" y2="14"/>
+                  <circle cx="15" cy="11" r="0.8" fill="currentColor" stroke="none"/>
+                  <circle cx="17.5" cy="13" r="0.8" fill="currentColor" stroke="none"/>
+                </svg>
+              </span>
+              <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-xl); letter-spacing: -0.02em;">playsunblocked</span>
+            </div>
+            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--leading-relaxed); color: var(--color-bg); opacity: 0.7;">
+              每日精选浏览器小游戏。无需下载，无需注册——全球休闲玩家即开即玩。
+            </p>
+            <div class="flex items-center gap-3" role="navigation" aria-label="社交媒体">
+              <a href="#" data-dom-id="social-twitter" class="gh-social-btn" aria-label="Twitter / X">
+                <i data-lucide="twitter" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+              <a href="#" data-dom-id="social-discord" class="gh-social-btn" aria-label="Discord">
+                <i data-lucide="message-circle" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+              <a href="#" data-dom-id="social-youtube" class="gh-social-btn" aria-label="YouTube">
+                <i data-lucide="youtube" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+              <a href="#" data-dom-id="social-instagram" class="gh-social-btn" aria-label="Instagram">
+                <i data-lucide="instagram" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+          <div class="flex flex-col gap-4">
+            <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-base); color: var(--color-primary); letter-spacing: -0.01em;">快捷链接</h3>
+            <ul class="flex flex-col gap-3" role="list">
+              <li><a href="index-cn.html" data-dom-id="footer-nav-home" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">首页</a></li>
+              <li><a href="games-cn.html" data-dom-id="footer-nav-games" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">游戏</a></li>
+              <li><a href="games-cn.html" data-dom-id="footer-nav-categories" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">分类</a></li>
+              <li><a href="index-cn.html" data-dom-id="footer-nav-about" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">关于</a></li>
+              <li><a href="mailto:contact@playsunblocked.com" data-dom-id="footer-nav-contact" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">联系我们</a></li>
+            </ul>
+          </div>
+          <div class="flex flex-col gap-4">
+            <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-base); color: var(--color-primary); letter-spacing: -0.01em;">法律信息</h3>
+            <ul class="flex flex-col gap-3" role="list">
+              <li><a href="#" data-dom-id="footer-privacy" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">隐私政策</a></li>
+              <li><a href="#" data-dom-id="footer-terms" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">服务条款</a></li>
+              <li><a href="#" data-dom-id="footer-cookies" class="gh-footer-link font-sans" style="font-size: var(--text-sm);">Cookie 政策</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="gh-footer-divider mt-10 flex flex-col items-start gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-bg); opacity: 0.6;">
+            &copy; 2026 playsunblocked. 多玩少虑，快乐无限。
+          </p>
+          <p class="font-mono" style="font-size: var(--text-xs); color: var(--color-bg); opacity: 0.4;">
+            为休闲玩家打造
+          </p>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+    <!-- ========================== -->
+    <!-- START SHELL SCRIPT          -->
+    <!-- ========================== -->
+    <script>
+      (function () {
+        var header = document.getElementById('site-header');
+        if (!header) return;
+        var ticking = false;
+        function onScroll() {
+          if (!ticking) {
+            window.requestAnimationFrame(function () {
+              header.setAttribute('data-scrolled', window.scrollY > 8 ? 'true' : 'false');
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      })();
+    </script>
+    <!-- END SHELL SCRIPT -->
+
+    <!-- ========================== -->
+    <!-- START PAGE SCRIPT           -->
+    <!-- ========================== -->
+    <script>
+      // Emoji cycling on the interactive "0" in 404
+      (function () {
+        var emojis = ['0', '\uD83C\uDFAE', '\uD83D\uDD79\uFE0F', '\uD83C\uDFAF', '\uD83E\uDDE9', '\u2B50', '\uD83C\uDFAA'];
+        var labels = ['零', '游戏手柄', '摇杆', '靶心', '拼图', '星星', '马戏团'];
+        var index = 0;
+        var btn = document.querySelector('[data-dom-id="emoji-cycle"]');
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+          index = (index + 1) % emojis.length;
+          btn.textContent = emojis[index];
+          btn.setAttribute('aria-label', labels[index] + ' — 点击切换');
+        });
+      })();
+
+      // Hidden pixel easter egg: reveal confetti + congratulations overlay
+      (function () {
+        var pixel = document.querySelector('[data-dom-id="easter-egg-pixel"]');
+        var confetti = document.getElementById('confetti-container');
+        var overlay = document.getElementById('reveal-overlay');
+        var closeBtn = document.querySelector('[data-dom-id="reveal-close"]');
+        if (!pixel || !confetti || !overlay) return;
+
+        function revealEgg() {
+          confetti.classList.add('active');
+          overlay.classList.add('active');
+          overlay.setAttribute('aria-hidden', 'false');
+          pixel.style.display = 'none';
+          // Auto-hide confetti after animation completes
+          setTimeout(function () {
+            confetti.classList.remove('active');
+          }, 3500);
+        }
+
+        function closeReveal() {
+          overlay.classList.remove('active');
+          overlay.setAttribute('aria-hidden', 'true');
+          confetti.classList.remove('active');
+        }
+
+        pixel.addEventListener('click', revealEgg);
+        if (closeBtn) {
+          closeBtn.addEventListener('click', closeReveal);
+        }
+        // Close on backdrop click
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) {
+            closeReveal();
+          }
+        });
+        // Close on Escape
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && overlay.classList.contains('active')) {
+            closeReveal();
+          }
+        });
+      })();
+    </script>
+    <!-- END PAGE SCRIPT -->
+    </main>
+    <script>lucide.createIcons();</script>
+
+<script>
+// Language toggle: navigate between EN/CN page pairs
+(function() {
+  var btn = document.querySelector('[data-dom-id="lang-toggle"]');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    var url = window.location.pathname;
+    var query = window.location.search;
+    var hash = window.location.hash;
+    if (url.indexOf('-en.html') !== -1) {
+      url = url.replace('-en.html', '-cn.html');
+    } else if (url.indexOf('-cn.html') !== -1) {
+      url = url.replace('-cn.html', '-en.html');
+    }
+    window.location.href = url + query + hash;
+  });
+})();
+</script>
+
+</body>
+</html>

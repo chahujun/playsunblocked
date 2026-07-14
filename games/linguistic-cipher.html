@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    '读不懂的控制台 · The Silent Console': 'The Silent Console',
+    '这些符号不属于任何已知的语言。戳一下，看它怎么反应，再猜它是什么意思。把核心推到 100%。': "The glyphs don't speak any language you know. Poke them, watch how they react, figure out what they mean. Get the core to 100%.",
+    '校准失败。核心过载了。': "Calibration failed. Core's overloaded.",
+    '全部破译。核心锁定 100%。': 'All glyphs cracked. Core locked at 100%.',
+    '探测用完了，切到标记模式吧。': 'Out of probes. Switch to MARK mode.',
+    '先把所有符号都标记了，再校准。': 'Tag all glyphs first, then calibrate.',
+    '新的符号上来了。': 'New glyphs on screen.',
+    '已加入词典：': 'Added to lexicon:',
+    '回合重置，探测补满了。': 'Round reset. Probes refilled.',
+    '探测模式 — 点一个符号，看它怎么动': 'PROBE MODE — Click a glyph, watch it react',
+    '标记模式 — 点一个符号，给它贴标签': 'MARK MODE — Click a glyph to tag it',
+    '控制台启动。等你操作。': 'Console booted. Waiting for input.',
+    '每个符号都猜对了。核心嗡地一声活过来，锁在 100%。你上线了。': "Every glyph read right. The core hums to life and locks at 100%. You're online.",
+    '哪里不对。核心冲过头，挂了。重置再来一次。': "Something's off. The core spiked and shut down. Reset and try again.",
+    '偷看了一眼底牌。一个符号的真实身份露出来了。': "Peeked under the hood. One glyph's truth is showing.",
+    '这回合的洞察用完了。': 'No insights left this round.',
+    '挑一个符号，看看它的真面目。': 'Pick a glyph to reveal what it really is.',
+    '能量从基线往上窜。有东西在往里灌。': "Energy jumps up from the baseline. Something's pumping in.",
+    '信号翻了一下，自己跟自己镜像。这是反转。': "The signal flips and mirrors itself. That's inversion.",
+    '信号往上爬，撞到天花板，停住了。': 'The signal climbs, hits a wall, and stops dead.',
+    '拿下三个了，词典开始有东西了。': "First three down. The lexicon's growing.",
+    '过半。6 个符号到手。': 'Halfway there. 6 glyphs cracked.',
+    '九个了，你已经能读懂这些了。': "Nine down. You're reading these fluently now.",
+    '12 个全破。这台控制台归你了。': 'All 12 cracked. The console is yours.',
+    '第 5 回合，老手了。': "Round 5. You've been at this a while.",
+    '注意，有两个长得几乎一样，但其实不是一回事。看行为，别看脸。': "Heads up — two of these look alike but aren't the same. Trust the behavior, not the picture.",
+    '还没破译任何符号。\n探测一个，标记一个，搞定它。': 'Nothing decoded yet.\nProbe a glyph, tag it, crack it.',
+    '外星符号 — 点击标记 / 探测': 'ALIEN GLYPHS — CLICK TO MARK / PROBE',
+    '你觉得这个是什么？': 'What do you think this one is?',
+    '欢迎回来。词典：': 'Welcome back. Lexicon:',
+    '读不懂的控制台': 'THE SILENT CONSOLE',
+    '核心稳定！系统上线。': 'CORE STABILIZED! SYSTEM ONLINE.',
+    '核心过载！': 'CORE OVERLOAD!',
+    '探测模式 — 点一个符号': 'PROBE MODE — Click a glyph',
+    '标记模式 — 点一个符号': 'MARK MODE — Click a glyph',
+    '标记为：': 'Mark as:',
+    '核心稳定': 'CORE STABILIZED',
+    '核心过载': 'CORE OVERLOAD',
+    '电压/增幅': 'VOLTAGE',
+    '反转/偏置': 'INVERT',
+    '限制/阻尼': 'LIMIT',
+    '能量核心': 'ENERGY CORE',
+    '剩余探测': 'PROBES',
+    '探测模式': 'PROBE MODE',
+    '标记模式': 'MARK MODE',
+    '校准中...': 'Running calibration...',
+    '欢迎，操作员': 'Welcome, Operator',
+    '最高回合': 'BEST ROUND',
+    '破译总数': 'TOTAL GLYPHS',
+    '环境音 开': 'Ambient sound on',
+    '环境音 关': 'Ambient sound off',
+    '标记为': 'tagged as',
+    '控制台': 'Console',
+    '词典': 'LEXICON',
+    '目标': 'TARGET',
+    '校准': 'CALIBRATE',
+    '取消': 'CANCEL',
+    '关闭': 'CLOSE',
+    '继续': 'CONTINUE',
+    '重试': 'RETRY ROUND',
+    '重置回合': 'RESET ROUND',
+    '下一回合': 'NEXT ROUND',
+    '上一步': 'BACK',
+    '下一步': 'NEXT',
+    '跳过': 'SKIP',
+    '开始': 'BEGIN',
+    '错了': 'WRONG',
+    '对了': 'CORRECT',
+    '洞察': 'INSIGHT',
+    '音效': 'SOUND',
+    '胜场': 'WINS',
+    '符号': 'Glyph',
+    '成就解锁': 'ACHIEVEMENT',
+    '符号扫描': 'GLYPH SCAN',
+    '警告': 'WARNING',
+    '探测': 'Probe',
+    '标记': 'Mark',
+    '校准': 'Calibrate',
+    '重置': 'Reset',
+    '回合': 'ROUND',
+    '已破译': 'DECODED'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    if (T[text.trim()]) return T[text.trim()];
+    var result = text;
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>读不懂的控制台 · The Silent Console</title>
+<style>
+  :root {
+    --bg: #050a08;
+    --bg-2: #0a1612;
+    --bg-3: #0e1f18;
+    --fg: #5cff9a;
+    --fg-dim: #2a8a4a;
+    --fg-bright: #aaffcc;
+    --accent: #ffcc33;
+    --accent-2: #ffaa22;
+    --danger: #ff4444;
+    --border: #1a3a2a;
+    --border-bright: #2a6a4a;
+    --glow: 0 0 8px var(--fg), 0 0 16px rgba(92,255,154,0.3);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0,0,0,0.18) 0px,
+      rgba(0,0,0,0.18) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    pointer-events: none;
+    z-index: 100;
+    animation: flicker 6s infinite;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);
+    pointer-events: none;
+    z-index: 99;
+  }
+
+  @keyframes flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: 0.85; }
+    98% { opacity: 0.92; }
+  }
+
+  #terminal {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    gap: 10px;
+    padding: 16px 20px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 10px;
+  }
+
+  .title-wrap { display: flex; align-items: baseline; gap: 14px; }
+
+  h1 {
+    font-size: 22px;
+    letter-spacing: 5px;
+    color: var(--fg-bright);
+    text-shadow: var(--glow);
+    font-weight: bold;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: var(--fg-dim);
+    letter-spacing: 2px;
+  }
+
+  .header-right { display: flex; align-items: center; gap: 12px; }
+
+  .round-badge {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    border: 1px solid var(--accent);
+    padding: 4px 10px;
+  }
+
+  #lang-toggle {
+    background: transparent;
+    border: 1px solid var(--fg-dim);
+    color: var(--fg);
+    padding: 6px 12px;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  #lang-toggle:hover {
+    background: var(--fg-dim);
+    color: var(--bg);
+    box-shadow: var(--glow);
+  }
+
+  #desc {
+    font-size: 12px;
+    color: var(--fg-dim);
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
+  #desc .tag { color: var(--accent); margin: 0 4px; }
+
+  #main-area {
+    display: grid;
+    grid-template-columns: 200px 1fr 240px;
+    gap: 14px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .panel {
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, var(--bg-2), var(--bg));
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .panel-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--fg-dim);
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 6px;
+  }
+
+  /* Core meter */
+  #core-meter {
+    flex: 1;
+    position: relative;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    min-height: 180px;
+    overflow: hidden;
+  }
+  #core-fill {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(0deg, var(--fg-dim), var(--fg));
+    transition: height 0.4s ease, background 0.3s;
+    height: 50%;
+    box-shadow: 0 0 12px var(--fg);
+  }
+  #core-fill.danger {
+    background: linear-gradient(0deg, var(--danger), #ff8844);
+    box-shadow: 0 0 16px var(--danger);
+  }
+  #core-fill.stable {
+    background: linear-gradient(0deg, var(--accent-2), var(--accent));
+    box-shadow: 0 0 20px var(--accent);
+  }
+  #core-value {
+    position: absolute;
+    top: 10px; left: 0; right: 0;
+    text-align: center;
+    font-size: 26px;
+    color: var(--fg-bright);
+    text-shadow: var(--glow);
+    z-index: 2;
+  }
+  .meter-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+  }
+  .meter-line.target { background: var(--accent); box-shadow: 0 0 4px var(--accent); }
+  .meter-line.critical { background: var(--danger); opacity: 0.4; }
+  .meter-label {
+    position: absolute;
+    right: 4px;
+    font-size: 9px;
+    color: var(--accent);
+    transform: translateY(-50%);
+  }
+  .meter-label.crit { color: var(--danger); }
+
+  .core-stats {
+    font-size: 11px;
+    color: var(--fg-dim);
+    line-height: 1.6;
+  }
+  .core-stats .val { color: var(--accent); }
+  #probe-count { color: var(--accent); font-weight: bold; font-size: 14px; }
+
+  /* Glyph panel */
+  #glyph-panel { align-items: stretch; }
+  #glyph-row {
+    flex: 1;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 10px;
+  }
+  .glyph-card {
+    width: 120px;
+    min-height: 160px;
+    border: 1px solid var(--border);
+    background: var(--bg-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 6px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+  }
+  .glyph-card:hover {
+    border-color: var(--fg);
+    box-shadow: var(--glow);
+    transform: translateY(-2px);
+  }
+  .glyph-card.probed {
+    border-color: var(--accent);
+  }
+  .glyph-card.probed::before {
+    content: '◉';
+    position: absolute;
+    top: 3px; right: 5px;
+    color: var(--accent);
+    font-size: 9px;
+  }
+  .glyph-card.known {
+    border-color: var(--fg-dim);
+  }
+  .glyph-card.known::after {
+    content: '✓';
+    position: absolute;
+    top: 3px; left: 5px;
+    color: var(--fg);
+    font-size: 10px;
+  }
+  .glyph-card.correct-flash {
+    animation: flashGood 0.5s;
+  }
+  .glyph-card.wrong-flash {
+    animation: flashBad 0.5s;
+  }
+  @keyframes flashGood {
+    0%,100% { background: var(--bg-3); }
+    50% { background: rgba(92,255,154,0.3); box-shadow: 0 0 20px var(--fg); }
+  }
+  @keyframes flashBad {
+    0%,100% { background: var(--bg-3); }
+    50% { background: rgba(255,68,68,0.3); box-shadow: 0 0 20px var(--danger); }
+  }
+
+  .glyph-id {
+    font-size: 9px;
+    color: var(--fg-dim);
+    letter-spacing: 2px;
+  }
+  .glyph-svg {
+    width: 62px;
+    height: 62px;
+    color: var(--fg-bright);
+    filter: drop-shadow(0 0 5px var(--fg));
+  }
+  .glyph-mark {
+    text-align: center;
+    min-height: 34px;
+    line-height: 1.3;
+  }
+  .glyph-mark .mark-en {
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+  .glyph-mark .mark-zh {
+    font-size: 9px;
+    color: var(--accent-2);
+    opacity: 0.85;
+  }
+  .glyph-mark.empty .mark-en {
+    color: var(--fg-dim);
+    opacity: 0.5;
+  }
+
+  #mode-indicator {
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-align: center;
+    min-height: 16px;
+    border-top: 1px dashed var(--border);
+    padding-top: 6px;
+  }
+  #mode-indicator.probe-active { color: var(--accent-2); animation: pulse 1.5s infinite; }
+  @keyframes pulse { 50% { opacity: 0.5; } }
+
+  /* Dictionary panel */
+  #dict-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 11px;
+  }
+  .dict-entry {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 4px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .dict-entry svg {
+    width: 22px; height: 22px;
+    color: var(--fg);
+  }
+  .dict-entry .dict-id { color: var(--fg-dim); font-size: 10px; }
+  .dict-entry .dict-type { color: var(--accent); font-size: 10px; text-align: right; }
+  .dict-empty {
+    color: var(--fg-dim);
+    font-size: 10px;
+    text-align: center;
+    padding: 24px 8px;
+    line-height: 1.6;
+  }
+  .dict-progress {
+    font-size: 10px;
+    color: var(--fg-dim);
+    text-align: center;
+  }
+  .dict-progress .val { color: var(--accent); }
+
+  /* Controls */
+  #controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    background: transparent;
+    border: 1px solid var(--fg-dim);
+    color: var(--fg);
+    padding: 10px 24px;
+    font-family: inherit;
+    cursor: pointer;
+    font-size: 12px;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+  }
+  .btn:hover:not(:disabled) {
+    background: var(--fg-dim);
+    color: var(--bg);
+    box-shadow: var(--glow);
+  }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn.active {
+    background: var(--accent-2);
+    color: var(--bg);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .btn.primary { border-color: var(--accent); color: var(--accent); }
+  .btn.primary:hover { background: var(--accent); color: var(--bg); box-shadow: 0 0 12px var(--accent); }
+  .btn.danger { border-color: var(--danger); color: var(--danger); }
+  .btn.danger:hover { background: var(--danger); color: var(--bg); }
+
+  /* Log */
+  #log {
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    padding: 8px 12px;
+    height: 90px;
+    overflow-y: auto;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .log-line { color: var(--fg-dim); }
+  .log-line::before { content: '> '; color: var(--fg-dim); opacity: 0.6; }
+  .log-line.accent { color: var(--accent); }
+  .log-line.accent::before { color: var(--accent); }
+  .log-line.danger { color: var(--danger); }
+  .log-line.danger::before { color: var(--danger); }
+  .log-line.success { color: var(--fg-bright); }
+  .log-line.success::before { color: var(--fg-bright); }
+
+  /* Modal */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(2px);
+  }
+  .overlay.show { display: flex; }
+
+  .modal-content {
+    background: var(--bg-2);
+    border: 1px solid var(--fg);
+    padding: 28px;
+    min-width: 320px;
+    max-width: 420px;
+    box-shadow: 0 0 30px rgba(92,255,154,0.4);
+  }
+  .modal-content h3 {
+    margin-bottom: 16px;
+    color: var(--fg-bright);
+    letter-spacing: 2px;
+    font-size: 14px;
+  }
+  .modal-glyph-preview {
+    text-align: center;
+    margin-bottom: 18px;
+    padding: 12px;
+    border: 1px dashed var(--border);
+    background: var(--bg-3);
+  }
+  .modal-glyph-preview svg {
+    width: 70px; height: 70px;
+    color: var(--fg-bright);
+    filter: drop-shadow(0 0 6px var(--fg));
+  }
+  .modal-glyph-preview .gid {
+    font-size: 10px;
+    color: var(--fg-dim);
+    margin-top: 6px;
+    letter-spacing: 2px;
+  }
+  .modal-options { display: flex; flex-direction: column; gap: 8px; }
+  .modal-option {
+    background: transparent;
+    border: 1px solid var(--fg-dim);
+    color: var(--fg);
+    padding: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-option:hover {
+    background: var(--fg-dim);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+  .modal-option.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(255,204,51,0.1);
+  }
+  .modal-option .opt-zh { font-size: 10px; opacity: 0.7; }
+  .modal-close {
+    margin-top: 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--fg-dim);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    width: 100%;
+    padding: 8px;
+    letter-spacing: 2px;
+  }
+  .modal-close:hover { color: var(--fg); border-color: var(--fg-dim); }
+
+  /* Probe overlay */
+  .probe-box {
+    background: var(--bg-2);
+    border: 1px solid var(--accent);
+    padding: 32px;
+    text-align: center;
+    box-shadow: 0 0 30px var(--accent);
+    min-width: 320px;
+  }
+  .probe-title {
+    font-size: 11px;
+    color: var(--fg-dim);
+    letter-spacing: 3px;
+    margin-bottom: 14px;
+  }
+  .probe-glyph {
+    width: 80px; height: 80px;
+    margin: 0 auto 16px;
+    color: var(--fg-bright);
+    filter: drop-shadow(0 0 8px var(--fg));
+  }
+  .probe-meter {
+    width: 220px;
+    height: 110px;
+    border: 1px solid var(--border);
+    margin: 16px auto;
+    position: relative;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .probe-baseline {
+    position: absolute;
+    bottom: 50%; left: 0; right: 0;
+    height: 1px;
+    background: var(--fg-dim);
+    opacity: 0.4;
+  }
+  .probe-needle {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 6px;
+    background: var(--fg);
+    transition: all 0.6s cubic-bezier(.2,.8,.2,1);
+    height: 10%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px var(--fg);
+  }
+  .probe-needle.mirror {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .probe-cap {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+    display: none;
+    box-shadow: 0 0 6px var(--accent);
+  }
+  .probe-cap.show { display: block; }
+  .probe-cap-hit {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent);
+    font-size: 10px;
+    display: none;
+    animation: capHit 0.3s;
+  }
+  @keyframes capHit { 0%{opacity:0;} 50%{opacity:1;} 100%{opacity:0;} }
+
+  .probe-label {
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-top: 10px;
+    min-height: 20px;
+  }
+  .probe-hint {
+    color: var(--fg-dim);
+    font-size: 10px;
+    margin-top: 8px;
+    line-height: 1.5;
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Result overlay */
+  .result-box {
+    background: var(--bg-2);
+    border: 2px solid var(--fg);
+    padding: 40px;
+    text-align: center;
+    max-width: 440px;
+  }
+  .result-box.danger {
+    border-color: var(--danger);
+    box-shadow: 0 0 40px var(--danger);
+  }
+  .result-box.success {
+    border-color: var(--fg);
+    box-shadow: 0 0 40px var(--fg);
+  }
+  .result-title {
+    font-size: 26px;
+    letter-spacing: 4px;
+    margin-bottom: 16px;
+  }
+  .result-box.danger .result-title { color: var(--danger); text-shadow: 0 0 12px var(--danger); }
+  .result-box.success .result-title { color: var(--fg-bright); text-shadow: var(--glow); }
+  .result-msg {
+    color: var(--fg-dim);
+    margin-bottom: 22px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .result-detail {
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 18px;
+    line-height: 1.7;
+  }
+  .result-detail .wrong { color: var(--danger); }
+  .result-detail .right { color: var(--fg-bright); }
+
+  /* Cursor */
+  .cursor::after {
+    content: '_';
+    animation: blink 1s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--fg-dim); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--fg); }
+
+  /* === OPTIMIZATIONS === */
+
+  /* Particle canvas overlaying core meter */
+  #particle-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Oscilloscope upgrade for probe meter */
+  .probe-meter { height: 130px; }
+  #probe-osc {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .probe-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(92,255,154,0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(92,255,154,0.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+    pointer-events: none;
+  }
+  .probe-baseline { opacity: 0.25; }
+
+  /* Insight & sound buttons */
+  .btn.insight { border-color: var(--accent-2); color: var(--accent-2); }
+  .btn.insight:hover:not(:disabled) { background: var(--accent-2); color: var(--bg); box-shadow: 0 0 12px var(--accent-2); }
+  .btn.insight:disabled { opacity: 0.25; cursor: not-allowed; }
+  .btn.sound { padding: 10px 14px; font-size: 14px; min-width: 50px; }
+
+  /* Dict stats footer */
+  .dict-stats {
+    font-size: 10px;
+    color: var(--fg-dim);
+    border-top: 1px dashed var(--border);
+    padding-top: 8px;
+    margin-top: 4px;
+    line-height: 1.7;
+  }
+  .dict-stats .val { color: var(--accent); }
+  .dict-stats .row { display: flex; justify-content: space-between; }
+
+  /* Toast notifications */
+  #toast-container {
+    position: fixed;
+    top: 70px; right: 20px;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+    max-width: 320px;
+  }
+  .toast {
+    background: var(--bg-2);
+    border: 1px solid var(--fg);
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    font-size: 11px;
+    color: var(--fg-bright);
+    letter-spacing: 1px;
+    box-shadow: 0 0 12px rgba(92,255,154,0.3);
+    animation: toastIn 0.3s ease, toastOut 0.4s ease 3.3s forwards;
+    line-height: 1.5;
+  }
+  .toast.achievement { border-left-color: var(--accent); }
+  .toast.warn { border-left-color: var(--danger); color: var(--danger); box-shadow: 0 0 12px rgba(255,68,68,0.3); }
+  .toast.info { border-left-color: var(--fg-dim); }
+  .toast .toast-title { font-size: 9px; color: var(--accent); letter-spacing: 2px; margin-bottom: 3px; }
+  .toast.warn .toast-title { color: var(--danger); }
+  @keyframes toastIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
+  @keyframes toastOut { to { opacity:0; transform: translateX(30px); } }
+
+  /* Tutorial overlay */
+  #tutorial-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.92);
+    z-index: 250;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(3px);
+  }
+  #tutorial-overlay.hide { display: none; }
+  .tut-box {
+    background: var(--bg-2);
+    border: 1px solid var(--fg);
+    padding: 32px;
+    max-width: 500px;
+    box-shadow: 0 0 40px rgba(92,255,154,0.4);
+  }
+  .tut-step { display: none; }
+  .tut-step.active { display: block; animation: tutFade 0.4s; }
+  @keyframes tutFade { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+  .tut-step h2 {
+    color: var(--accent);
+    font-size: 14px;
+    letter-spacing: 3px;
+    margin-bottom: 14px;
+  }
+  .tut-step p {
+    color: var(--fg);
+    font-size: 12px;
+    line-height: 1.8;
+    margin-bottom: 10px;
+  }
+  .tut-step .tut-hint {
+    color: var(--fg-dim);
+    font-size: 11px;
+    border-left: 2px solid var(--accent);
+    padding-left: 10px;
+    margin: 14px 0;
+    line-height: 1.6;
+  }
+  .tut-demo {
+    text-align: center;
+    margin: 14px 0;
+    padding: 14px;
+    border: 1px dashed var(--border);
+    background: var(--bg-3);
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .tut-demo svg { width: 44px; height: 44px; color: var(--fg-bright); filter: drop-shadow(0 0 5px var(--fg)); }
+  .tut-demo .demo-label { font-size: 9px; color: var(--accent); letter-spacing: 1px; margin-top: 4px; }
+  .tut-demo .demo-item { text-align: center; }
+  .tut-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; }
+  .tut-dots { display: flex; gap: 6px; }
+  .tut-dot { width: 8px; height: 8px; border: 1px solid var(--fg-dim); border-radius: 50%; transition: all 0.2s; }
+  .tut-dot.active { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .tut-skip { font-size: 10px; color: var(--fg-dim); cursor: pointer; border: none; background: transparent; font-family: inherit; letter-spacing: 1px; }
+  .tut-skip:hover { color: var(--fg); }
+
+  /* Keyboard hint chip */
+  .kbd {
+    display: inline-block;
+    border: 1px solid var(--fg-dim);
+    padding: 1px 6px;
+    font-size: 10px;
+    color: var(--accent);
+    border-radius: 2px;
+    margin: 0 2px;
+  }
+
+  /* Insight reveal glow on glyph card */
+  .glyph-card.insight-reveal { animation: insightGlow 1.4s ease; }
+  @keyframes insightGlow {
+    0%,100% { box-shadow: none; }
+    50% { box-shadow: 0 0 28px var(--accent-2); border-color: var(--accent-2); }
+  }
+
+  /* Twin glyph marker (similar-looking deceptive pair) */
+  .twin-mark {
+    position: absolute;
+    top: 2px; left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent-2);
+    font-size: 11px;
+    text-shadow: 0 0 4px var(--accent-2);
+    pointer-events: none;
+  }
+
+  /* Hint bar under controls */
+  #kbd-hint {
+    text-align: center;
+    font-size: 10px;
+    color: var(--fg-dim);
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 960px) {
+    #main-area { grid-template-columns: 1fr; }
+    #core-panel { display: none; }
+    #dict-panel { display: none; }
+    .glyph-card { width: 90px; min-height: 130px; }
+    .glyph-svg { width: 48px; height: 48px; }
+  }
+</style>
+</head>
+<body>
+  <div id="terminal">
+    <header>
+      <div class="title-wrap">
+        <h1 id="title">THE SILENT CONSOLE</h1>
+        <span class="subtitle" id="subtitle">v1.0</span>
+      </div>
+      <div class="header-right">
+        <div class="round-badge" id="round-badge">ROUND 01</div>
+        <button id="lang-toggle">EN / 简中</button>
+      </div>
+    </header>
+
+    <p id="desc"></p>
+
+    <div id="main-area">
+      <div class="panel" id="core-panel">
+        <div class="panel-label" id="lbl-core">ENERGY CORE</div>
+        <div id="core-meter">
+          <div class="meter-line critical" style="bottom: 100%;"></div>
+          <span class="meter-label crit" style="bottom: 100%;">150</span>
+          <div class="meter-line target" style="bottom: 66.67%;"></div>
+          <span class="meter-label" style="bottom: 66.67%;">100</span>
+          <div class="meter-line" style="bottom: 33.33%; background: var(--fg-dim); opacity:0.3;"></div>
+          <span class="meter-label" style="bottom: 33.33%; color:var(--fg-dim);">50</span>
+          <canvas id="particle-canvas"></canvas>
+          <div id="core-fill"></div>
+          <div id="core-value">50%</div>
+        </div>
+        <div class="core-stats">
+          <div id="lbl-target">TARGET: <span class="val">100%</span></div>
+          <div id="lbl-probes">PROBES: <span id="probe-count">3</span></div>
+          <div id="lbl-insight">INSIGHT: <span id="insight-count" class="val">1</span></div>
+        </div>
+      </div>
+
+      <div class="panel" id="glyph-panel">
+        <div class="panel-label" id="lbl-glyphs">ALIEN GLYPHS — CLICK TO MARK / PROBE</div>
+        <div id="glyph-row"></div>
+        <div id="mode-indicator"></div>
+      </div>
+
+      <div class="panel" id="dict-panel">
+        <div class="panel-label" id="lbl-dict">LEXICON</div>
+        <div class="dict-progress" id="dict-progress"></div>
+        <div id="dict-list"></div>
+        <div class="dict-stats" id="dict-stats"></div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <button class="btn" id="probe-btn">PROBE MODE</button>
+      <button class="btn insight" id="insight-btn">INSIGHT</button>
+      <button class="btn primary" id="calibrate-btn">CALIBRATE</button>
+      <button class="btn danger" id="reset-btn">RESET ROUND</button>
+      <button class="btn sound" id="sound-btn" title="Toggle ambient sound">♪</button>
+    </div>
+
+    <div id="kbd-hint"></div>
+
+    <div id="log"></div>
+  </div>
+
+  <!-- Mark modal -->
+  <div class="overlay" id="mark-modal">
+    <div class="modal-content">
+      <h3 id="mark-title">MARK AS:</h3>
+      <div class="modal-glyph-preview" id="mark-preview"></div>
+      <div class="modal-options" id="mark-options"></div>
+      <button class="modal-close" id="mark-close">CANCEL</button>
+    </div>
+  </div>
+
+  <!-- Probe overlay -->
+  <div class="overlay" id="probe-overlay">
+    <div class="probe-box">
+      <div class="probe-title" id="probe-title">GLYPH SCAN</div>
+      <svg class="probe-glyph" id="probe-glyph-svg" viewBox="0 0 100 100"></svg>
+      <div class="probe-meter">
+        <div class="probe-grid"></div>
+        <div class="probe-baseline"></div>
+        <div class="probe-cap" id="probe-cap"></div>
+        <canvas id="probe-osc"></canvas>
+      </div>
+      <div class="probe-label" id="probe-label">...</div>
+      <div class="probe-hint" id="probe-hint"></div>
+      <button class="btn" id="probe-close" style="margin-top:18px;">CLOSE</button>
+    </div>
+  </div>
+
+  <!-- Result overlay -->
+  <div class="overlay" id="result-overlay">
+    <div class="result-box" id="result-box">
+      <div class="result-title" id="result-title"></div>
+      <div class="result-msg" id="result-msg"></div>
+      <div class="result-detail" id="result-detail"></div>
+      <button class="btn primary" id="result-btn">CONTINUE</button>
+    </div>
+  </div>
+
+  <!-- Toast notifications -->
+  <div id="toast-container"></div>
+
+  <!-- Tutorial overlay -->
+  <div id="tutorial-overlay" class="hide">
+    <div class="tut-box">
+      <div class="tut-step active" data-step="0">
+        <h2 id="tut1-title">WELCOME, OPERATOR</h2>
+        <p id="tut1-p1">You found an alien console. The glyphs don't read like anything you've seen. But poke them, and they <strong style="color:var(--accent)">react</strong> differently.</p>
+        <p id="tut1-p2">That's the clue. Figure out what each glyph does, then push the energy core to <strong style="color:var(--accent)">100%</strong>.</p>
+        <div class="tut-hint" id="tut1-hint">Three kinds of glyphs. Three kinds of behavior. Watch closely.</div>
+      </div>
+      <div class="tut-step" data-step="1">
+        <h2 id="tut2-title">THREE GLYPH TYPES</h2>
+        <div class="tut-demo" id="tut2-demo"></div>
+        <p id="tut2-p1"><strong style="color:var(--accent)">VOLTAGE</strong> pumps energy in. The waveform jumps up.</p>
+        <p id="tut2-p2"><strong style="color:var(--accent)">INVERT</strong> flips the signal. The waveform mirrors itself.</p>
+        <p id="tut2-p3"><strong style="color:var(--accent)">LIMIT</strong> caps the output. The waveform hits a ceiling and stops.</p>
+      </div>
+      <div class="tut-step" data-step="2">
+        <h2 id="tut3-title">THE LOOP</h2>
+        <p id="tut3-p1"><strong>1. PROBE</strong> — Flip to PROBE mode, click a glyph, watch how it behaves. You get a few probes per round, so spend them well.</p>
+        <p id="tut3-p2"><strong>2. MARK</strong> — Back in MARK mode, tag each glyph with what you think it is. Your guess shows up under it, in both languages.</p>
+        <p id="tut3-p3"><strong>3. CALIBRATE</strong> — When all four are tagged, hit calibrate. Get them right and the core locks at 100%. Get one wrong and it overloads.</p>
+        <p id="tut3-p4">Every glyph you crack gets logged in your <strong style="color:var(--accent)">Lexicon</strong> for good. Decode all 12 and you own this console.</p>
+        <div class="tut-hint" id="tut3-hint">Shortcuts: P probe · M mark · I insight · C calibrate · R reset · L language</div>
+      </div>
+      <div class="tut-nav">
+        <button class="tut-skip" id="tut-skip">SKIP</button>
+        <div class="tut-dots">
+          <span class="tut-dot active"></span>
+          <span class="tut-dot"></span>
+          <span class="tut-dot"></span>
+        </div>
+        <button class="btn primary" id="tut-next">NEXT</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ============================================================
+//  读不懂的控制台 · The Silent Console
+//  Single-file 2D glyph-decoding game
+// ============================================================
+
+// ===== I18n Dictionary =====
+const Lang = {
+  en: {
+    title: "THE SILENT CONSOLE",
+    subtitle: "v1.0",
+    desc: "The glyphs don't speak any language you know. Poke them, watch how they react, figure out what they mean. Get the core to 100%.",
+    mark: "Mark as:",
+    voltage: "VOLTAGE",
+    invert: "INVERT",
+    limit: "LIMIT",
+    warning: "CORE OVERLOAD!",
+    win: "CORE STABILIZED! SYSTEM ONLINE.",
+    coreLabel: "ENERGY CORE",
+    glyphLabel: "ALIEN GLYPHS — CLICK TO MARK / PROBE",
+    dictLabel: "LEXICON",
+    probesLeft: "PROBES",
+    target: "TARGET",
+    probe: "PROBE MODE",
+    calibrate: "CALIBRATE",
+    reset: "RESET ROUND",
+    cancel: "CANCEL",
+    close: "CLOSE",
+    continue: "CONTINUE",
+    retry: "RETRY ROUND",
+    nextRound: "NEXT ROUND",
+    probeMode: "PROBE MODE — Click a glyph, watch it react",
+    markMode: "MARK MODE — Click a glyph to tag it",
+    logStart: "Console booted. Waiting for input.",
+    logProbe: "Probing",
+    logMarked: "Glyph",
+    logMarkedAs: "tagged as",
+    logCalibrate: "Running calibration...",
+    logWin: "All glyphs cracked. Core locked at 100%.",
+    logOverload: "Calibration failed. Core's overloaded.",
+    logProbeFail: "Out of probes. Switch to MARK mode.",
+    logNeedMarks: "Tag all glyphs first, then calibrate.",
+    logNewRound: "New glyphs on screen.",
+    logDictUpdate: "Added to lexicon:",
+    logReset: "Round reset. Probes refilled.",
+    resultWin: "CORE STABILIZED",
+    resultWinMsg: "Every glyph read right. The core hums to life and locks at 100%. You're online.",
+    resultLose: "CORE OVERLOAD",
+    resultLoseMsg: "Something's off. The core spiked and shut down. Reset and try again.",
+    unknown: "???",
+    empty: "[ untagged ]",
+    round: "ROUND",
+    decoded: "DECODED",
+    of: "of",
+    dictEmpty: "Nothing decoded yet.\nProbe a glyph, tag it, crack it.",
+    markHint: "What do you think this one is?",
+    probeHintV: "Energy jumps up from the baseline. Something's pumping in.",
+    probeHintI: "The signal flips and mirrors itself. That's inversion.",
+    probeHintL: "The signal climbs, hits a wall, and stops dead.",
+    probeV: "PULSE +Δ",
+    probeI: "MIRROR ◆",
+    probeL: "CEILING ─",
+    wrong: "WRONG",
+    right: "CORRECT",
+    insight: "INSIGHT",
+    insightUsed: "Peeked under the hood. One glyph's truth is showing.",
+    insightNone: "No insights left this round.",
+    insightPick: "Pick a glyph to reveal what it really is.",
+    sound: "SOUND",
+    soundOn: "Ambient sound on",
+    soundOff: "Ambient sound off",
+    kbdHint: "<span class='kbd'>P</span>robe · <span class='kbd'>M</span>ark · <span class='kbd'>I</span>nsight · <span class='kbd'>C</span>alibrate · <span class='kbd'>R</span>eset · <span class='kbd'>L</span>ang",
+    statBest: "BEST ROUND",
+    statWins: "WINS",
+    statTotal: "TOTAL GLYPHS",
+    achDecoded3: "First three down. The lexicon's growing.",
+    achDecoded6: "Halfway there. 6 glyphs cracked.",
+    achDecoded9: "Nine down. You're reading these fluently now.",
+    achDecoded12: "All 12 cracked. The console is yours.",
+    achRound5: "Round 5. You've been at this a while.",
+    twinWarn: "Heads up — two of these look alike but aren't the same. Trust the behavior, not the picture.",
+    tutWelcome: "Welcome, Operator",
+    tutNext: "NEXT",
+    tutSkip: "SKIP",
+    tutStart: "BEGIN",
+    tutPrev: "BACK"
+  },
+  zh: {
+    title: "读不懂的控制台",
+    subtitle: "v1.0",
+    desc: "这些符号不属于任何已知的语言。戳一下，看它怎么反应，再猜它是什么意思。把核心推到 100%。",
+    mark: "标记为：",
+    voltage: "电压/增幅",
+    invert: "反转/偏置",
+    limit: "限制/阻尼",
+    warning: "核心过载！",
+    win: "核心稳定！系统上线。",
+    coreLabel: "能量核心",
+    glyphLabel: "外星符号 — 点击标记 / 探测",
+    dictLabel: "词典",
+    probesLeft: "剩余探测",
+    target: "目标",
+    probe: "探测模式",
+    calibrate: "校准",
+    reset: "重置回合",
+    cancel: "取消",
+    close: "关闭",
+    continue: "继续",
+    retry: "重试",
+    nextRound: "下一回合",
+    probeMode: "探测模式 — 点一个符号，看它怎么动",
+    markMode: "标记模式 — 点一个符号，给它贴标签",
+    logStart: "控制台启动。等你操作。",
+    logProbe: "正在探测",
+    logMarked: "符号",
+    logMarkedAs: "标记为",
+    logCalibrate: "校准中...",
+    logWin: "全部破译。核心锁定 100%。",
+    logOverload: "校准失败。核心过载了。",
+    logProbeFail: "探测用完了，切到标记模式吧。",
+    logNeedMarks: "先把所有符号都标记了，再校准。",
+    logNewRound: "新的符号上来了。",
+    logDictUpdate: "已加入词典：",
+    logReset: "回合重置，探测补满了。",
+    resultWin: "核心稳定",
+    resultWinMsg: "每个符号都猜对了。核心嗡地一声活过来，锁在 100%。你上线了。",
+    resultLose: "核心过载",
+    resultLoseMsg: "哪里不对。核心冲过头，挂了。重置再来一次。",
+    unknown: "？？？",
+    empty: "[ 未标记 ]",
+    round: "回合",
+    decoded: "已破译",
+    of: "共",
+    dictEmpty: "还没破译任何符号。\n探测一个，标记一个，搞定它。",
+    markHint: "你觉得这个是什么？",
+    probeHintV: "能量从基线往上窜。有东西在往里灌。",
+    probeHintI: "信号翻了一下，自己跟自己镜像。这是反转。",
+    probeHintL: "信号往上爬，撞到天花板，停住了。",
+    probeV: "脉冲 +Δ",
+    probeI: "镜像 ◆",
+    probeL: "上限 ─",
+    wrong: "错了",
+    right: "对了",
+    insight: "洞察",
+    insightUsed: "偷看了一眼底牌。一个符号的真实身份露出来了。",
+    insightNone: "这回合的洞察用完了。",
+    insightPick: "挑一个符号，看看它的真面目。",
+    sound: "音效",
+    soundOn: "环境音 开",
+    soundOff: "环境音 关",
+    kbdHint: "<span class='kbd'>P</span>探测 · <span class='kbd'>M</span>标记 · <span class='kbd'>I</span>洞察 · <span class='kbd'>C</span>校准 · <span class='kbd'>R</span>重置 · <span class='kbd'>L</span>语言",
+    statBest: "最高回合",
+    statWins: "胜场",
+    statTotal: "破译总数",
+    achDecoded3: "拿下三个了，词典开始有东西了。",
+    achDecoded6: "过半。6 个符号到手。",
+    achDecoded9: "九个了，你已经能读懂这些了。",
+    achDecoded12: "12 个全破。这台控制台归你了。",
+    achRound5: "第 5 回合，老手了。",
+    twinWarn: "注意，有两个长得几乎一样，但其实不是一回事。看行为，别看脸。",
+    tutWelcome: "欢迎，操作员",
+    tutNext: "下一步",
+    tutSkip: "跳过",
+    tutStart: "开始",
+    tutPrev: "上一步"
+  }
+};
+
+// ===== Seeded RNG (deterministic glyph generation) =====
+function seededRand(seed) {
+  let s = seed % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return function() {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+// ===== Procedural Alien Glyph Generator =====
+// Each glyph is deterministically generated from a seed.
+// Produces unique, alien-looking SVG composed of geometric primitives.
+function generateGlyphSVG(seed) {
+  const rng = seededRand(seed * 7 + 13);
+  let svg = '';
+  const stroke = 'stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"';
+
+  // Base frame (3 variants)
+  const frame = Math.floor(rng() * 4);
+  generateGlyphSVG._lastFrame = frame;
+  if (frame === 0) {
+    // Circle
+    const r = 22 + rng() * 8;
+    svg += `<circle cx="50" cy="50" r="${r.toFixed(1)}" ${stroke}/>`;
+  } else if (frame === 1) {
+    // Hexagon
+    let pts = '';
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI / 3) * i - Math.PI / 2;
+      pts += `${(50 + 28 * Math.cos(a)).toFixed(1)},${(50 + 28 * Math.sin(a)).toFixed(1)} `;
+    }
+    svg += `<polygon points="${pts}" ${stroke}/>`;
+  } else if (frame === 2) {
+    // Triangle
+    svg += `<polygon points="50,18 80,78 20,78" ${stroke}/>`;
+  } else {
+    // Diamond
+    svg += `<polygon points="50,16 80,50 50,84 20,50" ${stroke}/>`;
+  }
+
+  // Inner core (2-3 modifiers)
+  const numMods = 2 + Math.floor(rng() * 2);
+  for (let i = 0; i < numMods; i++) {
+    const mod = Math.floor(rng() * 7);
+    const cx = 30 + rng() * 40;
+    const cy = 30 + rng() * 40;
+    if (mod === 0) {
+      // Filled dot
+      svg += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="2.5" fill="currentColor"/>`;
+    } else if (mod === 1) {
+      // Line segment
+      const ang = rng() * Math.PI * 2;
+      const len = 10 + rng() * 14;
+      const x2 = cx + Math.cos(ang) * len;
+      const y2 = cy + Math.sin(ang) * len;
+      svg += `<line x1="${cx.toFixed(1)}" y1="${cy.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" ${stroke}/>`;
+    } else if (mod === 2) {
+      // Small ring
+      const r = 4 + rng() * 4;
+      svg += `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${r.toFixed(1)}" ${stroke}/>`;
+    } else if (mod === 3) {
+      // Cross
+      svg += `<line x1="${(cx-5).toFixed(1)}" y1="${cy.toFixed(1)}" x2="${(cx+5).toFixed(1)}" y2="${cy.toFixed(1)}" ${stroke}/>`;
+      svg += `<line x1="${cx.toFixed(1)}" y1="${(cy-5).toFixed(1)}" x2="${cx.toFixed(1)}" y2="${(cy+5).toFixed(1)}" ${stroke}/>`;
+    } else if (mod === 4) {
+      // Chevron
+      const dir = Math.floor(rng() * 4);
+      const d = 6;
+      let p;
+      if (dir === 0) p = `M${cx-d},${cy+d} L${cx},${cy-d} L${cx+d},${cy+d}`;
+      else if (dir === 1) p = `M${cx-d},${cy-d} L${cx+d},${cy} L${cx-d},${cy+d}`;
+      else if (dir === 2) p = `M${cx-d},${cy-d} L${cx},${cy+d} L${cx+d},${cy-d}`;
+      else p = `M${cx+d},${cy-d} L${cx-d},${cy} L${cx+d},${cy+d}`;
+      svg += `<path d="${p}" ${stroke}/>`;
+    } else if (mod === 5) {
+      // Arc
+      const r = 6 + rng() * 6;
+      const a0 = rng() * Math.PI * 2;
+      const a1 = a0 + Math.PI * (0.5 + rng() * 1.2);
+      const x1 = cx + Math.cos(a0) * r;
+      const y1 = cy + Math.sin(a0) * r;
+      const x2 = cx + Math.cos(a1) * r;
+      const y2 = cy + Math.sin(a1) * r;
+      const large = (a1 - a0) > Math.PI ? 1 : 0;
+      svg += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r.toFixed(1)},${r.toFixed(1)} 0 ${large} 1 ${x2.toFixed(1)},${y2.toFixed(1)}" ${stroke}/>`;
+    } else {
+      // Small triangle
+      const s = 4 + rng() * 3;
+      svg += `<polygon points="${cx},${(cy-s).toFixed(1)} ${(cx+s).toFixed(1)},${(cy+s*0.6).toFixed(1)} ${(cx-s).toFixed(1)},${(cy+s*0.6).toFixed(1)}" ${stroke}/>`;
+    }
+  }
+
+  // Central node
+  if (rng() > 0.4) {
+    svg += `<circle cx="50" cy="50" r="3" fill="currentColor"/>`;
+  }
+
+  return svg;
+}
+
+// ===== Glyph Pool =====
+// 12 unique glyphs, 4 per type. Type assignment is fixed so the
+// lexicon persists meaningfully across rounds.
+const GLYPH_DEFS = [
+  { id: 'α-01', seed: 101, type: 'voltage' },
+  { id: 'β-02', seed: 217, type: 'voltage' },
+  { id: 'γ-03', seed: 343, type: 'voltage' },
+  { id: 'δ-04', seed: 469, type: 'voltage' },
+  { id: 'ε-05', seed: 587, type: 'invert'  },
+  { id: 'ζ-06', seed: 613, type: 'invert'  },
+  { id: 'η-07', seed: 731, type: 'invert'  },
+  { id: 'θ-08', seed: 853, type: 'invert'  },
+  { id: 'ι-09', seed: 977, type: 'limit'   },
+  { id: 'κ-10', seed: 1091, type: 'limit'  },
+  { id: 'λ-11', seed: 1213, type: 'limit'  },
+  { id: 'μ-12', seed: 1367, type: 'limit'  }
+];
+
+// Pre-generate SVGs (deterministic)
+const GLYPHS = GLYPH_DEFS.map(d => {
+  const svg = generateGlyphSVG(d.seed);
+  return { ...d, svg, frame: generateGlyphSVG._lastFrame };
+});
+
+// ===== Game State =====
+const state = {
+  lang: 'en',
+  round: 1,
+  coreValue: 50,
+  probesLeft: 3,
+  insightsLeft: 1,
+  activeGlyphs: [],
+  marks: {},        // glyphId -> type (player's current mark)
+  probed: {},       // glyphId -> true (probed this round)
+  dictionary: {},   // glyphId -> type (confirmed, persistent)
+  revealed: {},     // glyphId -> true (insight-revealed this round)
+  mode: 'mark',     // 'mark' | 'probe' | 'insight'
+  twinPair: [],     // ids of twin glyphs this round (visual deception)
+  gameOver: false,
+  calibrating: false,
+  soundOn: false,
+  stats: { bestRound: 1, wins: 0 },
+  achievements: new Set()
+};
+
+const $ = id => document.getElementById(id);
+
+// ===== Audio (Web Audio API beeps) =====
+let audioCtx = null;
+function beep(freq, dur, type='square', vol=0.04) {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = vol;
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  } catch(e) {}
+}
+
+// ===== Ambient drone (background atmosphere) =====
+let ambientNodes = null;
+function startAmbient() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ambientNodes) return;
+    const o1 = audioCtx.createOscillator();
+    const o2 = audioCtx.createOscillator();
+    const lfo = audioCtx.createOscillator();
+    const lfoGain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+    const master = audioCtx.createGain();
+    o1.type = 'sawtooth'; o1.frequency.value = 55;
+    o2.type = 'sine'; o2.frequency.value = 82.4;
+    lfo.type = 'sine'; lfo.frequency.value = 0.15;
+    lfoGain.gain.value = 8;
+    lfo.connect(lfoGain).connect(o1.frequency);
+    filter.type = 'lowpass'; filter.frequency.value = 220; filter.Q.value = 2;
+    master.gain.value = 0.025;
+    o1.connect(filter); o2.connect(filter);
+    filter.connect(master).connect(audioCtx.destination);
+    o1.start(); o2.start(); lfo.start();
+    ambientNodes = { o1, o2, lfo, master };
+  } catch(e) {}
+}
+function stopAmbient() {
+  if (!ambientNodes) return;
+  try {
+    ambientNodes.master.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+    const n = ambientNodes;
+    setTimeout(() => { try{ n.o1.stop(); n.o2.stop(); n.lfo.stop(); }catch(e){} }, 500);
+  } catch(e) {}
+  ambientNodes = null;
+}
+
+// ===== localStorage persistence =====
+const STORE_KEY = 'linguistic-cipher-v1';
+function saveState() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      lang: state.lang,
+      dictionary: state.dictionary,
+      stats: state.stats,
+      achievements: [...state.achievements],
+      soundOn: state.soundOn,
+      tutored: true
+    }));
+  } catch(e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+// ===== Toast notifications =====
+function toast(msg, type='info', title='') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = (title ? `<div class="toast-title">${title}</div>` : '') + msg;
+  $('toast-container').appendChild(el);
+  setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); }, 3800);
+}
+
+// ===== Achievements =====
+function checkAchievements() {
+  const n = Object.keys(state.dictionary).length;
+  const checks = [
+    [3, 'achDecoded3'],
+    [6, 'achDecoded6'],
+    [9, 'achDecoded9'],
+    [12, 'achDecoded12']
+  ];
+  checks.forEach(([count, key]) => {
+    if (n >= count && !state.achievements.has(key)) {
+      state.achievements.add(key);
+      toast(t(key), 'achievement', state.lang === 'en' ? 'ACHIEVEMENT' : '成就解锁');
+      beep(990, 0.08); setTimeout(()=>beep(1320,0.12),100);
+      saveState();
+    }
+  });
+  if (state.round >= 5 && !state.achievements.has('achRound5')) {
+    state.achievements.add('achRound5');
+    toast(t('achRound5'), 'achievement', state.lang === 'en' ? 'ACHIEVEMENT' : '成就解锁');
+    saveState();
+  }
+}
+
+// ===== Core particle system =====
+let particles = [];
+let particleRAF = null;
+function initParticles() {
+  const canvas = $('particle-canvas');
+  const meter = $('core-meter');
+  const resize = () => {
+    canvas.width = meter.clientWidth;
+    canvas.height = meter.clientHeight;
+  };
+  resize();
+  window.addEventListener('resize', resize);
+  function loop() {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const h = canvas.height;
+    const fillH = h * (Math.max(0,Math.min(150,state.coreValue)) / 150);
+    const intensity = state.coreValue >= 100 ? 0.5 : (state.coreValue > 80 ? 0.25 : 0.1);
+    // spawn
+    if (Math.random() < intensity && particles.length < 60) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: h - fillH + Math.random() * 4,
+        vy: -0.4 - Math.random() * 1.2,
+        vx: (Math.random() - 0.5) * 0.4,
+        life: 1,
+        size: 1 + Math.random() * 2,
+        col: state.coreValue > 100 ? '#ff6644' : (state.coreValue === 100 && state.gameOver ? '#ffcc33' : '#5cff9a')
+      });
+    }
+    particles = particles.filter(p => p.life > 0);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.life -= 0.012;
+      ctx.globalAlpha = p.life * 0.8;
+      ctx.fillStyle = p.col;
+      ctx.shadowBlur = 6; ctx.shadowColor = p.col;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    particleRAF = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ===== Oscilloscope waveform renderer =====
+let oscRAF = null;
+let oscStart = 0;
+let oscType = null;
+function drawOscilloscope(type) {
+  const canvas = $('probe-osc');
+  const meter = canvas.parentElement;
+  canvas.width = meter.clientWidth;
+  canvas.height = meter.clientHeight;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  oscType = type;
+  oscStart = performance.now();
+  if (oscRAF) cancelAnimationFrame(oscRAF);
+  // toggle cap visibility for limit type
+  $('probe-cap').classList.toggle('show', type === 'limit');
+  if (type === 'limit') $('probe-cap').style.bottom = '55%';
+
+  function frame(now) {
+    const elapsed = (now - oscStart) / 1000;
+    ctx.clearRect(0,0,W,H);
+    const midY = H * 0.5;
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = type === 'invert' ? '#ffcc33' : '#5cff9a';
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.beginPath();
+    for (let x = 0; x <= W; x += 2) {
+      const tx = x / W;
+      let y = midY;
+      if (type === 'voltage') {
+        // rising pulse with decay, repeats
+        const phase = (tx * 3 + elapsed * 1.5) % 1;
+        const pulse = Math.exp(-phase * 5) * Math.sin(phase * Math.PI * 6);
+        y = midY - pulse * H * 0.38;
+      } else if (type === 'invert') {
+        // mirrored sine — two reflected waves
+        const wave = Math.sin(tx * Math.PI * 4 + elapsed * 3) * H * 0.3;
+        const mirror = Math.sin((1 - tx) * Math.PI * 4 + elapsed * 3) * H * 0.3;
+        y = midY - (wave * 0.5 + mirror * 0.5);
+      } else if (type === 'limit') {
+        // signal tries to rise but clamps at ceiling
+        const raw = Math.sin(tx * Math.PI * 3 + elapsed * 2.5) * H * 0.5;
+        const ceiling = -H * 0.22; // top cap position
+        y = midY + Math.max(raw, ceiling * 1) * 0.6;
+        y = Math.min(y, midY + H * 0.05); // never far below mid when clamped
+        y = Math.max(y, H * 0.32); // ceiling clamp
+      }
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    // baseline glow
+    ctx.strokeStyle = 'rgba(92,255,154,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, midY); ctx.lineTo(W, midY); ctx.stroke();
+    oscRAF = requestAnimationFrame(frame);
+  }
+  frame(performance.now());
+}
+function stopOscilloscope() {
+  if (oscRAF) { cancelAnimationFrame(oscRAF); oscRAF = null; }
+  const canvas = $('probe-osc');
+  if (canvas) { const c = canvas.getContext('2d'); c && c.clearRect(0,0,canvas.width,canvas.height); }
+}
+
+// ===== i18n =====
+function t(key) { return (Lang[state.lang] && Lang[state.lang][key]) || key; }
+
+function applyI18n() {
+  $('title').textContent = t('title');
+  $('subtitle').textContent = t('subtitle');
+  $('lbl-core').textContent = t('coreLabel');
+  $('lbl-glyphs').textContent = t('glyphLabel');
+  $('lbl-dict').textContent = t('dictLabel');
+  $('lbl-target').innerHTML = `${t('target')}: <span class="val">100%</span>`;
+  $('lbl-probes').innerHTML = `${t('probesLeft')}: <span id="probe-count">${state.probesLeft}</span>`;
+  $('lbl-insight').innerHTML = `${t('insight')}: <span id="insight-count" class="val">${state.insightsLeft}</span>`;
+  $('round-badge').textContent = `${t('round')} ${String(state.round).padStart(2,'0')}`;
+  $('desc').innerHTML =
+    `<span class="tag">[${t('voltage')}]</span> · <span class="tag">[${t('invert')}]</span> · <span class="tag">[${t('limit')}]</span> — ${t('desc')}`;
+  $('mark-title').textContent = t('mark');
+  $('mark-close').textContent = t('cancel');
+  $('probe-btn').textContent = t('probe');
+  $('insight-btn').textContent = t('insight');
+  $('calibrate-btn').textContent = t('calibrate');
+  $('reset-btn').textContent = t('reset');
+  $('probe-close').textContent = t('close');
+  $('probe-title').textContent = state.lang === 'en' ? 'GLYPH SCAN' : '符号扫描';
+  $('kbd-hint').innerHTML = t('kbdHint');
+
+  const modeInd = $('mode-indicator');
+  if (state.mode === 'probe') modeInd.textContent = t('probeMode');
+  else if (state.mode === 'insight') modeInd.textContent = t('insightPick');
+  else modeInd.textContent = t('markMode');
+  modeInd.classList.toggle('probe-active', state.mode === 'probe' || state.mode === 'insight');
+  $('probe-btn').classList.toggle('active', state.mode === 'probe');
+  $('insight-btn').classList.toggle('active', state.mode === 'insight');
+  $('insight-btn').disabled = state.insightsLeft <= 0;
+  $('sound-btn').textContent = state.soundOn ? '♪' : '♪';
+  $('sound-btn').style.opacity = state.soundOn ? '1' : '0.4';
+
+  renderGlyphs();
+  renderDict();
+  renderCore();
+}
+
+// ===== Logging =====
+function log(msg, cls='') {
+  const div = document.createElement('div');
+  div.className = 'log-line ' + cls;
+  div.textContent = msg;
+  $('log').appendChild(div);
+  $('log').scrollTop = $('log').scrollHeight;
+}
+
+// ===== Core Meter =====
+function renderCore() {
+  const fill = $('core-fill');
+  const val = $('core-value');
+  const pct = Math.max(0, Math.min(150, state.coreValue));
+  fill.style.height = (pct / 1.5) + '%';
+  val.textContent = Math.round(state.coreValue) + '%';
+  fill.classList.remove('danger', 'stable');
+  if (state.coreValue > 100) {
+    fill.classList.add('danger');
+    val.style.color = 'var(--danger)';
+  } else if (state.coreValue === 100 && state.gameOver) {
+    fill.classList.add('stable');
+    val.style.color = 'var(--accent)';
+  } else {
+    val.style.color = 'var(--fg-bright)';
+  }
+}
+
+// ===== Glyph Rendering =====
+function markMarkup(type) {
+  if (!type) return `<div class="glyph-mark empty"><div class="mark-en">${t('empty')}</div></div>`;
+  return `<div class="glyph-mark">
+    <div class="mark-en">${Lang.en[type]}</div>
+    <div class="mark-zh">${Lang.zh[type]}</div>
+  </div>`;
+}
+
+function renderGlyphs() {
+  const row = $('glyph-row');
+  row.innerHTML = '';
+  state.activeGlyphs.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'glyph-card';
+    card.dataset.id = g.id;
+    if (state.probed[g.id]) card.classList.add('probed');
+    if (state.dictionary[g.id]) card.classList.add('known');
+    if (state.revealed[g.id]) card.classList.add('insight-reveal');
+    const isTwin = state.twinPair.includes(g.id);
+    // Show revealed type as a forced mark if not yet marked
+    const showType = state.marks[g.id] || (state.revealed[g.id] ? g.type : null);
+    card.innerHTML = `
+      ${isTwin ? '<span class="twin-mark">⚭</span>' : ''}
+      <div class="glyph-id">${g.id}</div>
+      <svg class="glyph-svg" viewBox="0 0 100 100">${g.svg}</svg>
+      ${markMarkup(showType)}
+    `;
+    card.addEventListener('click', () => onGlyphClick(g, card));
+    row.appendChild(card);
+  });
+}
+
+// ===== Dictionary Panel =====
+function renderDict() {
+  const list = $('dict-list');
+  const known = Object.keys(state.dictionary);
+  $('dict-progress').innerHTML = `${t('decoded')}: <span class="val">${known.length}</span> ${t('of')} ${GLYPHS.length}`;
+  list.innerHTML = '';
+  if (known.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'dict-empty';
+    empty.textContent = t('dictEmpty');
+    list.appendChild(empty);
+    return;
+  }
+  known.sort().forEach(id => {
+    const glyph = GLYPHS.find(g => g.id === id);
+    const type = state.dictionary[id];
+    const entry = document.createElement('div');
+    entry.className = 'dict-entry';
+    entry.innerHTML = `
+      <svg viewBox="0 0 100 100">${glyph.svg}</svg>
+      <span class="dict-id">${id}</span>
+      <span class="dict-type">${t(type)}</span>
+    `;
+    list.appendChild(entry);
+  });
+  // Stats footer
+  $('dict-stats').innerHTML = `
+    <div class="row"><span>${t('statBest')}</span><span class="val">${state.stats.bestRound}</span></div>
+    <div class="row"><span>${t('statWins')}</span><span class="val">${state.stats.wins}</span></div>
+    <div class="row"><span>${t('statTotal')}</span><span class="val">${known.length}/${GLYPHS.length}</span></div>
+  `;
+}
+
+// ===== Glyph Click Handler =====
+function onGlyphClick(glyph, card) {
+  if (state.gameOver || state.calibrating) return;
+  if (state.mode === 'probe') {
+    probeGlyph(glyph);
+  } else if (state.mode === 'insight') {
+    useInsight(glyph);
+  } else {
+    openMarkModal(glyph);
+  }
+}
+
+// ===== Probe (oscilloscope waveform) =====
+function probeGlyph(glyph) {
+  if (state.probesLeft <= 0) {
+    log(t('logProbeFail'), 'danger');
+    toast(t('logProbeFail'), 'warn');
+    beep(140, 0.25, 'sawtooth');
+    return;
+  }
+  state.probesLeft--;
+  state.probed[glyph.id] = true;
+  $('lbl-probes').innerHTML = `${t('probesLeft')}: <span id="probe-count">${state.probesLeft}</span>`;
+  log(`${t('logProbe')} ${glyph.id}...`, 'accent');
+  beep(440, 0.08);
+
+  // Show probe overlay
+  $('probe-glyph-svg').innerHTML = glyph.svg;
+  $('probe-overlay').classList.add('show');
+
+  const label = $('probe-label');
+  const hint = $('probe-hint');
+  label.textContent = '...';
+  hint.textContent = '';
+
+  // Animate oscilloscope based on TRUE type
+  setTimeout(() => {
+    drawOscilloscope(glyph.type);
+    if (glyph.type === 'voltage') {
+      label.textContent = t('probeV');
+      hint.textContent = t('probeHintV');
+      beep(660, 0.12);
+      setTimeout(() => beep(880, 0.1), 120);
+    } else if (glyph.type === 'invert') {
+      label.textContent = t('probeI');
+      hint.textContent = t('probeHintI');
+      beep(520, 0.08);
+      setTimeout(() => beep(520, 0.08), 250);
+    } else if (glyph.type === 'limit') {
+      label.textContent = t('probeL');
+      hint.textContent = t('probeHintL');
+      beep(330, 0.1, 'square');
+      setTimeout(() => beep(220, 0.15, 'square'), 200);
+    }
+  }, 350);
+
+  renderGlyphs();
+}
+
+// ===== Insight system =====
+function toggleInsightMode() {
+  if (state.gameOver || state.calibrating) return;
+  if (state.insightsLeft <= 0) {
+    toast(t('insightNone'), 'warn');
+    beep(140, 0.2, 'sawtooth');
+    return;
+  }
+  state.mode = state.mode === 'insight' ? 'mark' : 'insight';
+  applyI18n();
+  beep(700, 0.05);
+}
+
+function useInsight(glyph) {
+  if (state.insightsLeft <= 0) return;
+  state.insightsLeft--;
+  state.revealed[glyph.id] = true;
+  state.marks[glyph.id] = glyph.type; // auto-mark with truth
+  $('lbl-insight').innerHTML = `${t('insight')}: <span id="insight-count" class="val">${state.insightsLeft}</span>`;
+  log(`${t('insightUsed')} ${glyph.id} → ${t(glyph.type)}`, 'success');
+  toast(t('insightUsed'), 'info', t('insight'));
+  beep(740, 0.08); setTimeout(()=>beep(990,0.1),90);
+  // Exit insight mode after use
+  state.mode = 'mark';
+  applyI18n();
+  saveState();
+}
+
+// ===== Mark Modal =====
+function openMarkModal(glyph) {
+  $('mark-preview').innerHTML =
+    `<svg viewBox="0 0 100 100">${glyph.svg}</svg><div class="gid">${glyph.id}</div>`;
+  const options = $('mark-options');
+  options.innerHTML = '';
+  ['voltage', 'invert', 'limit'].forEach(type => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-option';
+    if (state.marks[glyph.id] === type) btn.classList.add('selected');
+    btn.innerHTML = `<span>${Lang.en[type]}</span><span class="opt-zh">${Lang.zh[type]}</span>`;
+    btn.addEventListener('click', () => {
+      state.marks[glyph.id] = type;
+      log(`${t('logMarked')} ${glyph.id} ${t('logMarkedAs')} ${t(type)}`, 'success');
+      beep(740, 0.06);
+      closeMarkModal();
+      renderGlyphs();
+    });
+    options.appendChild(btn);
+  });
+  $('mark-modal').classList.add('show');
+}
+
+function closeMarkModal() {
+  $('mark-modal').classList.remove('show');
+}
+
+// ===== Calibrate =====
+function calibrate() {
+  if (state.gameOver || state.calibrating) return;
+  const allMarked = state.activeGlyphs.every(g => state.marks[g.id]);
+  if (!allMarked) {
+    log(t('logNeedMarks'), 'danger');
+    beep(140, 0.25, 'sawtooth');
+    return;
+  }
+
+  state.calibrating = true;
+  log(t('logCalibrate'), 'accent');
+  beep(280, 0.15);
+
+  const allCorrect = state.activeGlyphs.every(g => state.marks[g.id] === g.type);
+
+  // Animate core through glyph applications
+  let val = 50;
+  const cards = document.querySelectorAll('.glyph-card');
+  state.activeGlyphs.forEach((g, i) => {
+    setTimeout(() => {
+      const mark = state.marks[g.id];
+      const correct = mark === g.type;
+      const card = cards[i];
+      if (card) card.classList.add(correct ? 'correct-flash' : 'wrong-flash');
+
+      if (correct) {
+        if (g.type === 'voltage') val = Math.min(150, val + 18);
+        else if (g.type === 'invert') val = 100 - val;
+        else if (g.type === 'limit') val = Math.min(val, 72);
+      } else {
+        // Glitch
+        val = Math.max(0, Math.min(150, val + (Math.random() * 50 - 15)));
+      }
+      state.coreValue = val;
+      renderCore();
+      beep(correct ? 560 : 180, 0.06, correct ? 'square' : 'sawtooth');
+    }, i * 450);
+  });
+
+  setTimeout(() => {
+    state.calibrating = false;
+    if (allCorrect) {
+      state.coreValue = 100;
+      renderCore();
+      // Confirm glyphs into dictionary
+      let added = [];
+      state.activeGlyphs.forEach(g => {
+        if (!state.dictionary[g.id]) {
+          state.dictionary[g.id] = g.type;
+          added.push(g.id);
+        }
+      });
+      if (added.length) log(`${t('logDictUpdate')} ${added.join(', ')}`, 'success');
+      log(t('logWin'), 'success');
+      // Track stats
+      state.stats.wins++;
+      if (state.round > state.stats.bestRound) state.stats.bestRound = state.round;
+      saveState();
+      checkAchievements();
+      beep(880, 0.1);
+      setTimeout(() => beep(1100, 0.1), 110);
+      setTimeout(() => beep(1320, 0.2), 220);
+      showResult(true);
+    } else {
+      state.coreValue = 135;
+      renderCore();
+      log(t('logOverload'), 'danger');
+      beep(150, 0.4, 'sawtooth');
+      setTimeout(() => beep(100, 0.5, 'sawtooth'), 250);
+      showResult(false);
+    }
+  }, state.activeGlyphs.length * 450 + 300);
+}
+
+// ===== Result Overlay =====
+function showResult(win) {
+  const box = $('result-box');
+  box.className = 'result-box ' + (win ? 'success' : 'danger');
+  $('result-title').textContent = win ? t('resultWin') : t('resultLose');
+  $('result-msg').textContent = win ? t('resultWinMsg') : t('resultLoseMsg');
+
+  // Detail breakdown
+  let detail = '';
+  state.activeGlyphs.forEach(g => {
+    const mark = state.marks[g.id];
+    const correct = mark === g.type;
+    detail += `${g.id}: ${t(mark)} → ${correct ? '<span class="right">'+t('right')+'</span>' : '<span class="wrong">'+t('wrong')+' ('+t(g.type)+')</span>'}<br>`;
+  });
+  $('result-detail').innerHTML = detail;
+
+  $('result-btn').textContent = win ? t('nextRound') : t('retry');
+  $('result-overlay').classList.add('show');
+  state.gameOver = true;
+}
+
+// ===== New Round =====
+function newRound() {
+  state.gameOver = false;
+  state.coreValue = 50;
+  state.probesLeft = 3;
+  state.insightsLeft = 1;
+  state.marks = {};
+  state.probed = {};
+  state.revealed = {};
+  state.twinPair = [];
+  state.mode = 'mark';
+
+  const knownIds = Object.keys(state.dictionary);
+  const unknown = GLYPHS.filter(g => !state.dictionary[g.id]);
+  const known = knownIds.map(id => GLYPHS.find(g => g.id === id));
+
+  // Aim for 4 glyphs: prefer fresh unknowns, mix in known once we have a lexicon
+  const chosen = [];
+  const shuffledUnknown = [...unknown].sort(() => Math.random() - 0.5);
+  const shuffledKnown = [...known].sort(() => Math.random() - 0.5);
+
+  // Difficulty: more known glyphs appear as lexicon grows (review)
+  let targetUnknown = Math.min(shuffledUnknown.length, 3);
+  let targetKnown = Math.min(shuffledKnown.length, 4 - targetUnknown);
+  if (shuffledUnknown.length < 3) {
+    targetUnknown = shuffledUnknown.length;
+    targetKnown = Math.min(shuffledKnown.length, 4 - targetUnknown);
+  }
+  // First round: all unknown
+  if (state.round === 1) { targetUnknown = 4; targetKnown = 0; }
+
+  for (let i = 0; i < targetUnknown; i++) chosen.push(shuffledUnknown[i]);
+  for (let i = 0; i < targetKnown; i++) chosen.push(shuffledKnown[i]);
+
+  // Fill remainder if short
+  while (chosen.length < 4) {
+    const pool = GLYPHS.filter(g => !chosen.includes(g));
+    if (!pool.length) break;
+    chosen.push(pool[Math.floor(Math.random() * pool.length)]);
+  }
+
+  state.activeGlyphs = chosen.sort(() => Math.random() - 0.5).slice(0, 4);
+
+  // === Difficulty: Twin glyphs from round 3+ ===
+  // Pick two glyphs of DIFFERENT types but similar base frame to create
+  // visual deception. Mark them so the player is warned to trust behavior.
+  if (state.round >= 3 && state.activeGlyphs.length >= 2) {
+    const byType = { voltage: [], invert: [], limit: [] };
+    state.activeGlyphs.forEach(g => byType[g.type].push(g));
+    const typesWithGlyphs = Object.keys(byType).filter(k => byType[k].length);
+    if (typesWithGlyphs.length >= 2) {
+      // pick two different types, prefer same frame for deception
+      const t1 = typesWithGlyphs[Math.floor(Math.random() * typesWithGlyphs.length)];
+      let t2 = typesWithGlyphs.filter(k => k !== t1)[Math.floor(Math.random() * (typesWithGlyphs.length - 1))];
+      const g1 = byType[t1][0];
+      const g2 = byType[t2][0];
+      // Mark as twins when they share the same base frame (visual deception)
+      if (g1.frame === g2.frame) {
+        state.twinPair = [g1.id, g2.id];
+        toast(t('twinWarn'), 'warn', state.lang === 'en' ? 'WARNING' : '警告');
+      }
+    }
+  }
+
+  state.round++;
+  saveState();
+
+  log(`${t('logNewRound')} (${t('round')} ${state.round})`, 'accent');
+  applyI18n();
+}
+
+// ===== Reset Round (same glyphs, fresh probes) =====
+function resetRound() {
+  if (state.calibrating) return;
+  state.coreValue = 50;
+  state.marks = {};
+  state.probed = {};
+  state.revealed = {};
+  state.probesLeft = 3;
+  state.insightsLeft = 1;
+  state.gameOver = false;
+  state.mode = 'mark';
+  log(t('logReset'), 'accent');
+  beep(400, 0.08);
+  applyI18n();
+}
+
+// ===== Event Listeners =====
+$('lang-toggle').addEventListener('click', () => {
+  state.lang = state.lang === 'en' ? 'zh' : 'en';
+  saveState();
+  applyI18n();
+  beep(900, 0.05);
+});
+
+$('probe-btn').addEventListener('click', () => {
+  if (state.gameOver || state.calibrating) return;
+  state.mode = state.mode === 'probe' ? 'mark' : 'probe';
+  applyI18n();
+  beep(600, 0.05);
+});
+
+$('insight-btn').addEventListener('click', toggleInsightMode);
+
+$('sound-btn').addEventListener('click', () => {
+  state.soundOn = !state.soundOn;
+  if (state.soundOn) { startAmbient(); toast(t('soundOn'), 'info'); }
+  else { stopAmbient(); toast(t('soundOff'), 'info'); }
+  saveState();
+  applyI18n();
+  beep(800, 0.05);
+});
+
+$('calibrate-btn').addEventListener('click', calibrate);
+$('reset-btn').addEventListener('click', resetRound);
+$('mark-close').addEventListener('click', closeMarkModal);
+$('probe-close').addEventListener('click', () => {
+  $('probe-overlay').classList.remove('show');
+  stopOscilloscope();
+});
+$('result-btn').addEventListener('click', () => {
+  $('result-overlay').classList.remove('show');
+  const isWin = $('result-box').classList.contains('success');
+  if (isWin) newRound();
+  else resetRound();
+});
+
+// Close modals on backdrop click
+$('mark-modal').addEventListener('click', e => { if (e.target.id === 'mark-modal') closeMarkModal(); });
+$('probe-overlay').addEventListener('click', e => {
+  if (e.target.id === 'probe-overlay') {
+    $('probe-overlay').classList.remove('show');
+    stopOscilloscope();
+  }
+});
+
+// ===== Tutorial =====
+let tutStep = 0;
+function showTutorial() {
+  // populate demo glyphs in step 2
+  const demo = $('tut2-demo');
+  if (demo && !demo.childElementCount) {
+    const samples = [
+      GLYPHS.find(g => g.type === 'voltage'),
+      GLYPHS.find(g => g.type === 'invert'),
+      GLYPHS.find(g => g.type === 'limit')
+    ];
+    samples.forEach(g => {
+      const item = document.createElement('div');
+      item.className = 'demo-item';
+      item.innerHTML = `<svg viewBox="0 0 100 100">${g.svg}</svg><div class="demo-label">${Lang.en[g.type]}</div>`;
+      demo.appendChild(item);
+    });
+  }
+  $('tutorial-overlay').classList.remove('hide');
+  setTutStep(0);
+}
+function setTutStep(i) {
+  tutStep = i;
+  document.querySelectorAll('.tut-step').forEach((s, idx) => s.classList.toggle('active', idx === i));
+  document.querySelectorAll('.tut-dot').forEach((d, idx) => d.classList.toggle('active', idx === i));
+  $('tut-next').textContent = i === 2 ? t('tutStart') : t('tutNext');
+}
+$('tut-next').addEventListener('click', () => {
+  if (tutStep < 2) setTutStep(tutStep + 1);
+  else {
+    $('tutorial-overlay').classList.add('hide');
+    saveState();
+    beep(880, 0.1);
+  }
+});
+$('tut-skip').addEventListener('click', () => {
+  $('tutorial-overlay').classList.add('hide');
+  saveState();
+  beep(500, 0.06);
+});
+
+// ===== Keyboard shortcuts =====
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if ($('tutorial-overlay') && !$('tutorial-overlay').classList.contains('hide')) return;
+  if ($('mark-modal').classList.contains('show')) {
+    if (e.key === 'Escape') closeMarkModal();
+    if (['1','2','3'].includes(e.key)) {
+      const opts = document.querySelectorAll('.modal-option');
+      const idx = parseInt(e.key) - 1;
+      if (opts[idx]) opts[idx].click();
+    }
+    return;
+  }
+  if ($('probe-overlay').classList.contains('show')) {
+    if (e.key === 'Escape' || e.key === ' ') {
+      $('probe-overlay').classList.remove('show');
+      stopOscilloscope();
+    }
+    return;
+  }
+  if ($('result-overlay').classList.contains('show')) {
+    if (e.key === 'Enter' || e.key === ' ') $('result-btn').click();
+    return;
+  }
+  const k = e.key.toLowerCase();
+  if (k === 'p') $('probe-btn').click();
+  else if (k === 'm') { if (state.mode !== 'mark') { state.mode = 'mark'; applyI18n(); beep(600,0.05); } }
+  else if (k === 'i') $('insight-btn').click();
+  else if (k === 'c') $('calibrate-btn').click();
+  else if (k === 'r') $('reset-btn').click();
+  else if (k === 'l') $('lang-toggle').click();
+});
+
+// ===== Init =====
+function init() {
+  // Load persisted state
+  const saved = loadState();
+  let firstTime = true;
+  if (saved) {
+    state.lang = saved.lang || 'en';
+    state.dictionary = saved.dictionary || {};
+    state.stats = saved.stats || { bestRound: 1, wins: 0 };
+    state.achievements = new Set(saved.achievements || []);
+    state.soundOn = !!saved.soundOn;
+    firstTime = !saved.tutored;
+    if (saved.tutored) state.round = state.stats.bestRound;
+  }
+
+  // First round: 4 unknown glyphs
+  const unknownPool = GLYPHS.filter(g => !state.dictionary[g.id]);
+  const pool = unknownPool.length >= 4 ? unknownPool : GLYPHS;
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  state.activeGlyphs = shuffled.slice(0, 4);
+
+  log(t('logStart'), 'accent');
+  initParticles();
+  applyI18n();
+
+  if (state.soundOn) startAmbient();
+
+  if (firstTime) {
+    setTimeout(showTutorial, 300);
+  } else {
+    toast(state.lang === 'en'
+      ? `Welcome back. Lexicon: ${Object.keys(state.dictionary).length}/${GLYPHS.length}`
+      : `欢迎回来。词典：${Object.keys(state.dictionary).length}/${GLYPHS.length}`,
+      'info');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

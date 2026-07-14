@@ -1,0 +1,1662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    'Pawn Protocol / 借尸协议': 'Pawn Protocol',
+    '借尸协议': 'Pawn Protocol',
+    '简中': 'Chinese'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    var result = text;
+    if (T[text.trim()]) return T[text.trim()];
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  function applyInternalLang() {
+    try { if (typeof LANG !== 'undefined') LANG = 'en'; } catch(e) {}
+    try { if (typeof setLang === 'function') setLang('en'); } catch(e) {}
+    init();
+  }
+  if (document.readyState !== 'loading') setTimeout(applyInternalLang, 0);
+  else document.addEventListener('DOMContentLoaded', function() { setTimeout(applyInternalLang, 0); });
+  setTimeout(applyInternalLang, 100);
+  setTimeout(applyInternalLang, 500);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pawn Protocol / 借尸协议</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: #000; color: #00ff66;
+    font-family: 'Courier New', Consolas, monospace;
+    cursor: crosshair;
+  }
+  #game { display: block; position: absolute; top: 0; left: 0; }
+  /* 右上角语言切换 */
+  #langPanel {
+    position: fixed; top: 12px; right: 12px; z-index: 20;
+    display: flex; gap: 6px; align-items: center;
+    background: rgba(0,20,0,0.55);
+    border: 1px solid #00ff66;
+    padding: 6px 10px;
+    font-size: 13px; letter-spacing: 1px;
+    box-shadow: 0 0 12px rgba(0,255,102,0.35) inset;
+    user-select: none;
+  }
+  #langPanel .lbl { color: #6cf; opacity: .8; }
+  #langPanel button {
+    background: transparent; color: #00ff66;
+    border: 1px solid #00ff66; padding: 2px 8px;
+    font-family: inherit; font-size: 12px; cursor: pointer;
+    transition: all .15s;
+  }
+  #langPanel button.active {
+    background: #00ff66; color: #000; font-weight: bold;
+  }
+  #langPanel button:hover { box-shadow: 0 0 8px #00ff66; }
+  /* 左下提示 */
+  #hint {
+    position: fixed; bottom: 10px; left: 12px; z-index: 20;
+    font-size: 11px; color: #2a8; opacity: .75; line-height: 1.6;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="langPanel">
+  <span class="lbl">LANG</span>
+  <button id="btnEN" class="active">EN</button>
+  <button id="btnZH">简中</button>
+</div>
+<div id="hint"></div>
+
+<script>
+"use strict";
+/* =========================================================================
+   Pawn Protocol / 借尸协议
+   单文件 2D 俯视角动作 Rogue-lite
+   纯 Canvas + Web Audio API，零外部依赖
+   ========================================================================= */
+
+/* ---------- 0. 全局配置 ---------- */
+const CFG = {
+  ROOM_W: 760, ROOM_H: 560, WALL: 16,
+  PLAYER_SPEED: 3.0,
+  BATTERY_DRAIN: 8,        // 每秒掉电量（未寄生时）
+  POSSESS_RANGE: 520,      // 寄生线最大长度
+  POSSESS_SPEED: 14,       // 寄生线推进速度
+  HOST_DECAY: { guard: 3.0, drone: 3.6, turret: 2.2 }, // 每秒宿主掉血
+  HOST_HP:   { guard: 34, drone: 22, turret: 60 },
+  HOST_AMMO: { guard: 60, drone: 0, turret: 999 },
+  BULLET_SPEED: 8.5, BULLET_DMG: 6, BULLET_LIFE: 60,
+  TURRET_FAN_RANGE: 220, TURRET_FAN_DMG: 14, TURRET_COOLDOWN: 90,
+  GUARD_COOLDOWN: 18,
+  ENEMY_BULLET_SPEED: 4.5, ENEMY_BULLET_DMG: 8,
+  PRESTIGE_BONUS: 0.06,    // 每次转生：电池上限 +6%，宿主衰退 -6%
+};
+
+/* ---------- 1. 双语系统 ---------- */
+const I18N = {
+  en: {
+    title: "PAWN PROTOCOL",
+    target: "Target Core: ",
+    battery: "Battery Energy: ",
+    decay: "Host Decay: ",
+    possess: "Possess (Space)",
+    rebuild: "Rebuild Node (Prestige)",
+    cleared: "SYSTEM CLEARED!",
+    start: "[ CLICK or SPACE to JACK IN ]",
+    over: "ENERGY DEPLETED — SIGNAL LOST",
+    hint: "WASD move · Mouse aim · LMB shoot · Space possess · E eject host",
+    hostGuard: "GUARD", hostDrone: "DRONE", hostTurret: "TURRET",
+    core: "CORE", locked: "LOCKED — hack console with DRONE",
+    hacked: "CONSOLE HACKED — door opened",
+    lava: "HAZARD — need DRONE to fly over",
+    prestigeBtn: "REBUILD NODE",
+    newRun: "NEW MATRIX GENERATED",
+    noHost: "no host",
+    ammo: "AMMO",
+    floor: "FLOOR"
+  },
+  zh: {
+    title: "借尸协议",
+    target: "目标核心：",
+    battery: "剩余电量：",
+    decay: "宿主磨损：",
+    possess: "寄生控制 (空格)",
+    rebuild: "重构节点 (转生)",
+    cleared: "系统净化完成！",
+    start: "[ 点击或空格 接入矩阵 ]",
+    over: "电量耗尽 — 信号丢失",
+    hint: "WASD 移动 · 鼠标瞄准 · 左键射击 · 空格寄生 · E 脱离宿主",
+    hostGuard: "警卫", hostDrone: "无人机", hostTurret: "重甲炮塔",
+    core: "核心", locked: "已锁定 — 需用无人机黑入控制台",
+    hacked: "控制台已破解 — 门已开启",
+    lava: "伤害带 — 需无人机飞越",
+    prestigeBtn: "重构节点",
+    newRun: "新矩阵已生成",
+    noHost: "无宿主",
+    ammo: "弹药",
+    floor: "层数"
+  }
+};
+let LANG = "en";
+const t = (k) => (I18N[LANG][k] !== undefined ? I18N[LANG][k] : k);
+
+/* ---------- 2. Canvas 与画布尺寸 ---------- */
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+let VW = 0, VH = 0;
+function resize() {
+  VW = canvas.width = window.innerWidth;
+  VH = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resize);
+resize();
+
+/* ---------- 3. Web Audio 音效 ---------- */
+let audioCtx = null;
+function ensureAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { audioCtx = null; }
+  }
+  if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+}
+// 白噪音滤波 —— 火花爆裂
+function sfxSpark(intensity = 0.4) {
+  if (!audioCtx) return;
+  const dur = 0.18;
+  const bufferSize = audioCtx.sampleRate * dur;
+  const buf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1);
+  const src = audioCtx.createBufferSource(); src.buffer = buf;
+  const filt = audioCtx.createBiquadFilter();
+  filt.type = "bandpass"; filt.frequency.value = 1800; filt.Q.value = 0.8;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(intensity, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+  src.connect(filt); filt.connect(g); g.connect(audioCtx.destination);
+  src.start();
+}
+// Sweep 升调 —— 寄生成功脉冲
+function sfxPossess() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(1400, audioCtx.currentTime + 0.35);
+  g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.55);
+}
+// 低沉爆裂 —— 宿主报废 / 受击
+function sfxBreak() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.25);
+  g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.32);
+}
+// 清脆命中 —— 击中核心
+function sfxCore() {
+  if (!audioCtx) return;
+  [880, 1320, 1760].forEach((f, i) => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = "triangle"; osc.frequency.value = f;
+    const st = audioCtx.currentTime + i * 0.08;
+    g.gain.setValueAtTime(0.0001, st);
+    g.gain.exponentialRampToValueAtTime(0.25, st + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, st + 0.2);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(st); osc.stop(st + 0.22);
+  });
+}
+// 射击短促音
+function sfxShot() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type = "square";
+  osc.frequency.setValueAtTime(900, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+  g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.06);
+  osc.connect(g); g.connect(audioCtx.destination);
+  osc.start(); osc.stop(audioCtx.currentTime + 0.07);
+}
+
+/* ---------- 4. 输入系统 ---------- */
+const keys = {};
+const mouse = { x: 0, y: 0, down: false, pressed: false };
+window.addEventListener("keydown", (e) => {
+  ensureAudio();
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if (k === " ") { e.preventDefault(); spacePressed = true; }
+  if (k === "e") ejectPressed = true;
+  if (k === "r" && (state === STATE.GAMEOVER || state === STATE.WIN)) resetRequested = true;
+});
+window.addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = false; });
+canvas.addEventListener("mousemove", (e) => {
+  const r = canvas.getBoundingClientRect();
+  mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+});
+canvas.addEventListener("mousedown", (e) => {
+  ensureAudio();
+  if (e.button === 0) { mouse.down = true; mouse.pressed = true; }
+});
+canvas.addEventListener("mouseup", (e) => { if (e.button === 0) mouse.down = false; });
+canvas.addEventListener("click", () => { ensureAudio(); clickFlag = true; });
+let spacePressed = false, ejectPressed = false, clickFlag = false, resetRequested = false;
+
+/* ---------- 5. 游戏状态 ---------- */
+const STATE = { IDLE: 0, PLAYING: 1, GAMEOVER: 2, WIN: 3 };
+let state = STATE.IDLE;
+
+/* ---------- 6. 矩阵代码背景（纯视觉）---------- */
+const MATRIX = {
+  cols: 0, drops: [], charSize: 16,
+  init() {
+    this.cols = Math.ceil(VW / this.charSize) + 1;
+    this.drops = new Array(this.cols).fill(0).map(() => Math.random() * VH);
+  },
+  update() {
+    for (let i = 0; i < this.drops.length; i++) {
+      this.drops[i] += 2.2 + Math.random() * 1.5;
+      if (this.drops[i] > VH + 200) this.drops[i] = -Math.random() * 200;
+    }
+  },
+  draw() {
+    ctx.font = "14px Courier New";
+    ctx.textBaseline = "top";
+    const chars = "01ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ#$%&";
+    for (let i = 0; i < this.drops.length; i++) {
+      const x = i * this.charSize;
+      const headY = this.drops[i];
+      // 头部亮字符
+      ctx.fillStyle = "#aaffaa";
+      ctx.fillText(chars[(Math.random()*chars.length)|0], x, headY);
+      // 尾部渐隐
+      for (let j = 1; j < 8; j++) {
+        const y = headY - j * this.charSize;
+        if (y < 0) break;
+        ctx.fillStyle = `rgba(0,255,80,${0.18 - j*0.022})`;
+        ctx.fillText(chars[(Math.random()*chars.length)|0], x, y);
+      }
+    }
+  }
+};
+
+/* ---------- 7. 地图：3x3 随机房间矩阵 ---------- */
+let map = null;
+let currentRoom = null;
+let prestige = 0;
+
+const ROOM_TYPES = {
+  START: "start", COMBAT: "combat", HAZARD: "hazard",
+  CONSOLE: "console", CORE: "core"
+};
+
+function generateMap() {
+  // 3x3 房间
+  const grid = [];
+  for (let y = 0; y < 3; y++) {
+    grid[y] = [];
+    for (let x = 0; x < 3; x++) grid[y][x] = null;
+  }
+  // 起点：中心
+  const startX = 1, startY = 1;
+  // 终点核心：随机一个边角或边的房间
+  const candidates = [];
+  for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) {
+    if (x === startX && y === startY) continue;
+    candidates.push({x, y});
+  }
+  const core = candidates[(Math.random() * candidates.length) | 0];
+
+  // 分配房间类型
+  const others = candidates.filter(c => !(c.x === core.x && c.y === core.y));
+  // 打乱
+  for (let i = others.length - 1; i > 0; i--) {
+    const j = (Math.random() * (i + 1)) | 0;
+    [others[i], others[j]] = [others[j], others[i]];
+  }
+  // 1 个 console 房间（需无人机开门），1 个 hazard 房间，其余 combat
+  let oi = 0;
+  const consoleRoom = others[oi++];
+  const hazardRoom = others[oi++];
+
+  for (let y = 0; y < 3; y++) {
+    for (let x = 0; x < 3; x++) {
+      let type;
+      if (x === startX && y === startY) type = ROOM_TYPES.START;
+      else if (x === core.x && y === core.y) type = ROOM_TYPES.CORE;
+      else if (x === consoleRoom.x && y === consoleRoom.y) type = ROOM_TYPES.CONSOLE;
+      else if (x === hazardRoom.x && y === hazardRoom.y) type = ROOM_TYPES.HAZARD;
+      else type = ROOM_TYPES.COMBAT;
+      grid[y][x] = makeRoom(x, y, type);
+    }
+  }
+  return { grid, sx: startX, sy: startY, coreX: core.x, coreY: core.y };
+}
+
+function makeRoom(gx, gy, type) {
+  const W = CFG.ROOM_W, H = CFG.ROOM_H, Wl = CFG.WALL;
+  const walls = [];
+  // 外墙（带门洞），门洞位置在每条墙中央
+  const doorGap = 90;
+  // 上墙
+  walls.push({x: 0, y: 0, w: (W - doorGap)/2, h: Wl});
+  walls.push({x: (W + doorGap)/2, y: 0, w: (W - doorGap)/2, h: Wl});
+  // 下墙
+  walls.push({x: 0, y: H - Wl, w: (W - doorGap)/2, h: Wl});
+  walls.push({x: (W + doorGap)/2, y: H - Wl, w: (W - doorGap)/2, h: Wl});
+  // 左墙
+  walls.push({x: 0, y: 0, w: Wl, h: (H - doorGap)/2});
+  walls.push({x: 0, y: (H + doorGap)/2, w: Wl, h: (H - doorGap)/2});
+  // 右墙
+  walls.push({x: W - Wl, y: 0, w: Wl, h: (H - doorGap)/2});
+  walls.push({x: W - Wl, y: (H + doorGap)/2, w: Wl, h: (H - doorGap)/2});
+
+  // 内部障碍：根据类型加结构
+  const innerWalls = [];
+  if (type === ROOM_TYPES.COMBAT || type === ROOM_TYPES.CORE) {
+    // 4 根柱子
+    const pw = 40;
+    [[200,150],[W-200,150],[200,H-150],[W-200,H-150]].forEach(p => {
+      innerWalls.push({x: p[0]-pw/2, y: p[1]-pw/2, w: pw, h: pw});
+    });
+  }
+
+  // 危险带（岩浆/网格伤害）—— hazard 房间
+  const hazards = [];
+  if (type === ROOM_TYPES.HAZARD) {
+    hazards.push({x: Wl, y: H/2 - 40, w: W - Wl*2, h: 80, kind: "lava"});
+  }
+  // console 房间：放一个控制台 + 一道安全阻隔门
+  const consoles = [];
+  const lockedDoors = [];
+  if (type === ROOM_TYPES.CONSOLE) {
+    consoles.push({x: W/2, y: H - 90, r: 18, hacked: false});
+    // 一道横墙把房间分成两半，带门洞
+    lockedDoors.push({
+      x: W/2 - 60, y: H/2 - 10, w: 120, h: 20, open: false
+    });
+    // 上半区放柱
+    innerWalls.push({x: W/2 - 100, y: 120, w: 50, h: 50});
+    innerWalls.push({x: W/2 + 50, y: 120, w: 50, h: 50});
+  }
+
+  // 敌人
+  const enemies = [];
+  if (type === ROOM_TYPES.COMBAT) {
+    const n = 2 + ((Math.random() * 3) | 0);
+    for (let i = 0; i < n; i++) {
+      const kind = Math.random() < 0.6 ? "guard" : (Math.random() < 0.5 ? "drone" : "turret");
+      const ex = 120 + Math.random() * (W - 240);
+      const ey = 120 + Math.random() * (H - 240);
+      enemies.push(makeEnemy(ex, ey, kind));
+    }
+  } else if (type === ROOM_TYPES.HAZARD) {
+    // 危险房间必然有无人机可寄生
+    enemies.push(makeEnemy(W - 120, 120, "drone"));
+    enemies.push(makeEnemy(120, H - 120, "drone"));
+    enemies.push(makeEnemy(W - 120, H - 120, "guard"));
+  } else if (type === ROOM_TYPES.CONSOLE) {
+    enemies.push(makeEnemy(W/2, 200, "guard"));
+    enemies.push(makeEnemy(W/2, 200, "guard"));
+    // 上半区也放一只无人机供选择
+    enemies.push(makeEnemy(120, 200, "drone"));
+  } else if (type === ROOM_TYPES.CORE) {
+    // 核心房：2-3 个重甲炮塔守卫
+    enemies.push(makeEnemy(W/2, 180, "turret"));
+    enemies.push(makeEnemy(W/2 - 180, 280, "turret"));
+    enemies.push(makeEnemy(W/2 + 180, 280, "turret"));
+  }
+
+  return {
+    gx, gy, type, W, H, Wl,
+    walls, innerWalls, hazards, consoles, lockedDoors,
+    enemies, cleared: (type === ROOM_TYPES.START),
+    coreHp: (type === ROOM_TYPES.CORE ? 120 : 0),
+    coreMaxHp: 120,
+    visited: false
+  };
+}
+
+function makeEnemy(x, y, kind) {
+  const e = {
+    x, y, kind,
+    hp: CFG.HOST_HP[kind],
+    maxHp: CFG.HOST_HP[kind],
+    ammo: CFG.HOST_AMMO[kind],
+    r: (kind === "turret" ? 26 : (kind === "drone" ? 16 : 18)),
+    speed: (kind === "guard" ? 1.2 : (kind === "drone" ? 1.6 : 0)),
+    cooldown: 0,
+    vx: 0, vy: 0,
+    patrolDir: Math.random() * Math.PI * 2,
+    patrolTimer: 0,
+    flash: 0
+  };
+  return e;
+}
+
+/* ---------- 8. 玩家：能量球 / 寄生宿主 ---------- */
+let player = null;
+function makePlayer() {
+  return {
+    x: CFG.ROOM_W / 2, y: CFG.ROOM_H / 2,
+    r: 12,
+    battery: 100,
+    maxBattery: 100,
+    host: null,            // 当前寄生的宿主引用
+    hostKind: null,
+    hostHp: 0, hostMaxHp: 0, hostAmmo: 0,
+    facing: 0,             // 朝向（鼠标方向）
+    shootCd: 0,
+    decay: 0,              // 宿主磨损累计
+    alive: true
+  };
+}
+
+/* ---------- 9. 寄生线 / 子弹 / 粒子 ---------- */
+let possessLine = null;   // {x1,y1,x2,y2,tx,ty,len,maxlen,active}
+let bullets = [];         // 玩家子弹
+let enemyBullets = [];    // 敌人子弹
+let particles = [];
+let floatTexts = [];
+
+function spawnParticles(x, y, color, n, spd) {
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const s = spd * (0.3 + Math.random() * 0.9);
+    particles.push({
+      x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s,
+      life: 30 + (Math.random() * 20 | 0), max: 50, color
+    });
+  }
+}
+function floatText(x, y, txt, color) {
+  floatTexts.push({ x, y, txt, color, life: 50 });
+}
+
+/* ---------- 10. 房间切换 ---------- */
+function gotoRoom(gx, gy) {
+  if (gx < 0 || gx > 2 || gy < 0 || gy > 2) return false;
+  currentRoom = map.grid[gy][gx];
+  currentRoom.visited = true;
+  // 切换房间时清空旧房间的子弹与寄生线，避免跨房间误伤
+  bullets = []; enemyBullets = []; possessLine = null; fanFlash = null;
+  return true;
+}
+function tryTransition() {
+  if (!currentRoom || !player) return;
+  const Wl = currentRoom.Wl;
+  // 通过门洞走到邻接房间
+  const margin = 8;
+  // 切房后玩家应落在房间对侧门洞附近
+  function setPos(px, py) {
+    player.x = px; player.y = py;
+    if (player.host) { player.host.x = px; player.host.y = py; }
+  }
+  // 上门
+  if (player.y < Wl + margin && currentRoom.gy > 0) {
+    gotoRoom(currentRoom.gx, currentRoom.gy - 1);
+    setPos(player.x, CFG.ROOM_H - Wl - 24);
+    return;
+  }
+  if (player.y > CFG.ROOM_H - Wl - margin && currentRoom.gy < 2) {
+    gotoRoom(currentRoom.gx, currentRoom.gy + 1);
+    setPos(player.x, Wl + 24);
+    return;
+  }
+  if (player.x < Wl + margin && currentRoom.gx > 0) {
+    gotoRoom(currentRoom.gx - 1, currentRoom.gy);
+    setPos(CFG.ROOM_W - Wl - 24, player.y);
+    return;
+  }
+  if (player.x > CFG.ROOM_W - Wl - margin && currentRoom.gx < 2) {
+    gotoRoom(currentRoom.gx + 1, currentRoom.gy);
+    setPos(Wl + 24, player.y);
+    return;
+  }
+}
+
+/* ---------- 11. 碰撞工具 ---------- */
+function circleVsRect(cx, cy, cr, r) {
+  const nx = Math.max(r.x, Math.min(cx, r.x + r.w));
+  const ny = Math.max(r.y, Math.min(cy, r.y + r.h));
+  const dx = cx - nx, dy = cy - ny;
+  return (dx*dx + dy*dy) < cr*cr;
+}
+function resolveWallCollisions(ent, room) {
+  const all = room.walls.concat(room.innerWalls);
+  // locked door 视为墙（若未开启）
+  room.lockedDoors.forEach(d => { if (!d.open) all.push(d); });
+  for (const w of all) {
+    if (circleVsRect(ent.x, ent.y, ent.r, w)) {
+      const nx = Math.max(w.x, Math.min(ent.x, w.x + w.w));
+      const ny = Math.max(w.y, Math.min(ent.y, w.y + w.h));
+      let dx = ent.x - nx, dy = ent.y - ny;
+      let d = Math.hypot(dx, dy);
+      if (d === 0) {
+        // 嵌入：往最近边推
+        const left = ent.x - w.x, right = (w.x + w.w) - ent.x;
+        const top = ent.y - w.y, bot = (w.y + w.h) - ent.y;
+        const m = Math.min(left, right, top, bot);
+        if (m === left) ent.x = w.x - ent.r;
+        else if (m === right) ent.x = w.x + w.w + ent.r;
+        else if (m === top) ent.y = w.y - ent.r;
+        else ent.y = w.y + w.h + ent.r;
+      } else {
+        ent.x = nx + (dx / d) * ent.r;
+        ent.y = ny + (dy / d) * ent.r;
+      }
+    }
+  }
+  // 房间边界硬约束
+  ent.x = Math.max(ent.r + 2, Math.min(CFG.ROOM_W - ent.r - 2, ent.x));
+  ent.y = Math.max(ent.r + 2, Math.min(CFG.ROOM_H - ent.r - 2, ent.y));
+}
+
+/* ---------- 12. 危险带检测 ---------- */
+function inHazard(ent, room) {
+  for (const h of room.hazards) {
+    if (ent.x > h.x && ent.x < h.x + h.w && ent.y > h.y && ent.y < h.y + h.h) {
+      return h;
+    }
+  }
+  return null;
+}
+
+/* ---------- 13. 主流程：初始化 / 重置 ---------- */
+function startGame() {
+  map = generateMap();
+  currentRoom = map.grid[map.sy][map.sx];
+  currentRoom.visited = true;
+  player = makePlayer();
+  // 转生加成
+  player.maxBattery = 100 * (1 + prestige * CFG.PRESTIGE_BONUS);
+  player.battery = player.maxBattery;
+  possessLine = null;
+  bullets = []; enemyBullets = []; particles = []; floatTexts = [];
+  state = STATE.PLAYING;
+}
+
+/* ---------- 14. 更新：玩家 ---------- */
+function updatePlayer(dt) {
+  if (!player) return;
+  // 朝向 —— 基于玩家在屏幕中的实际位置
+  const psx = (VW - CFG.ROOM_W) / 2 + player.x;
+  const psy = (VH - CFG.ROOM_H) / 2 + player.y;
+  player.facing = Math.atan2(mouse.y - psy, mouse.x - psx);
+
+  // 移动
+  let mx = 0, my = 0;
+  if (keys["w"]) my -= 1;
+  if (keys["s"]) my += 1;
+  if (keys["a"]) mx -= 1;
+  if (keys["d"]) mx += 1;
+  const ml = Math.hypot(mx, my);
+  if (ml > 0) { mx /= ml; my /= ml; }
+  const sp = CFG.PLAYER_SPEED * (player.host ? (player.host.kind === "drone" ? 0.92 : 1) : 1.05);
+
+  // 寄生宿主时移动宿主实体；否则移动能量球
+  if (player.host) {
+    player.host.x += mx * sp;
+    player.host.y += my * sp;
+    // 危险带：非无人机宿主在岩浆上会快速损毁
+    const hz = inHazard(player.host, currentRoom);
+    if (hz && player.hostKind !== "drone") {
+      player.hostHp -= 25 * dt;
+    }
+    resolveWallCollisions(player.host, currentRoom);
+    player.x = player.host.x; player.y = player.host.y;
+  } else {
+    player.x += mx * sp;
+    player.y += my * sp;
+    const hz = inHazard(player, currentRoom);
+    if (hz) player.battery -= 30 * dt;
+    resolveWallCollisions(player, currentRoom);
+  }
+
+  // 电池衰减（未寄生）
+  if (!player.host) {
+    player.battery -= CFG.BATTERY_DRAIN * dt;
+    if (player.battery <= 0) {
+      player.battery = 0;
+      gameOver();
+    }
+  } else {
+    // 宿主衰退
+    const decayRate = CFG.HOST_DECAY[player.host.kind] * (1 - prestige * CFG.PRESTIGE_BONUS);
+    player.hostHp -= decayRate * dt;
+    player.decay += decayRate * dt;
+    // 同步宿主实体血量（脱离后用于血条/复用）
+    player.host.hp = Math.max(0, player.hostHp);
+    if (player.hostHp <= 0) {
+      // 宿主报废 —— 弹出能量球（宿主实体已不在房间数组中，无需移除）
+      sfxBreak();
+      spawnParticles(player.x, player.y, "#00ff66", 24, 4);
+      floatText(player.x, player.y - 30, (LANG === "en" ? "HOST BROKEN" : "宿主报废"), "#ff5566");
+      player.host = null; player.hostKind = null;
+      player.hostHp = 0; player.hostAmmo = 0;
+      player.r = 12;
+      // 给一点缓冲电量
+      player.battery = Math.max(player.battery, 25);
+    }
+  }
+
+  // 射击（警卫 / 炮塔）
+  if (player.host && (player.host.kind === "guard" || player.host.kind === "turret")) {
+    if (player.shootCd > 0) player.shootCd -= 1;
+    if (mouse.down && player.shootCd <= 0) {
+      if (player.host.kind === "guard") {
+        if (player.hostAmmo > 0) {
+          player.shootCd = CFG.GUARD_COOLDOWN;
+          bullets.push({
+            x: player.x, y: player.y,
+            vx: Math.cos(player.facing) * CFG.BULLET_SPEED,
+            vy: Math.sin(player.facing) * CFG.BULLET_SPEED,
+            life: CFG.BULLET_LIFE, dmg: CFG.BULLET_DMG
+          });
+          player.hostAmmo -= 1;
+          sfxShot();
+          spawnParticles(player.x + Math.cos(player.facing)*16, player.y + Math.sin(player.facing)*16, "#aaffaa", 3, 2);
+        }
+      } else {
+        // 炮塔：扇形 AoE
+        player.shootCd = CFG.TURRET_COOLDOWN;
+        sfxSpark(0.5);
+        // 命中扇形内敌人
+        const range = CFG.TURRET_FAN_RANGE;
+        const halfAngle = Math.PI / 4;
+        currentRoom.enemies.forEach(e => {
+          if (e === player.host) return;
+          const dx = e.x - player.x, dy = e.y - player.y;
+          const d = Math.hypot(dx, dy);
+          if (d < range) {
+            const a = Math.atan2(dy, dx);
+            let diff = Math.abs(a - player.facing);
+            if (diff > Math.PI) diff = Math.PI * 2 - diff;
+            if (diff < halfAngle) {
+              e.hp -= CFG.TURRET_FAN_DMG;
+              e.flash = 8;
+              spawnParticles(e.x, e.y, "#ffaa00", 6, 3);
+            }
+          }
+        });
+        // 核心也吃扇形伤害
+        if (currentRoom.type === ROOM_TYPES.CORE && currentRoom.coreHp > 0) {
+          const dx = CFG.ROOM_W/2 - player.x, dy = 200 - player.y;
+          const d = Math.hypot(dx, dy);
+          if (d < range) {
+            const a = Math.atan2(dy, dx);
+            let diff = Math.abs(a - player.facing);
+            if (diff > Math.PI) diff = Math.PI * 2 - diff;
+            if (diff < halfAngle) {
+              currentRoom.coreHp -= CFG.TURRET_FAN_DMG;
+              spawnParticles(CFG.ROOM_W/2, 200, "#ff5566", 8, 3);
+              if (currentRoom.coreHp <= 0) winGame();
+            }
+          }
+        }
+        // 视觉扇形
+        fanFlash = { x: player.x, y: player.y, facing: player.facing, life: 12 };
+      }
+    }
+  }
+
+  // 控制台黑入（无人机）
+  if (player.hostKind === "drone" && currentRoom.consoles.length > 0) {
+    currentRoom.consoles.forEach(c => {
+      if (!c.hacked) {
+        const d = Math.hypot(c.x - player.x, c.y - player.y);
+        if (d < c.r + 20) {
+          c.hacked = true;
+          currentRoom.lockedDoors.forEach(d => d.open = true);
+          sfxPossess();
+          floatText(c.x, c.y - 30, t("hacked"), "#00ffaa");
+          spawnParticles(c.x, c.y, "#00ffaa", 20, 3);
+        }
+      }
+    });
+  }
+
+  // E：脱离宿主 —— 把宿主重新放回当前房间，恢复敌对 AI（带当前血量）
+  if (ejectPressed && player.host) {
+    sfxSpark(0.3);
+    spawnParticles(player.x, player.y, "#00ff66", 12, 3);
+    const h = player.host;
+    h.hp = Math.max(1, player.hostHp);  // 脱离后至少 1 血，避免立即被 filter 清掉
+    h.cooldown = 60;                      // 给玩家脱离的缓冲
+    currentRoom.enemies.push(h);
+    player.host = null; player.hostKind = null;
+    player.hostHp = 0; player.hostAmmo = 0;
+    player.r = 12;
+  }
+  ejectPressed = false;
+
+  // 空格：发射寄生线（未寄生时）
+  if (spacePressed && !player.host) {
+    if (!possessLine || !possessLine.active) {
+      possessLine = {
+        x1: player.x, y1: player.y,
+        x2: player.x, y2: player.y,
+        tx: player.x + Math.cos(player.facing) * CFG.POSSESS_RANGE,
+        ty: player.y + Math.sin(player.facing) * CFG.POSSESS_RANGE,
+        len: 0, maxlen: CFG.POSSESS_RANGE, active: true, life: 25
+      };
+      sfxSpark(0.2);
+    }
+  }
+  spacePressed = false;
+}
+
+/* ---------- 15. 更新：寄生线 ---------- */
+let fanFlash = null;
+function updatePossessLine(dt) {
+  if (!possessLine || !possessLine.active) return;
+  const L = possessLine;
+  // 推进
+  const dx = L.tx - L.x1, dy = L.ty - L.y1;
+  const dist = Math.hypot(dx, dy);
+  if (dist > 1) {
+    const ux = dx / dist, uy = dy / dist;
+    L.x2 = L.x1 + ux * Math.min(L.len + CFG.POSSESS_SPEED, L.maxlen);
+    L.y2 = L.y1 + uy * Math.min(L.len + CFG.POSSESS_SPEED, L.maxlen);
+    L.len = Math.min(L.len + CFG.POSSESS_SPEED, L.maxlen);
+  }
+  // 检测命中敌人
+  for (const e of currentRoom.enemies) {
+    const d = pointSegDist(e.x, e.y, L.x1, L.y1, L.x2, L.y2);
+    if (d < e.r + 4) {
+      // 命中 —— 寄生
+      doPossess(e);
+      possessLine.active = false;
+      return;
+    }
+  }
+  // 检测命中核心（无意义，仅视觉）
+  if (L.len >= L.maxlen) {
+    L.life -= 1;
+    if (L.life <= 0) L.active = false;
+  }
+}
+function pointSegDist(px, py, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const l2 = dx*dx + dy*dy;
+  if (l2 === 0) return Math.hypot(px - x1, py - y1);
+  let t = ((px - x1) * dx + (py - y1) * dy) / l2;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(px - (x1 + t*dx), py - (y1 + t*dy));
+}
+function doPossess(enemy) {
+  sfxPossess();
+  spawnParticles(enemy.x, enemy.y, "#00ff66", 24, 4);
+  floatText(enemy.x, enemy.y - 30, (LANG === "en" ? "POSSESSED" : "寄生成功"), "#00ffaa");
+  // 从房间数组中移除 —— 宿主完全由 player.host 追踪，避免跨房间残留与双重绘制
+  const idx = currentRoom.enemies.indexOf(enemy);
+  if (idx >= 0) currentRoom.enemies.splice(idx, 1);
+  player.host = enemy;
+  player.hostKind = enemy.kind;
+  player.hostHp = enemy.hp;
+  player.hostMaxHp = enemy.maxHp;
+  player.hostAmmo = enemy.ammo;
+  player.r = enemy.r;
+  player.x = enemy.x; player.y = enemy.y;
+  player.decay = 0;
+}
+
+/* ---------- 16. 更新：敌人 AI ---------- */
+function updateEnemies(dt) {
+  const room = currentRoom;
+  room.enemies.forEach(e => {
+    if (e === player.host) return; // 玩家控制
+    e.flash = Math.max(0, e.flash - 1);
+    if (e.kind === "guard") {
+      // 巡逻
+      e.patrolTimer -= 1;
+      if (e.patrolTimer <= 0) {
+        e.patrolDir = Math.random() * Math.PI * 2;
+        e.patrolTimer = 60 + (Math.random() * 60 | 0);
+      }
+      e.x += Math.cos(e.patrolDir) * e.speed;
+      e.y += Math.sin(e.patrolDir) * e.speed;
+      resolveWallCollisions(e, room);
+      // 岩浆会摧毁 guard
+      const hz = inHazard(e, room);
+      if (hz) {
+        e.hp -= 30 * dt;
+        e.flash = 6;
+      }
+      // 看到玩家（敌人形态）就射击
+      if (player.host) {
+        const dx = player.x - e.x, dy = player.y - e.y;
+        const d = Math.hypot(dx, dy);
+        if (d < 380 && lineOfSight(e.x, e.y, player.x, player.y, room)) {
+          e.cooldown -= 1;
+          if (e.cooldown <= 0) {
+            e.cooldown = 75;
+            const a = Math.atan2(dy, dx);
+            enemyBullets.push({
+              x: e.x, y: e.y,
+              vx: Math.cos(a) * CFG.ENEMY_BULLET_SPEED,
+              vy: Math.sin(a) * CFG.ENEMY_BULLET_SPEED,
+              life: 90, dmg: CFG.ENEMY_BULLET_DMG
+            });
+            sfxShot();
+          }
+        }
+      }
+    } else if (e.kind === "drone") {
+      // 飞行巡逻，可越过岩浆
+      e.patrolTimer -= 1;
+      if (e.patrolTimer <= 0) {
+        e.patrolDir = Math.random() * Math.PI * 2;
+        e.patrolTimer = 50 + (Math.random() * 50 | 0);
+      }
+      e.x += Math.cos(e.patrolDir) * e.speed;
+      e.y += Math.sin(e.patrolDir) * e.speed;
+      // 不与墙碰撞（飞行）但仍受房间边界约束
+      e.x = Math.max(e.r + 2, Math.min(CFG.ROOM_W - e.r - 2, e.x));
+      e.y = Math.max(e.r + 2, Math.min(CFG.ROOM_H - e.r - 2, e.y));
+    } else if (e.kind === "turret") {
+      // 固定，朝玩家方向扇形射击
+      if (player.host) {
+        const dx = player.x - e.x, dy = player.y - e.y;
+        const d = Math.hypot(dx, dy);
+        if (d < CFG.TURRET_FAN_RANGE && lineOfSight(e.x, e.y, player.x, player.y, room)) {
+          e.cooldown -= 1;
+          if (e.cooldown <= 0) {
+            e.cooldown = CFG.TURRET_COOLDOWN;
+            const a = Math.atan2(dy, dx);
+            // 发散 3 发
+            for (let k = -1; k <= 1; k++) {
+              const aa = a + k * 0.25;
+              enemyBullets.push({
+                x: e.x, y: e.y,
+                vx: Math.cos(aa) * CFG.ENEMY_BULLET_SPEED * 1.1,
+                vy: Math.sin(aa) * CFG.ENEMY_BULLET_SPEED * 1.1,
+                life: 70, dmg: CFG.ENEMY_BULLET_DMG
+              });
+            }
+            sfxSpark(0.3);
+          }
+        }
+      }
+    }
+    if (e.hp <= 0) {
+      spawnParticles(e.x, e.y, "#ff5566", 16, 3);
+      sfxBreak();
+    }
+  });
+  // 清理死亡
+  room.enemies = room.enemies.filter(e => e.hp > 0);
+}
+function lineOfSight(x1, y1, x2, y2, room) {
+  const walls = room.walls.concat(room.innerWalls);
+  for (const w of walls) {
+    if (segIntersectRect(x1, y1, x2, y2, w)) return false;
+  }
+  return true;
+}
+function segIntersectRect(x1, y1, x2, y2, r) {
+  // 简化：采样点检测
+  const steps = 12;
+  for (let i = 1; i < steps; i++) {
+    const tt = i / steps;
+    const px = x1 + (x2 - x1) * tt, py = y1 + (y2 - y1) * tt;
+    if (px > r.x && px < r.x + r.w && py > r.y && py < r.y + r.h) return true;
+  }
+  return false;
+}
+
+/* ---------- 17. 更新：子弹 ---------- */
+function updateBullets() {
+  // 玩家子弹
+  for (let i = bullets.length - 1; i >= 0; i--) {
+    const b = bullets[i];
+    b.x += b.vx; b.y += b.vy; b.life -= 1;
+    // 出房间
+    if (b.x < 0 || b.x > CFG.ROOM_W || b.y < 0 || b.y > CFG.ROOM_H || b.life <= 0) {
+      bullets.splice(i, 1); continue;
+    }
+    // 撞墙
+    const all = currentRoom.walls.concat(currentRoom.innerWalls);
+    let hit = false;
+    for (const w of all) {
+      if (b.x > w.x && b.x < w.x + w.w && b.y > w.y && b.y < w.y + w.h) {
+        hit = true; spawnParticles(b.x, b.y, "#88ff88", 4, 2); break;
+      }
+    }
+    if (hit) { bullets.splice(i, 1); continue; }
+    // 撞敌人
+    let consumed = false;
+    for (const e of currentRoom.enemies) {
+      if (e === player.host) continue;
+      if (Math.hypot(b.x - e.x, b.y - e.y) < e.r) {
+        e.hp -= b.dmg; e.flash = 8;
+        spawnParticles(b.x, b.y, "#ffaa00", 5, 2);
+        bullets.splice(i, 1); consumed = true; break;
+      }
+    }
+    if (consumed) continue;
+    // 撞核心
+    if (currentRoom.type === ROOM_TYPES.CORE && currentRoom.coreHp > 0) {
+      const cx = CFG.ROOM_W / 2, cy = 200;
+      if (Math.hypot(b.x - cx, b.y - cy) < 38) {
+        currentRoom.coreHp -= b.dmg;
+        spawnParticles(b.x, b.y, "#ff5566", 5, 2);
+        bullets.splice(i, 1);
+        if (currentRoom.coreHp <= 0) winGame();
+        continue;
+      }
+    }
+  }
+  // 敌人子弹
+  for (let i = enemyBullets.length - 1; i >= 0; i--) {
+    const b = enemyBullets[i];
+    b.x += b.vx; b.y += b.vy; b.life -= 1;
+    if (b.x < 0 || b.x > CFG.ROOM_W || b.y < 0 || b.y > CFG.ROOM_H || b.life <= 0) {
+      enemyBullets.splice(i, 1); continue;
+    }
+    // 撞墙
+    const all = currentRoom.walls.concat(currentRoom.innerWalls);
+    let hit = false;
+    for (const w of all) {
+      if (b.x > w.x && b.x < w.x + w.w && b.y > w.y && b.y < w.y + w.h) { hit = true; break; }
+    }
+    if (hit) { enemyBullets.splice(i, 1); continue; }
+    // 撞玩家
+    if (Math.hypot(b.x - player.x, b.y - player.y) < (player.r + 3)) {
+      if (player.host) {
+        player.hostHp -= b.dmg;
+        spawnParticles(b.x, b.y, "#ff5566", 6, 2);
+      } else {
+        player.battery -= b.dmg * 0.8;
+        spawnParticles(b.x, b.y, "#ff5566", 6, 2);
+      }
+      enemyBullets.splice(i, 1);
+    }
+  }
+}
+
+/* ---------- 18. 更新：粒子 / 浮字 ---------- */
+function updateParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy; p.vx *= 0.92; p.vy *= 0.92; p.life -= 1;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+  for (let i = floatTexts.length - 1; i >= 0; i--) {
+    floatTexts[i].y -= 0.6; floatTexts[i].life -= 1;
+    if (floatTexts[i].life <= 0) floatTexts.splice(i, 1);
+  }
+  if (fanFlash) { fanFlash.life -= 1; if (fanFlash.life <= 0) fanFlash = null; }
+}
+
+/* ---------- 19. 渲染 ---------- */
+function worldToScreen(x, y) {
+  // 房间居中
+  return { sx: (VW - CFG.ROOM_W) / 2 + x, sy: (VH - CFG.ROOM_H) / 2 + y };
+}
+
+function draw() {
+  // 背景矩阵代码
+  ctx.fillStyle = "#000";
+  ctx.fillRect(0, 0, VW, VH);
+  MATRIX.draw();
+
+  if (state === STATE.IDLE) { drawIdle(); return; }
+
+  // 房间
+  const offX = (VW - CFG.ROOM_W) / 2;
+  const offY = (VH - CFG.ROOM_H) / 2;
+  ctx.save();
+  ctx.translate(offX, offY);
+
+  // 房间底色
+  ctx.fillStyle = "rgba(0,10,0,0.85)";
+  ctx.fillRect(0, 0, CFG.ROOM_W, CFG.ROOM_H);
+  // 网格
+  ctx.strokeStyle = "rgba(0,255,80,0.06)";
+  ctx.lineWidth = 1;
+  for (let x = 0; x < CFG.ROOM_W; x += 40) {
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CFG.ROOM_H); ctx.stroke();
+  }
+  for (let y = 0; y < CFG.ROOM_H; y += 40) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CFG.ROOM_W, y); ctx.stroke();
+  }
+
+  // 危险带
+  currentRoom.hazards.forEach(h => {
+    ctx.fillStyle = "rgba(255,80,0,0.18)";
+    ctx.fillRect(h.x, h.y, h.w, h.h);
+    ctx.strokeStyle = "#ff5500";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(h.x, h.y, h.w, h.h);
+    // 文字
+    ctx.fillStyle = "#ff8855";
+    ctx.font = "11px Courier New";
+    ctx.textAlign = "center";
+    ctx.fillText(t("lava"), h.x + h.w/2, h.y + h.h/2);
+  });
+
+  // 墙
+  drawWalls(currentRoom.walls, "#00aa44");
+  drawWalls(currentRoom.innerWalls, "#008833");
+  // locked door
+  currentRoom.lockedDoors.forEach(d => {
+    if (d.open) {
+      ctx.strokeStyle = "rgba(0,255,170,0.4)";
+      ctx.setLineDash([4, 4]);
+      ctx.strokeRect(d.x, d.y, d.w, d.h);
+      ctx.setLineDash([]);
+    } else {
+      ctx.fillStyle = "#cc3333";
+      ctx.fillRect(d.x, d.y, d.w, d.h);
+      ctx.fillStyle = "#ffaaaa";
+      ctx.font = "10px Courier New";
+      ctx.textAlign = "center";
+      ctx.fillText("LOCK", d.x + d.w/2, d.y + d.h/2 + 3);
+    }
+  });
+
+  // 控制台
+  currentRoom.consoles.forEach(c => {
+    ctx.beginPath();
+    ctx.arc(c.x, c.y, c.r, 0, Math.PI*2);
+    ctx.fillStyle = c.hacked ? "#00ffaa" : "#ffaa00";
+    ctx.fill();
+    ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.stroke();
+    ctx.fillStyle = "#000"; ctx.font = "bold 14px Courier New"; ctx.textAlign = "center";
+    ctx.fillText(c.hacked ? "✓" : "?", c.x, c.y + 4);
+    if (!c.hacked) {
+      ctx.fillStyle = "#ffcc66"; ctx.font = "10px Courier New";
+      ctx.fillText(t("locked"), c.x, c.y - 28);
+    }
+  });
+
+  // 终点核心
+  if (currentRoom.type === ROOM_TYPES.CORE && currentRoom.coreHp > 0) {
+    const cx = CFG.ROOM_W / 2, cy = 200;
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 200);
+    ctx.beginPath();
+    ctx.arc(cx, cy, 38, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,40,80,${0.3 + pulse*0.3})`;
+    ctx.fill();
+    ctx.strokeStyle = "#ff3355"; ctx.lineWidth = 3; ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, 22 + pulse*6, 0, Math.PI*2);
+    ctx.strokeStyle = "#ff77aa"; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = "#ffcccc"; ctx.font = "bold 12px Courier New"; ctx.textAlign = "center";
+    ctx.fillText(t("core"), cx, cy + 4);
+    // 血条
+    const bw = 80, bh = 6;
+    ctx.fillStyle = "#330000";
+    ctx.fillRect(cx - bw/2, cy - 56, bw, bh);
+    ctx.fillStyle = "#ff3355";
+    ctx.fillRect(cx - bw/2, cy - 56, bw * (currentRoom.coreHp / currentRoom.coreMaxHp), bh);
+  }
+
+  // 敌人
+  currentRoom.enemies.forEach(e => drawEnemy(e));
+
+  // 玩家
+  drawPlayer();
+
+  // 子弹
+  bullets.forEach(b => {
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 3, 0, Math.PI*2);
+    ctx.fillStyle = "#aaffaa"; ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - b.vx*1.5, b.y - b.vy*1.5);
+    ctx.strokeStyle = "rgba(170,255,170,0.5)"; ctx.lineWidth = 2; ctx.stroke();
+  });
+  enemyBullets.forEach(b => {
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, 3, 0, Math.PI*2);
+    ctx.fillStyle = "#ff5566"; ctx.fill();
+  });
+
+  // 寄生线
+  if (possessLine && possessLine.active) {
+    const L = possessLine;
+    ctx.beginPath();
+    ctx.moveTo(L.x1, L.y1); ctx.lineTo(L.x2, L.y2);
+    ctx.strokeStyle = "#00ff66"; ctx.lineWidth = 2.5;
+    ctx.shadowColor = "#00ff66"; ctx.shadowBlur = 12;
+    ctx.stroke(); ctx.shadowBlur = 0;
+    // 头部
+    ctx.beginPath();
+    ctx.arc(L.x2, L.y2, 4, 0, Math.PI*2);
+    ctx.fillStyle = "#aaffaa"; ctx.fill();
+  }
+
+  // 炮塔扇形闪光
+  if (fanFlash) {
+    const f = fanFlash;
+    ctx.beginPath();
+    ctx.moveTo(f.x, f.y);
+    ctx.arc(f.x, f.y, CFG.TURRET_FAN_RANGE, f.facing - Math.PI/4, f.facing + Math.PI/4);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(255,170,0,${0.18 * (f.life/12)})`;
+    ctx.fill();
+  }
+
+  // 粒子
+  particles.forEach(p => {
+    ctx.fillStyle = p.color;
+    ctx.globalAlpha = Math.max(0, p.life / p.max);
+    ctx.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
+  });
+  ctx.globalAlpha = 1;
+  // 浮字
+  floatTexts.forEach(f => {
+    ctx.fillStyle = f.color;
+    ctx.globalAlpha = Math.max(0, f.life / 50);
+    ctx.font = "bold 12px Courier New";
+    ctx.textAlign = "center";
+    ctx.fillText(f.txt, f.x, f.y);
+  });
+  ctx.globalAlpha = 1;
+
+  ctx.restore();
+
+  // 房间门指示
+  drawDoorIndicators();
+
+  // HUD
+  drawHUD();
+
+  // 状态界面
+  if (state === STATE.GAMEOVER) drawGameOver();
+  else if (state === STATE.WIN) drawWin();
+}
+
+function drawWalls(arr, color) {
+  arr.forEach(w => {
+    ctx.fillStyle = color;
+    ctx.fillRect(w.x, w.y, w.w, w.h);
+    ctx.strokeStyle = "rgba(0,255,120,0.5)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(w.x + 0.5, w.y + 0.5, w.w - 1, w.h - 1);
+  });
+}
+
+function drawEnemy(e) {
+  const isHostile = (e !== player.host);
+  const baseColor = isHostile ? "#ff3344" : "#00ff66";
+  const outline = isHostile ? "#ff5566" : "#aaffaa";
+  if (e.flash > 0) {
+    ctx.fillStyle = "#ffffff";
+  } else {
+    ctx.fillStyle = baseColor;
+  }
+  if (e.kind === "guard") {
+    // 灰色方块（巡逻机器）
+    ctx.fillStyle = e.flash > 0 ? "#fff" : "#778899";
+    ctx.fillRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+    ctx.strokeStyle = isHostile ? "#ff3344" : "#00ff66";
+    ctx.lineWidth = 2; ctx.strokeRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+    // 朝向枪管
+    ctx.strokeStyle = isHostile ? "#ff5566" : "#aaffaa";
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y);
+    ctx.lineTo(e.x + Math.cos(e.patrolDir) * (e.r + 8), e.y + Math.sin(e.patrolDir) * (e.r + 8));
+    ctx.stroke();
+  } else if (e.kind === "drone") {
+    // 蓝色圆圈（防卫无人机）
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.r, 0, Math.PI*2);
+    ctx.fillStyle = e.flash > 0 ? "#fff" : "#3399ff";
+    ctx.fill();
+    ctx.strokeStyle = isHostile ? "#ff3344" : "#00ff66";
+    ctx.lineWidth = 2; ctx.stroke();
+    // 旋翼
+    ctx.strokeStyle = "rgba(150,200,255,0.6)";
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.r + 4, Date.now()/100 % Math.PI, Date.now()/100 % Math.PI + Math.PI);
+    ctx.stroke();
+  } else if (e.kind === "turret") {
+    // 重甲炮塔 —— 大方块
+    ctx.fillStyle = e.flash > 0 ? "#fff" : "#aa3333";
+    ctx.fillRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+    ctx.strokeStyle = isHostile ? "#ff3344" : "#00ff66";
+    ctx.lineWidth = 3; ctx.strokeRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+    // 朝向玩家
+    let ang = e.patrolDir;
+    if (player.host) ang = Math.atan2(player.y - e.y, player.x - e.x);
+    ctx.strokeStyle = isHostile ? "#ff5566" : "#aaffaa";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y);
+    ctx.lineTo(e.x + Math.cos(ang) * (e.r + 14), e.y + Math.sin(ang) * (e.r + 14));
+    ctx.stroke();
+  }
+  // 血条
+  if (e.hp < e.maxHp) {
+    const bw = e.r * 2, bh = 3;
+    ctx.fillStyle = "#330000";
+    ctx.fillRect(e.x - bw/2, e.y - e.r - 8, bw, bh);
+    ctx.fillStyle = isHostile ? "#ff5566" : "#00ff66";
+    ctx.fillRect(e.x - bw/2, e.y - e.r - 8, bw * (e.hp / e.maxHp), bh);
+  }
+}
+
+function drawPlayer() {
+  if (player.host) {
+    // 寄生宿主 —— 绘制宿主体 + 绿色发光轮廓
+    const e = player.host;
+    // 宿主本体（保留原色，体现"借用的躯壳"）
+    if (e.kind === "guard") {
+      ctx.fillStyle = e.flash > 0 ? "#fff" : "#778899";
+      ctx.fillRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+      ctx.strokeStyle = "#aaffaa";
+      ctx.lineWidth = 2; ctx.strokeRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+      ctx.beginPath();
+      ctx.moveTo(e.x, e.y);
+      ctx.lineTo(e.x + Math.cos(player.facing) * (e.r + 10), e.y + Math.sin(player.facing) * (e.r + 10));
+      ctx.strokeStyle = "#aaffaa"; ctx.lineWidth = 2; ctx.stroke();
+    } else if (e.kind === "drone") {
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r, 0, Math.PI*2);
+      ctx.fillStyle = e.flash > 0 ? "#fff" : "#3399ff";
+      ctx.fill();
+      ctx.strokeStyle = "#aaffaa"; ctx.lineWidth = 2; ctx.stroke();
+      ctx.strokeStyle = "rgba(150,255,200,0.7)";
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r + 4, Date.now()/100 % Math.PI, Date.now()/100 % Math.PI + Math.PI);
+      ctx.stroke();
+    } else if (e.kind === "turret") {
+      ctx.fillStyle = e.flash > 0 ? "#fff" : "#aa3333";
+      ctx.fillRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+      ctx.strokeStyle = "#aaffaa"; ctx.lineWidth = 2;
+      ctx.strokeRect(e.x - e.r, e.y - e.r, e.r*2, e.r*2);
+      ctx.strokeStyle = "#aaffaa"; ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(e.x, e.y);
+      ctx.lineTo(e.x + Math.cos(player.facing) * (e.r + 16), e.y + Math.sin(player.facing) * (e.r + 16));
+      ctx.stroke();
+    }
+    // 绿色寄生轮廓发光
+    ctx.save();
+    ctx.shadowColor = "#00ff66"; ctx.shadowBlur = 16;
+    ctx.strokeStyle = "#00ff66";
+    ctx.lineWidth = 3;
+    if (e.kind === "guard" || e.kind === "turret") {
+      ctx.strokeRect(e.x - e.r - 3, e.y - e.r - 3, e.r*2 + 6, e.r*2 + 6);
+    } else {
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.r + 4, 0, Math.PI*2);
+      ctx.stroke();
+    }
+    ctx.restore();
+    // 瞄准线
+    ctx.beginPath();
+    ctx.moveTo(e.x, e.y);
+    ctx.lineTo(e.x + Math.cos(player.facing) * 60, e.y + Math.sin(player.facing) * 60);
+    ctx.strokeStyle = "rgba(0,255,120,0.35)";
+    ctx.lineWidth = 1; ctx.setLineDash([3, 4]); ctx.stroke(); ctx.setLineDash([]);
+    // 宿主血条（同步 player.hostHp）
+    const hpPct = player.hostHp / player.hostMaxHp;
+    const bw = e.r * 2, bh = 3;
+    ctx.fillStyle = "#003300";
+    ctx.fillRect(e.x - bw/2, e.y - e.r - 10, bw, bh);
+    ctx.fillStyle = hpPct > 0.4 ? "#00ff66" : "#ff3344";
+    ctx.fillRect(e.x - bw/2, e.y - e.r - 10, bw * Math.max(0, hpPct), bh);
+  } else {
+    // 能量球
+    const pulse = 0.5 + 0.5 * Math.sin(Date.now() / 120);
+    ctx.save();
+    ctx.shadowColor = "#00ff66"; ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + pulse * 2, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(0,255,120,${0.4 + pulse * 0.3})`;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r - 4, 0, Math.PI*2);
+    ctx.fillStyle = "#aaffaa";
+    ctx.fill();
+    ctx.restore();
+    // 瞄准线（虚线指向鼠标方向）
+    ctx.beginPath();
+    ctx.moveTo(player.x, player.y);
+    ctx.lineTo(player.x + Math.cos(player.facing) * 80, player.y + Math.sin(player.facing) * 80);
+    ctx.strokeStyle = "rgba(0,255,120,0.25)";
+    ctx.lineWidth = 1; ctx.setLineDash([4, 6]); ctx.stroke(); ctx.setLineDash([]);
+  }
+}
+
+function drawDoorIndicators() {
+  // 显示相邻房间是否存在（小地图风格）
+  const mini = 120, cellW = mini / 3;
+  const mx = VW - mini - 20, my = VH - mini - 20;
+  ctx.save();
+  ctx.fillStyle = "rgba(0,15,0,0.7)";
+  ctx.fillRect(mx, my, mini, mini);
+  ctx.strokeStyle = "#00ff66"; ctx.lineWidth = 1;
+  ctx.strokeRect(mx + 0.5, my + 0.5, mini - 1, mini - 1);
+  for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) {
+    const rx = mx + x * cellW, ry = my + y * cellW;
+    const room = map.grid[y][x];
+    if (room === currentRoom) {
+      ctx.fillStyle = "#00ff66";
+    } else if (room.visited) {
+      ctx.fillStyle = "rgba(0,180,80,0.5)";
+    } else {
+      ctx.fillStyle = "rgba(0,60,30,0.3)";
+    }
+    ctx.fillRect(rx + 2, ry + 2, cellW - 4, cellW - 4);
+    if (room.type === ROOM_TYPES.CORE && room.visited) {
+      ctx.fillStyle = "#ff3355"; ctx.font = "10px Courier New"; ctx.textAlign = "center";
+      ctx.fillText("C", rx + cellW/2, ry + cellW/2 + 3);
+    }
+  }
+  ctx.fillStyle = "#88ffaa"; ctx.font = "9px Courier New"; ctx.textAlign = "left";
+  ctx.fillText(t("floor") + ": " + (prestige + 1), mx, my - 6);
+  ctx.restore();
+}
+
+function drawHUD() {
+  // 左上：标题 + 信息
+  ctx.save();
+  ctx.font = "bold 18px Courier New";
+  ctx.fillStyle = "#00ff66";
+  ctx.shadowColor = "#00ff66"; ctx.shadowBlur = 8;
+  ctx.textAlign = "left";
+  ctx.fillText(t("title"), 16, 28);
+  ctx.shadowBlur = 0;
+
+  ctx.font = "12px Courier New";
+  let y = 50;
+  ctx.fillStyle = "#ff7799";
+  ctx.fillText(t("target") + (currentRoom.type === ROOM_TYPES.CORE ? t("core") : ("[" + (map.coreX+1) + "," + (map.coreY+1) + "]")), 16, y); y += 18;
+
+  // 电池
+  const battPct = player.battery / player.maxBattery;
+  ctx.fillStyle = "#88ffaa";
+  ctx.fillText(t("battery") + Math.ceil(player.battery) + "%", 16, y); y += 6;
+  ctx.fillStyle = "rgba(0,40,0,0.7)";
+  ctx.fillRect(16, y, 180, 8);
+  ctx.fillStyle = battPct > 0.4 ? "#00ff66" : (battPct > 0.2 ? "#ffaa00" : "#ff3344");
+  ctx.fillRect(16, y, 180 * Math.max(0, battPct), 8);
+  ctx.strokeStyle = "#00ff66"; ctx.lineWidth = 1; ctx.strokeRect(16, y, 180, 8);
+  y += 22;
+
+  // 宿主信息
+  if (player.host) {
+    const kindName = player.hostKind === "guard" ? t("hostGuard") :
+                     player.hostKind === "drone" ? t("hostDrone") : t("hostTurret");
+    ctx.fillStyle = "#00ddaa";
+    ctx.fillText("> " + kindName, 16, y); y += 16;
+    // 宿主 HP
+    const hpPct = player.hostHp / player.hostMaxHp;
+    ctx.fillStyle = "rgba(40,0,0,0.7)";
+    ctx.fillRect(16, y, 140, 6);
+    ctx.fillStyle = hpPct > 0.4 ? "#00ff66" : "#ff3344";
+    ctx.fillRect(16, y, 140 * Math.max(0, hpPct), 6);
+    ctx.strokeStyle = "#00ff66"; ctx.strokeRect(16, y, 140, 6);
+    y += 14;
+    ctx.fillStyle = "#ff5566";
+    ctx.fillText(t("decay") + player.decay.toFixed(1), 16, y); y += 16;
+    if (player.hostAmmo !== 0 || player.hostKind === "guard") {
+      ctx.fillStyle = "#ffcc66";
+      ctx.fillText(t("ammo") + ": " + (player.hostKind === "turret" ? "∞" : player.hostAmmo), 16, y);
+    }
+  } else {
+    ctx.fillStyle = "#888";
+    ctx.fillText(t("noHost") + " — " + t("possess"), 16, y); y += 16;
+  }
+  ctx.restore();
+
+  // 提示文字
+  document.getElementById("hint").textContent = t("hint");
+}
+
+function drawIdle() {
+  ctx.fillStyle = "#00ff66";
+  ctx.font = "bold 42px Courier New";
+  ctx.textAlign = "center";
+  ctx.shadowColor = "#00ff66"; ctx.shadowBlur = 18;
+  ctx.fillText(t("title"), VW/2, VH/2 - 40);
+  ctx.shadowBlur = 0;
+  ctx.font = "14px Courier New";
+  ctx.fillStyle = "#88ffaa";
+  ctx.fillText(t("hint"), VW/2, VH/2 + 6);
+  ctx.fillStyle = "#ffaa00";
+  ctx.fillText(t("start"), VW/2, VH/2 + 40);
+  // 副标题描述
+  ctx.fillStyle = "#557755";
+  ctx.font = "11px Courier New";
+  const desc = (LANG === "en") ?
+    "// possess hosts · drain battery · breach the core" :
+    "// 寄生宿主 · 电量耗尽前 · 击穿核心";
+  ctx.fillText(desc, VW/2, VH/2 + 70);
+}
+
+function drawGameOver() {
+  ctx.fillStyle = "rgba(0,0,0,0.7)";
+  ctx.fillRect(0, 0, VW, VH);
+  ctx.fillStyle = "#ff3344";
+  ctx.font = "bold 36px Courier New";
+  ctx.textAlign = "center";
+  ctx.shadowColor = "#ff3344"; ctx.shadowBlur = 14;
+  ctx.fillText(t("over"), VW/2, VH/2);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "#ffaa66";
+  ctx.font = "14px Courier New";
+  ctx.fillText((LANG === "en" ? "[ R or Click to re-init ]" : "[ R 或点击 重新接入 ]"), VW/2, VH/2 + 36);
+}
+
+function drawWin() {
+  ctx.fillStyle = "rgba(0,10,0,0.75)";
+  ctx.fillRect(0, 0, VW, VH);
+  ctx.fillStyle = "#00ff66";
+  ctx.font = "bold 40px Courier New";
+  ctx.textAlign = "center";
+  ctx.shadowColor = "#00ff66"; ctx.shadowBlur = 18;
+  ctx.fillText(t("cleared"), VW/2, VH/2 - 20);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = "#aaffaa";
+  ctx.font = "13px Courier New";
+  ctx.fillText(t("newRun") + " · " + t("floor") + " " + (prestige + 1), VW/2, VH/2 + 16);
+  ctx.fillStyle = "#ffcc66";
+  ctx.fillText("[" + t("prestigeBtn") + "]", VW/2, VH/2 + 48);
+  ctx.fillStyle = "#557755";
+  ctx.font = "11px Courier New";
+  ctx.fillText((LANG === "en" ? "press R to prestige (battery +6%, decay -6%)" : "按 R 重构节点（电池 +6%，磨损 -6%）"), VW/2, VH/2 + 76);
+}
+
+/* ---------- 20. 状态切换 ---------- */
+function gameOver() {
+  if (state !== STATE.PLAYING) return;
+  state = STATE.GAMEOVER;
+  sfxBreak();
+  spawnParticles(player.x, player.y, "#00ff66", 30, 5);
+}
+function winGame() {
+  if (state !== STATE.PLAYING) return;
+  state = STATE.WIN;
+  sfxCore();
+  spawnParticles(CFG.ROOM_W/2, 200, "#00ffaa", 50, 6);
+}
+
+/* ---------- 21. 主循环 ---------- */
+let lastTime = performance.now();
+function loop(now) {
+  const dt = Math.min(0.05, (now - lastTime) / 1000);
+  lastTime = now;
+
+  MATRIX.update();
+
+  if (state === STATE.PLAYING) {
+    updatePlayer(dt);
+    updatePossessLine(dt);
+    updateEnemies(dt);
+    updateBullets();
+    updateParticles();
+    tryTransition();
+  } else {
+    updateParticles();
+  }
+
+  draw();
+
+  // 状态切换输入
+  if (state === STATE.IDLE && (clickFlag || spacePressed)) {
+    startGame();
+  }
+  if ((state === STATE.GAMEOVER || state === STATE.WIN) && (resetRequested || clickFlag || spacePressed)) {
+    if (state === STATE.WIN) prestige += 1;
+    startGame();
+    resetRequested = false;
+  }
+  clickFlag = false; spacePressed = false;
+
+  requestAnimationFrame(loop);
+}
+
+/* ---------- 22. 语言切换 ---------- */
+function setLang(l) {
+  LANG = l;
+  document.getElementById("btnEN").classList.toggle("active", l === "en");
+  document.getElementById("btnZH").classList.toggle("active", l === "zh");
+}
+document.getElementById("btnEN").addEventListener("click", () => setLang("en"));
+document.getElementById("btnZH").addEventListener("click", () => setLang("zh"));
+
+/* ---------- 23. 启动 ---------- */
+MATRIX.init();
+window.addEventListener("resize", () => MATRIX.init());
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

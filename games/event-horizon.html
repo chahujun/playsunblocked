@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    'Bite-sized Cosmos · 一口一个宇宙': 'Bite-sized Cosmos',
+    '点屏幕任意位置发射引力波': 'Click anywhere to fire a wave',
+    '触发超新星塌缩': 'Trigger Collapse',
+    '深空 · 实时观测': 'Deep space · live feed',
+    '点屏幕 · 或按空格': 'Click anywhere · or press Space',
+    '暗物质生成器': 'Dark Matter Auto',
+    '自动发射 · 开': 'Auto Wave · On',
+    '自动发射 · 关': 'Auto Wave · Off',
+    '塌缩完成 · 获得 ': 'Collapsed! +',
+    '引力波频': 'Wave Frequency',
+    '引力增强': 'Gravity Strength',
+    '吸积盘扩张': 'Accretion Disk',
+    '发射引力波': 'Send Gravity Wave',
+    '慢慢嚼，别噎着': 'Eat the universe, one bite at a time.',
+    '一口一个宇宙': 'Bite-sized Cosmos',
+    '当前质量': 'Mass',
+    '引力范围': 'Pull Range',
+    '虚空晶体': 'Void Crystals',
+    '引力加成': 'Gravity Boost',
+    '自动发射': 'Auto Wave',
+    '质量还不够': 'Not enough mass yet',
+    '冷却中': 'Cooling...',
+    '升级': 'UPGRADES',
+    '操作': 'ACTIONS',
+    '消耗': 'Cost',
+    ' 颗晶体': ' crystals born',
+    '[ 空格 ] · [ 点击 ] · [ 按钮 ]': '[ Space ] · [ Click ] · [ Button ]'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    if (T[text.trim()]) return T[text.trim()];
+    var result = text;
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bite-sized Cosmos · 一口一个宇宙</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #03030a;
+    --panel: rgba(8, 14, 28, 0.72);
+    --panel-border: rgba(0, 212, 255, 0.22);
+    --cyan: #00d4ff;
+    --cyan-soft: rgba(0, 212, 255, 0.5);
+    --gold: #ffce4d;
+    --mint: #6effc7;
+    --violet: #b388ff;
+    --text: #cfe9ff;
+    --text-dim: #6ea8c7;
+  }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    background: var(--bg);
+    font-family: 'JetBrains Mono', 'Consolas', 'SF Mono', 'Courier New', monospace;
+    color: var(--text);
+    user-select: none;
+    -webkit-user-select: none;
+    font-feature-settings: 'tnum' 1;
+  }
+  #game {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+
+  /* ===== HUD Panel with corner brackets ===== */
+  .panel {
+    position: absolute;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 2px;
+    padding: 14px 16px;
+    backdrop-filter: blur(10px) saturate(1.2);
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow:
+      0 0 32px rgba(0, 212, 255, 0.05),
+      inset 0 0 1px rgba(0, 212, 255, 0.3);
+    z-index: 10;
+  }
+  .panel::before, .panel::after {
+    content: ''; position: absolute;
+    width: 9px; height: 9px;
+    border: 1px solid var(--cyan);
+    pointer-events: none;
+  }
+  .panel::before {
+    top: -1px; left: -1px;
+    border-right: none; border-bottom: none;
+  }
+  .panel::after {
+    bottom: -1px; right: -1px;
+    border-left: none; border-top: none;
+  }
+
+  /* ===== Stats (top-left) ===== */
+  #stats { top: 18px; left: 18px; min-width: 264px; }
+  #title {
+    font-size: 13px; font-weight: 400; letter-spacing: 5px;
+    color: var(--cyan);
+    margin-bottom: 3px;
+    display: flex; align-items: center; gap: 9px;
+    text-shadow: 0 0 14px rgba(0, 212, 255, 0.4);
+  }
+  .title-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--cyan);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--cyan);
+    animation: pulse 2.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.85); }
+  }
+  .title-sub {
+    font-size: 9px; letter-spacing: 2.5px;
+    color: var(--text-dim);
+    margin-bottom: 12px; padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+    opacity: 0.7;
+  }
+  .stat-row {
+    display: flex; justify-content: space-between;
+    align-items: baseline;
+    margin: 8px 0; gap: 14px;
+  }
+  .stat-label {
+    color: var(--text-dim);
+    letter-spacing: 1.2px;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+  .stat-value {
+    color: var(--gold);
+    font-weight: 500;
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.2s;
+  }
+  .stat-value.crystal { color: var(--violet); }
+  .stat-value.range { color: var(--mint); }
+  .stat-value.bump {
+    animation: bump 0.5s ease-out;
+  }
+  @keyframes bump {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.18); filter: brightness(1.6); }
+    100% { transform: scale(1); }
+  }
+
+  /* ===== Lang toggle ===== */
+  #lang-toggle {
+    position: absolute; top: 18px; right: 18px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    color: var(--cyan); padding: 10px 16px;
+    font-family: inherit; font-size: 11px; font-weight: 500;
+    letter-spacing: 2.5px; cursor: pointer; border-radius: 2px;
+    transition: all 0.2s; z-index: 20;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    position: absolute;
+  }
+  #lang-toggle::before, #lang-toggle::after {
+    content: ''; position: absolute;
+    width: 7px; height: 7px;
+    border: 1px solid var(--cyan);
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  #lang-toggle::before {
+    top: -1px; left: -1px;
+    border-right: none; border-bottom: none;
+  }
+  #lang-toggle::after {
+    bottom: -1px; right: -1px;
+    border-left: none; border-top: none;
+  }
+  #lang-toggle:hover {
+    background: rgba(0, 212, 255, 0.12);
+    border-color: var(--cyan);
+    box-shadow: 0 0 16px rgba(0, 212, 255, 0.3);
+  }
+
+  /* ===== Upgrades (bottom-left) ===== */
+  #upgrades { bottom: 18px; left: 18px; min-width: 294px; }
+  .panel-title {
+    font-size: 10px; letter-spacing: 3px; color: var(--text-dim);
+    margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+    display: flex; align-items: center; gap: 9px;
+    text-transform: uppercase;
+  }
+  .panel-title::before {
+    content: ''; display: inline-block;
+    width: 3px; height: 11px;
+    background: var(--cyan);
+    box-shadow: 0 0 6px var(--cyan);
+    flex-shrink: 0;
+  }
+  .upgrade-btn {
+    display: block; width: 100%;
+    background: rgba(0, 20, 40, 0.4);
+    border: 1px solid rgba(0, 212, 255, 0.13);
+    border-left: 2px solid rgba(0, 212, 255, 0.3);
+    color: var(--text); padding: 9px 12px; margin: 7px 0;
+    font-family: inherit; font-size: 12px;
+    cursor: pointer; border-radius: 0 2px 2px 0;
+    text-align: left;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative; overflow: hidden;
+  }
+  .upgrade-btn::after {
+    content: ''; position: absolute;
+    top: 0; right: 0; bottom: 0;
+    width: 0;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.08));
+    transition: width 0.3s;
+  }
+  .upgrade-btn:hover:not(:disabled) {
+    background: rgba(0, 45, 75, 0.6);
+    border-left-color: var(--cyan);
+    border-left-width: 3px;
+    padding-left: 11px;
+    box-shadow: -3px 0 14px rgba(0, 212, 255, 0.18);
+  }
+  .upgrade-btn:hover:not(:disabled)::after { width: 100%; }
+  .upgrade-btn:active:not(:disabled) { transform: translateX(1px); }
+  .upgrade-btn:disabled { opacity: 0.32; cursor: not-allowed; }
+  .upgrade-name {
+    color: var(--cyan);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    display: block;
+  }
+  .upgrade-level {
+    color: var(--mint);
+    float: right;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+  }
+  .upgrade-cost {
+    color: var(--gold);
+    font-size: 10px;
+    display: block;
+    margin-top: 4px;
+    letter-spacing: 1.2px;
+    opacity: 0.8;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===== Actions (bottom-right) ===== */
+  #actions { bottom: 18px; right: 18px; min-width: 274px; }
+  .action-btn {
+    display: block; width: 100%; padding: 12px 16px;
+    margin: 8px 0; font-family: inherit; font-size: 11px;
+    font-weight: 500; letter-spacing: 2.5px;
+    cursor: pointer; border-radius: 2px;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative; overflow: hidden;
+    text-transform: uppercase;
+  }
+  .action-btn::before {
+    content: ''; position: absolute;
+    left: 0; top: 50%; transform: translateY(-50%);
+    width: 3px; height: 55%;
+    background: currentColor;
+    opacity: 0.45;
+    transition: all 0.22s;
+  }
+  .action-btn:hover:not(:disabled) {
+    padding-left: 18px;
+  }
+  .action-btn:hover:not(:disabled)::before {
+    height: 88%; opacity: 1;
+    box-shadow: 0 0 8px currentColor;
+  }
+  #wave-btn {
+    background: rgba(0, 60, 100, 0.32);
+    border: 1px solid rgba(0, 212, 255, 0.5);
+    color: var(--cyan);
+  }
+  #wave-btn:hover:not(:disabled) {
+    background: rgba(0, 100, 150, 0.5);
+    border-color: var(--cyan);
+    box-shadow: 0 0 22px rgba(0, 212, 255, 0.35), inset 0 0 20px rgba(0, 212, 255, 0.08);
+  }
+  #wave-btn:disabled { opacity: 0.32; cursor: not-allowed; }
+  #auto-toggle {
+    background: rgba(20, 50, 40, 0.32);
+    border: 1px solid rgba(110, 255, 199, 0.32);
+    color: var(--mint);
+  }
+  #auto-toggle.active {
+    background: rgba(40, 100, 70, 0.5);
+    border-color: var(--mint);
+    box-shadow: 0 0 18px rgba(110, 255, 199, 0.28), inset 0 0 16px rgba(110, 255, 199, 0.07);
+  }
+  #auto-toggle.active::before {
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  #prestige-btn {
+    background: rgba(60, 30, 100, 0.35);
+    border: 1px solid rgba(179, 136, 255, 0.45);
+    color: var(--violet);
+  }
+  #prestige-btn:hover:not(:disabled) {
+    background: rgba(100, 50, 160, 0.55);
+    border-color: var(--violet);
+    box-shadow: 0 0 24px rgba(179, 136, 255, 0.38), inset 0 0 22px rgba(179, 136, 255, 0.08);
+  }
+  #prestige-btn:disabled { opacity: 0.32; cursor: not-allowed; }
+
+  /* ===== Cooldown bar ===== */
+  .cooldown-bar {
+    height: 2px;
+    background: rgba(0, 212, 255, 0.1);
+    margin-top: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .cooldown-fill {
+    height: 100%;
+    background: var(--cyan);
+    width: 0%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  /* ===== Toast ===== */
+  #toast {
+    position: absolute; top: 42%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.98);
+    background: rgba(0, 0, 0, 0.88);
+    border: 1px solid var(--cyan);
+    border-left: 3px solid var(--gold);
+    padding: 16px 34px;
+    font-size: 11px; color: var(--gold);
+    border-radius: 0 2px 2px 0;
+    pointer-events: none;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    z-index: 100; text-align: center; letter-spacing: 2.5px;
+    text-transform: uppercase;
+    box-shadow: 0 0 32px rgba(0, 0, 0, 0.8), 0 0 24px rgba(255, 206, 77, 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    max-width: 80vw;
+  }
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* ===== Top center coordinates ===== */
+  #coords {
+    position: absolute; top: 22px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px; letter-spacing: 2.5px;
+    color: var(--text-dim);
+    opacity: 0.55;
+    z-index: 5;
+    text-align: center;
+    pointer-events: none;
+    text-transform: uppercase;
+  }
+  #coords .coord-line { margin: 2px 0; }
+
+  /* ===== Bottom center hint ===== */
+  #footer-hint {
+    position: absolute; bottom: 24px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px; letter-spacing: 3px;
+    color: var(--text-dim);
+    opacity: 0.4;
+    z-index: 5;
+    pointer-events: none;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  @media (max-width: 760px) {
+    #stats, #upgrades, #actions { min-width: 200px; padding: 10px 12px; }
+    #title { font-size: 11px; letter-spacing: 3px; }
+    .title-sub { font-size: 8px; }
+    .stat-value { font-size: 13px; }
+    .stat-label { font-size: 9px; }
+    .upgrade-btn, .action-btn { font-size: 10px; padding: 8px 11px; }
+    .panel-title { font-size: 9px; }
+    #coords, #footer-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="coords">
+  <div class="coord-line" data-i18n="coord1">SECTOR · M87 · SINGULARITY CORE</div>
+  <div class="coord-line">RA 12h 30m 49s · DEC +12°23′28″</div>
+</div>
+
+<div id="stats" class="panel">
+  <div id="title">
+    <span class="title-dot"></span>
+    <span id="title-text">Bite-sized Cosmos</span>
+  </div>
+  <div class="title-sub" data-i18n="subtitle">GRAVITATIONAL SINGULARITY ENGINE</div>
+  <div class="stat-row"><span class="stat-label" data-i18n="mass">Mass</span><span class="stat-value" id="mass-val">0</span></div>
+  <div class="stat-row"><span class="stat-label" data-i18n="range">Grav-Range</span><span class="stat-value range" id="range-val">0</span></div>
+  <div class="stat-row"><span class="stat-label" data-i18n="crystal">Void Crystals</span><span class="stat-value crystal" id="crystal-val">0</span></div>
+  <div class="stat-row"><span class="stat-label" data-i18n="bonus">Gravity Bonus</span><span class="stat-value crystal" id="bonus-val">+0%</span></div>
+</div>
+
+<button id="lang-toggle">[ EN / 简中 ]</button>
+
+<div id="upgrades" class="panel">
+  <div class="panel-title" data-i18n="upgradeTitle">UPGRADES</div>
+  <button class="upgrade-btn" id="up-wave">
+    <span class="upgrade-name" data-i18n="upWaveName">Wave Frequency</span>
+    <span class="upgrade-level" id="up-wave-lvl">Lv.0</span>
+    <span class="upgrade-cost" id="up-wave-cost">Cost: 50</span>
+  </button>
+  <button class="upgrade-btn" id="up-grav">
+    <span class="upgrade-name" data-i18n="upGravName">Grav-Constant</span>
+    <span class="upgrade-level" id="up-grav-lvl">Lv.0</span>
+    <span class="upgrade-cost" id="up-grav-cost">Cost: 80</span>
+  </button>
+  <button class="upgrade-btn" id="up-dark">
+    <span class="upgrade-name" data-i18n="upDarkName">Dark Matter Auto</span>
+    <span class="upgrade-level" id="up-dark-lvl">Lv.0</span>
+    <span class="upgrade-cost" id="up-dark-cost">Cost: 200</span>
+  </button>
+  <button class="upgrade-btn" id="up-accretion">
+    <span class="upgrade-name" data-i18n="upAccName">Accretion Disk</span>
+    <span class="upgrade-level" id="up-accretion-lvl">Lv.0</span>
+    <span class="upgrade-cost" id="up-accretion-cost">Cost: 150</span>
+  </button>
+</div>
+
+<div id="actions" class="panel">
+  <div class="panel-title" data-i18n="actionTitle">ACTIONS</div>
+  <button class="action-btn" id="wave-btn" data-i18n="waveBtn">Emit Grav-Wave</button>
+  <div class="cooldown-bar"><div class="cooldown-fill" id="cooldown-fill"></div></div>
+  <button class="action-btn" id="auto-toggle" data-i18n="autoWave">Auto-Emitter</button>
+  <button class="action-btn" id="prestige-btn" data-i18n="warpBtn">Trigger Collapse</button>
+</div>
+
+<div id="toast"></div>
+
+<div id="footer-hint" data-i18n="footerHint">CLICK · SPACE · EMIT GRAVITY RIPPLE</div>
+
+<script>
+// ==================== I18N ====================
+const I18N = {
+  en: {
+    title: 'Bite-sized Cosmos',
+    subtitle: 'Eat the universe, one bite at a time.',
+    coord1: 'Deep space · live feed',
+    footerHint: 'Click anywhere · or press Space',
+    mass: 'Mass',
+    range: 'Pull Range',
+    crystal: 'Void Crystals',
+    bonus: 'Gravity Boost',
+    upgradeTitle: 'UPGRADES',
+    upWaveName: 'Wave Frequency',
+    upGravName: 'Gravity Strength',
+    upDarkName: 'Dark Matter Auto',
+    upAccName: 'Accretion Disk',
+    actionTitle: 'ACTIONS',
+    waveBtn: 'Send Gravity Wave',
+    autoWave: 'Auto Wave',
+    warpBtn: 'Trigger Collapse',
+    levelUp: '',
+    cost: 'Cost',
+    level: 'Lv.',
+    autoOn: 'Auto Wave · On',
+    autoOff: 'Auto Wave · Off',
+    prestigeReady: 'Collapsed! +',
+    crystals: ' crystals born',
+    needMore: 'Not enough mass yet',
+    waveCool: 'Cooling...',
+    waveHint: 'Click anywhere to fire a wave',
+    hint2: '[ Space ] · [ Click ] · [ Button ]'
+  },
+  zh: {
+    title: '一口一个宇宙',
+    subtitle: '慢慢嚼，别噎着',
+    coord1: '深空 · 实时观测',
+    footerHint: '点屏幕 · 或按空格',
+    mass: '当前质量',
+    range: '引力范围',
+    crystal: '虚空晶体',
+    bonus: '引力加成',
+    upgradeTitle: '升级',
+    upWaveName: '引力波频',
+    upGravName: '引力增强',
+    upDarkName: '暗物质生成器',
+    upAccName: '吸积盘扩张',
+    actionTitle: '操作',
+    waveBtn: '发射引力波',
+    autoWave: '自动发射',
+    warpBtn: '触发超新星塌缩',
+    levelUp: '',
+    cost: '消耗',
+    level: 'Lv.',
+    autoOn: '自动发射 · 开',
+    autoOff: '自动发射 · 关',
+    prestigeReady: '塌缩完成 · 获得 ',
+    crystals: ' 颗晶体',
+    needMore: '质量还不够',
+    waveCool: '冷却中',
+    waveHint: '点屏幕任意位置发射引力波',
+    hint2: '[ 空格 ] · [ 点击 ] · [ 按钮 ]'
+  }
+};
+let lang = 'en';
+
+// ==================== Game State ====================
+const game = {
+  mass: 100,
+  voidCrystals: 0,
+  totalCollected: 0,
+  upgrades: { wave: 0, grav: 0, dark: 0, accretion: 0 },
+  rippleCooldown: 0,
+  autoEmit: false,
+  prestigeThreshold: 3000
+};
+
+// ==================== Canvas ====================
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0, CX = 0, CY = 0;
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  CX = W / 2; CY = H / 2;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ==================== Stars ====================
+const stars = [];
+function initStars() {
+  stars.length = 0;
+  const count = Math.floor((W * H) / 8000);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.2 + 0.2,
+      twinkle: Math.random() * Math.PI * 2,
+      twinkleSpeed: 0.005 + Math.random() * 0.025,
+      brightness: 0.3 + Math.random() * 0.7
+    });
+  }
+}
+initStars();
+window.addEventListener('resize', initStars);
+
+// ==================== Particles ====================
+const particles = [];
+const PARTICLE_TYPES = {
+  quark:  { mass: 1, size: 1.8, color: '#7fd8ff', speed: 1.4 },
+  dust:   { mass: 3, size: 3.0, color: '#ffd47f', speed: 1.0 },
+  meteor: { mass: 8, size: 5.0, color: '#ff8f7f', speed: 0.6 }
+};
+
+function spawnParticle() {
+  if (particles.length > 90) return;
+  const edge = Math.floor(Math.random() * 4);
+  let x, y;
+  const m = 30;
+  if (edge === 0) { x = -m; y = Math.random() * H; }
+  else if (edge === 1) { x = W + m; y = Math.random() * H; }
+  else if (edge === 2) { x = Math.random() * W; y = -m; }
+  else { x = Math.random() * W; y = H + m; }
+
+  const r = Math.random();
+  let type;
+  if (r < 0.55) type = 'quark';
+  else if (r < 0.88) type = 'dust';
+  else type = 'meteor';
+
+  const def = PARTICLE_TYPES[type];
+  // Aim somewhere near center (with offset so they don't all hit dead-center)
+  const tx = CX + (Math.random() - 0.5) * 250;
+  const ty = CY + (Math.random() - 0.5) * 250;
+  const dx = tx - x, dy = ty - y;
+  const d = Math.max(1, Math.sqrt(dx*dx + dy*dy));
+  const sp = def.speed * (0.6 + Math.random() * 0.7);
+
+  particles.push({
+    x, y,
+    vx: (dx / d) * sp,
+    vy: (dy / d) * sp,
+    type, mass: def.mass, size: def.size, color: def.color,
+    captured: false,
+    angle: 0, stretch: 1, age: 0
+  });
+}
+
+// ==================== Ripples ====================
+const ripples = [];
+function emitRipple(x, y) {
+  ripples.push({
+    x, y,
+    radius: 8,
+    maxRadius: 320,
+    speed: 4.5,
+    life: 1.0,
+    prevRadius: 8
+  });
+  playRippleSound();
+}
+
+// ==================== Consume Effects ====================
+const effects = [];
+
+// ==================== Audio ====================
+let audioCtx = null;
+let ambientGain = null;
+let audioReady = false;
+
+function initAudio() {
+  if (audioReady) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return;
+  }
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // 40Hz deep rumble with slow LFO drift
+    const osc = audioCtx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = 40;
+    const lfo = audioCtx.createOscillator();
+    lfo.frequency.value = 0.1;
+    const lfoGain = audioCtx.createGain();
+    lfoGain.gain.value = 10;
+    lfo.connect(lfoGain);
+    lfoGain.connect(osc.frequency);
+    lfo.start();
+
+    // Red-noise: white noise -> lowpass ~60Hz
+    const bufSize = audioCtx.sampleRate * 2;
+    const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const data = buf.getChannelData(0);
+    let last = 0;
+    for (let i = 0; i < bufSize; i++) {
+      const w = Math.random() * 2 - 1;
+      // simple one-pole lowpass -> redder noise
+      last = last * 0.97 + w * 0.03;
+      data[i] = last * 4;
+    }
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buf;
+    noise.loop = true;
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 60;
+    noiseFilter.Q.value = 1.2;
+
+    ambientGain = audioCtx.createGain();
+    ambientGain.gain.value = 0.09;
+
+    osc.connect(ambientGain);
+    noise.connect(noiseFilter);
+    noiseFilter.connect(ambientGain);
+    ambientGain.connect(audioCtx.destination);
+
+    osc.start();
+    noise.start();
+    audioReady = true;
+  } catch (e) { console.warn('Audio init failed', e); }
+}
+
+function playChirp(pitch = 1) {
+  if (!audioReady) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(420 * pitch, t);
+  osc.frequency.exponentialRampToValueAtTime(2600 * pitch, t + 0.07);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(0.14, t + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(t);
+  osc.stop(t + 0.2);
+}
+
+function playRippleSound() {
+  if (!audioReady) return;
+  const t = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(180, t);
+  osc.frequency.exponentialRampToValueAtTime(55, t + 0.4);
+  gain.gain.setValueAtTime(0.0001, t);
+  gain.gain.exponentialRampToValueAtTime(0.1, t + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start(t);
+  osc.stop(t + 0.55);
+}
+
+function playPrestigeSound() {
+  if (!audioReady) return;
+  const t = audioCtx.currentTime;
+  for (let i = 0; i < 3; i++) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = i === 0 ? 'sawtooth' : 'sine';
+    osc.frequency.setValueAtTime(800 - i * 120, t);
+    osc.frequency.exponentialRampToValueAtTime(35, t + 1.3);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.1 - i * 0.02, t + 0.05);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 1.5);
+  }
+}
+
+// ==================== Derived Stats ====================
+function getG() {
+  // Base G, scaled by grav upgrade and prestige bonus
+  return 35 * Math.pow(1.45, game.upgrades.grav) * (1 + game.voidCrystals * 0.05);
+}
+function getRange() {
+  return 200 + Math.sqrt(game.mass) * 4 + game.upgrades.accretion * 25;
+}
+function getEventHorizonRadius() {
+  return 14 + Math.sqrt(game.mass) * 0.55 + game.upgrades.accretion * 3.5;
+}
+function getRippleCooldown() {
+  return Math.max(400, 3000 * Math.pow(0.85, game.upgrades.wave));
+}
+function getDarkMatterRate() {
+  return game.upgrades.dark * 0.6;
+}
+function getUpgradeCost(which) {
+  const base = { wave: 50, grav: 80, dark: 200, accretion: 150 };
+  const lvl = game.upgrades[which];
+  return Math.floor(base[which] * Math.pow(1.6, lvl));
+}
+function getPrestigeGain() {
+  if (game.mass < game.prestigeThreshold) return 0;
+  return Math.floor(Math.sqrt(game.mass / 500));
+}
+
+// ==================== I18N Apply ====================
+function applyI18n() {
+  const dict = I18N[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (dict[key]) el.textContent = dict[key];
+  });
+  document.getElementById('title-text').textContent = dict.title;
+  document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+  updateUI();
+}
+function toggleLang() {
+  lang = lang === 'en' ? 'zh' : 'en';
+  applyI18n();
+  saveGame();
+}
+
+// ==================== UI ====================
+function updateUI() {
+  const dict = I18N[lang];
+  document.getElementById('mass-val').textContent = Math.floor(game.mass);
+  document.getElementById('range-val').textContent = Math.floor(getRange());
+  document.getElementById('crystal-val').textContent = game.voidCrystals;
+  document.getElementById('bonus-val').textContent = '+' + (game.voidCrystals * 5) + '%';
+
+  ['wave','grav','dark','accretion'].forEach(k => {
+    document.getElementById('up-'+k+'-lvl').textContent = dict.level + game.upgrades[k];
+    const cost = getUpgradeCost(k);
+    document.getElementById('up-'+k+'-cost').textContent = dict.cost + cost;
+    document.getElementById('up-'+k).disabled = game.mass < cost;
+  });
+
+  const cdPct = 1 - (game.rippleCooldown / getRippleCooldown());
+  document.getElementById('cooldown-fill').style.width = (Math.max(0, Math.min(1, cdPct)) * 100) + '%';
+  document.getElementById('wave-btn').disabled = game.rippleCooldown > 0;
+  document.getElementById('wave-btn').textContent = game.rippleCooldown > 0 ? dict.waveCool : dict.waveBtn;
+
+  const autoBtn = document.getElementById('auto-toggle');
+  autoBtn.textContent = game.autoEmit ? dict.autoOn : dict.autoOff;
+  autoBtn.classList.toggle('active', game.autoEmit);
+
+  const gain = getPrestigeGain();
+  const presBtn = document.getElementById('prestige-btn');
+  presBtn.disabled = gain <= 0;
+  presBtn.textContent = gain > 0 ? dict.warpBtn + ' (+' + gain + ')' : dict.warpBtn;
+}
+
+let toastTimer = null;
+function showToast(msg, duration = 1800) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function bumpStat(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('bump');
+  void el.offsetWidth; // force reflow to restart animation
+  el.classList.add('bump');
+}
+
+function buyUpgrade(k) {
+  const cost = getUpgradeCost(k);
+  if (game.mass < cost) return;
+  game.mass -= cost;
+  game.upgrades[k]++;
+  const nameKey = { wave: 'upWaveName', grav: 'upGravName', dark: 'upDarkName', accretion: 'upAccName' }[k];
+  showToast(I18N[lang][nameKey] + ' → Lv.' + game.upgrades[k]);
+  bumpStat('up-'+k+'-lvl');
+  updateUI();
+  saveGame();
+}
+
+function tryEmitWave(x, y) {
+  if (game.rippleCooldown > 0) return false;
+  emitRipple(x, y);
+  game.rippleCooldown = getRippleCooldown();
+  updateUI();
+  return true;
+}
+
+function doPrestige() {
+  const gain = getPrestigeGain();
+  if (gain <= 0) { showToast(I18N[lang].needMore); return; }
+  game.voidCrystals += gain;
+  game.mass = 100;
+  game.upgrades = { wave: 0, grav: 0, dark: 0, accretion: 0 };
+  game.rippleCooldown = 0;
+  particles.length = 0;
+  ripples.length = 0;
+  effects.length = 0;
+  playPrestigeSound();
+  showToast(I18N[lang].prestigeReady + gain + I18N[lang].crystals, 3000);
+  bumpStat('crystal-val');
+  bumpStat('bonus-val');
+  updateUI();
+  saveGame();
+}
+
+// ==================== Save / Load ====================
+function saveGame() {
+  try {
+    localStorage.setItem('eventHorizonSave', JSON.stringify({
+      mass: game.mass,
+      voidCrystals: game.voidCrystals,
+      totalCollected: game.totalCollected,
+      upgrades: game.upgrades,
+      autoEmit: game.autoEmit,
+      lang: lang
+    }));
+  } catch(e) {}
+}
+function loadGame() {
+  try {
+    const s = localStorage.getItem('eventHorizonSave');
+    if (!s) return;
+    const d = JSON.parse(s);
+    if (typeof d.mass === 'number') game.mass = d.mass;
+    if (typeof d.voidCrystals === 'number') game.voidCrystals = d.voidCrystals;
+    if (typeof d.totalCollected === 'number') game.totalCollected = d.totalCollected;
+    if (d.upgrades) game.upgrades = Object.assign(game.upgrades, d.upgrades);
+    if (typeof d.autoEmit === 'boolean') game.autoEmit = d.autoEmit;
+    if (d.lang) lang = d.lang;
+  } catch(e) {}
+}
+
+// ==================== Events ====================
+document.getElementById('lang-toggle').addEventListener('click', () => {
+  initAudio();
+  toggleLang();
+});
+document.getElementById('wave-btn').addEventListener('click', () => {
+  initAudio();
+  tryEmitWave(CX, CY);
+});
+document.getElementById('auto-toggle').addEventListener('click', () => {
+  initAudio();
+  game.autoEmit = !game.autoEmit;
+  updateUI();
+  saveGame();
+});
+document.getElementById('prestige-btn').addEventListener('click', doPrestige);
+document.getElementById('up-wave').addEventListener('click', () => buyUpgrade('wave'));
+document.getElementById('up-grav').addEventListener('click', () => buyUpgrade('grav'));
+document.getElementById('up-dark').addEventListener('click', () => buyUpgrade('dark'));
+document.getElementById('up-accretion').addEventListener('click', () => buyUpgrade('accretion'));
+
+canvas.addEventListener('click', (e) => {
+  initAudio();
+  tryEmitWave(e.clientX, e.clientY);
+});
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    initAudio();
+    tryEmitWave(CX, CY);
+  }
+});
+
+// ==================== Game Update ====================
+let lastTime = performance.now();
+let spawnTimer = 0;
+
+function update(dt) {
+  // Spawn
+  spawnTimer -= dt;
+  if (spawnTimer <= 0) {
+    spawnParticle();
+    spawnTimer = 350 + Math.random() * 250;
+  }
+
+  // Cooldown
+  if (game.rippleCooldown > 0) {
+    game.rippleCooldown = Math.max(0, game.rippleCooldown - dt);
+  }
+
+  // Auto emit
+  if (game.autoEmit && game.rippleCooldown <= 0) {
+    tryEmitWave(CX + (Math.random() - 0.5) * 240, CY + (Math.random() - 0.5) * 240);
+  }
+
+  // Dark matter passive
+  if (getDarkMatterRate() > 0) {
+    game.mass += getDarkMatterRate() * (dt / 1000);
+  }
+
+  const G = getG();
+  const range = getRange();
+  const ehr = getEventHorizonRadius();
+  const timeScale = dt / 16.67;
+
+  // Particles
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.age += dt;
+
+    const dx = CX - p.x;
+    const dy = CY - p.y;
+    const r = Math.max(ehr * 0.5, Math.sqrt(dx*dx + dy*dy));
+
+    // Gravity F = G*M/r^2
+    if (r < range) {
+      let a = (G * (game.mass / 30)) / (r * r);
+      if (p.captured) a *= 2.2; // captured particles pulled harder
+      a = Math.min(a, 4); // clamp to prevent insane slingshot
+      p.vx += (dx / r) * a * timeScale;
+      p.vy += (dy / r) * a * timeScale;
+    }
+
+    // Cosmic drag (very subtle)
+    p.vx *= 0.9985;
+    p.vy *= 0.9985;
+
+    p.x += p.vx * timeScale;
+    p.y += p.vy * timeScale;
+
+    p.angle = Math.atan2(p.y - CY, p.x - CX);
+
+    // Spaghettification: stretch as approaches horizon
+    const stretchZone = ehr * 4.5;
+    if (r < stretchZone) {
+      const t = 1 - (r / stretchZone);
+      p.stretch = 1 + t * t * 5;
+    } else {
+      p.stretch = 1;
+    }
+
+    // Consume
+    if (r < ehr) {
+      game.mass += p.mass;
+      game.totalCollected += p.mass;
+      playChirp(0.8 + Math.random() * 0.6);
+      effects.push({
+        x: p.x, y: p.y,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        life: 1,
+        color: p.color,
+        size: p.size
+      });
+      particles.splice(i, 1);
+      continue;
+    }
+
+    // Off-screen cleanup
+    const off = 220;
+    if (p.x < -off || p.x > W + off || p.y < -off || p.y > H + off) {
+      if (!p.captured || r > range * 1.8) {
+        particles.splice(i, 1);
+      } else {
+        // pull back gently
+        p.vx += (dx / r) * 0.4;
+        p.vy += (dy / r) * 0.4;
+      }
+    }
+  }
+
+  // Ripples
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    const rp = ripples[i];
+    rp.prevRadius = rp.radius;
+    rp.radius += rp.speed * timeScale;
+    rp.life = Math.max(0, 1 - (rp.radius / rp.maxRadius));
+
+    // Affect particles in the expanding ring band
+    for (const p of particles) {
+      const dx = p.x - rp.x;
+      const dy = p.y - rp.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d > rp.prevRadius && d <= rp.radius) {
+        // Push towards black hole + tangential for orbit
+        const bx = CX - p.x;
+        const by = CY - p.y;
+        const bd = Math.max(1, Math.sqrt(bx*bx + by*by));
+        const strength = 2.8 * rp.life;
+        p.vx += (bx / bd) * strength;
+        p.vy += (by / bd) * strength;
+        p.vx += (-by / bd) * strength * 0.45;
+        p.vy += (bx / bd) * strength * 0.45;
+        p.captured = true;
+      }
+    }
+
+    if (rp.radius >= rp.maxRadius) ripples.splice(i, 1);
+  }
+
+  // Effects
+  for (let i = effects.length - 1; i >= 0; i--) {
+    const e = effects[i];
+    e.x += e.vx * timeScale;
+    e.y += e.vy * timeScale;
+    e.life -= dt / 600;
+    if (e.life <= 0) effects.splice(i, 1);
+  }
+
+  // Stars twinkle
+  for (const s of stars) s.twinkle += s.twinkleSpeed;
+
+  updateUI();
+}
+
+// ==================== Render ====================
+let frame = 0;
+
+function hexToRgb(hex) {
+  const m = hex.match(/^#([0-9a-f]{6})$/i);
+  if (!m) return { r: 255, g: 255, b: 255 };
+  const v = parseInt(m[1], 16);
+  return { r: (v>>16)&255, g: (v>>8)&255, b: v&255 };
+}
+function blendColor(c1, c2, t) {
+  const p1 = hexToRgb(c1), p2 = hexToRgb(c2);
+  const r = Math.round(p1.r + (p2.r - p1.r) * t);
+  const g = Math.round(p1.g + (p2.g - p1.g) * t);
+  const b = Math.round(p1.b + (p2.b - p1.b) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+function render() {
+  frame++;
+  // Background
+  ctx.fillStyle = '#03030a';
+  ctx.fillRect(0, 0, W, H);
+
+  // Nebula gradient
+  const neb = ctx.createRadialGradient(CX, CY, 50, CX, CY, Math.max(W, H));
+  neb.addColorStop(0, 'rgba(20, 10, 40, 0.45)');
+  neb.addColorStop(0.5, 'rgba(5, 8, 25, 0.2)');
+  neb.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = neb;
+  ctx.fillRect(0, 0, W, H);
+
+  // Stars
+  for (const s of stars) {
+    const tw = (Math.sin(s.twinkle) * 0.5 + 0.5) * s.brightness;
+    ctx.fillStyle = `rgba(255, 255, 255, ${tw})`;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const ehr = getEventHorizonRadius();
+  const range = getRange();
+  const diskOuter = ehr + 22 + game.upgrades.accretion * 3;
+
+  // Gravity range indicator (dashed faint)
+  ctx.strokeStyle = 'rgba(0, 212, 255, 0.1)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 8]);
+  ctx.beginPath();
+  ctx.arc(CX, CY, range, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Accretion disk (rotating colored rings)
+  for (let ring = 0; ring < 3; ring++) {
+    const ringR = ehr + (diskOuter - ehr) * (ring / 2.5);
+    const ringAlpha = 0.4 - ring * 0.1;
+    const rotation = frame * 0.006 * (1 + ring * 0.4);
+    ctx.save();
+    ctx.translate(CX, CY);
+    ctx.rotate(rotation);
+    const segments = 48;
+    for (let j = 0; j < segments; j++) {
+      const a1 = (j / segments) * Math.PI * 2;
+      const a2 = ((j + 1) / segments) * Math.PI * 2;
+      const hue = (j * 7 + frame * 0.4 + ring * 40) % 360;
+      const lit = 50 + Math.sin(a1 * 3 + frame * 0.02) * 15;
+      const alpha = ringAlpha * (0.45 + Math.sin(a1 * 5 + frame * 0.05) * 0.55);
+      ctx.strokeStyle = `hsla(${hue}, 85%, ${lit}%, ${alpha})`;
+      ctx.lineWidth = 2 + ring * 0.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, ringR, a1, a2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Outer accretion glow
+  const glow = ctx.createRadialGradient(CX, CY, ehr, CX, CY, diskOuter + 35);
+  glow.addColorStop(0, 'rgba(255, 150, 80, 0.32)');
+  glow.addColorStop(0.5, 'rgba(255, 80, 60, 0.12)');
+  glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = glow;
+  ctx.beginPath();
+  ctx.arc(CX, CY, diskOuter + 35, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Event horizon ring (bright orange)
+  ctx.strokeStyle = 'rgba(255, 180, 100, 0.85)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(CX, CY, ehr, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Black hole core
+  const core = ctx.createRadialGradient(CX, CY, 0, CX, CY, ehr);
+  core.addColorStop(0, '#000000');
+  core.addColorStop(0.72, '#000000');
+  core.addColorStop(0.94, '#1a0510');
+  core.addColorStop(1, '#4a1a20');
+  ctx.fillStyle = core;
+  ctx.beginPath();
+  ctx.arc(CX, CY, ehr, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Ripples
+  for (const rp of ripples) {
+    const alpha = rp.life * 0.7;
+    ctx.strokeStyle = `rgba(0, 212, 255, ${alpha})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(rp.x, rp.y, rp.radius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.strokeStyle = `rgba(110, 255, 199, ${alpha * 0.35})`;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(rp.x, rp.y, rp.radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Particles
+  for (const p of particles) {
+    ctx.save();
+    ctx.translate(p.x, p.y);
+    ctx.rotate(p.angle);
+
+    // Color shift to orange-red when spaghettified
+    let drawColor = p.color;
+    if (p.stretch > 1.3) {
+      const t = Math.min(1, (p.stretch - 1) / 4);
+      drawColor = blendColor(p.color, '#ff4520', t);
+    }
+
+    ctx.fillStyle = drawColor;
+    ctx.shadowColor = drawColor;
+    ctx.shadowBlur = 8;
+
+    if (p.stretch > 1.1) {
+      ctx.beginPath();
+      ctx.ellipse(0, 0, p.size * p.stretch, p.size / Math.sqrt(p.stretch), 0, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Captured trail
+    if (p.captured) {
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = drawColor.replace('rgb', 'rgba').replace(')', ',0.25)');
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-p.size * 2, 0);
+      ctx.lineTo(-p.size * 5, 0);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // Consume burst effects
+  for (const e of effects) {
+    const alpha = e.life;
+    ctx.fillStyle = `rgba(255, 200, 100, ${alpha})`;
+    ctx.shadowColor = `rgba(255, 180, 80, ${alpha})`;
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.arc(e.x, e.y, e.size * (1 + (1 - e.life) * 3), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  // Hint when fresh game
+  if (game.totalCollected < 30 && ripples.length === 0) {
+    ctx.fillStyle = 'rgba(207, 233, 255, 0.45)';
+    ctx.font = '12px Consolas, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(I18N[lang].waveHint, CX, CY + ehr + 50);
+    ctx.fillText(I18N[lang].hint2, CX, CY + ehr + 70);
+  }
+}
+
+function loop(now) {
+  const dt = Math.min(50, now - lastTime);
+  lastTime = now;
+  update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+
+// ==================== Boot ====================
+loadGame();
+applyI18n();
+setInterval(saveGame, 10000);
+window.addEventListener('beforeunload', saveGame);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

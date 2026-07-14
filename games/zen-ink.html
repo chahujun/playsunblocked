@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    '半卷山水 · Half a Scroll': 'Half a Scroll',
+    '點墨於紙，氤氳成畫。': 'Tap the paper. Watch the ink bloom.',
+    '墨跡所觸，山水甦醒，禪意自生。': 'Where it touches, a mountain wakes up.',
+    '點一下紙面，墨就落下了。': 'Tap the paper. Watch the ink bloom.',
+    '它會自己暈開，碰到哪裡，那裡的山就醒過來。': 'Where it touches, a mountain wakes up.',
+    '墨暈開更快，也分出更多枝丫': 'Ink blooms faster, splits more',
+    '多一種顏色，所得翻倍': 'Add a hue, double what you earn',
+    '硯台自己按節奏滴墨': 'Ink drops on its own, in rhythm',
+    '重畫一張，換取加成': 'Reset for a multiplier',
+    '重畫一張，留住心得': 'Reset, keep the lessons',
+    '點擊畫布滴墨': 'Tap the paper to drop ink',
+    '點一下紙面，墨就落下': 'Tap the paper to drop ink',
+    '水墨滲透率': 'Permeability',
+    '每滴墨擴散得更遠': 'Each drop spreads further',
+    '墨跡洇染度': 'Capillary Flow',
+    '五色墨': 'Five-Color Ink',
+    '自動行筆': 'Golden Brush',
+    '積墨重疊': 'Layered Wash',
+    '畫卷開悟': "Painting's Awakening",
+    '禪意點數: ': 'Zen Focus: ',
+    '禪意點數': 'Zen Focus',
+    '積墨層': 'Shading Layers',
+    '已臻化境': 'Mastered',
+    '還差 ': 'Needs ',
+    '消耗 ': 'Costs ',
+    '靈感': 'Inspiration',
+    '修行': 'Practice',
+    '半卷山水': 'Half a Scroll',
+    '入 境': 'E N T E R',
+    ' / 秒': '/s',
+    ' 層': ' layers',
+    ' 禪意': ' Zen'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    if (T[text.trim()]) return T[text.trim()];
+    var result = text;
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>半卷山水 · Half a Scroll</title>
+<style>
+  :root{
+    --paper:#fcfaf2; --ink:#1a1a1a; --ink-soft:#3a3a3a;
+    --sepia:#8b6f47; --seal:#a8362c; --moss:#3a5a40;
+    --panel:rgba(252,250,242,.86); --line:rgba(26,26,26,.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--paper);
+    font-family:'KaiTi','STKaiti','Songti SC','SimSun','Noto Serif SC',serif;
+    color:var(--ink);user-select:none}
+  #stage{position:fixed;inset:0;display:block;cursor:crosshair}
+  #topbar{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;
+    align-items:flex-start;padding:22px 26px;pointer-events:none;z-index:20}
+  #titleWrap{display:flex;align-items:flex-start;gap:10px;pointer-events:auto}
+  #titleVert{writing-mode:vertical-rl;font-size:30px;letter-spacing:14px;line-height:1;
+    color:var(--ink);text-shadow:0 1px 0 rgba(0,0,0,.06)}
+  #seal{width:34px;height:34px;background:var(--seal);color:#fcfaf2;display:flex;
+    align-items:center;justify-content:center;font-size:15px;border-radius:3px;
+    box-shadow:0 0 0 2px rgba(168,54,44,.25);transform:rotate(-3deg)}
+  #topCtrl{display:flex;gap:8px;pointer-events:auto}
+  .ctrlBtn{background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    font-family:inherit;font-size:12px;letter-spacing:2px;padding:8px 12px;cursor:pointer;
+    border-radius:2px;transition:.25s;backdrop-filter:blur(4px)}
+  .ctrlBtn:hover{background:#f3eedf}
+  .ctrlBtn.active{background:var(--ink);color:var(--paper)}
+  #zenBox{position:fixed;left:26px;bottom:24px;z-index:18;pointer-events:none}
+  #zenVal{font-size:42px;font-weight:bold;letter-spacing:2px;line-height:1;
+    text-shadow:0 1px 0 rgba(0,0,0,.05)}
+  #zenLab{font-size:12px;letter-spacing:6px;color:var(--sepia);margin-top:6px}
+  #zenRate{font-size:11px;letter-spacing:1px;color:var(--moss);margin-top:4px;opacity:.85}
+  #inspBox{margin-top:14px}
+  #inspVal{font-size:18px;letter-spacing:2px;color:var(--seal)}
+  #inspLab{font-size:10px;letter-spacing:4px;color:var(--sepia);margin-top:2px}
+  #shadBox{margin-top:8px}
+  #shadVal{font-size:16px;letter-spacing:2px;color:var(--moss)}
+  #shadLab{font-size:10px;letter-spacing:4px;color:var(--sepia);margin-top:2px}
+  #panel{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:18;
+    width:248px;max-height:80vh;overflow-y:auto;display:flex;flex-direction:column;gap:9px;
+    background:var(--panel);border:1px solid var(--line);border-radius:3px;
+    padding:14px 14px 12px;backdrop-filter:blur(6px);box-shadow:0 6px 30px rgba(80,60,30,.07)}
+  #panelHead{display:flex;justify-content:space-between;align-items:center;
+    padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:4px}
+  #panelHead span{font-size:13px;letter-spacing:6px;color:var(--ink-soft)}
+  #panelHint{font-size:10px;color:var(--sepia);letter-spacing:1px}
+  .upg{border:1px solid var(--line);border-radius:2px;padding:9px 10px;cursor:pointer;
+    transition:.2s;background:rgba(255,253,245,.5)}
+  .upg:hover{background:#f6f0df;border-color:var(--sepia)}
+  .upg.locked{opacity:.5;cursor:not-allowed}
+  .upg.maxed{opacity:.7;cursor:default}
+  .upgRow{display:flex;justify-content:space-between;align-items:baseline}
+  .upgName{font-size:13px;letter-spacing:2px}
+  .upgLv{font-size:10px;color:var(--sepia);letter-spacing:1px}
+  .upgDesc{font-size:10px;color:#6a6256;letter-spacing:.5px;margin-top:3px;line-height:1.4}
+  .upgCost{font-size:11px;color:var(--seal);margin-top:5px;letter-spacing:1px}
+  .upgCost.cant{color:#9a9a9a}
+  .prestige{display:flex;gap:7px;margin-top:4px}
+  .prestige .upg{flex:1;text-align:center}
+  .prestige .upgName{font-size:11px;letter-spacing:1px}
+  .prestigeBtn{border-color:var(--seal);background:rgba(168,54,44,.06)}
+  .prestigeBtn:hover{background:rgba(168,54,44,.14)}
+  .ascendBtn{border-color:var(--moss);background:rgba(58,90,64,.06)}
+  .ascendBtn:hover{background:rgba(58,90,64,.14)}
+  #intro{position:fixed;inset:0;z-index:50;background:rgba(252,250,242,.96);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;transition:opacity .8s}
+  #intro h1{font-size:64px;letter-spacing:24px;margin-bottom:6px;
+    writing-mode:vertical-rl;text-orientation:upright}
+  #intro .en{font-size:14px;letter-spacing:10px;color:var(--sepia);margin:14px 0 30px}
+  #intro p{font-size:13px;letter-spacing:3px;color:#6a6256;line-height:2;max-width:340px}
+  #startBtn{margin-top:34px;background:var(--ink);color:var(--paper);border:none;
+    font-family:inherit;font-size:15px;letter-spacing:8px;padding:13px 42px;cursor:pointer;
+    border-radius:2px;transition:.3s}
+  #startBtn:hover{background:var(--seal);letter-spacing:12px}
+  #toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:40;
+    background:var(--ink);color:var(--paper);padding:14px 30px;font-size:14px;
+    letter-spacing:4px;border-radius:2px;opacity:0;transition:opacity .4s;pointer-events:none}
+  #toast.show{opacity:.95}
+  @media (max-width:760px){
+    #titleVert{font-size:22px;letter-spacing:9px}
+    #panel{width:200px;right:10px}
+    #zenVal{font-size:30px}
+    #intro h1{font-size:44px;letter-spacing:16px}
+  }
+</style>
+</head>
+<body>
+  <canvas id="stage"></canvas>
+  <div id="intro">
+    <h1>半卷山水</h1>
+    <div class="en">H A L F &nbsp; A &nbsp; S C R O L L</div>
+    <p id="introText">點墨於紙，氤氳成畫。<br>墨跡所觸，山水甦醒，禪意自生。</p>
+    <button id="startBtn">入 境</button>
+  </div>
+  <div id="topbar">
+    <div id="titleWrap">
+      <div id="seal">禪</div>
+      <div><div id="titleVert">半卷山水</div></div>
+    </div>
+    <div id="topCtrl">
+      <button class="ctrlBtn" id="muteBtn">♪</button>
+      <button class="ctrlBtn" id="langBtn">EN / 繁中</button>
+    </div>
+  </div>
+  <div id="zenBox">
+    <div id="zenVal">0</div>
+    <div id="zenLab">禪意點數</div>
+    <div id="zenRate">+0 / s</div>
+    <div id="inspBox">
+      <div id="inspVal">0</div>
+      <div id="inspLab">靈感</div>
+    </div>
+    <div id="shadBox">
+      <div id="shadVal">0</div>
+      <div id="shadLab">積墨層</div>
+    </div>
+  </div>
+  <div id="panel">
+    <div id="panelHead"><span id="panelTitle">修行</span><span id="panelHint">點擊畫布滴墨</span></div>
+    <div class="upg" data-key="permeate"></div>
+    <div class="upg" data-key="flow"></div>
+    <div class="upg" data-key="color"></div>
+    <div class="upg" data-key="brush"></div>
+    <div class="prestige">
+      <div class="upg prestigeBtn" data-key="shading"></div>
+      <div class="upg ascendBtn" data-key="ascend"></div>
+    </div>
+  </div>
+  <div id="toast"></div>
+<script>
+"use strict";
+/* 半卷山水 · Half a Scroll — single-file incremental ink-wash game */
+/* ---------- I18n ---------- */
+const I18N = {
+  en:{
+    title:"Half a Scroll",
+    zen:"Zen Focus: ", insp:"Inspiration", shad:"Shading Layers",
+    rate:"+{0}/s",
+    panel:"Practice", hint:"Tap the paper to drop ink",
+    permeate:["Permeability","Each drop spreads further"],
+    flow:["Capillary Flow","Ink blooms faster, splits more"],
+    color:["Five-Color Ink","Add a hue, double what you earn"],
+    brush:["Golden Brush","Ink drops on its own, in rhythm"],
+    shading:["Layered Wash","Reset for a multiplier"],
+    ascend:["Painting's Awakening","Reset, keep the lessons"],
+    cost:"Costs {0}",
+    max:"Mastered",
+    shadeGain:"+{0} layers", ascGain:"+{0} inspiration",
+    needZen:"Needs {0} Zen",
+    intro:["Tap the paper. Watch the ink bloom.","Where it touches, a mountain wakes up."],
+    start:"E N T E R"
+  },
+  zh:{
+    title:"半卷山水",
+    zen:"禪意點數: ", insp:"靈感", shad:"積墨層",
+    rate:"+{0} / 秒",
+    panel:"修行", hint:"點一下紙面，墨就落下",
+    permeate:["水墨滲透率","每滴墨擴散得更遠"],
+    flow:["墨跡洇染度","墨暈開更快，也分出更多枝丫"],
+    color:["五色墨","多一種顏色，所得翻倍"],
+    brush:["自動行筆","硯台自己按節奏滴墨"],
+    shading:["積墨重疊","重畫一張，換取加成"],
+    ascend:["畫卷開悟","重畫一張，留住心得"],
+    cost:"消耗 {0}",
+    max:"已臻化境",
+    shadeGain:"+{0} 層", ascGain:"+{0} 靈感",
+    needZen:"還差 {0} 禪意",
+    intro:["點一下紙面，墨就落下了。","它會自己暈開，碰到哪裡，那裡的山就醒過來。"],
+    start:"入 境"
+  }
+};
+let LANG = "zh";
+const t = (k,...a)=>{ let s=I18N[LANG][k]||k; a.forEach((v,i)=>s=s.replace('{'+i+'}',v)); return s; };
+
+/* ---------- Audio (Web Audio API) ---------- */
+const Audio = (()=>{
+  let actx=null, muted=false, master=null;
+  function ensure(){
+    if(actx) return;
+    actx = new (window.AudioContext||window.webkitAudioContext)();
+    master = actx.createGain(); master.gain.value=0.5; master.connect(actx.destination);
+  }
+  // Karplus-Strong plucked string — guqin-like physical modeling delay line
+  function guqin(freq, vol){
+    vol = vol||0.28;
+    if(muted) return; ensure();
+    const dur=2.6, sr=actx.sampleRate, N=Math.max(2,Math.floor(sr/freq));
+    const buf=actx.createBuffer(1, Math.floor(sr*dur), sr);
+    const d=buf.getChannelData(0);
+    const ks=new Float32Array(N);
+    for(let i=0;i<N;i++) ks[i]=Math.random()*2-1;
+    const damp=0.993;
+    for(let i=0;i<d.length;i++){
+      if(i<N) d[i]=ks[i];
+      else d[i]=damp*0.5*(d[i-N]+d[i-N-1]);
+    }
+    const src=actx.createBufferSource(); src.buffer=buf;
+    const g=actx.createGain();
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0008, actx.currentTime+dur);
+    const lp=actx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2200;
+    src.connect(lp); lp.connect(g); g.connect(master); src.start();
+  }
+  // water drop — sine with quick pitch fall
+  function drop(vol){
+    vol = vol||0.22;
+    if(muted) return; ensure();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type="sine";
+    o.frequency.setValueAtTime(880, actx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(180, actx.currentTime+0.16);
+    g.gain.setValueAtTime(vol, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+0.22);
+    o.connect(g); g.connect(master); o.start(); o.stop(actx.currentTime+0.24);
+  }
+  function chime(freq, vol){
+    freq=freq||523; vol=vol||0.18;
+    if(muted) return; ensure();
+    [1,1.5,2].forEach(function(m,i){
+      const o=actx.createOscillator(), g=actx.createGain();
+      o.type="sine"; o.frequency.value=freq*m;
+      g.gain.setValueAtTime(0, actx.currentTime+i*0.04);
+      g.gain.linearRampToValueAtTime(vol/(i+1), actx.currentTime+i*0.04+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, actx.currentTime+1.4);
+      o.connect(g); g.connect(master); o.start(actx.currentTime+i*0.04);
+      o.stop(actx.currentTime+1.5);
+    });
+  }
+  const PENTA=[196,220,247,294,330,392,440,494,588,660];
+  return {
+    init(){ ensure(); if(actx.state==="suspended") actx.resume(); },
+    inkDrop(){ drop(); guqin(PENTA[Math.floor(Math.random()*PENTA.length)], 0.14); },
+    upgrade(){ guqin(PENTA[2],0.3); },
+    awaken(){ chime(523,0.2); guqin(330,0.2); },
+    prestige(){ guqin(196,0.34); setTimeout(function(){guqin(247,0.3);},120); setTimeout(function(){guqin(330,0.28);},260); },
+    toggleMute(){ muted=!muted; return muted; }
+  };
+})();
+/* ---------- canvas setup ---------- */
+const stage = document.getElementById('stage');
+const ctx = stage.getContext('2d');
+let W=0,H=0,DPR=1;
+const persist = document.createElement('canvas');
+const pctx = persist.getContext('2d');
+const sceneryLayer = document.createElement('canvas');
+const sctx = sceneryLayer.getContext('2d');
+let sceneryDirty = true;
+
+function resize(){
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = window.innerWidth; H = window.innerHeight;
+  [stage,persist,sceneryLayer].forEach(function(c){
+    c.width = Math.floor(W*DPR); c.height = Math.floor(H*DPR);
+  });
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  pctx.setTransform(DPR,0,0,DPR,0,0);
+  sctx.setTransform(DPR,0,0,DPR,0,0);
+  generatePaper();
+  bakedDrops.forEach(function(d){ paintDrop(pctx, d.x,d.y,d.r,d.color,d.alpha); });
+  sceneryDirty = true;
+}
+window.addEventListener('resize', resize);
+
+/* ---------- paper texture ---------- */
+function generatePaper(){
+  pctx.fillStyle = '#fcfaf2';
+  pctx.fillRect(0,0,W,H);
+  const g = pctx.createRadialGradient(W*0.5,H*0.5,Math.min(W,H)*0.2, W*0.5,H*0.5,Math.max(W,H)*0.75);
+  g.addColorStop(0,'rgba(255,250,235,0.0)');
+  g.addColorStop(1,'rgba(180,160,120,0.10)');
+  pctx.fillStyle=g; pctx.fillRect(0,0,W,H);
+  // noise grain (device pixels)
+  pctx.save();
+  pctx.setTransform(1,0,0,1,0,0);
+  const id = pctx.getImageData(0,0,persist.width,persist.height);
+  const dd = id.data;
+  for(let i=0;i<dd.length;i+=4){
+    const n=(Math.random()-0.5)*10;
+    dd[i]+=n; dd[i+1]+=n; dd[i+2]+=n;
+  }
+  pctx.putImageData(id,0,0);
+  pctx.restore();
+  // fibers
+  pctx.strokeStyle='rgba(150,130,95,0.05)';
+  pctx.lineWidth=0.6;
+  for(let i=0;i<70;i++){
+    pctx.beginPath();
+    const x=Math.random()*W,y=Math.random()*H,a=Math.random()*Math.PI*2,len=Math.random()*60+20;
+    pctx.moveTo(x,y); pctx.lineTo(x+Math.cos(a)*len,y+Math.sin(a)*len); pctx.stroke();
+  }
+  pctx.strokeStyle='rgba(120,100,70,0.10)'; pctx.lineWidth=1;
+  pctx.strokeRect(18,18,W-36,H-36);
+}
+
+/* ---------- colors ---------- */
+const COLOR_INKS = ['#1a1a1a', '#3a5a40', '#9c3a2a', '#7a5a2a', '#2a4a6a', '#4a2a4a'];
+function colorForLevel(lv){ return COLOR_INKS[Math.min(lv, COLOR_INKS.length-1)]; }
+function hexA(hex,a){
+  const n=parseInt(hex.slice(1),16);
+  return 'rgba('+((n>>16)&255)+','+((n>>8)&255)+','+(n&255)+','+a+')';
+}
+
+/* ---------- ink drop (multi-ring exponential diffusion + branches) ---------- */
+let bakedDrops = [];
+let activeDrops = [];
+
+function InkDrop(x,y,color,maxR,viscosity,speed,brushAlpha){
+  this.x=x; this.y=y; this.color=color; this.maxR=maxR;
+  this.viscosity=viscosity; this.speed=speed;
+  this.r=2; this.age=0;
+  this.duration = 2.2 / Math.max(0.2,speed);
+  this.branches=[];
+  this.alpha = (brushAlpha===undefined)?1:brushAlpha;
+  this.done=false;
+  this._branchTimer=0;
+}
+InkDrop.prototype.update = function(dt){
+  if(this.done) return;
+  this.age += dt;
+  const tt = Math.min(this.age/this.duration,1);
+  this.r = this.maxR * (1 - Math.exp(-3.2*tt));
+  if(this.viscosity>0 && tt<0.9){
+    this._branchTimer += dt;
+    const interval = 0.18 / (0.4+this.viscosity);
+    while(this._branchTimer>interval && this.branches.length<10){
+      this._branchTimer -= interval;
+      const ang = Math.random()*Math.PI*2;
+      const dist = this.r*(0.55+Math.random()*0.3);
+      const br = new InkDrop(
+        this.x+Math.cos(ang)*dist, this.y+Math.sin(ang)*dist, this.color,
+        this.maxR*(0.28+Math.random()*0.22), 0, this.speed*1.6, this.alpha*0.8
+      );
+      br.duration = this.duration*0.7;
+      this.branches.push(br);
+    }
+  }
+  this.branches.forEach(function(b){ b.update(dt); });
+  this.branches = this.branches.filter(function(b){ return !b.done; });
+  if(tt>=1 && this.branches.length===0) this.done=true;
+};
+InkDrop.prototype.draw = function(g){
+  paintDrop(g, this.x, this.y, this.r, this.color, this.alpha);
+  this.branches.forEach(function(b){ b.draw(g); });
+};
+
+function paintDrop(g,x,y,r,color,alpha){
+  if(r<0.5) return;
+  r = Math.max(0.5,r);
+  if(alpha===undefined) alpha=1;
+  g.save();
+  g.globalAlpha = alpha;
+  // soft outer halo
+  let grd = g.createRadialGradient(x,y,0,x,y,r*1.35);
+  grd.addColorStop(0, hexA(color,0));
+  grd.addColorStop(0.62, hexA(color,0));
+  grd.addColorStop(0.85, hexA(color,0.10*alpha));
+  grd.addColorStop(1, hexA(color,0));
+  g.fillStyle=grd;
+  g.beginPath(); g.arc(x,y,r*1.35,0,Math.PI*2); g.fill();
+  // main body
+  grd = g.createRadialGradient(x,y,r*0.05,x,y,r);
+  grd.addColorStop(0, hexA(color,0.92));
+  grd.addColorStop(0.45, hexA(color,0.62));
+  grd.addColorStop(0.78, hexA(color,0.26));
+  grd.addColorStop(1, hexA(color,0));
+  g.fillStyle=grd;
+  g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill();
+  // fuzzy edge rings
+  g.globalAlpha = alpha*0.5;
+  for(let i=0;i<3;i++){
+    const rr = r*(0.82+Math.random()*0.22);
+    const ox=(Math.random()-0.5)*r*0.18, oy=(Math.random()-0.5)*r*0.18;
+    const gg = g.createRadialGradient(x+ox,y+oy,rr*0.6,x+ox,y+oy,rr);
+    gg.addColorStop(0, hexA(color,0));
+    gg.addColorStop(0.8, hexA(color,0.10));
+    gg.addColorStop(1, hexA(color,0));
+    g.fillStyle=gg;
+    g.beginPath(); g.arc(x+ox,y+oy,rr,0,Math.PI*2); g.fill();
+  }
+  // dark core
+  g.globalAlpha = alpha*0.6;
+  grd = g.createRadialGradient(x,y,0,x,y,r*0.3);
+  grd.addColorStop(0, hexA(color,0.5));
+  grd.addColorStop(1, hexA(color,0));
+  g.fillStyle=grd;
+  g.beginPath(); g.arc(x,y,r*0.3,0,Math.PI*2); g.fill();
+  g.restore();
+}
+/* ---------- scenery points (意境點) ---------- */
+const SCENERY_DEFS = [
+  {x:0.16,y:0.26,type:'mountain',rate:0.6,need:34,size:130},
+  {x:0.46,y:0.22,type:'mountain',rate:0.7,need:44,size:160},
+  {x:0.74,y:0.27,type:'mountain',rate:0.6,need:38,size:115},
+  {x:0.86,y:0.14,type:'moon',rate:2.4,need:22,size:42},
+  {x:0.34,y:0.34,type:'bird',rate:1.8,need:16,size:26},
+  {x:0.56,y:0.39,type:'bird',rate:1.8,need:16,size:22},
+  {x:0.62,y:0.31,type:'bird',rate:2.0,need:14,size:18},
+  {x:0.50,y:0.56,type:'boat',rate:3.2,need:52,size:74},
+  {x:0.24,y:0.66,type:'rock',rate:1.2,need:28,size:52},
+  {x:0.66,y:0.70,type:'rock',rate:1.6,need:32,size:60},
+  {x:0.78,y:0.60,type:'leaf',rate:1.5,need:18,size:30},
+  {x:0.10,y:0.80,type:'reed',rate:1.0,need:22,size:84},
+  {x:0.90,y:0.82,type:'reed',rate:1.0,need:22,size:84},
+  {x:0.40,y:0.48,type:'pavilion',rate:2.6,need:40,size:46},
+];
+let scenery = [];
+function initScenery(){
+  scenery = SCENERY_DEFS.map(function(d){ return Object.assign({}, d, {reveal:0, awakened:false, justAwoke:false}); });
+}
+function drawScenery(g){
+  g.clearRect(0,0,W,H);
+  scenery.forEach(function(s){
+    const x=s.x*W, y=s.y*H;
+    const a = Math.max(0, Math.min(1, s.reveal));
+    if(a<=0.001) return;
+    g.save();
+    g.globalAlpha = a*0.92;
+    g.strokeStyle = '#15110d'; g.fillStyle = '#15110d';
+    g.lineCap='round'; g.lineJoin='round';
+    if(s.type==='mountain') drawMountain(g,x,y,s.size);
+    else if(s.type==='moon') drawMoon(g,x,y,s.size);
+    else if(s.type==='bird') drawBird(g,x,y,s.size);
+    else if(s.type==='boat') drawBoat(g,x,y,s.size);
+    else if(s.type==='rock') drawRock(g,x,y,s.size);
+    else if(s.type==='leaf') drawLeaf(g,x,y,s.size);
+    else if(s.type==='reed') drawReed(g,x,y,s.size);
+    else if(s.type==='pavilion') drawPavilion(g,x,y,s.size);
+    g.restore();
+    if(s.justAwoke){
+      g.save();
+      const gr=g.createRadialGradient(x,y,0,x,y,s.size*1.5);
+      gr.addColorStop(0,'rgba(255,250,220,0.5)');
+      gr.addColorStop(1,'rgba(255,250,220,0)');
+      g.fillStyle=gr; g.beginPath(); g.arc(x,y,s.size*1.5,0,Math.PI*2); g.fill();
+      g.restore();
+    }
+  });
+}
+function drawMountain(g,x,y,s){
+  g.beginPath();
+  g.moveTo(x-s*0.9,y+s*0.25); g.lineTo(x-s*0.35,y-s*0.35);
+  g.lineTo(x-s*0.1,y-s*0.05); g.lineTo(x+s*0.2,y-s*0.55);
+  g.lineTo(x+s*0.55,y-s*0.1); g.lineTo(x+s*0.9,y+s*0.25);
+  g.closePath(); g.fill();
+  g.fillStyle='rgba(80,75,68,0.4)';
+  g.beginPath();
+  g.moveTo(x+s*0.2,y-s*0.55); g.lineTo(x+s*0.55,y-s*0.1); g.lineTo(x+s*0.3,y-s*0.1);
+  g.closePath(); g.fill();
+}
+function drawMoon(g,x,y,s){
+  g.save(); g.globalAlpha*=0.7;
+  const gr=g.createRadialGradient(x,y,0,x,y,s);
+  gr.addColorStop(0,'rgba(245,235,200,0.9)');
+  gr.addColorStop(0.7,'rgba(230,215,170,0.5)');
+  gr.addColorStop(1,'rgba(230,215,170,0)');
+  g.fillStyle=gr; g.beginPath(); g.arc(x,y,s,0,Math.PI*2); g.fill();
+  g.restore();
+}
+function drawBird(g,x,y,s){
+  g.lineWidth=Math.max(1.5,s*0.08);
+  g.beginPath();
+  g.moveTo(x-s,y);
+  g.quadraticCurveTo(x-s*0.4,y-s*0.8,x,y-s*0.15);
+  g.quadraticCurveTo(x+s*0.4,y-s*0.8,x+s,y);
+  g.stroke();
+}
+function drawBoat(g,x,y,s){
+  g.lineWidth=Math.max(1.5,s*0.06);
+  g.beginPath();
+  g.moveTo(x-s*0.6,y+s*0.15);
+  g.quadraticCurveTo(x,y+s*0.4,x+s*0.6,y+s*0.15);
+  g.lineTo(x+s*0.45,y); g.lineTo(x-s*0.45,y);
+  g.closePath(); g.stroke();
+  g.beginPath();
+  g.moveTo(x,y); g.lineTo(x,y-s*0.7);
+  g.moveTo(x-s*0.1,y-s*0.2); g.lineTo(x-s*0.1,y-s*0.55);
+  g.stroke();
+  g.beginPath();
+  g.moveTo(x-s*0.22,y-s*0.55); g.lineTo(x-s*0.1,y-s*0.68); g.lineTo(x+s*0.02,y-s*0.55);
+  g.stroke();
+}
+function drawRock(g,x,y,s){
+  g.beginPath();
+  g.moveTo(x-s*0.7,y+s*0.3); g.lineTo(x-s*0.5,y-s*0.2);
+  g.lineTo(x-s*0.1,y-s*0.35); g.lineTo(x+s*0.3,y-s*0.25);
+  g.lineTo(x+s*0.65,y+s*0.05); g.lineTo(x+s*0.5,y+s*0.32); g.lineTo(x-s*0.2,y+s*0.38);
+  g.closePath(); g.fill();
+  g.strokeStyle='rgba(90,85,78,0.5)'; g.lineWidth=1;
+  g.beginPath(); g.moveTo(x-s*0.3,y-s*0.05); g.lineTo(x+s*0.2,y-s*0.05); g.stroke();
+  g.beginPath(); g.moveTo(x-s*0.1,y+s*0.15); g.lineTo(x+s*0.35,y+s*0.1); g.stroke();
+}
+function drawLeaf(g,x,y,s){
+  g.lineWidth=Math.max(1.2,s*0.07);
+  g.beginPath(); g.moveTo(x-s*0.8,y+s*0.3); g.quadraticCurveTo(x,y-s*0.6,x+s*0.8,y+s*0.2); g.stroke();
+  g.beginPath(); g.moveTo(x-s*0.7,y+s*0.32); g.quadraticCurveTo(x,y+s*0.1,x+s*0.7,y+s*0.22); g.stroke();
+}
+function drawReed(g,x,y,s){
+  g.lineWidth=Math.max(1.2,s*0.04);
+  for(let i=-2;i<=2;i++){
+    const bx=x+i*s*0.18;
+    g.beginPath(); g.moveTo(bx,y+s*0.4); g.quadraticCurveTo(bx+i*2,y, bx+i*6,y-s*0.7); g.stroke();
+  }
+  for(let i=-2;i<=2;i++){
+    const bx=x+i*s*0.18, ty=y-s*0.7+i*4;
+    g.beginPath(); g.moveTo(bx,ty); g.quadraticCurveTo(bx+8,ty-12,bx+16,ty-6); g.stroke();
+  }
+}
+function drawPavilion(g,x,y,s){
+  g.lineWidth=Math.max(1.3,s*0.05);
+  g.beginPath();
+  g.moveTo(x-s*0.7,y-s*0.1); g.lineTo(x-s*0.85,y); g.lineTo(x-s*0.5,y-s*0.05);
+  g.lineTo(x,y-s*0.5); g.lineTo(x+s*0.5,y-s*0.05); g.lineTo(x+s*0.85,y); g.lineTo(x+s*0.7,y-s*0.1);
+  g.stroke();
+  g.fillStyle='rgba(40,38,34,0.6)';
+  g.beginPath();
+  g.moveTo(x-s*0.5,y-s*0.05); g.lineTo(x,y-s*0.5); g.lineTo(x+s*0.5,y-s*0.05);
+  g.lineTo(x+s*0.35,y); g.lineTo(x-s*0.35,y);
+  g.closePath(); g.fill();
+  g.beginPath();
+  g.moveTo(x-s*0.3,y); g.lineTo(x-s*0.3,y+s*0.5);
+  g.moveTo(x+s*0.3,y); g.lineTo(x+s*0.3,y+s*0.5);
+  g.moveTo(x-s*0.3,y+s*0.5); g.lineTo(x+s*0.3,y+s*0.5);
+  g.stroke();
+}
+
+/* ---------- game state ---------- */
+const SAVE_KEY = 'zenInkSave_v1';
+let state = {
+  zen:0, totalZen:0, insp:0, shad:0, asc:0,
+  upg:{permeate:0,flow:0,color:0,brush:0},
+  autoBrush:false, muted:false,
+};
+let lastSave = 0;
+function effect(){
+  const u=state.upg;
+  return {
+    maxR: 55 + u.permeate*16,
+    viscosity: u.flow*0.35,
+    speed: (1 + u.flow*0.22) * (1/(1+state.insp*0.12)),
+    colorMul: Math.pow(2, u.color),
+    shadMul: 1 + state.shad*0.5,
+    ascMul: 1 + state.asc*1.0,
+    autoRate: u.brush,
+    color: colorForLevel(u.color),
+  };
+}
+function zenPerSec(){
+  const e=effect();
+  let sum=0;
+  scenery.forEach(function(s){ if(s.awakened) sum += s.rate; });
+  return sum * e.colorMul * e.shadMul * e.ascMul;
+}
+
+/* ---------- upgrades ---------- */
+const UPG_CFG = {
+  permeate:{base:10,  growth:1.55},
+  flow:    {base:55,  growth:1.85},
+  color:   {base:600, growth:6.0,  max:5},
+  brush:   {base:120, growth:1.95},
+};
+function upgCost(key){ const c=UPG_CFG[key], lv=state.upg[key]; return Math.ceil(c.base*Math.pow(c.growth,lv)); }
+function buyUpgrade(key){
+  const c=UPG_CFG[key];
+  if(c.max && state.upg[key]>=c.max) return;
+  if(state.zen < upgCost(key)) return;
+  state.zen -= upgCost(key);
+  state.upg[key]++;
+  Audio.upgrade(); refreshPanel(); save();
+}
+
+/* ---------- prestige ---------- */
+function shadeReq(){ return 800; }
+function shadeGain(){ return Math.floor(Math.sqrt(state.totalZen/800)); }
+function ascReq(){ return 40000; }
+function ascGain(){ return Math.floor(Math.sqrt(state.totalZen/40000)); }
+function doShade(){
+  if(state.totalZen < shadeReq()) return;
+  const g = shadeGain(); if(g<=0) return;
+  state.shad += g; resetRun();
+  toast(LANG==='zh'?('+'+g+' 積墨層'):('+'+g+' layers'));
+  Audio.prestige(); refreshPanel(); save();
+}
+function doAscend(){
+  if(state.totalZen < ascReq()) return;
+  const g = ascGain(); if(g<=0) return;
+  state.insp += g; state.asc++; state.autoBrush = true; resetRun();
+  toast(LANG==='zh'?('+'+g+' 靈感'):('+'+g+' inspiration'));
+  Audio.prestige(); refreshPanel(); save();
+}
+function resetRun(){
+  state.zen=0; state.totalZen=0;
+  activeDrops=[]; bakedDrops=[];
+  generatePaper(); sceneryDirty=true; initScenery();
+}
+
+/* ---------- input ---------- */
+function dropInkAt(x,y, fromAuto){
+  const e=effect();
+  let color = e.color;
+  if(state.upg.color>0){
+    const palette = COLOR_INKS.slice(0, state.upg.color+1);
+    color = palette[Math.floor(Math.random()*palette.length)];
+  }
+  const d = new InkDrop(x,y,color,e.maxR,e.viscosity,e.speed);
+  activeDrops.push(d);
+  if(!fromAuto) Audio.inkDrop();
+}
+stage.addEventListener('pointerdown', function(ev){
+  Audio.init();
+  const r=stage.getBoundingClientRect();
+  dropInkAt(ev.clientX-r.left, ev.clientY-r.top);
+});
+
+/* ---------- auto systems ---------- */
+let autoBrushTimer=0, autoDropTimer=0;
+function updateAuto(dt){
+  const e=effect();
+  if(e.autoRate>0){
+    autoDropTimer += dt;
+    const interval = 1/e.autoRate;
+    while(autoDropTimer>=interval){
+      autoDropTimer-=interval;
+      const targets = scenery.filter(function(s){ return !s.awakened; });
+      let tx,ty;
+      if(targets.length && Math.random()<0.7){
+        const s=targets[Math.floor(Math.random()*targets.length)];
+        tx=s.x*W + (Math.random()-0.5)*80;
+        ty=s.y*H + (Math.random()-0.5)*80;
+      }else{ tx=Math.random()*W; ty=Math.random()*H; }
+      dropInkAt(tx,ty,true);
+    }
+  }
+  if(state.autoBrush){
+    autoBrushTimer += dt;
+    if(autoBrushTimer>2.4){ autoBrushTimer=0; drawBrushStroke(); }
+  }
+}
+function drawBrushStroke(){
+  const x0=Math.random()*W, y0=Math.random()*H;
+  const x2=Math.random()*W, y2=Math.random()*H;
+  const cx=x0+(x2-x0)*0.3 + (Math.random()-0.5)*200;
+  const cy=y0+(y2-y0)*0.3 + (Math.random()-0.5)*200;
+  const e=effect();
+  const steps=8;
+  for(let i=0;i<=steps;i++){
+    const u=i/steps;
+    const x=(1-u)*(1-u)*x0+2*(1-u)*u*cx+u*u*x2;
+    const y=(1-u)*(1-u)*y0+2*(1-u)*u*cy+u*u*y2;
+    const col = state.upg.color>0 ? COLOR_INKS[1+Math.floor(Math.random()*state.upg.color)] : e.color;
+    const d=new InkDrop(x,y,col,e.maxR*0.55,e.viscosity*0.6,e.speed*1.4,0.7);
+    activeDrops.push(d);
+  }
+}
+/* ---------- scenery reveal ---------- */
+function updateScenery(dt){
+  let anyChange=false;
+  for(let i=0;i<scenery.length;i++){
+    const s=scenery[i];
+    if(s.awakened){ if(s.justAwoke){ s.justAwoke=false; } continue; }
+    const px=s.x*W, py=s.y*H;
+    const reach = s.size*0.6;
+    for(let j=0;j<activeDrops.length;j++){
+      const d=activeDrops[j];
+      const dx=px-d.x, dy=py-d.y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const rr=d.r+reach;
+      if(dist<rr){
+        const cov = (1 - dist/rr) * 0.9;
+        s.reveal += dt * cov * (0.5 + d.viscosity*0.3);
+        anyChange=true;
+      }
+    }
+    if(s.reveal>=1){
+      s.reveal=1; s.awakened=true; s.justAwoke=true;
+      Audio.awaken(); anyChange=true;
+    }
+  }
+  if(anyChange) sceneryDirty=true;
+}
+function bakeDrop(d){
+  bakedDrops.push({x:d.x,y:d.y,r:d.maxR*0.92,color:d.color,alpha:d.alpha});
+  if(bakedDrops.length>400) bakedDrops.shift();
+  paintDrop(pctx, d.x, d.y, d.maxR*0.92, d.color, d.alpha);
+  let changed=false;
+  for(let i=0;i<scenery.length;i++){
+    const s=scenery[i];
+    if(s.awakened) continue;
+    const dx=s.x*W-d.x, dy=s.y*H-d.y;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    const rr=d.maxR*0.92 + s.size*0.6;
+    if(dist<rr){
+      s.reveal += (1-dist/rr)*0.22;
+      if(s.reveal>=1){ s.reveal=1; s.awakened=true; s.justAwoke=true; Audio.awaken(); }
+      changed=true;
+    }
+  }
+  if(changed) sceneryDirty=true;
+}
+
+/* ---------- render ---------- */
+function render(){
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(persist,0,0,W,H);
+  if(sceneryDirty){ drawScenery(sctx); sceneryDirty=false; }
+  ctx.drawImage(sceneryLayer,0,0,W,H);
+  for(let i=0;i<activeDrops.length;i++) activeDrops[i].draw(ctx);
+  // faint hint dots for unrevealed scenery
+  ctx.save();
+  ctx.globalAlpha=0.06; ctx.fillStyle='#3a3328';
+  for(let i=0;i<scenery.length;i++){
+    const s=scenery[i];
+    if(s.reveal>0.02) continue;
+    ctx.beginPath(); ctx.arc(s.x*W,s.y*H,3,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+/* ---------- main loop ---------- */
+let last=performance.now();
+function loop(now){
+  let dt=(now-last)/1000; last=now;
+  if(dt>0.1) dt=0.1;
+  for(let i=0;i<activeDrops.length;i++) activeDrops[i].update(dt);
+  const finished = activeDrops.filter(function(d){ return d.done; });
+  finished.forEach(function(d){ bakeDrop(d); });
+  activeDrops = activeDrops.filter(function(d){ return !d.done; });
+  updateScenery(dt);
+  updateAuto(dt);
+  state.zen += zenPerSec()*dt;
+  state.totalZen += zenPerSec()*dt;
+  render();
+  updateHUD();
+  if(now-lastSave>4000){ save(); lastSave=now; }
+  requestAnimationFrame(loop);
+}
+
+/* ---------- HUD ---------- */
+const elZenVal=document.getElementById('zenVal');
+const elZenLab=document.getElementById('zenLab');
+const elZenRate=document.getElementById('zenRate');
+const elInspVal=document.getElementById('inspVal');
+const elInspLab=document.getElementById('inspLab');
+const elShadVal=document.getElementById('shadVal');
+const elShadLab=document.getElementById('shadLab');
+let hudTimer=0;
+function updateHUD(){
+  hudTimer++;
+  if(hudTimer%6!==0) return;
+  elZenVal.textContent = fmt(state.zen);
+  elZenLab.textContent = t('zen');
+  elZenRate.textContent = t('rate', fmt(zenPerSec()));
+  elInspVal.textContent = fmt(state.insp);
+  elInspLab.textContent = t('insp');
+  elShadVal.textContent = fmt(state.shad);
+  elShadLab.textContent = t('shad');
+  refreshAffordability();
+}
+function fmt(n){
+  if(n<100) return (Math.floor(n*10)/10).toString();
+  if(n<10000) return Math.floor(n).toString();
+  if(n<1e6) return (n/1e3).toFixed(2)+'K';
+  if(n<1e9) return (n/1e6).toFixed(2)+'M';
+  if(n<1e12) return (n/1e9).toFixed(2)+'B';
+  return (n/1e12).toFixed(2)+'T';
+}
+
+/* ---------- panel ---------- */
+const panelEls={};
+document.querySelectorAll('.upg').forEach(function(el){
+  panelEls[el.dataset.key]=el;
+  el.addEventListener('click', function(){
+    const k=el.dataset.key;
+    if(k==='shading') return doShade();
+    if(k==='ascend') return doAscend();
+    buyUpgrade(k);
+  });
+});
+function refreshPanel(){
+  renderUpgrade('permeate'); renderUpgrade('flow');
+  renderUpgrade('color'); renderUpgrade('brush');
+  renderPrestige('shading'); renderPrestige('ascend');
+  document.getElementById('panelTitle').textContent=t('panel');
+  document.getElementById('panelHint').textContent=t('hint');
+}
+function renderUpgrade(key){
+  const el=panelEls[key]; const c=UPG_CFG[key]; const lv=state.upg[key];
+  const arr = I18N[LANG][key]; const name=arr[0], desc=arr[1];
+  const maxed = c.max && lv>=c.max;
+  const cost = upgCost(key);
+  el.classList.toggle('maxed', maxed);
+  el.innerHTML =
+    '<div class="upgRow"><span class="upgName">'+name+'</span><span class="upgLv">Lv '+lv+(c.max?('/'+c.max):'')+'</span></div>'+
+    '<div class="upgDesc">'+desc+'</div>'+
+    '<div class="upgCost">'+(maxed?t('max'):t('cost',fmt(cost)))+'</div>';
+}
+function renderPrestige(key){
+  const el=panelEls[key];
+  const arr = I18N[LANG][key]; const name=arr[0], sub=arr[1];
+  const isShade = key==='shading';
+  const req=isShade?shadeReq():ascReq();
+  const g=isShade?shadeGain():ascGain();
+  const can = state.totalZen>=req && g>0;
+  el.classList.toggle('locked', !can);
+  const color = isShade?'var(--seal)':'var(--moss)';
+  el.innerHTML =
+    '<div class="upgRow"><span class="upgName">'+name+'</span></div>'+
+    '<div class="upgDesc" style="color:'+color+'">'+sub+'</div>'+
+    '<div class="upgCost '+(can?'':'cant')+'">'+(can?(isShade?t('shadeGain',g):t('ascGain',g)):t('needZen',fmt(req)))+'</div>';
+}
+function refreshAffordability(){
+  ['permeate','flow','color','brush'].forEach(function(k){
+    const el=panelEls[k]; if(!el||el.classList.contains('maxed')) return;
+    const costEl=el.querySelector('.upgCost');
+    if(costEl) costEl.classList.toggle('cant', state.zen<upgCost(k));
+  });
+  renderPrestige('shading'); renderPrestige('ascend');
+}
+
+/* ---------- toast ---------- */
+const elToast=document.getElementById('toast');
+let toastTimer=null;
+function toast(msg){
+  elToast.textContent=msg; elToast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){ elToast.classList.remove('show'); },1600);
+}
+
+/* ---------- language toggle ---------- */
+document.getElementById('langBtn').addEventListener('click', function(){
+  LANG = LANG==='zh'?'en':'zh';
+  refreshPanel();
+  document.getElementById('introText').innerHTML = I18N[LANG].intro.join('<br>');
+  document.querySelector('#intro .en').textContent = LANG==='en'?'H A L F   A   S C R O L L':'';
+  document.getElementById('startBtn').textContent = I18N[LANG].start;
+  document.getElementById('titleVert').textContent = I18N[LANG].title;
+});
+
+/* ---------- mute ---------- */
+document.getElementById('muteBtn').addEventListener('click', function(){
+  const m=Audio.toggleMute();
+  state.muted=m;
+  document.getElementById('muteBtn').classList.toggle('active',m);
+  document.getElementById('muteBtn').textContent = m?'\u266A\u0338':'\u266A';
+});
+
+/* ---------- save / load ---------- */
+function save(){
+  try{
+    const data=Object.assign({}, state, {
+      baked:bakedDrops.slice(-200),
+      sc:scenery.map(function(s){ return {r:s.reveal,a:s.awakened?1:0}; })
+    });
+    localStorage.setItem(SAVE_KEY, JSON.stringify(data));
+  }catch(e){}
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(SAVE_KEY); if(!raw) return false;
+    const d=JSON.parse(raw);
+    state.zen=d.zen||0; state.totalZen=d.totalZen||0; state.insp=d.insp||0;
+    state.shad=d.shad||0; state.asc=d.asc||0;
+    state.autoBrush=!!d.autoBrush; state.muted=!!d.muted;
+    state.upg=Object.assign({permeate:0,flow:0,color:0,brush:0}, d.upg||{});
+    if(d.baked) bakedDrops=d.baked;
+    if(d.sc && d.sc.length===scenery.length){
+      scenery.forEach(function(s,i){ s.reveal=d.sc[i].r; s.awakened=!!d.sc[i].a; });
+    }
+    if(state.muted){
+      Audio.toggleMute();
+      document.getElementById('muteBtn').classList.add('active');
+      document.getElementById('muteBtn').textContent='\u266A\u0338';
+    }
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ---------- intro ---------- */
+document.getElementById('startBtn').addEventListener('click', function(){
+  Audio.init();
+  document.getElementById('intro').style.opacity='0';
+  setTimeout(function(){ document.getElementById('intro').style.display='none'; },800);
+});
+
+/* ---------- boot ---------- */
+function boot(){
+  initScenery();
+  resize();
+  const loaded = load();
+  bakedDrops.forEach(function(d){ paintDrop(pctx, d.x,d.y,d.r,d.color,d.alpha); });
+  sceneryDirty=true;
+  if(loaded){
+    document.getElementById('intro').style.opacity='0';
+    setTimeout(function(){ document.getElementById('intro').style.display='none'; },800);
+  }
+  refreshPanel();
+  requestAnimationFrame(loop);
+}
+boot();
+</script>
+</body>
+</html>

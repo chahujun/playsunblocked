@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    '系统://因果引擎.v1 — 致命悖论': 'SYS://causal_engine.v1 — FATAL PARADOX',
+    '系统://因果引擎.v1 — 运行中': 'SYS://causal_engine.v1 — RUNNING',
+    '系统://因果引擎.v1 — 已解除': 'SYS://causal_engine.v1 — RESOLVED',
+    '系统://因果引擎.v1 — 就绪': 'SYS://causal_engine.v1 — READY',
+    '点击节点 → 点击节点池 · 点击开始演算': 'TAP NODE → TAP POOL · TAP SIMULATE',
+    '先点「那么: 行走」选中它，再从下方节点池选「那么: 跳跃」': 'Click [THEN: Walk] to select it, then pick [THEN: Jump] from the pool below.',
+    '全部关卡已通过': 'ALL STAGES CLEARED',
+    '选择一个关卡开始': 'Select a stage to begin',
+    '毒水 — 滑行通过': 'Poison — slide through it',
+    '地刺 — 跳跃越过': 'Spikes — jump over them',
+    '电网 — 停下等它收起': 'Grid — stop and wait for it to retract',
+    '横梁 — 蹲下穿过': 'Beam — duck under it',
+    '感谢游玩。': 'Thanks for playing.',
+    '下一关：': 'Next: ',
+    '如果: 地刺': 'IF: Spikes',
+    '如果: 毒水': 'IF: Poison',
+    '如果: 电网': 'IF: Grid',
+    '如果: 横梁': 'IF: Beam',
+    '那么: 行走': 'THEN: Walk',
+    '那么: 跳跃': 'THEN: Jump',
+    '那么: 滑行': 'THEN: Slide',
+    '那么: 停下': 'THEN: Stop',
+    '那么: 蹲下': 'THEN: Duck',
+    '开始演算': 'SIMULATE',
+    '选择关卡': 'SELECT STAGE',
+    '逻辑正确': 'Logic correct',
+    '逻辑错误': 'Logic error',
+    '因果逻辑流': 'Logic Flow',
+    '逻辑节点池': 'Node Pool',
+    '下一关': 'NEXT STAGE',
+    '重试': 'RETRY',
+    '通关': 'STAGE CLEARED',
+    '失败': 'FAILED',
+    '开始': 'START',
+    '重置': 'RESET',
+    '入门': 'INTRO',
+    '进阶': 'DUAL',
+    '挑战': 'TRIPLE',
+    '终局': 'FINAL',
+    '初见': 'First Steps',
+    '岔路': 'Fork',
+    '三重门': 'Triple Gate',
+    '如果·那么': 'IF/THEN'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    if (T[text.trim()]) return T[text.trim()];
+    var result = text;
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>IF/THEN</title>
+<style>
+  /* ============ 黑客复古风格 ============ */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    background: #050608;
+    color: #00ff9c;
+    font-family: 'Courier New', 'Consolas', monospace;
+    letter-spacing: 1px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,255,156,0.035) 0px, rgba(0,255,156,0.035) 1px, transparent 1px, transparent 3px),
+      radial-gradient(ellipse at center, #0a120e 0%, #050608 80%);
+    text-shadow: 0 0 4px rgba(0,255,156,0.6);
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.7) 100%);
+    z-index: 1000;
+  }
+  #app {
+    width: 100%; height: 100vh; height: 100dvh;
+    padding: 8px 12px 12px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  /* ============ Header ============ */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px dashed #1f6b4a;
+    padding-bottom: 6px;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+  #titleWrap { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  #title {
+    font-size: clamp(16px, 4vw, 22px); font-weight: 900;
+    letter-spacing: 3px;
+    color: #b6ffe1;
+    text-shadow: 0 0 6px #00ff9c, 0 0 14px rgba(0,255,156,0.5);
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  #title::before, #title::after {
+    content: attr(data-text);
+    position: absolute; top: 0; left: 0;
+    width: 100%; overflow: hidden;
+    opacity: 0.85;
+  }
+  #title::before { color: #ff3b6b; transform: translate(-1px, 0); clip-path: inset(0 0 60% 0); animation: gl1 3s infinite linear alternate; }
+  #title::after  { color: #00d8ff; transform: translate(1px, 0); clip-path: inset(60% 0 0 0); animation: gl2 2.5s infinite linear alternate; }
+  @keyframes gl1 { 0%,92%{transform:translate(-1px,0)} 94%{transform:translate(-3px,1px)} 96%{transform:translate(2px,-1px)} 100%{transform:translate(-1px,0)} }
+  @keyframes gl2 { 0%,90%{transform:translate(1px,0)} 93%{transform:translate(3px,-1px)} 97%{transform:translate(-2px,1px)} 100%{transform:translate(1px,0)} }
+  #stageInfo {
+    font-size: 10px; color: #6dffb8;
+    letter-spacing: 2px;
+    opacity: 0.8;
+  }
+  #headerRight { display: flex; align-items: center; gap: 6px; }
+  #helpBtn {
+    background: transparent;
+    color: #6dffb8;
+    border: 1px solid #1f6b4a;
+    padding: 5px 9px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all .15s;
+  }
+  #helpBtn:hover { background: rgba(0,255,156,0.15); color: #00ff9c; }
+  #langToggle {
+    display: flex; gap: 0;
+    border: 1px solid #1f6b4a;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  #langToggle button {
+    background: transparent;
+    color: #00ff9c;
+    border: none;
+    padding: 5px 10px;
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all .15s;
+    min-height: 28px;
+  }
+  #langToggle button.active {
+    background: #00ff9c;
+    color: #050608;
+    text-shadow: none;
+  }
+  #langToggle button:hover:not(.active) { background: rgba(0,255,156,0.15); }
+
+  /* ============ Canvas (上屏) ============ */
+  #canvasWrap {
+    position: relative;
+    border: 1px solid #1f6b4a;
+    background: #03060a;
+    box-shadow: inset 0 0 40px rgba(0,255,156,0.08), 0 0 12px rgba(0,255,156,0.15);
+    flex: 0 0 auto;
+    overflow: hidden;
+    transition: transform 0.05s;
+  }
+  #canvasWrap.shake { animation: shake 0.4s; }
+  @keyframes shake {
+    0%,100% { transform: translate(0,0); }
+    15% { transform: translate(-6px, 3px); }
+    30% { transform: translate(5px, -3px); }
+    45% { transform: translate(-4px, 2px); }
+    60% { transform: translate(3px, -2px); }
+    75% { transform: translate(-2px, 1px); }
+  }
+  #game {
+    display: block;
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+  #hud {
+    position: absolute; top: 6px; left: 8px;
+    font-size: 11px; color: #6dffb8;
+    opacity: 0.85;
+    pointer-events: none;
+  }
+  #statusMsg {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    font-size: clamp(16px, 4vw, 26px); font-weight: 900; letter-spacing: 3px;
+    color: #ffe066;
+    text-shadow: 0 0 10px #ff8c00, 0 0 24px rgba(255,140,0,0.7);
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s;
+    text-align: center;
+    padding: 0 16px;
+  }
+  #statusMsg.show { opacity: 1; }
+  #statusMsg.win { color: #00ff9c; text-shadow: 0 0 10px #00ff9c, 0 0 24px rgba(0,255,156,0.7); }
+  #statusMsg .sub { font-size: 0.5em; opacity: 0.8; letter-spacing: 1px; }
+  #flashOverlay {
+    position: absolute; inset: 0;
+    background: #00ff9c;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s;
+  }
+  #flashOverlay.flash { opacity: 0.4; transition: opacity 0.05s; }
+  #hint {
+    position: absolute; bottom: 6px; right: 10px;
+    font-size: 10px; color: #4a8a6e;
+    pointer-events: none;
+  }
+
+  /* ============ Tutorial Tooltip ============ */
+  #tutorialTip {
+    position: fixed;
+    background: rgba(8,18,14,0.95);
+    border: 1px solid #ffe066;
+    color: #ffe066;
+    padding: 8px 12px;
+    font-size: 12px;
+    border-radius: 2px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s;
+    box-shadow: 0 0 12px rgba(255,224,102,0.5);
+    z-index: 50;
+    max-width: 260px;
+    transform: translateX(-50%);
+  }
+  #tutorialTip.show { opacity: 1; animation: tipPulse 1.5s infinite; }
+  @keyframes tipPulse {
+    0%,100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.04); }
+  }
+  #tutorialTip::before {
+    content: '▸';
+    margin-right: 6px;
+    color: #ffe066;
+  }
+  #tutorialTip::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: #ffe066;
+    border-bottom: 0;
+  }
+
+  /* Error hint bubble */
+  #errorHint {
+    position: fixed;
+    bottom: 12px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(80, 10, 20, 0.95);
+    border: 1px solid #ff3b6b;
+    color: #ffb0c0;
+    padding: 8px 16px;
+    font-size: 12px;
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity .3s;
+    pointer-events: none;
+    z-index: 50;
+    text-align: center;
+    max-width: 90vw;
+  }
+  #errorHint.show { opacity: 1; }
+
+  /* ============ Logic Panel (下屏) ============ */
+  #logicPanel {
+    flex: 1 1 auto;
+    border: 1px solid #1f6b4a;
+    background: rgba(8,18,14,0.6);
+    padding: 10px 12px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+    overflow: auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .panel-label {
+    font-size: 11px;
+    color: #6dffb8;
+    border-left: 3px solid #00ff9c;
+    padding-left: 6px;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  #chains {
+    display: flex; flex-direction: column; gap: 6px;
+    flex-shrink: 0;
+  }
+  .chain {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px;
+    background: rgba(0,40,28,0.4);
+    border: 1px dashed #1f6b4a;
+    border-radius: 2px;
+    font-size: 13px;
+    transition: all .2s;
+    flex-wrap: nowrap;
+  }
+  .chain.active {
+    border-color: #ffe066;
+    background: rgba(80,60,0,0.3);
+    box-shadow: 0 0 10px rgba(255,224,102,0.4);
+  }
+  .chain.solved {
+    border-color: #00ff9c;
+    background: rgba(0,80,50,0.35);
+  }
+  .chain.hint {
+    border-color: #ff3b6b;
+    animation: hintBlink 1s 3;
+  }
+  @keyframes hintBlink {
+    0%,100% { box-shadow: 0 0 0 rgba(255,59,107,0); }
+    50% { box-shadow: 0 0 12px rgba(255,59,107,0.7); }
+  }
+  .node {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 10px;
+    border: 1px solid #2a8a66;
+    background: #021410;
+    color: #b6ffe1;
+    font-size: 12px;
+    cursor: default;
+    min-width: 90px;
+    justify-content: center;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .node.action {
+    cursor: pointer;
+    background: #061a14;
+    min-height: 32px;
+  }
+  .node.action:hover { background: #0a2820; border-color: #00ff9c; }
+  .node.action.selected {
+    background: #ffe066; color: #050608; border-color: #ffe066;
+    text-shadow: none;
+    box-shadow: 0 0 10px #ffe066;
+  }
+  .arrow {
+    color: #00ff9c; font-weight: 900;
+    text-shadow: 0 0 6px #00ff9c;
+    flex-shrink: 0;
+  }
+  .flow-line {
+    position: relative;
+    height: 2px;
+    flex: 1;
+    min-width: 20px;
+    background: #1f6b4a;
+    margin-left: 4px;
+    overflow: hidden;
+  }
+  .flow-line.energized::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, #00ff9c, #b6ffe1, #00ff9c, transparent);
+    background-size: 50% 100%;
+    background-repeat: no-repeat;
+    animation: flow 0.9s linear infinite;
+    box-shadow: 0 0 8px #00ff9c;
+  }
+  @keyframes flow {
+    0% { background-position: -50% 0; }
+    100% { background-position: 150% 0; }
+  }
+  #poolWrap {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  #poolNodes {
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .pool-node {
+    padding: 8px 14px;
+    border: 1px solid #2a8a66;
+    background: linear-gradient(180deg, #061a14, #021410);
+    color: #b6ffe1;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all .15s;
+    min-height: 36px;
+    display: flex; align-items: center;
+  }
+  .pool-node:hover {
+    border-color: #00ff9c;
+    background: #0a2820;
+    transform: translateY(-2px);
+  }
+  .pool-node:active { transform: translateY(0); }
+  .pool-node.used {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+  #controls {
+    display: flex; gap: 10px; margin-top: auto;
+    flex-shrink: 0;
+  }
+  .btn {
+    flex: 1;
+    padding: 12px 0;
+    background: #021410;
+    border: 1px solid #00ff9c;
+    color: #00ff9c;
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all .2s;
+    font-weight: 700;
+    min-height: 44px;
+  }
+  .btn:hover { background: #00ff9c; color: #050608; text-shadow: none; box-shadow: 0 0 12px #00ff9c; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn.warn { border-color: #ff3b6b; color: #ff3b6b; }
+  .btn.warn:hover { background: #ff3b6b; color: #050608; box-shadow: 0 0 12px #ff3b6b; }
+
+  /* ============ Stage Overlay ============ */
+  #stageOverlay {
+    position: fixed; inset: 0;
+    background: rgba(5,6,8,0.92);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 500;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s;
+    padding: 20px;
+    text-align: center;
+  }
+  #stageOverlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #overlayTitle {
+    font-size: clamp(24px, 7vw, 48px);
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: #00ff9c;
+    text-shadow: 0 0 12px #00ff9c, 0 0 32px rgba(0,255,156,0.5);
+    position: relative;
+  }
+  #overlayTitle::before, #overlayTitle::after {
+    content: attr(data-text);
+    position: absolute; top: 0; left: 0; width: 100%;
+  }
+  #overlayTitle::before { color: #ff3b6b; transform: translate(-2px,0); clip-path: inset(0 0 55% 0); }
+  #overlayTitle::after { color: #00d8ff; transform: translate(2px,0); clip-path: inset(55% 0 0 0); }
+  #overlaySub {
+    font-size: clamp(13px, 3vw, 18px);
+    color: #b6ffe1;
+    letter-spacing: 3px;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+  #overlayStages {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+    max-width: 700px;
+  }
+  .stage-card {
+    border: 1px solid #2a8a66;
+    background: rgba(0,40,28,0.3);
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: all .2s;
+    min-width: 110px;
+    text-align: center;
+  }
+  .stage-card:hover { border-color: #00ff9c; background: rgba(0,80,50,0.4); transform: translateY(-3px); }
+  .stage-card.locked { opacity: 0.3; cursor: not-allowed; }
+  .stage-card.locked:hover { transform: none; border-color: #2a8a66; background: rgba(0,40,28,0.3); }
+  .stage-card.completed { border-color: #00ff9c; }
+  .stage-card .stage-num { font-size: 10px; color: #6dffb8; letter-spacing: 2px; }
+  .stage-card .stage-name { font-size: 14px; margin-top: 6px; color: #b6ffe1; }
+  .stage-card.completed .stage-name::after { content: ' ✓'; color: #00ff9c; }
+  #overlayBtn {
+    margin-top: 12px;
+    padding: 12px 32px;
+    background: transparent;
+    border: 1px solid #00ff9c;
+    color: #00ff9c;
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    transition: all .2s;
+    font-weight: 700;
+    min-height: 44px;
+  }
+  #overlayBtn:hover { background: #00ff9c; color: #050608; box-shadow: 0 0 16px #00ff9c; }
+
+  /* ============ Mobile ============ */
+  @media (max-width: 640px) {
+    #app { padding: 6px 8px 8px; gap: 6px; }
+    header { flex-wrap: wrap; }
+    #stageInfo { font-size: 9px; }
+    #title { letter-spacing: 2px; }
+    .node { min-width: 70px; font-size: 11px; padding: 5px 8px; }
+    .pool-node { padding: 8px 12px; font-size: 11px; }
+    .btn { font-size: 12px; letter-spacing: 2px; padding: 12px 0; }
+    .chain { gap: 6px; padding: 5px 6px; }
+    .panel-label { font-size: 10px; }
+    #logicPanel { padding: 8px; gap: 6px; }
+    #helpBtn { padding: 5px 8px; font-size: 11px; }
+    #langToggle button { padding: 5px 8px; }
+  }
+  @media (max-width: 420px) {
+    .flow-line { min-width: 12px; }
+    .node { min-width: 60px; font-size: 10px; padding: 4px 6px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div id="titleWrap">
+      <div id="title" data-text="IF/THEN">IF/THEN</div>
+      <div id="stageInfo">STAGE 1/4 · TUTORIAL</div>
+    </div>
+    <div id="headerRight">
+      <button id="helpBtn">?</button>
+      <div id="langToggle">
+        <button data-lang="en">EN</button>
+        <button data-lang="zh" class="active">中</button>
+      </div>
+    </div>
+  </header>
+
+  <div id="canvasWrap">
+    <canvas id="game" width="960" height="280"></canvas>
+    <div id="hud">SYS://causal_engine.v1 — READY</div>
+    <div id="statusMsg"></div>
+    <div id="flashOverlay"></div>
+    <div id="hint">TAP NODE → TAP POOL · TAP SIMULATE</div>
+  </div>
+
+  <div id="logicPanel">
+    <div class="panel-label" id="lblDrop">Logic Flow</div>
+    <div id="chains"></div>
+    <div class="panel-label" id="lblPool">Node Pool</div>
+    <div id="poolWrap">
+      <div id="poolNodes"></div>
+    </div>
+    <div id="controls">
+      <button class="btn" id="btnSimulate">开始演算</button>
+      <button class="btn warn" id="btnReset">重置</button>
+    </div>
+  </div>
+</div>
+
+<div id="stageOverlay">
+  <div id="overlayTitle" data-text="">IF/THEN</div>
+  <div id="overlaySub"></div>
+  <div id="overlayStages"></div>
+  <button id="overlayBtn">开始</button>
+</div>
+
+<div id="tutorialTip"></div>
+<div id="errorHint"></div>
+
+<script>
+/* ================================================================
+ * IF/THEN · 如果·那么 (Multi-stage Edition)
+ * ================================================================ */
+
+// ============ I18n ============
+const I18N = {
+  en: {
+    title: 'IF/THEN',
+    simulate: 'SIMULATE',
+    reset: 'RESET',
+    dropZone: 'Logic Flow',
+    nodePool: 'Node Pool',
+    ifSpikes: 'IF: Spikes',
+    ifWater:  'IF: Poison',
+    ifElec:   'IF: Grid',
+    ifBeam:   'IF: Beam',
+    thenWalk: 'THEN: Walk',
+    thenJump: 'THEN: Jump',
+    thenSlide:'THEN: Slide',
+    thenStop: 'THEN: Stop',
+    thenDuck: 'THEN: Duck',
+    success: 'STAGE CLEARED',
+    successSub: 'Logic correct',
+    death: 'FAILED',
+    deathSub: 'Logic error',
+    hint: 'TAP NODE → TAP POOL · TAP SIMULATE',
+    hudRun: 'SYS://causal_engine.v1 — RUNNING',
+    hudDead: 'SYS://causal_engine.v1 — FATAL PARADOX',
+    hudWin: 'SYS://causal_engine.v1 — RESOLVED',
+    hudIdle:'SYS://causal_engine.v1 — READY',
+    nextStage: 'NEXT STAGE',
+    retry: 'RETRY',
+    selectStage: 'SELECT STAGE',
+    allCleared: 'ALL STAGES CLEARED',
+    allClearedSub: 'Thanks for playing.',
+    start: 'START',
+    selectStagePrompt: 'Select a stage to begin',
+    nextStageLabel: 'Next: ',
+    tutorialTipL1: 'Click [THEN: Walk] to select it, then pick [THEN: Jump] from the pool below.',
+    hintWater: 'Poison — slide through it',
+    hintSpikes: 'Spikes — jump over them',
+    hintElec: 'Grid — stop and wait for it to retract',
+    hintBeam: 'Beam — duck under it',
+    stageLabels: ['INTRO','DUAL','TRIPLE','FINAL'],
+    stageNames: ['First Steps','Fork','Triple Gate','Endgame']
+  },
+  zh: {
+    title: '如果·那么',
+    simulate: '开始演算',
+    reset: '重置',
+    dropZone: '因果逻辑流',
+    nodePool: '逻辑节点池',
+    ifSpikes: '如果: 地刺',
+    ifWater:  '如果: 毒水',
+    ifElec:   '如果: 电网',
+    ifBeam:   '如果: 横梁',
+    thenWalk: '那么: 行走',
+    thenJump: '那么: 跳跃',
+    thenSlide:'那么: 滑行',
+    thenStop: '那么: 停下',
+    thenDuck: '那么: 蹲下',
+    success: '通关',
+    successSub: '逻辑正确',
+    death: '失败',
+    deathSub: '逻辑错误',
+    hint: '点击节点 → 点击节点池 · 点击开始演算',
+    hudRun: '系统://因果引擎.v1 — 运行中',
+    hudDead:'系统://因果引擎.v1 — 致命悖论',
+    hudWin: '系统://因果引擎.v1 — 已解除',
+    hudIdle:'系统://因果引擎.v1 — 就绪',
+    nextStage: '下一关',
+    retry: '重试',
+    selectStage: '选择关卡',
+    allCleared: '全部关卡已通过',
+    allClearedSub: '感谢游玩。',
+    start: '开始游戏',
+    selectStagePrompt: '选择一个关卡开始',
+    nextStageLabel: '下一关：',
+    tutorialTipL1: '先点「那么: 行走」选中它，再从下方节点池选「那么: 跳跃」',
+    hintWater: '毒水 — 滑行通过',
+    hintSpikes: '地刺 — 跳跃越过',
+    hintElec: '电网 — 停下等它收起',
+    hintBeam: '横梁 — 蹲下穿过',
+    stageLabels: ['入门','进阶','挑战','终局'],
+    stageNames: ['初见','岔路','三重门','终局']
+  }
+};
+let lang = 'zh';
+function t(key){ return I18N[lang][key]; }
+function condLabel(c){ return c==='spikes'?t('ifSpikes'):c==='water'?t('ifWater'):c==='elec'?t('ifElec'):t('ifBeam'); }
+function actLabel(a){ return a==='walk'?t('thenWalk'):a==='jump'?t('thenJump'):a==='slide'?t('thenSlide'):a==='stop'?t('thenStop'):t('thenDuck'); }
+function hintFor(cond){
+  return cond==='water'?t('hintWater'):cond==='spikes'?t('hintSpikes'):cond==='elec'?t('hintElec'):t('hintBeam');
+}
+
+// ============ Level Definitions ============
+// Each level: obstacles array + initial wrong chains + available pool actions
+const LEVELS = [
+  {
+    obstacles: [
+      { type:'spikes', x: 380, w: 70, h: 22 }
+    ],
+    initActions: { spikes:'walk' },
+    pool: ['walk','jump'],
+    flagX: 870,
+    tutorial: 'L1'
+  },
+  {
+    obstacles: [
+      { type:'water',  x: 230, w: 80, h: 14 },
+      { type:'spikes', x: 470, w: 70, h: 22 }
+    ],
+    initActions: { water:'walk', spikes:'walk' },
+    pool: ['walk','jump','slide'],
+    flagX: 870,
+    tutorial: null
+  },
+  {
+    obstacles: [
+      { type:'water',  x: 200, w: 80, h: 14 },
+      { type:'spikes', x: 400, w: 70, h: 22 },
+      { type:'elec',   x: 600, w: 80, h: 60 }
+    ],
+    initActions: { water:'walk', spikes:'walk', elec:'walk' },
+    pool: ['walk','jump','slide','stop'],
+    flagX: 870,
+    tutorial: null
+  },
+  {
+    obstacles: [
+      { type:'water',  x: 170, w: 80, h: 14 },
+      { type:'spikes', x: 350, w: 70, h: 22 },
+      { type:'elec',   x: 530, w: 80, h: 60 },
+      { type:'beam',   x: 720, w: 70, h: 30 }
+    ],
+    initActions: { water:'walk', spikes:'walk', elec:'walk', beam:'walk' },
+    pool: ['walk','jump','slide','stop','duck'],
+    flagX: 870,
+    tutorial: null
+  }
+];
+
+let currentLevel = 0;
+let unlockedLevel = 0; // highest unlocked
+let completed = new Set();
+
+// ============ Game State ============
+const STATE = { IDLE:0, SIMULATING:1, DEAD:2, WON:3, OVERLAY:4 };
+let gameState = STATE.OVERLAY;
+
+let chains = [];
+let selectedChainIdx = null;
+let failedOnceThisLevel = false; // for tutorial hint trigger
+
+// ============ Audio ============
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx){
+    try { audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }
+    catch(e){}
+  }
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+}
+function playTypeClick(){
+  ensureAudio(); if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const bufSize = Math.floor(0.04 * audioCtx.sampleRate);
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i=0;i<bufSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufSize);
+  const src = audioCtx.createBufferSource(); src.buffer = buf;
+  const hp = audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=2200;
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0.18, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now+0.05);
+  src.connect(hp).connect(g).connect(audioCtx.destination);
+  src.start(now); src.stop(now+0.06);
+}
+let tickInterval = null;
+function startTick(){
+  ensureAudio(); if(!audioCtx) return;
+  let toggle = false;
+  tickInterval = setInterval(()=>{
+    if(!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type='square';
+    osc.frequency.value = toggle ? 660 : 440;
+    g.gain.setValueAtTime(0.08, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now+0.08);
+    osc.connect(g).connect(audioCtx.destination);
+    osc.start(now); osc.stop(now+0.09);
+    toggle = !toggle;
+  }, 260);
+}
+function stopTick(){ if(tickInterval){ clearInterval(tickInterval); tickInterval=null; } }
+function playDeathNoise(){
+  ensureAudio(); if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const dur = 0.6;
+  const bufSize = Math.floor(dur * audioCtx.sampleRate);
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i=0;i<bufSize;i++){
+    const env = Math.pow(1 - i/bufSize, 1.5);
+    data[i] = (Math.random()*2-1) * env;
+  }
+  const src = audioCtx.createBufferSource(); src.buffer = buf;
+  const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1800; bp.Q.value=0.6;
+  const dist = audioCtx.createWaveShaper();
+  const curve = new Float32Array(256);
+  for(let i=0;i<256;i++){ const x=(i/128)-1; curve[i]=Math.tanh(x*4); }
+  dist.curve = curve;
+  const g = audioCtx.createGain(); g.gain.value = 0.5;
+  src.connect(bp).connect(dist).connect(g).connect(audioCtx.destination);
+  src.start(now); src.stop(now+dur);
+  const osc = audioCtx.createOscillator();
+  const og = audioCtx.createGain();
+  osc.type='sawtooth'; osc.frequency.setValueAtTime(160, now);
+  osc.frequency.exponentialRampToValueAtTime(40, now+dur);
+  og.gain.setValueAtTime(0.25, now);
+  og.gain.exponentialRampToValueAtTime(0.001, now+dur);
+  osc.connect(og).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now+dur);
+}
+function playSuccess(){
+  ensureAudio(); if(!audioCtx) return;
+  const notes = [523, 659, 784, 1047];
+  notes.forEach((f,i)=>{
+    const now = audioCtx.currentTime + i*0.12;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type='triangle'; osc.frequency.value=f;
+    g.gain.setValueAtTime(0.001, now);
+    g.gain.exponentialRampToValueAtTime(0.22, now+0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now+0.4);
+    osc.connect(g).connect(audioCtx.destination);
+    osc.start(now); osc.stop(now+0.42);
+  });
+}
+function playPulse(){
+  ensureAudio(); if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type='sine'; osc.frequency.setValueAtTime(440, now);
+  osc.frequency.exponentialRampToValueAtTime(880, now+0.15);
+  g.gain.setValueAtTime(0.12, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now+0.2);
+  osc.connect(g).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now+0.22);
+}
+function playLand(){
+  ensureAudio(); if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  osc.type='sine'; osc.frequency.value=180;
+  g.gain.setValueAtTime(0.12, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now+0.12);
+  osc.connect(g).connect(audioCtx.destination);
+  osc.start(now); osc.stop(now+0.13);
+}
+
+// ============ Canvas ============
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const GROUND_Y = 220;
+
+let player = {
+  x: 50, y: GROUND_Y, vy: 0,
+  action: 'walk',
+  frame: 0,
+  alive: true,
+  jumping: false, jumpT: 0,
+  sliding: false, slideT: 0,
+  stopping: false, stopT: 0,
+  ducking: false, duckT: 0,
+  deadFreeze: 0
+};
+
+let obstacles = [];
+let flagX = 870;
+let particles = [];
+let dustTimer = 0;
+
+// ============ Rendering ============
+function drawBackground(){
+  const grd = ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0, '#0a1420');
+  grd.addColorStop(0.6, '#040a0c');
+  grd.addColorStop(1, '#020605');
+  ctx.fillStyle = grd; ctx.fillRect(0,0,W,H);
+
+  // parallax stars
+  const t = performance.now()/1000;
+  ctx.fillStyle = 'rgba(0,255,156,0.4)';
+  for(let i=0;i<30;i++){
+    const sx = (i*73 + t*5) % W;
+    const sy = (i*37) % 100;
+    const s = (i%3)+1;
+    ctx.fillRect(sx, sy, s, s);
+  }
+
+  // grid floor lines
+  ctx.strokeStyle = 'rgba(0,255,156,0.05)';
+  ctx.lineWidth = 1;
+  for(let x=0;x<W;x+=40){
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+  }
+  for(let y=0;y<H;y+=40){
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  ctx.fillStyle = '#0a1f17';
+  ctx.fillRect(0, GROUND_Y, W, H-GROUND_Y);
+  ctx.strokeStyle = '#00ff9c';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = '#00ff9c'; ctx.shadowBlur = 8;
+  ctx.beginPath(); ctx.moveTo(0, GROUND_Y); ctx.lineTo(W, GROUND_Y); ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  ctx.strokeStyle = 'rgba(0,255,156,0.25)';
+  ctx.setLineDash([6,8]);
+  ctx.beginPath(); ctx.moveTo(0, GROUND_Y+8); ctx.lineTo(W, GROUND_Y+8); ctx.stroke();
+  ctx.setLineDash([]);
+
+  drawCorners();
+}
+function drawCorners(){
+  ctx.strokeStyle = 'rgba(0,255,156,0.5)';
+  ctx.lineWidth = 1;
+  const s = 12;
+  ctx.beginPath(); ctx.moveTo(0,s); ctx.lineTo(0,0); ctx.lineTo(s,0); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W-s,0); ctx.lineTo(W,0); ctx.lineTo(W,s); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0,H-s); ctx.lineTo(0,H); ctx.lineTo(s,H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(W-s,H); ctx.lineTo(W,H); ctx.lineTo(W,H-s); ctx.stroke();
+}
+
+function drawObstacle(o){
+  const pulse = Math.sin(performance.now()/200)*0.5+0.5;
+  if(o.type==='water'){
+    const x = o.x, w = o.w, y = GROUND_Y;
+    ctx.fillStyle = 'rgba(60,255,80,0.18)';
+    ctx.beginPath(); ctx.ellipse(x+w/2, y+2, w/2, o.h/2+3, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = `rgba(120,255,140,${0.5+0.3*pulse})`;
+    ctx.beginPath(); ctx.ellipse(x+w/2, y, w/2, o.h/2, 0, 0, Math.PI); ctx.fill();
+    for(let i=0;i<3;i++){
+      const bx = x + (i+1)*w/4 + Math.sin(performance.now()/300+i)*4;
+      const by = y - 2 - ((performance.now()/30 + i*40) % 14);
+      ctx.fillStyle = `rgba(180,255,180,0.7)`;
+      ctx.beginPath(); ctx.arc(bx, by, 2, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.shadowColor='#7fff7f'; ctx.shadowBlur=10;
+    ctx.strokeStyle='rgba(120,255,120,0.5)';
+    ctx.beginPath(); ctx.ellipse(x+w/2, y, w/2, o.h/2, 0, 0, Math.PI); ctx.stroke();
+    ctx.shadowBlur=0;
+  }
+  else if(o.type==='spikes'){
+    const x = o.x, w = o.w, h = o.h, y = GROUND_Y;
+    ctx.fillStyle = `rgba(255,80,80,${0.8+0.2*pulse})`;
+    ctx.shadowColor='#ff5050'; ctx.shadowBlur=8;
+    const spikes = 5;
+    for(let i=0;i<spikes;i++){
+      const sx = x + i*(w/spikes);
+      const sw = w/spikes;
+      ctx.beginPath();
+      ctx.moveTo(sx, y);
+      ctx.lineTo(sx + sw/2, y - h);
+      ctx.lineTo(sx + sw, y);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.shadowBlur=0;
+    ctx.fillStyle='#5a1010';
+    ctx.fillRect(x, y-2, w, 3);
+  }
+  else if(o.type==='elec'){
+    const x = o.x, w = o.w, y = GROUND_Y;
+    o.anim += 0.1;
+    const isActive = o.active;
+    const intensity = isActive ? 1 : 0.2;
+    ctx.strokeStyle = isActive ? '#555' : '#222'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x, 60); ctx.lineTo(x+w, 60); ctx.stroke();
+    const gridTopY = 60 + Math.abs(Math.sin(o.anim))*8 + (isActive ? 0 : 60);
+    ctx.strokeStyle = `rgba(0,220,255,${(0.5+0.5*pulse)*intensity})`;
+    ctx.shadowColor='#00d8ff'; ctx.shadowBlur = isActive ? 12 : 2;
+    ctx.lineWidth=1.5;
+    for(let i=0;i<=4;i++){
+      const gx = x + i*(w/4);
+      ctx.beginPath(); ctx.moveTo(gx, gridTopY); ctx.lineTo(gx, y); ctx.stroke();
+    }
+    for(let j=0;j<3;j++){
+      const gy = gridTopY + (j+1)*((y-gridTopY)/4);
+      ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x+w, gy); ctx.stroke();
+    }
+    ctx.shadowBlur=0;
+    if(isActive){
+      ctx.strokeStyle=`rgba(180,240,255,${0.6+0.4*pulse})`;
+      ctx.beginPath();
+      let ax = x;
+      ctx.moveTo(ax, y-15);
+      while(ax < x+w){
+        ax += 8 + Math.random()*6;
+        ctx.lineTo(Math.min(ax,x+w), y-15 - Math.random()*10);
+      }
+      ctx.stroke();
+    }
+    ctx.fillStyle=`rgba(0,220,255,${(0.15+0.1*pulse)*intensity})`;
+    ctx.beginPath(); ctx.ellipse(x+w/2, y+2, w/2, 4, 0, 0, Math.PI*2); ctx.fill();
+    if(!isActive){
+      ctx.fillStyle='rgba(0,255,156,0.5)';
+      ctx.font='bold 10px monospace';
+      ctx.fillText('OFFLINE', x+w/2-18, 56);
+    }
+  }
+  else if(o.type==='beam'){
+    // low horizontal beam — must duck under
+    const x = o.x, w = o.w, y = GROUND_Y;
+    const beamY = y - 28; // beam hangs at this height; agent normal standing hits it
+    const isActive = o.active !== false;
+    // supports
+    ctx.strokeStyle = '#444'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(x, 60); ctx.lineTo(x, beamY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+w, 60); ctx.lineTo(x+w, beamY); ctx.stroke();
+    // beam itself
+    ctx.fillStyle = `rgba(255,140,0,${0.7+0.3*pulse})`;
+    ctx.shadowColor='#ff8c00'; ctx.shadowBlur=10;
+    ctx.fillRect(x, beamY-3, w, 6);
+    // warning stripes
+    ctx.fillStyle = '#1a0a00';
+    for(let i=0;i<w;i+=10){
+      ctx.fillRect(x+i, beamY-3, 5, 6);
+    }
+    ctx.shadowBlur=0;
+    // danger zone indicator on ground
+    ctx.strokeStyle = `rgba(255,140,0,${0.4+0.2*pulse})`;
+    ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(x, beamY); ctx.lineTo(x, y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+w, beamY); ctx.lineTo(x+w, y); ctx.stroke();
+    ctx.setLineDash([]);
+    // height marker showing "duck zone"
+    ctx.strokeStyle = 'rgba(255,224,102,0.3)';
+    ctx.beginPath(); ctx.moveTo(x-4, beamY); ctx.lineTo(x+w+4, beamY); ctx.stroke();
+  }
+
+  if(o.trig){
+    o.pulse = Math.min(1, o.pulse + 0.08);
+  } else {
+    o.pulse = Math.max(0, o.pulse - 0.05);
+  }
+  if(o.pulse>0){
+    ctx.strokeStyle = `rgba(255,224,102,${o.pulse})`;
+    ctx.lineWidth = 2;
+    ctx.shadowColor='#ffe066'; ctx.shadowBlur = 16*o.pulse;
+    ctx.strokeRect(o.x-4, GROUND_Y - (o.h+10), o.w+8, o.h+14);
+    ctx.shadowBlur = 0;
+  }
+}
+
+function drawFlag(){
+  const x = flagX, y = GROUND_Y;
+  ctx.strokeStyle='#b6ffe1'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y-50); ctx.stroke();
+  const wave = Math.sin(performance.now()/200)*4;
+  ctx.fillStyle='#00ff9c';
+  ctx.shadowColor='#00ff9c'; ctx.shadowBlur=10;
+  ctx.beginPath();
+  ctx.moveTo(x, y-50);
+  ctx.lineTo(x+30, y-46 + wave);
+  ctx.lineTo(x+30, y-32 + wave);
+  ctx.lineTo(x, y-28);
+  ctx.closePath();
+  ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#1f6b4a';
+  ctx.fillRect(x-5, y-3, 10, 4);
+  // glow ring when near
+  if(player.alive && player.x > x-100){
+    const dist = Math.max(0, 1 - (x - player.x)/100);
+    ctx.strokeStyle = `rgba(0,255,156,${dist*0.4})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, y-25, 30+dist*8, 0, Math.PI*2); ctx.stroke();
+  }
+}
+
+function drawPlayer(){
+  if(!player.alive){
+    if(player.deadFreeze>0){
+      // freeze-frame: show exploded silhouette
+      drawDeadPlayer();
+    }
+    return;
+  }
+  const px = player.x, py = player.y;
+  const f = player.frame;
+
+  ctx.fillStyle='rgba(0,0,0,0.4)';
+  let shadowW = 14;
+  if(player.sliding) shadowW = 22;
+  else if(player.ducking) shadowW = 12;
+  ctx.beginPath(); ctx.ellipse(px, GROUND_Y+1, shadowW, 3, 0, 0, Math.PI*2); ctx.fill();
+
+  let bodyColor = '#00ff9c';
+  if(player.stopping) bodyColor = '#ffe066';
+  else if(player.sliding) bodyColor = '#00d8ff';
+  else if(player.ducking) bodyColor = '#ff8c00';
+  else if(player.jumping) bodyColor = '#b6ffe1';
+
+  ctx.save();
+  ctx.translate(px, py);
+  let bob = player.action==='walk' ? Math.sin(f*0.3)*1.5 : 0;
+  if(player.sliding) drawAgent(0, 4, bodyColor, 'slide', f);
+  else if(player.jumping) drawAgent(0, 0, bodyColor, 'jump', f);
+  else if(player.stopping) drawAgent(0, bob, bodyColor, 'stop', f);
+  else if(player.ducking) drawAgent(0, 0, bodyColor, 'duck', f);
+  else drawAgent(0, bob, bodyColor, 'walk', f);
+  ctx.restore();
+
+  if(player.jumping){
+    ctx.strokeStyle='rgba(0,255,156,0.3)';
+    ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.arc(px, GROUND_Y, 30, Math.PI, 0); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+function drawAgent(x, y, color, pose, f){
+  ctx.shadowColor=color; ctx.shadowBlur=8;
+  ctx.fillStyle=color;
+  ctx.strokeStyle=color;
+  ctx.lineWidth=2;
+  if(pose==='slide'){
+    ctx.fillRect(x-12, y-2, 16, 6);
+    ctx.beginPath(); ctx.arc(x+6, y+1, 4, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle='rgba(0,216,255,0.6)';
+    ctx.beginPath(); ctx.moveTo(x-18,y); ctx.lineTo(x-24,y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-20,y+3); ctx.lineTo(x-26,y+3); ctx.stroke();
+    ctx.strokeStyle=color;
+  } else if(pose==='jump'){
+    ctx.fillRect(x-3, y-12, 6, 10);
+    ctx.beginPath(); ctx.arc(x, y-16, 4, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x-3, y-10); ctx.lineTo(x-8, y-16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+3, y-10); ctx.lineTo(x+8, y-16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-2, y-2); ctx.lineTo(x-5, y+2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+2, y-2); ctx.lineTo(x+5, y+2); ctx.stroke();
+  } else if(pose==='stop'){
+    ctx.fillRect(x-3, y-14, 6, 12);
+    ctx.beginPath(); ctx.arc(x, y-18, 4, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(x-3, y-10); ctx.lineTo(x-9, y-8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+3, y-10); ctx.lineTo(x+9, y-8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-2, y-2); ctx.lineTo(x-2, y+4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+2, y-2); ctx.lineTo(x+2, y+4); ctx.stroke();
+    ctx.fillStyle='#ffe066';
+    ctx.font='bold 12px monospace';
+    ctx.fillText('!', x+8, y-18);
+  } else if(pose==='duck'){
+    // crouched: body lowered, head forward
+    ctx.fillRect(x-6, y-8, 10, 6);
+    ctx.beginPath(); ctx.arc(x+6, y-6, 4, 0, Math.PI*2); ctx.fill();
+    // legs bent
+    ctx.beginPath(); ctx.moveTo(x-4, y-2); ctx.lineTo(x-7, y+2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+2, y-2); ctx.lineTo(x+5, y+2); ctx.stroke();
+    // arms forward
+    ctx.beginPath(); ctx.moveTo(x+4, y-6); ctx.lineTo(x+10, y-4); ctx.stroke();
+  } else {
+    ctx.fillRect(x-3, y-14, 6, 12);
+    ctx.beginPath(); ctx.arc(x, y-18, 4, 0, Math.PI*2); ctx.fill();
+    const armA = Math.sin(f*0.3)*4;
+    ctx.beginPath(); ctx.moveTo(x-3, y-10); ctx.lineTo(x-7, y-6 + armA); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+3, y-10); ctx.lineTo(x+7, y-6 - armA); ctx.stroke();
+    const legA = Math.sin(f*0.3)*3;
+    ctx.beginPath(); ctx.moveTo(x-2, y-2); ctx.lineTo(x-3, y+4 + legA); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x+2, y-2); ctx.lineTo(x+3, y+4 - legA); ctx.stroke();
+  }
+  ctx.shadowBlur=0;
+}
+
+function drawDeadPlayer(){
+  const px = player.x, py = player.y;
+  ctx.strokeStyle='#ff3b6b';
+  ctx.lineWidth=3;
+  ctx.shadowColor='#ff3b6b'; ctx.shadowBlur=12;
+  ctx.beginPath();
+  ctx.moveTo(px-8, py-10); ctx.lineTo(px+8, py+4);
+  ctx.moveTo(px+8, py-10); ctx.lineTo(px-8, py+4);
+  ctx.stroke();
+  ctx.shadowBlur=0;
+}
+
+function drawParticles(){
+  particles.forEach(p=>{
+    ctx.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.life})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+
+function drawDust(){
+  particles.filter(p=>p.kind==='dust').forEach(p=>{
+    ctx.fillStyle = `rgba(120,200,160,${p.life*0.4})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+
+function draw(){
+  drawBackground();
+  obstacles.forEach(drawObstacle);
+  drawFlag();
+  drawPlayer();
+  drawParticles();
+
+  // scanline overlay
+  ctx.fillStyle='rgba(0,0,0,0.08)';
+  for(let y=0;y<H;y+=3){ ctx.fillRect(0,y,W,1); }
+}
+
+// ============ Particle Helpers ============
+function spawnDeathSparks(x,y){
+  for(let i=0;i<40;i++){
+    const a = Math.random()*Math.PI*2;
+    const s = 1+Math.random()*5;
+    particles.push({
+      x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s - 1,
+      life: 1, size: 1+Math.random()*2.5,
+      r: 255, g: 60+Math.random()*80|0, b: 110,
+      kind:'spark'
+    });
+  }
+}
+function spawnWinSparks(x,y){
+  for(let i=0;i<30;i++){
+    const a = Math.random()*Math.PI*2;
+    const s = 1+Math.random()*4;
+    particles.push({
+      x, y, vx: Math.cos(a)*s, vy: Math.sin(a)*s - 2,
+      life: 1, size: 1+Math.random()*2,
+      r: 0, g: 255, b: 156, kind:'spark'
+    });
+  }
+}
+function spawnWalkDust(x){
+  particles.push({
+    x: x-6, y: GROUND_Y+1,
+    vx: -1-Math.random()*0.5, vy: -Math.random()*0.8,
+    life: 0.6, size: 1+Math.random()*1.5,
+    r:120, g:200, b:160, kind:'dust'
+  });
+}
+function spawnLandDust(x){
+  for(let i=0;i<6;i++){
+    particles.push({
+      x: x+(Math.random()-0.5)*8, y: GROUND_Y+1,
+      vx: (Math.random()-0.5)*3, vy: -Math.random()*1.5,
+      life: 0.8, size: 1+Math.random()*1.5,
+      r:120, g:200, b:160, kind:'dust'
+    });
+  }
+}
+function updateParticles(){
+  for(let i=particles.length-1;i>=0;i--){
+    const p = particles[i];
+    p.x += p.vx; p.y += p.vy;
+    p.vy += p.kind==='dust' ? 0.05 : 0.12;
+    p.life -= p.kind==='dust' ? 0.03 : 0.02;
+    if(p.life<=0) particles.splice(i,1);
+  }
+}
+
+// ============ Level Loader ============
+function loadLevel(idx){
+  currentLevel = idx;
+  const L = LEVELS[idx];
+  obstacles = L.obstacles.map(o=>({
+    type:o.type, x:o.x, w:o.w, h:o.h,
+    trig:false, pulse:0, active:true, anim:0
+  }));
+  flagX = L.flagX;
+  chains = Object.keys(L.initActions).map(cond=>({
+    cond, action: L.initActions[cond]
+  }));
+  selectedChainIdx = null;
+  failedOnceThisLevel = false;
+  resetPlayer();
+  gameState = STATE.IDLE;
+  hideStatus();
+  setHud(t('hudIdle'));
+  document.getElementById('btnSimulate').disabled = false;
+  document.querySelectorAll('.flow-line').forEach(l=>l.classList.remove('energized'));
+  document.querySelectorAll('.chain').forEach(c=>c.classList.remove('solved','active','hint'));
+  hideErrorHint();
+  hideTutorialTip();
+  renderChains();
+  renderPool();
+  updateStageInfo();
+  // tutorial for L1
+  if(L.tutorial === 'L1'){
+    setTimeout(showTutorialTipL1, 400);
+  }
+}
+
+function updateStageInfo(){
+  const lbl = t('stageLabels')[currentLevel] || '';
+  const name = t('stageNames')[currentLevel] || '';
+  document.getElementById('stageInfo').textContent = `STAGE ${currentLevel+1}/${LEVELS.length} · ${lbl} — ${name}`;
+}
+
+// ============ Simulation ============
+function resetPlayer(){
+  player.x = 50; player.y = GROUND_Y;
+  player.vy = 0;
+  player.action = 'walk';
+  player.frame = 0;
+  player.alive = true;
+  player.jumping=false; player.jumpT=0;
+  player.sliding=false; player.slideT=0;
+  player.stopping=false; player.stopT=0;
+  player.ducking=false; player.duckT=0;
+  player.deadFreeze=0;
+  obstacles.forEach(o=>{ o.trig=false; o.pulse=0; o.active=true; });
+  particles = [];
+  dustTimer = 0;
+}
+
+function startSimulation(){
+  if(gameState===STATE.SIMULATING) return;
+  ensureAudio();
+  gameState = STATE.SIMULATING;
+  resetPlayer();
+  hideStatus();
+  hideErrorHint();
+  hideTutorialTip();
+  setHud(t('hudRun'));
+  startTick();
+  document.querySelectorAll('.flow-line').forEach(l=>l.classList.add('energized'));
+  document.getElementById('btnSimulate').disabled = true;
+}
+
+function failSimulation(failedCond){
+  if(gameState!==STATE.SIMULATING) return;
+  gameState = STATE.DEAD;
+  player.alive = false;
+  player.deadFreeze = 12; // freeze frames for dramatic effect
+  spawnDeathSparks(player.x, player.y-10);
+  playDeathNoise();
+  stopTick();
+  setHud(t('hudDead'));
+  showStatus(t('death'), false, t('deathSub'));
+  document.getElementById('canvasWrap').classList.add('shake');
+  setTimeout(()=>document.getElementById('canvasWrap').classList.remove('shake'), 400);
+  document.querySelectorAll('.flow-line').forEach(l=>l.classList.remove('energized'));
+
+  // hint after first failure
+  if(!failedOnceThisLevel && failedCond){
+    failedOnceThisLevel = true;
+    setTimeout(()=>{
+      showErrorHint(hintFor(failedCond));
+      const el = document.querySelector(`.chain[data-cond="${failedCond}"]`);
+      if(el) el.classList.add('hint');
+    }, 800);
+  }
+
+  setTimeout(()=>{
+    if(gameState===STATE.DEAD){
+      resetPlayer();
+      gameState = STATE.IDLE;
+      hideStatus();
+      setHud(t('hudIdle'));
+      document.getElementById('btnSimulate').disabled = false;
+      renderChains();
+    }
+  }, 1800);
+}
+
+function winSimulation(){
+  if(gameState!==STATE.SIMULATING) return;
+  gameState = STATE.WON;
+  spawnWinSparks(player.x, player.y-20);
+  playSuccess();
+  stopTick();
+  setHud(t('hudWin'));
+  showStatus(t('success'), true, t('successSub'));
+  // flash
+  const flash = document.getElementById('flashOverlay');
+  flash.classList.add('flash');
+  setTimeout(()=>flash.classList.remove('flash'), 80);
+  document.querySelectorAll('.flow-line').forEach(l=>l.classList.remove('energized'));
+  chains.forEach(c=>{
+    const el = document.querySelector(`.chain[data-cond="${c.cond}"]`);
+    if(el) el.classList.add('solved');
+  });
+  document.getElementById('btnSimulate').disabled = false;
+  completed.add(currentLevel);
+  if(currentLevel+1 < LEVELS.length) unlockedLevel = Math.max(unlockedLevel, currentLevel+1);
+
+  // proceed to next stage or victory screen
+  setTimeout(()=>{
+    if(currentLevel+1 < LEVELS.length){
+      showStageOverlay('complete');
+    } else {
+      showStageOverlay('victory');
+    }
+  }, 1800);
+}
+
+// Update loop
+function update(){
+  player.frame++;
+  updateParticles();
+
+  if(player.deadFreeze>0){ player.deadFreeze--; return; }
+  if(gameState!==STATE.SIMULATING) return;
+
+  if(player.jumping){
+    player.jumpT += 1;
+    const T = 40;
+    const p = player.jumpT / T;
+    player.y = GROUND_Y - Math.sin(p*Math.PI)*42;
+    player.x += 3.0;
+    if(player.jumpT>=T){
+      player.jumping = false;
+      player.y = GROUND_Y;
+      player.action = 'walk';
+      playLand();
+      spawnLandDust(player.x);
+    }
+    return;
+  }
+  if(player.sliding){
+    player.slideT += 1;
+    player.x += 3.0;
+    if(player.slideT>=45){
+      player.sliding=false;
+      player.action='walk';
+    }
+  }
+  if(player.ducking){
+    player.duckT += 1;
+    player.x += 1.6;
+    if(player.duckT>=70){
+      player.ducking=false;
+      player.action='walk';
+    }
+  }
+  if(player.stopping){
+    player.stopT += 1;
+    if(player.stopT>=60){
+      player.stopping=false;
+      player.action='walk';
+      const ec = obstacles.find(o=>o.type==='elec');
+      if(ec) ec.active = false;
+    }
+  }
+
+  if(!player.jumping && !player.sliding && !player.stopping && !player.ducking){
+    player.x += 1.6;
+    player.action = 'walk';
+    // walking dust
+    dustTimer++;
+    if(dustTimer>=8){ spawnWalkDust(player.x); dustTimer=0; }
+  }
+
+  // trigger obstacle logic
+  for(const o of obstacles){
+    const triggerX = o.x - 30;
+    if(!o.trig && player.x >= triggerX && player.x < o.x + o.w){
+      const chain = chains.find(c=>c.cond===o.type);
+      if(chain){
+        o.trig = true;
+        activateChain(o, chain.action);
+      }
+    }
+    if(player.alive){
+      const px = player.x;
+      let hit = false;
+      if(o.type==='water'){
+        if(px > o.x+4 && px < o.x+o.w-4 && !player.sliding){
+          hit = true;
+        }
+      } else if(o.type==='spikes'){
+        if(px > o.x && px < o.x+o.w && !player.jumping){
+          hit = true;
+        }
+      } else if(o.type==='elec'){
+        if(o.active && px > o.x+4 && px < o.x+o.w-4 && !player.stopping){
+          hit = true;
+        }
+      } else if(o.type==='beam'){
+        // beam hangs at GROUND_Y-28; agent standing (height ~22) hits it; ducking (height ~10) passes
+        if(px > o.x && px < o.x+o.w && !player.ducking){
+          hit = true;
+        }
+      }
+      if(hit){
+        failSimulation(o.type);
+        return;
+      }
+    }
+  }
+
+  if(player.x >= flagX-6){
+    winSimulation();
+  }
+}
+
+function activateChain(o, action){
+  playPulse();
+  const el = document.querySelector(`.chain[data-cond="${o.type}"]`);
+  if(el){
+    el.classList.add('active');
+    setTimeout(()=>el.classList.remove('active'), 700);
+  }
+  if(action==='jump'){
+    player.jumping = true; player.jumpT = 0; player.action = 'jump';
+  } else if(action==='slide'){
+    player.sliding = true; player.slideT = 0; player.action = 'slide';
+  } else if(action==='stop'){
+    player.stopping = true; player.stopT = 0; player.action = 'stop';
+  } else if(action==='duck'){
+    player.ducking = true; player.duckT = 0; player.action = 'duck';
+  } else {
+    player.action = 'walk';
+  }
+}
+
+// ============ UI Rendering ============
+function renderChains(){
+  const wrap = document.getElementById('chains');
+  wrap.innerHTML = '';
+  chains.forEach((c, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'chain';
+    row.dataset.cond = c.cond;
+
+    const condNode = document.createElement('span');
+    condNode.className = 'node cond';
+    condNode.textContent = condLabel(c.cond);
+
+    const arrow = document.createElement('span');
+    arrow.className = 'arrow';
+    arrow.textContent = '→';
+
+    const actNode = document.createElement('span');
+    actNode.className = 'node action';
+    actNode.textContent = actLabel(c.action);
+    actNode.dataset.action = c.action;
+    if(selectedChainIdx === idx) actNode.classList.add('selected');
+    actNode.addEventListener('click', ()=>{
+      ensureAudio();
+      playTypeClick();
+      selectedChainIdx = (selectedChainIdx===idx) ? null : idx;
+      renderChains();
+    });
+
+    const flow = document.createElement('div');
+    flow.className = 'flow-line';
+
+    row.appendChild(condNode);
+    row.appendChild(arrow);
+    row.appendChild(actNode);
+    row.appendChild(flow);
+    wrap.appendChild(row);
+  });
+}
+
+function renderPool(){
+  const pool = document.getElementById('poolNodes');
+  pool.innerHTML = '';
+  const L = LEVELS[currentLevel];
+  L.pool.forEach(a=>{
+    const isLimited = a !== 'walk';
+    const usedCount = chains.filter(c=>c.action===a).length;
+    const used = isLimited && usedCount >= 1;
+
+    const btn = document.createElement('div');
+    btn.className = 'pool-node';
+    if(used) btn.classList.add('used');
+    btn.textContent = actLabel(a);
+    btn.dataset.action = a;
+    btn.addEventListener('click', ()=>{
+      ensureAudio();
+      playTypeClick();
+      if(used) return;
+      if(selectedChainIdx === null){
+        selectedChainIdx = 0;
+      }
+      const target = chains[selectedChainIdx];
+      target.action = a;
+      // remove hint marker on this chain
+      const el = document.querySelector(`.chain[data-cond="${target.cond}"]`);
+      if(el) el.classList.remove('hint');
+      selectedChainIdx = null;
+      renderChains();
+      renderPool();
+    });
+    pool.appendChild(btn);
+  });
+}
+
+// ============ Status / HUD / Hints ============
+function setHud(msg){ document.getElementById('hud').textContent = msg; }
+function showStatus(msg, isWin, sub){
+  const el = document.getElementById('statusMsg');
+  el.innerHTML = `<div>${msg}</div>` + (sub?`<div class="sub">${sub}</div>`:'');
+  el.classList.add('show');
+  el.classList.toggle('win', !!isWin);
+}
+function hideStatus(){
+  const el = document.getElementById('statusMsg');
+  el.classList.remove('show','win');
+}
+function showTutorialTipL1(){
+  const tip = document.getElementById('tutorialTip');
+  tip.textContent = t('tutorialTipL1');
+  // position above the first chain's action node using viewport coords
+  const firstAction = document.querySelector('.chain .node.action');
+  if(firstAction){
+    const rect = firstAction.getBoundingClientRect();
+    const x = rect.left + rect.width/2;
+    const y = rect.top - 10;
+    tip.style.left = Math.max(140, Math.min(window.innerWidth - 140, x)) + 'px';
+    tip.style.top = Math.max(60, y - tip.offsetHeight - 8) + 'px';
+    tip.classList.add('show');
+    // re-measure after show
+    requestAnimationFrame(()=>{
+      const h = tip.offsetHeight;
+      tip.style.top = Math.max(60, y - h - 8) + 'px';
+    });
+  }
+}
+function hideTutorialTip(){
+  document.getElementById('tutorialTip').classList.remove('show');
+}
+function showErrorHint(msg){
+  const el = document.getElementById('errorHint');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideErrorHint(){
+  document.getElementById('errorHint').classList.remove('show');
+}
+
+// ============ Stage Overlay ============
+function showStageOverlay(mode){
+  gameState = STATE.OVERLAY;
+  const ov = document.getElementById('stageOverlay');
+  const title = document.getElementById('overlayTitle');
+  const sub = document.getElementById('overlaySub');
+  const stages = document.getElementById('overlayStages');
+  const btn = document.getElementById('overlayBtn');
+
+  stages.innerHTML = '';
+
+  if(mode==='start'){
+    title.textContent = t('title');
+    title.setAttribute('data-text', t('title'));
+    sub.textContent = t('selectStagePrompt');
+    btn.textContent = t('start');
+    btn.dataset.action = 'start-first';
+    renderStageCards(stages);
+  } else if(mode==='complete'){
+    const nextName = t('stageNames')[currentLevel+1] || '';
+    title.textContent = t('success');
+    title.setAttribute('data-text', t('success'));
+    sub.innerHTML = `${t('successSub')}<br>${t('nextStageLabel')}${t('stageLabels')[currentLevel+1]||''} — ${nextName}`;
+    btn.textContent = t('nextStage');
+    btn.dataset.action = 'next';
+  } else if(mode==='victory'){
+    title.textContent = t('allCleared');
+    title.setAttribute('data-text', t('allCleared'));
+    sub.textContent = t('allClearedSub');
+    btn.textContent = t('selectStage');
+    btn.dataset.action = 'restart';
+    renderStageCards(stages);
+  }
+  ov.classList.add('show');
+}
+
+function renderStageCards(container){
+  LEVELS.forEach((L, i)=>{
+    const card = document.createElement('div');
+    card.className = 'stage-card';
+    if(i > unlockedLevel) card.classList.add('locked');
+    if(completed.has(i)) card.classList.add('completed');
+    const num = document.createElement('div');
+    num.className = 'stage-num';
+    num.textContent = `STAGE ${i+1} · ${t('stageLabels')[i]}`;
+    const name = document.createElement('div');
+    name.className = 'stage-name';
+    name.textContent = t('stageNames')[i];
+    card.appendChild(num);
+    card.appendChild(name);
+    if(i <= unlockedLevel){
+      card.addEventListener('click', ()=>{
+        hideStageOverlay();
+        loadLevel(i);
+      });
+    }
+    container.appendChild(card);
+  });
+}
+
+function hideStageOverlay(){
+  document.getElementById('stageOverlay').classList.remove('show');
+}
+
+// ============ Language Switch ============
+function setLang(l){
+  lang = l;
+  document.querySelectorAll('#langToggle button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.lang===l);
+  });
+  const title = document.getElementById('title');
+  title.textContent = t('title');
+  title.setAttribute('data-text', t('title'));
+  document.getElementById('lblDrop').textContent = t('dropZone');
+  document.getElementById('lblPool').textContent = t('nodePool');
+  document.getElementById('btnSimulate').textContent = t('simulate');
+  document.getElementById('btnReset').textContent = t('reset');
+  document.getElementById('hint').textContent = t('hint');
+  // HUD: refresh based on current state
+  const hudKey = gameState===STATE.SIMULATING ? 'hudRun'
+              : gameState===STATE.DEAD ? 'hudDead'
+              : gameState===STATE.WON ? 'hudWin'
+              : 'hudIdle';
+  setHud(t(hudKey));
+  updateStageInfo();
+  renderChains();
+  renderPool();
+  // Refresh tutorial tip text if visible
+  const tip = document.getElementById('tutorialTip');
+  if(tip.classList.contains('show')){
+    tip.textContent = t('tutorialTipL1');
+    showTutorialTipL1(); // reposition
+  }
+  // Refresh error hint text if visible
+  const eh = document.getElementById('errorHint');
+  if(eh.classList.contains('show')){
+    // re-derive which cond was hinted from the chain with .hint class
+    const hintedChain = document.querySelector('.chain.hint');
+    if(hintedChain){
+      const cond = hintedChain.dataset.cond;
+      eh.textContent = hintFor(cond);
+    }
+  }
+  // Refresh status message if visible
+  const sm = document.getElementById('statusMsg');
+  if(sm.classList.contains('show')){
+    const isWin = sm.classList.contains('win');
+    if(isWin){
+      showStatus(t('success'), true, t('successSub'));
+    } else {
+      showStatus(t('death'), false, t('deathSub'));
+    }
+  }
+  // Refresh overlay if shown — re-render based on current mode
+  if(gameState===STATE.OVERLAY){
+    const action = document.getElementById('overlayBtn').dataset.action;
+    if(action==='start-first') showStageOverlay('start');
+    else if(action==='next') showStageOverlay('complete');
+    else if(action==='restart') showStageOverlay('victory');
+  }
+}
+
+// ============ Event Listeners ============
+document.getElementById('btnSimulate').addEventListener('click', ()=>{
+  ensureAudio();
+  playTypeClick();
+  startSimulation();
+});
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  ensureAudio();
+  playTypeClick();
+  stopTick();
+  loadLevel(currentLevel);
+});
+document.querySelectorAll('#langToggle button').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    ensureAudio();
+    playTypeClick();
+    setLang(b.dataset.lang);
+  });
+});
+document.getElementById('helpBtn').addEventListener('click', ()=>{
+  ensureAudio();
+  playTypeClick();
+  showStageOverlay('start');
+});
+document.getElementById('overlayBtn').addEventListener('click', ()=>{
+  const btn = document.getElementById('overlayBtn');
+  const action = btn.dataset.action;
+  hideStageOverlay();
+  if(action==='start-first'){
+    loadLevel(unlockedLevel);
+  } else if(action==='next'){
+    loadLevel(currentLevel+1);
+  } else if(action==='restart'){
+    showStageOverlay('start');
+  }
+});
+
+// ============ Responsive Canvas ============
+function fitCanvas(){
+  // Canvas keeps internal 960x280; CSS auto-scales via width:100%.
+  // Just ensure crisp rendering on hi-dpi.
+  const dpr = window.devicePixelRatio || 1;
+  // (We keep 960x280 internal for simplicity; CSS handles scaling.)
+}
+window.addEventListener('resize', fitCanvas);
+window.addEventListener('orientationchange', ()=>setTimeout(fitCanvas, 100));
+
+// ============ Main Loop ============
+function loop(){
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// ============ Init ============
+fitCanvas();
+loop();
+showStageOverlay('start');
+</script>
+</body>
+</html>

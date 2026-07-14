@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    'Switch Spectrum · 换光谱': 'Switch Spectrum',
+    '红外和紫外下各藏着传感器。换光谱去找。': 'Switch to IR and UV. Each hides a sensor. Find all three.',
+    '拖镜子两端的亮点拐光。滚轮转镜子。': 'Drag the dots on a mirror to bend the light. Scroll to spin it.',
+    '换光谱，房间就不一样了。藏着的东西会显出来。': 'Switch spectra. The room changes. Hidden things show up.',
+    '三个传感器都点亮，门就开了。': 'Light up all three sensors. The door opens.',
+    '墙动了动。路，通了。': 'The walls shift. The way is open.',
+    '空间传送门已开启！': 'Portal Opened!',
+    '三个齐了。退后点看。': "That's all three. Step back.",
+    '点亮可见光那个': 'Light up the visible sensor',
+    '点亮红外线那个': 'Light up the infrared sensor',
+    '点亮紫外线那个': 'Light up the ultraviolet sensor',
+    '顺着箭头找': 'Arrow points the way',
+    '红外线 (热能)': 'Infrared (Heat)',
+    '紫外线 (荧光)': 'Ultraviolet (Fluorescent)',
+    '光谱模式：': 'Spectra Mode: ',
+    '可见光': 'Visible Light',
+    '换光谱': 'Switch Spectrum',
+    '重置': 'Reset',
+    '进 入': 'ENTER',
+    '再来': 'AGAIN',
+    '剩余：': 'Remaining: '
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    if (T[text.trim()]) return T[text.trim()];
+    var result = text;
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Switch Spectrum · 换光谱</title>
+<style>
+  /* ========== 设计令牌：模式色动态主导 ========== */
+  :root{
+    --mode-color:#ffdd66;        /* 当前模式主色 */
+    --mode-color-soft:#ffdd6640; /* 半透明模式色 */
+    --mode-glow:rgba(255,221,102,.35);
+    --mode-glow-strong:rgba(255,221,102,.55);
+    --bg-deep:#04040a;
+    --bg-mid:#0a0a16;
+    --glass-bg:rgba(255,255,255,.035);
+    --glass-border:rgba(255,255,255,.08);
+    --text-primary:#e8eaf2;
+    --text-muted:#7a80a0;
+    --text-dim:#4a5070;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-deep);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--text-primary);touch-action:none}
+
+  /* 全局背景：深色径向 + 模式色微光 */
+  body::before{content:'';position:fixed;inset:0;background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, var(--mode-color-soft) 0%, transparent 60%),
+    radial-gradient(ellipse at top left, rgba(80,40,120,.15) 0%, transparent 50%),
+    radial-gradient(ellipse at bottom right, rgba(20,40,80,.15) 0%, transparent 50%),
+    var(--bg-deep);
+    opacity:.6;transition:opacity .6s, background .6s;pointer-events:none;z-index:0}
+  body::after{content:'';position:fixed;inset:0;background-image:
+    linear-gradient(rgba(255,255,255,.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.015) 1px, transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0;opacity:.5}
+
+  #game-container{position:relative;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:14px;z-index:1}
+
+  /* ========== 顶部栏：玻璃态浮卡 ========== */
+  #top-bar{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:940px;padding:12px 20px;flex-shrink:0;
+    background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+    border:1px solid var(--glass-border);border-radius:16px;
+    box-shadow:0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06);
+    position:relative;overflow:hidden}
+  #top-bar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--mode-color),transparent);opacity:.6;transition:.4s}
+  #title{font-size:clamp(18px,2.8vw,24px);font-weight:200;letter-spacing:clamp(3px,1.2vw,8px);
+    background:linear-gradient(90deg,#fff 0%,var(--mode-color) 50%,#fff 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    text-shadow:0 0 40px var(--mode-glow);transition:.4s;font-family:'Segoe UI Light','Helvetica Neue Thin',sans-serif}
+  #title b{font-weight:700;letter-spacing:clamp(1px,.5vw,3px)}
+  #lang-btn{background:transparent;border:1px solid var(--glass-border);color:var(--text-muted);
+    padding:7px 18px;border-radius:24px;cursor:pointer;font-size:12px;letter-spacing:2px;
+    transition:.3s;backdrop-filter:blur(8px);flex-shrink:0;font-weight:500;
+    position:relative;overflow:hidden}
+  #lang-btn::before{content:'';position:absolute;inset:0;background:var(--mode-color-soft);opacity:0;transition:.3s}
+  #lang-btn:hover{color:var(--mode-color);border-color:var(--mode-color);box-shadow:0 0 20px var(--mode-glow)}
+  #lang-btn:hover::before{opacity:.15}
+  #lang-btn span{position:relative;z-index:1}
+
+  /* ========== Canvas 容器：玻璃边框 + 模式光晕 ========== */
+  #canvas-wrap{position:relative;flex-shrink:1;flex-grow:1;display:flex;align-items:center;justify-content:center;width:100%;max-width:940px}
+  #canvas-wrap::before{content:'';position:absolute;inset:-2px;border-radius:14px;
+    background:linear-gradient(135deg,var(--mode-color) 0%,transparent 40%,transparent 60%,var(--mode-color) 100%);
+    opacity:.35;filter:blur(8px);transition:.5s;z-index:-1}
+  #game-canvas{border-radius:12px;cursor:crosshair;display:block;touch-action:none;
+    box-shadow:0 0 80px var(--mode-glow), 0 20px 60px rgba(0,0,0,.6), inset 0 0 60px rgba(0,0,0,.4);
+    border:1px solid var(--glass-border);transition:box-shadow .5s}
+
+  /* ========== 底部栏：玻璃态胶囊组 ========== */
+  #bottom-bar{display:flex;align-items:center;gap:8px;width:100%;max-width:940px;justify-content:center;flex-wrap:wrap;flex-shrink:0;
+    padding:10px 16px;background:var(--glass-bg);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);
+    border:1px solid var(--glass-border);border-radius:16px;
+    box-shadow:0 8px 32px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.06)}
+
+  .mode-btn{background:transparent;border:1px solid var(--glass-border);color:var(--text-muted);
+    padding:9px 18px;border-radius:10px;cursor:pointer;font-size:12px;letter-spacing:1.5px;
+    transition:.3s;position:relative;overflow:hidden;white-space:nowrap;font-weight:500;
+    backdrop-filter:blur(6px)}
+  .mode-btn::before{content:'';position:absolute;inset:0;background:var(--mode-color-soft);opacity:0;transition:.3s}
+  .mode-btn::after{content:'';position:absolute;bottom:0;left:50%;width:0;height:2px;background:var(--mode-color);transition:.3s;transform:translateX(-50%);box-shadow:0 0 8px var(--mode-color)}
+  .mode-btn:hover{color:var(--text-primary);border-color:rgba(255,255,255,.2)}
+  .mode-btn:hover::before{opacity:.08}
+  .mode-btn span{position:relative;z-index:1}
+  .mode-btn.active{color:#fff;border-color:var(--mode-color);background:var(--mode-color-soft);
+    box-shadow:0 0 24px var(--mode-glow), inset 0 0 16px var(--mode-color-soft)}
+  .mode-btn.active::after{width:60%}
+  .mode-btn.active[data-mode="visible"]{--mode-color:#ffdd66;--mode-color-soft:#ffdd6620;--mode-glow:rgba(255,221,102,.4)}
+  .mode-btn.active[data-mode="ir"]{--mode-color:#ff5544;--mode-color-soft:#ff554420;--mode-glow:rgba(255,85,68,.4)}
+  .mode-btn.active[data-mode="uv"]{--mode-color:#bb66ff;--mode-color-soft:#bb66ff20;--mode-glow:rgba(187,102,255,.4)}
+
+  #reset-btn{background:transparent;border:1px solid var(--glass-border);color:var(--text-dim);
+    padding:9px 16px;border-radius:10px;cursor:pointer;font-size:11px;letter-spacing:1.5px;
+    transition:.3s;white-space:nowrap;font-weight:500;backdrop-filter:blur(6px);
+    display:flex;align-items:center;gap:6px}
+  #reset-btn::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--text-dim);transition:.3s}
+  #reset-btn:hover{color:#ff7788;border-color:rgba(255,80,100,.4);box-shadow:0 0 16px rgba(255,80,100,.2)}
+  #reset-btn:hover::before{background:#ff7788;box-shadow:0 0 8px #ff7788}
+
+  /* ========== 状态栏：发光指示器 ========== */
+  #status-bar{display:flex;align-items:center;gap:12px;padding:0 8px;margin-left:auto}
+  .sensor-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);
+    transition:.4s;position:relative;background:rgba(0,0,0,.3)}
+  .sensor-dot.on{box-shadow:0 0 12px currentColor, inset 0 0 4px rgba(255,255,255,.5)}
+  .sensor-dot[data-s="visible"].on{background:#ffdd66;border-color:#ffdd66;color:#ffdd66}
+  .sensor-dot[data-s="ir"].on{background:#ff5544;border-color:#ff5544;color:#ff5544}
+  .sensor-dot[data-s="uv"].on{background:#bb66ff;border-color:#bb66ff;color:#bb66ff}
+  .sensor-dot.pending::after{content:'';position:absolute;inset:-5px;border-radius:50%;
+    border:1.5px solid currentColor;animation:ping 1.8s cubic-bezier(0,0,.2,1) infinite;opacity:0}
+  .sensor-dot[data-s="visible"].pending{color:#ffdd66}
+  .sensor-dot[data-s="ir"].pending{color:#ff5544}
+  .sensor-dot[data-s="uv"].pending{color:#bb66ff}
+  @keyframes ping{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.4);opacity:0}}
+
+  /* ========== 提示文字 ========== */
+  #objective-text{font-size:12px;letter-spacing:2px;text-align:center;min-height:18px;flex-shrink:0;
+    font-weight:300;text-transform:uppercase;transition:.4s;
+    color:var(--text-muted);font-family:'Segoe UI Light',sans-serif}
+  #objective-text strong{font-weight:600;color:var(--mode-color);text-shadow:0 0 12px var(--mode-glow)}
+  #clue-text{font-size:11px;color:var(--text-dim);letter-spacing:1.5px;text-align:center;
+    max-width:700px;min-height:14px;transition:.4s;flex-shrink:0;font-weight:300}
+
+  /* ========== 遮罩层：玻璃态深景 ========== */
+  .overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:rgba(4,4,10,.75);backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);
+    z-index:10;border-radius:12px;transition:.5s}
+  .overlay::before{content:'';position:absolute;inset:0;background:
+    radial-gradient(ellipse at center, var(--mode-color-soft) 0%, transparent 60%);opacity:.5;pointer-events:none}
+  .overlay h2{font-size:clamp(32px,6vw,52px);font-weight:100;letter-spacing:clamp(6px,2vw,14px);
+    margin-bottom:24px;text-align:center;position:relative;z-index:1;
+    font-family:'Segoe UI Light','Helvetica Neue Thin',sans-serif}
+  .overlay h2 b{font-weight:700;display:block}
+  .overlay p{font-size:13px;color:var(--text-muted);letter-spacing:1.5px;margin-bottom:6px;
+    text-align:center;max-width:480px;line-height:1.9;position:relative;z-index:1;font-weight:300}
+  .overlay button{margin-top:32px;padding:14px 48px;font-size:13px;letter-spacing:4px;font-weight:500;
+    border-radius:30px;cursor:pointer;border:1px solid var(--glass-border);
+    background:transparent;color:var(--text-primary);transition:.4s;position:relative;z-index:1;
+    backdrop-filter:blur(10px);overflow:hidden}
+  .overlay button::before{content:'';position:absolute;inset:0;background:var(--mode-color-soft);opacity:0;transition:.4s}
+  .overlay button span{position:relative;z-index:1}
+  .overlay button:hover{border-color:var(--mode-color);color:var(--mode-color);
+    box-shadow:0 0 40px var(--mode-glow), inset 0 0 20px var(--mode-color-soft);transform:translateY(-2px)}
+  .overlay button:hover::before{opacity:.2}
+
+  #start-overlay h2{background:linear-gradient(135deg,#ffdd66 0%,#ff7755 50%,#bb66ff 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 30px rgba(180,140,255,.4))}
+  #win-overlay{display:none}
+  #win-overlay h2{background:linear-gradient(135deg,#bb66ff 0%,#ffdd66 50%,#55ffaa 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    animation:pulse 2.5s ease-in-out infinite}
+  @keyframes pulse{0%,100%{filter:drop-shadow(0 0 15px rgba(187,102,255,.5))}50%{filter:drop-shadow(0 0 40px rgba(255,221,102,.7))}}
+
+  .hint-icons{display:flex;gap:40px;margin:24px 0 8px;position:relative;z-index:1}
+  .hint-icons span{font-size:32px;opacity:.5;filter:drop-shadow(0 0 12px currentColor);animation:floatHint 3s ease-in-out infinite}
+  .hint-icons span:nth-child(2){animation-delay:.5s}
+  .hint-icons span:nth-child(3){animation-delay:1s}
+  @keyframes floatHint{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+  /* 角落装饰线 */
+  .corner-deco{position:absolute;width:24px;height:24px;border:1px solid var(--mode-color);opacity:.4;transition:.4s}
+  .corner-deco.tl{top:12px;left:12px;border-right:none;border-bottom:none}
+  .corner-deco.tr{top:12px;right:12px;border-left:none;border-bottom:none}
+  .corner-deco.bl{bottom:12px;left:12px;border-right:none;border-top:none}
+  .corner-deco.br{bottom:12px;right:12px;border-left:none;border-top:none}
+
+  /* ========== 移动端 ========== */
+  @media (max-width:640px){
+    #game-container{padding:8px;gap:6px}
+    #top-bar{padding:8px 14px}
+    #bottom-bar{gap:6px;padding:8px 10px}
+    .mode-btn{padding:7px 12px;font-size:11px;letter-spacing:1px}
+    #reset-btn{padding:7px 10px;font-size:10px}
+    #status-bar{margin-left:0}
+    .hint-icons{gap:24px}
+    .hint-icons span{font-size:26px}
+    .corner-deco{width:18px;height:18px}
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="top-bar">
+    <span class="corner-deco tl"></span>
+    <span class="corner-deco tr"></span>
+    <h1 id="title">SWITCH<b> SPECTRUM</b></h1>
+    <button id="lang-btn"><span>中文</span></button>
+  </div>
+  <div id="canvas-wrap">
+    <canvas id="game-canvas" width="900" height="600"></canvas>
+  </div>
+  <div id="bottom-bar">
+    <button class="mode-btn active" data-mode="visible"><span>Visible Light</span></button>
+    <button class="mode-btn" data-mode="ir"><span>Infrared</span></button>
+    <button class="mode-btn" data-mode="uv"><span>Ultraviolet</span></button>
+    <div id="status-bar">
+      <div class="sensor-dot" data-s="visible" title="Visible"></div>
+      <div class="sensor-dot" data-s="ir" title="IR"></div>
+      <div class="sensor-dot" data-s="uv" title="UV"></div>
+    </div>
+    <button id="reset-btn">Reset</button>
+  </div>
+  <div id="objective-text"></div>
+  <div id="clue-text"></div>
+
+  <div id="start-overlay" class="overlay">
+    <span class="corner-deco tl"></span>
+    <span class="corner-deco tr"></span>
+    <span class="corner-deco bl"></span>
+    <span class="corner-deco br"></span>
+    <h2 id="start-title">SWITCH<b>SPECTRUM</b></h2>
+    <p id="start-desc-1">Drag the glowing endpoints of mirrors to redirect the light beam.</p>
+    <p id="start-desc-2">Switch spectral modes to reveal hidden sensors in different dimensions.</p>
+    <p id="start-desc-3">Guide the beam to all three sensors to open the portal.</p>
+    <div class="hint-icons"><span>👁️</span><span>🔥</span><span>💜</span></div>
+    <button id="start-btn"><span>ENTER</span></button>
+  </div>
+
+  <div id="win-overlay" class="overlay">
+    <span class="corner-deco tl"></span>
+    <span class="corner-deco tr"></span>
+    <span class="corner-deco bl"></span>
+    <span class="corner-deco br"></span>
+    <h2 id="win-title">ALL<b>THREE</b></h2>
+    <p id="win-desc">The ancient seal dissolves. Reality folds upon itself.</p>
+    <button id="play-again-btn"><span>ENTER AGAIN</span></button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  换光谱 Switch Spectrum — 单文件解谜游戏
+// ============================================================
+
+// ========== 1. 国际化系统 (I18n) ==========
+const I18N = {
+  en: {
+    title: "SWITCH SPECTRUM",
+    optic: "Spectra Mode: ",
+    visible: "Visible Light",
+    ir: "Infrared (Heat)",
+    uv: "Ultraviolet (Fluorescent)",
+    clue: "Switch to IR and UV. Each hides a sensor. Find all three.",
+    win: "Portal Opened!",
+    winDesc: "The walls shift. The way is open.",
+    reset: "Reset",
+    start: "ENTER",
+    again: "AGAIN",
+    s1: "Drag the dots on a mirror to bend the light. Scroll to spin it.",
+    s2: "Switch spectra. The room changes. Hidden things show up.",
+    s3: "Light up all three sensors. The door opens.",
+    langLabel: "中文",
+    objVisible: "Light up the visible sensor",
+    objIR: "Light up the infrared sensor",
+    objUV: "Light up the ultraviolet sensor",
+    objAllDone: "That's all three. Step back.",
+    objHint: "Arrow points the way"
+  },
+  zh: {
+    title: "换光谱",
+    optic: "光谱模式：",
+    visible: "可见光",
+    ir: "红外线 (热能)",
+    uv: "紫外线 (荧光)",
+    clue: "红外和紫外下各藏着传感器。换光谱去找。",
+    win: "空间传送门已开启！",
+    winDesc: "墙动了动。路，通了。",
+    reset: "重置",
+    start: "进 入",
+    again: "再来",
+    s1: "拖镜子两端的亮点拐光。滚轮转镜子。",
+    s2: "换光谱，房间就不一样了。藏着的东西会显出来。",
+    s3: "三个传感器都点亮，门就开了。",
+    langLabel: "EN",
+    objVisible: "点亮可见光那个",
+    objIR: "点亮红外线那个",
+    objUV: "点亮紫外线那个",
+    objAllDone: "三个齐了。退后点看。",
+    objHint: "顺着箭头找"
+  }
+};
+let lang = 'en';
+function t(key){ return I18N[lang][key]; }
+
+// ========== 2. 音频系统 (Web Audio API) ==========
+let audioCtx = null;
+let masterGain = null;
+function initAudio(){
+  if(!audioCtx){
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0.7;
+    masterGain.connect(audioCtx.destination);
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+// 维度切换音效：带通滤波器扫频
+function playSwitchSound(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const bp = audioCtx.createBiquadFilter();
+  const gain = audioCtx.createGain();
+  osc.type = 'sawtooth';
+  osc.frequency.setValueAtTime(60, now);
+  osc.frequency.exponentialRampToValueAtTime(500, now + 0.35);
+  bp.type = 'bandpass';
+  bp.frequency.setValueAtTime(180, now);
+  bp.frequency.exponentialRampToValueAtTime(3500, now + 0.3);
+  bp.frequency.exponentialRampToValueAtTime(400, now + 0.4);
+  bp.Q.value = 6;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.18, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+  osc.connect(bp); bp.connect(gain); gain.connect(masterGain);
+  osc.start(now); osc.stop(now + 0.5);
+}
+
+// 水晶音效：调频合成器 + 谐波叠加
+function playCrystalSound(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5];
+  notes.forEach((freq, i)=>{
+    const start = now + i * 0.06;
+    const carrier = audioCtx.createOscillator();
+    const modOsc = audioCtx.createOscillator();
+    const modGain = audioCtx.createGain();
+    const gain = audioCtx.createGain();
+    carrier.type = 'sine';
+    modOsc.type = 'sine';
+    carrier.frequency.value = freq;
+    modOsc.frequency.value = freq * 3.01;
+    modGain.gain.value = freq * 0.8;
+    modOsc.connect(modGain);
+    modGain.connect(carrier.frequency);
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(0.12, start + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 1.2);
+    carrier.connect(gain);
+    gain.connect(masterGain);
+    modOsc.start(start); carrier.start(start);
+    modOsc.stop(start + 1.3); carrier.stop(start + 1.3);
+  });
+}
+
+// 镜子拾取音效（短促清脆）
+function playPickupSound(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(660, now);
+  osc.frequency.exponentialRampToValueAtTime(880, now + 0.08);
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.1, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+  osc.connect(gain); gain.connect(masterGain);
+  osc.start(now); osc.stop(now + 0.15);
+}
+
+// 光束击墙音效（柔和的嗒声）
+let lastWallHitTime = 0;
+function playWallHitSound(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  if(now - lastWallHitTime < 0.3) return; // 节流
+  lastWallHitTime = now;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  osc.type = 'square';
+  osc.frequency.value = 120 + Math.random() * 40;
+  filter.type = 'lowpass';
+  filter.frequency.value = 400;
+  gain.gain.setValueAtTime(0, now);
+  gain.gain.linearRampToValueAtTime(0.04, now + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+  osc.connect(filter); filter.connect(gain); gain.connect(masterGain);
+  osc.start(now); osc.stop(now + 0.1);
+}
+
+// 传感器接近音效（上升音调）
+let proximityOsc = null, proximityGain = null;
+function updateProximitySound(dist, maxDist){
+  if(!audioCtx) return;
+  const proximity = Math.max(0, 1 - dist / maxDist);
+  if(proximity > 0.05){
+    if(!proximityOsc){
+      proximityOsc = audioCtx.createOscillator();
+      proximityGain = audioCtx.createGain();
+      proximityOsc.type = 'sine';
+      proximityOsc.frequency.value = 200;
+      proximityGain.gain.value = 0;
+      proximityOsc.connect(proximityGain);
+      proximityGain.connect(masterGain);
+      proximityOsc.start();
+    }
+    proximityOsc.frequency.setTargetAtTime(200 + proximity * 600, audioCtx.currentTime, 0.05);
+    proximityGain.gain.setTargetAtTime(proximity * 0.06, audioCtx.currentTime, 0.05);
+  } else if(proximityOsc){
+    proximityGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+  }
+}
+
+function stopProximitySound(){
+  if(proximityOsc){
+    proximityGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+    setTimeout(()=>{
+      if(proximityOsc){ try{proximityOsc.stop();}catch(e){} proximityOsc = null; proximityGain = null; }
+    }, 200);
+  }
+}
+
+// 胜利和弦
+function playWinFanfare(){
+  if(!audioCtx) return;
+  const now = audioCtx.currentTime;
+  // 大调和弦上行 C-E-G-C
+  const chord = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99];
+  chord.forEach((freq, i)=>{
+    const start = now + i * 0.12;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, start);
+    gain.gain.linearRampToValueAtTime(0.15, start + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 2);
+    osc.connect(gain); gain.connect(masterGain);
+    osc.start(start); osc.stop(start + 2.1);
+  });
+  // 低音垫
+  const bass = audioCtx.createOscillator();
+  const bassGain = audioCtx.createGain();
+  bass.type = 'sine';
+  bass.frequency.value = 130.81;
+  bassGain.gain.setValueAtTime(0, now);
+  bassGain.gain.linearRampToValueAtTime(0.08, now + 0.1);
+  bassGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+  bass.connect(bassGain); bassGain.connect(masterGain);
+  bass.start(now); bass.stop(now + 2.6);
+}
+
+// ========== 3. 游戏状态 ==========
+const GameState = { IDLE:'idle', PLAYING:'playing', WON:'won' };
+let gameState = GameState.IDLE;
+let currentMode = 'visible';
+
+// ========== 4. 关卡数据 ==========
+const W = 900, H = 600;
+const ROOM = { x:50, y:50, w:800, h:500, right:850, bottom:550 };
+
+const level = {
+  source: { x: 80, y: 300, angle: 0 },
+  mirrors: [
+    { x1: 320, y1: 180, x2: 320, y2: 260 },
+    { x1: 560, y1: 360, x2: 640, y2: 360 },
+    { x1: 420, y1: 440, x2: 500, y2: 440 }
+  ],
+  initialMirrors: null,
+  sensors: {
+    visible: { x: 815, y: 110, r: 18, activated: false, color:'#ffdd66' },
+    ir:      { x: 815, y: 490, r: 18, activated: false, color:'#ff5544' },
+    uv:      { x: 130, y: 510, r: 18, activated: false, color:'#bb66ff' }
+  }
+};
+level.initialMirrors = level.mirrors.map(m=>({...m}));
+
+let particles = [];
+let beamPath = [];
+let beamEndPoint = null; // 光束最终落点（用于击墙火花）
+let beamEndType = null;  // 'wall' | 'sensor' | 'mirror'
+let beamHitSensor = false;
+let flashAlpha = 0;
+let flashColor = '255,255,255';
+
+// 鼠标悬停状态
+let mousePos = { x: -1, y: -1 };
+let hoveredMirror = null;
+
+// ========== 5. Canvas 设置 + 响应式 ==========
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas(){
+  const wrap = document.getElementById('canvas-wrap');
+  const maxW = wrap.clientWidth;
+  const maxH = wrap.clientHeight;
+  const aspect = W / H;
+  let w = maxW, h = w / aspect;
+  if(h > maxH){ h = maxH; w = h * aspect; }
+  canvas.style.width = Math.floor(w) + 'px';
+  canvas.style.height = Math.floor(h) + 'px';
+}
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 50);
+
+function getCanvasPos(e){
+  const rect = canvas.getBoundingClientRect();
+  const sx = canvas.width / rect.width;
+  const sy = canvas.height / rect.height;
+  const cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+  const cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+  return { x: cx * sx, y: cy * sy };
+}
+
+function isTouch(){ return 'ontouchstart' in window; }
+
+// ========== 6. 光线追迹 ==========
+function raySegmentIntersect(rx, ry, rdx, rdy, x1, y1, x2, y2){
+  const sx = x2 - x1, sy = y2 - y1;
+  const denom = rdx * sy - rdy * sx;
+  if(Math.abs(denom) < 1e-9) return null;
+  const t = ((x1 - rx) * sy - (y1 - ry) * sx) / denom;
+  const s = ((x1 - rx) * rdy - (y1 - ry) * rdx) / denom;
+  if(t > 1e-4 && s >= -0.001 && s <= 1.001){
+    return { t, x: rx + t * rdx, y: ry + t * rdy, s };
+  }
+  return null;
+}
+
+function rayCircleIntersect(rx, ry, rdx, rdy, cx, cy, radius){
+  const fx = rx - cx, fy = ry - cy;
+  const a = rdx*rdx + rdy*rdy;
+  const b = 2*(fx*rdx + fy*rdy);
+  const c = fx*fx + fy*fy - radius*radius;
+  const disc = b*b - 4*a*c;
+  if(disc < 0) return null;
+  const sq = Math.sqrt(disc);
+  const t1 = (-b - sq) / (2*a);
+  const t2 = (-b + sq) / (2*a);
+  const t = t1 > 1e-4 ? t1 : (t2 > 1e-4 ? t2 : null);
+  if(t === null) return null;
+  return { t, x: rx + t*rdx, y: ry + t*rdy };
+}
+
+function reflect(dx, dy, nx, ny){
+  const dot = dx*nx + dy*ny;
+  return { dx: dx - 2*dot*nx, dy: dy - 2*dot*ny };
+}
+
+function traceBeam(){
+  beamPath = [{ x: level.source.x, y: level.source.y }];
+  beamHitSensor = false;
+  beamEndPoint = null;
+  beamEndType = null;
+  let x = level.source.x, y = level.source.y;
+  let dx = Math.cos(level.source.angle), dy = Math.sin(level.source.angle);
+  const maxBounces = 12;
+  const sensor = level.sensors[currentMode];
+
+  for(let bounce = 0; bounce < maxBounces; bounce++){
+    let closest = null;
+    let closestType = null;
+    let closestObj = null;
+
+    for(const m of level.mirrors){
+      const hit = raySegmentIntersect(x, y, dx, dy, m.x1, m.y1, m.x2, m.y2);
+      if(hit && (!closest || hit.t < closest.t)){
+        closest = hit; closestType = 'mirror'; closestObj = m;
+      }
+    }
+    const walls = [
+      { x1:ROOM.x, y1:ROOM.y, x2:ROOM.right, y2:ROOM.y },
+      { x1:ROOM.right, y1:ROOM.y, x2:ROOM.right, y2:ROOM.bottom },
+      { x1:ROOM.right, y1:ROOM.bottom, x2:ROOM.x, y2:ROOM.bottom },
+      { x1:ROOM.x, y1:ROOM.bottom, x2:ROOM.x, y2:ROOM.y }
+    ];
+    for(const w of walls){
+      const hit = raySegmentIntersect(x, y, dx, dy, w.x1, w.y1, w.x2, w.y2);
+      if(hit && (!closest || hit.t < closest.t)){
+        closest = hit; closestType = 'wall'; closestObj = w;
+      }
+    }
+    if(!sensor.activated){
+      const hit = rayCircleIntersect(x, y, dx, dy, sensor.x, sensor.y, sensor.r);
+      if(hit && (!closest || hit.t < closest.t)){
+        closest = hit; closestType = 'sensor'; closestObj = sensor;
+      }
+    }
+
+    if(!closest){
+      beamPath.push({ x: x + dx * 2000, y: y + dy * 2000 });
+      beamEndPoint = { x: x + dx * 2000, y: y + dy * 2000 };
+      beamEndType = 'wall';
+      break;
+    }
+
+    beamPath.push({ x: closest.x, y: closest.y });
+    beamEndPoint = { x: closest.x, y: closest.y };
+    beamEndType = closestType;
+
+    if(closestType === 'sensor'){
+      beamHitSensor = true;
+      activateSensor(currentMode);
+      break;
+    } else if(closestType === 'wall'){
+      break;
+    } else if(closestType === 'mirror'){
+      const mdx = closestObj.x2 - closestObj.x1;
+      const mdy = closestObj.y2 - closestObj.y1;
+      const mlen = Math.sqrt(mdx*mdx + mdy*mdy);
+      const nx = -mdy / mlen, ny = mdx / mlen;
+      const r = reflect(dx, dy, nx, ny);
+      dx = r.dx; dy = r.dy;
+      x = closest.x + dx * 0.5;
+      y = closest.y + dy * 0.5;
+    }
+  }
+
+  // 光束击墙时生成火花
+  if(beamEndType === 'wall' && beamEndPoint && gameState === GameState.PLAYING && Math.random() < 0.3){
+    const c = getModeColors();
+    spawnWallSparks(beamEndPoint.x, beamEndPoint.y, c.beam);
+    playWallHitSound();
+  }
+
+  // 传感器接近检测
+  if(!sensor.activated && beamEndPoint){
+    const dist = Math.hypot(beamEndPoint.x - sensor.x, beamEndPoint.y - sensor.y);
+    updateProximitySound(dist, 120);
+  } else {
+    updateProximitySound(999, 120);
+  }
+}
+
+function activateSensor(mode){
+  const s = level.sensors[mode];
+  if(!s.activated){
+    s.activated = true;
+    playCrystalSound();
+    stopProximitySound();
+    for(let i = 0; i < 50; i++){
+      const ang = (Math.PI * 2 * i) / 50 + Math.random() * 0.3;
+      const spd = 1 + Math.random() * 4;
+      particles.push({
+        x: s.x, y: s.y,
+        vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+        life: 1, color: s.color, size: 2 + Math.random() * 3, trail:true
+      });
+    }
+    updateStatusDots();
+    updateObjective();
+    if(level.sensors.visible.activated && level.sensors.ir.activated && level.sensors.uv.activated){
+      setTimeout(()=>{ winGame(); }, 800);
+    }
+  }
+}
+
+function spawnWallSparks(x, y, color){
+  for(let i = 0; i < 3; i++){
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 0.5 + Math.random() * 1.5;
+    particles.push({
+      x, y,
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      life: 0.6, color, size: 1 + Math.random() * 2, trail:false
+    });
+  }
+}
+
+// ========== 7. 输入处理 ==========
+let dragTarget = null;
+
+function findDragTarget(pos){
+  const grabR = isTouch() ? 28 : 18;
+  for(const m of level.mirrors){
+    if(Math.hypot(pos.x - m.x1, pos.y - m.y1) < grabR)
+      return { mirror: m, end: 0 };
+    if(Math.hypot(pos.x - m.x2, pos.y - m.y2) < grabR)
+      return { mirror: m, end: 1 };
+  }
+  for(const m of level.mirrors){
+    const d = pointToSegmentDist(pos.x, pos.y, m.x1, m.y1, m.x2, m.y2);
+    if(d < (isTouch() ? 18 : 12)){
+      return { mirror: m, type:'move', end:-1, offsetX: pos.x, offsetY: pos.y, ox1:m.x1, oy1:m.y1, ox2:m.x2, oy2:m.y2 };
+    }
+  }
+  return null;
+}
+
+function pointToSegmentDist(px, py, x1, y1, x2, y2){
+  const dx = x2 - x1, dy = y2 - y1;
+  const len2 = dx*dx + dy*dy;
+  if(len2 < 1e-9) return Math.hypot(px - x1, py - y1);
+  let t = ((px - x1)*dx + (py - y1)*dy) / len2;
+  t = Math.max(0, Math.min(1, t));
+  return Math.hypot(px - (x1 + t*dx), py - (y1 + t*dy));
+}
+
+function clamp(v, min, max){ return Math.max(min, Math.min(max, v)); }
+
+function updateHover(){
+  if(gameState !== GameState.PLAYING || dragTarget){ hoveredMirror = null; return; }
+  hoveredMirror = null;
+  for(const m of level.mirrors){
+    const grabR = isTouch() ? 28 : 18;
+    if(Math.hypot(mousePos.x - m.x1, mousePos.y - m.y1) < grabR ||
+       Math.hypot(mousePos.x - m.x2, mousePos.y - m.y2) < grabR){
+      hoveredMirror = m; return;
+    }
+  }
+  for(const m of level.mirrors){
+    const d = pointToSegmentDist(mousePos.x, mousePos.y, m.x1, m.y1, m.x2, m.y2);
+    if(d < (isTouch() ? 18 : 12)){ hoveredMirror = m; return; }
+  }
+}
+
+function handleDown(e){
+  e.preventDefault();
+  initAudio();
+  if(gameState !== GameState.PLAYING) return;
+  const pos = getCanvasPos(e);
+  dragTarget = findDragTarget(pos);
+  if(dragTarget) playPickupSound();
+}
+
+function handleMove(e){
+  if(e.touches){
+    e.preventDefault();
+  }
+  const pos = getCanvasPos(e);
+  mousePos = pos;
+  if(!dragTarget || gameState !== GameState.PLAYING) return;
+  const m = dragTarget.mirror;
+  const margin = 20;
+
+  if(dragTarget.type === 'move'){
+    const dx = pos.x - dragTarget.offsetX;
+    const dy = pos.y - dragTarget.offsetY;
+    let nx1 = dragTarget.ox1 + dx, ny1 = dragTarget.oy1 + dy;
+    let nx2 = dragTarget.ox2 + dx, ny2 = dragTarget.oy2 + dy;
+    nx1 = clamp(nx1, ROOM.x + margin, ROOM.right - margin);
+    ny1 = clamp(ny1, ROOM.y + margin, ROOM.bottom - margin);
+    nx2 = clamp(nx2, ROOM.x + margin, ROOM.right - margin);
+    ny2 = clamp(ny2, ROOM.y + margin, ROOM.bottom - margin);
+    m.x1 = nx1; m.y1 = ny1; m.x2 = nx2; m.y2 = ny2;
+  } else {
+    const px = clamp(pos.x, ROOM.x + margin, ROOM.right - margin);
+    const py = clamp(pos.y, ROOM.y + margin, ROOM.bottom - margin);
+    if(dragTarget.end === 0){ m.x1 = px; m.y1 = py; }
+    else { m.x2 = px; m.y2 = py; }
+    if(Math.hypot(m.x1 - m.x2, m.y1 - m.y2) < 20){
+      const ang = Math.atan2(m.y2 - m.y1, m.x2 - m.x1);
+      if(dragTarget.end === 0){
+        m.x1 = m.x2 - Math.cos(ang) * 20;
+        m.y1 = m.y2 - Math.sin(ang) * 20;
+      } else {
+        m.x2 = m.x1 + Math.cos(ang) * 20;
+        m.y2 = m.y1 + Math.sin(ang) * 20;
+      }
+    }
+  }
+}
+
+function handleUp(e){ dragTarget = null; }
+
+canvas.addEventListener('mousedown', handleDown);
+canvas.addEventListener('mousemove', handleMove);
+canvas.addEventListener('mouseup', handleUp);
+canvas.addEventListener('mouseleave', (e)=>{ dragTarget = null; mousePos = {x:-1,y:-1}; hoveredMirror = null; });
+canvas.addEventListener('touchstart', handleDown, {passive:false});
+canvas.addEventListener('touchmove', handleMove, {passive:false});
+canvas.addEventListener('touchend', handleUp);
+
+// 滚轮旋转镜子
+canvas.addEventListener('wheel', (e)=>{
+  e.preventDefault();
+  if(gameState !== GameState.PLAYING) return;
+  const pos = getCanvasPos(e);
+  for(const m of level.mirrors){
+    const d = pointToSegmentDist(pos.x, pos.y, m.x1, m.y1, m.x2, m.y2);
+    if(d < 20){
+      const cx = (m.x1 + m.x2) / 2, cy = (m.y1 + m.y2) / 2;
+      const ang = Math.atan2(m.y2 - m.y1, m.x2 - m.x1);
+      const len = Math.hypot(m.x2 - m.x1, m.y2 - m.y1);
+      const newAng = ang + (e.deltaY > 0 ? 0.12 : -0.12);
+      m.x1 = cx - Math.cos(newAng) * len / 2;
+      m.y1 = cy - Math.sin(newAng) * len / 2;
+      m.x2 = cx + Math.cos(newAng) * len / 2;
+      m.y2 = cy + Math.sin(newAng) * len / 2;
+      break;
+    }
+  }
+}, {passive:false});
+
+// 双指旋转（移动端）
+let pinchInitialAngle = null;
+let pinchMirror = null;
+let pinchMirrorInitialAngle = null;
+canvas.addEventListener('touchstart', (e)=>{
+  if(e.touches.length === 2 && gameState === GameState.PLAYING){
+    const pos = { x:(e.touches[0].clientX + e.touches[1].clientX)/2, y:(e.touches[0].clientY + e.touches[1].clientY)/2 };
+    const rect = canvas.getBoundingClientRect();
+    const sx = canvas.width / rect.width, sy = canvas.height / rect.height;
+    const cx = (pos.x - rect.left) * sx, cy = (pos.y - rect.top) * sy;
+    for(const m of level.mirrors){
+      const d = pointToSegmentDist(cx, cy, m.x1, m.y1, m.x2, m.y2);
+      if(d < 30){
+        pinchMirror = m;
+        pinchMirrorInitialAngle = Math.atan2(m.y2 - m.y1, m.x2 - m.x1);
+        pinchInitialAngle = Math.atan2(e.touches[0].clientY - e.touches[1].clientY, e.touches[0].clientX - e.touches[1].clientX);
+        break;
+      }
+    }
+  }
+}, {passive:false});
+canvas.addEventListener('touchmove', (e)=>{
+  if(e.touches.length === 2 && pinchMirror){
+    e.preventDefault();
+    const curAng = Math.atan2(e.touches[0].clientY - e.touches[1].clientY, e.touches[0].clientX - e.touches[1].clientX);
+    const delta = curAng - pinchInitialAngle;
+    const cx = (pinchMirror.x1 + pinchMirror.x2) / 2, cy = (pinchMirror.y1 + pinchMirror.y2) / 2;
+    const len = Math.hypot(pinchMirror.x2 - pinchMirror.x1, pinchMirror.y2 - pinchMirror.y1);
+    const newAng = pinchMirrorInitialAngle + delta;
+    pinchMirror.x1 = cx - Math.cos(newAng) * len / 2;
+    pinchMirror.y1 = cy - Math.sin(newAng) * len / 2;
+    pinchMirror.x2 = cx + Math.cos(newAng) * len / 2;
+    pinchMirror.y2 = cy + Math.sin(newAng) * len / 2;
+  }
+}, {passive:false});
+canvas.addEventListener('touchend', (e)=>{
+  if(e.touches.length < 2){ pinchMirror = null; }
+});
+
+// ========== 8. 渲染 ==========
+let time = 0;
+
+function getModeColors(){
+  switch(currentMode){
+    case 'visible':
+      return {
+        bg1:'#1a1410', bg2:'#0f0c08',
+        floor:'#2a2218', floorLine:'rgba(255,200,120,.04)',
+        wall:'#3a3028', wallEdge:'#5a4838',
+        beam:'#ffeeaa', beamGlow:'rgba(255,238,170,.6)',
+        accent:'#ffdd66',
+        flashRGB:'255,221,102'
+      };
+    case 'ir':
+      return {
+        bg1:'#080820', bg2:'#040414',
+        floor:'#0c0c28', floorLine:'rgba(255,80,60,.06)',
+        wall:'#141438', wallEdge:'#2a2a58',
+        beam:'#ff4422', beamGlow:'rgba(255,68,34,.6)',
+        accent:'#ff5544',
+        flashRGB:'255,85,68'
+      };
+    case 'uv':
+      return {
+        bg1:'#100820', bg2:'#080414',
+        floor:'#180c2c', floorLine:'rgba(180,100,255,.06)',
+        wall:'#241040', wallEdge:'#44206a',
+        beam:'#cc66ff', beamGlow:'rgba(204,102,255,.6)',
+        accent:'#bb66ff',
+        flashRGB:'187,102,255'
+      };
+  }
+}
+
+function render(){
+  time += 0.016;
+  updateHover();
+  const c = getModeColors();
+
+  // 背景
+  const grad = ctx.createRadialGradient(W/2, H/2, 50, W/2, H/2, 600);
+  grad.addColorStop(0, c.bg1);
+  grad.addColorStop(1, c.bg2);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // 房间地板
+  ctx.fillStyle = c.floor;
+  ctx.fillRect(ROOM.x, ROOM.y, ROOM.w, ROOM.h);
+
+  // 地板纹理
+  ctx.strokeStyle = c.floorLine;
+  ctx.lineWidth = 1;
+  for(let i = ROOM.x; i < ROOM.right; i += 40){
+    ctx.beginPath(); ctx.moveTo(i, ROOM.y); ctx.lineTo(i, ROOM.bottom); ctx.stroke();
+  }
+  for(let i = ROOM.y; i < ROOM.bottom; i += 40){
+    ctx.beginPath(); ctx.moveTo(ROOM.x, i); ctx.lineTo(ROOM.right, i); ctx.stroke();
+  }
+
+  // 模式装饰
+  drawModeDecorations(c);
+
+  // 方向指引箭头（指向当前模式未激活的传感器）
+  drawDirectionHint(c);
+
+  // 墙壁
+  ctx.strokeStyle = c.wallEdge;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(ROOM.x, ROOM.y, ROOM.w, ROOM.h);
+  ctx.strokeStyle = c.wall;
+  ctx.lineWidth = 2;
+  ctx.strokeRect(ROOM.x + 2, ROOM.y + 2, ROOM.w - 4, ROOM.h - 4);
+
+  // 已激活传感器（暗淡印记）
+  drawActivatedSensors();
+
+  // 光源
+  drawLightSource(c);
+
+  // 镜子
+  drawMirrors(c);
+
+  // 光束
+  if(gameState === GameState.PLAYING){
+    traceBeam();
+    drawBeam(c);
+  }
+
+  // 当前模式传感器
+  drawCurrentSensor(c);
+
+  // 粒子
+  updateAndDrawParticles();
+
+  // 模式切换闪光（带颜色）
+  if(flashAlpha > 0){
+    ctx.fillStyle = `rgba(${flashColor},${flashAlpha})`;
+    ctx.fillRect(0, 0, W, H);
+    flashAlpha *= 0.88;
+    if(flashAlpha < 0.01) flashAlpha = 0;
+  }
+
+  // 胜利传送门
+  if(gameState === GameState.WON){
+    drawPortal();
+  }
+}
+
+function drawModeDecorations(c){
+  if(currentMode === 'ir'){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255,60,40,.35)';
+    ctx.lineWidth = 2;
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = '#ff3322';
+    ctx.beginPath();
+    ctx.moveTo(ROOM.x + 20, ROOM.y + 80);
+    ctx.lineTo(ROOM.x + 200, ROOM.y + 80);
+    ctx.lineTo(ROOM.x + 200, ROOM.y + 160);
+    ctx.lineTo(ROOM.x + 350, ROOM.y + 160);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ROOM.right - 80, ROOM.y + 250);
+    ctx.lineTo(ROOM.right - 250, ROOM.y + 250);
+    ctx.lineTo(ROOM.right - 250, ROOM.y + 380);
+    ctx.stroke();
+    ctx.fillStyle = '#ff4422';
+    ctx.shadowBlur = 20;
+    [[ROOM.x+200, ROOM.y+80],[ROOM.x+200, ROOM.y+160],[ROOM.right-250, ROOM.y+250]].forEach(([x,y])=>{
+      ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,100,80,.15)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.strokeRect(ROOM.x + 380, ROOM.y + 380, 80, 60);
+    ctx.strokeRect(ROOM.right - 130, ROOM.y + 100, 70, 50);
+    ctx.setLineDash([]);
+    ctx.restore();
+  } else if(currentMode === 'uv'){
+    ctx.save();
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = '#cc66ff';
+    ctx.fillStyle = 'rgba(180,100,255,.4)';
+    ctx.font = 'bold 28px monospace';
+    ctx.fillText('◇', ROOM.x + 300, ROOM.y + 460);
+    ctx.fillText('◇', ROOM.x + 240, ROOM.y + 500);
+    ctx.fillText('◇', ROOM.x + 180, ROOM.y + 520);
+    ctx.fillStyle = 'rgba(100,255,200,.3)';
+    ctx.shadowColor = '#66ffcc';
+    ctx.font = '14px monospace';
+    ctx.fillText('λ = 380nm', ROOM.x + 550, ROOM.y + 100);
+    ctx.fillText('◆ SEAL ◆', ROOM.x + 600, ROOM.y + 480);
+    ctx.strokeStyle = 'rgba(200,150,255,.2)';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = '#aa66ff';
+    for(let i = 0; i < 3; i++){
+      ctx.beginPath();
+      ctx.moveTo(ROOM.right - 100 + i*12, ROOM.y + 200);
+      ctx.lineTo(ROOM.right - 70 + i*12, ROOM.y + 260);
+      ctx.stroke();
+    }
+    ctx.restore();
+  } else {
+    ctx.save();
+    ctx.fillStyle = 'rgba(80,60,40,.4)';
+    ctx.strokeStyle = 'rgba(120,90,60,.3)';
+    ctx.lineWidth = 2;
+    ctx.fillRect(ROOM.x + 150, ROOM.y + 200, 50, 50);
+    ctx.strokeRect(ROOM.x + 150, ROOM.y + 200, 50, 50);
+    ctx.fillStyle = 'rgba(100,100,110,.3)';
+    ctx.fillRect(ROOM.right - 120, ROOM.y + 300, 60, 20);
+    ctx.strokeRect(ROOM.right - 120, ROOM.y + 300, 60, 20);
+    ctx.restore();
+  }
+}
+
+// 方向指引：当当前模式传感器未激活时，从光源附近显示箭头指向传感器
+function drawDirectionHint(c){
+  const s = level.sensors[currentMode];
+  if(s.activated) return;
+  const sx = level.source.x, sy = level.source.y;
+  const ang = Math.atan2(s.y - sy, s.x - sx);
+  const dist = Math.hypot(s.x - sx, s.y - sy);
+  const arrowDist = 55;
+  const ax = sx + Math.cos(ang) * arrowDist;
+  const ay = sy + Math.sin(ang) * arrowDist;
+
+  ctx.save();
+  ctx.translate(ax, ay);
+  ctx.rotate(ang);
+  const pulse = 0.5 + Math.sin(time * 4) * 0.3;
+  ctx.globalAlpha = pulse;
+  ctx.shadowBlur = 15;
+  ctx.shadowColor = s.color;
+  ctx.fillStyle = s.color;
+  ctx.beginPath();
+  ctx.moveTo(10, 0);
+  ctx.lineTo(-6, -7);
+  ctx.lineTo(-3, 0);
+  ctx.lineTo(-6, 7);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawLightSource(c){
+  const s = level.source;
+  const pulse = 1 + Math.sin(time * 3) * 0.15;
+  ctx.save();
+  // 外层脉动光晕
+  const glowGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 35 * pulse);
+  glowGrad.addColorStop(0, c.beamGlow);
+  glowGrad.addColorStop(0.5, c.beamGlow.replace('.6','.3'));
+  glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = glowGrad;
+  ctx.fillRect(s.x - 40, s.y - 40, 80, 80);
+  // 核心
+  ctx.shadowBlur = 25;
+  ctx.shadowColor = c.accent;
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, 10 * pulse, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = c.accent;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, 6 * pulse, 0, Math.PI * 2);
+  ctx.fill();
+  // 旋转光线
+  ctx.strokeStyle = c.beamGlow;
+  ctx.lineWidth = 1.5;
+  ctx.globalAlpha = 0.4;
+  for(let i = 0; i < 4; i++){
+    const a = time * 0.8 + i * Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(s.x + Math.cos(a) * 12, s.y + Math.sin(a) * 12);
+    ctx.lineTo(s.x + Math.cos(a) * 18, s.y + Math.sin(a) * 18);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawMirrors(c){
+  for(const m of level.mirrors){
+    const isHovered = (hoveredMirror === m);
+    const isDragged = (dragTarget && dragTarget.mirror === m);
+    ctx.save();
+    // 悬停/拖拽高亮环
+    if(isHovered || isDragged){
+      const cx = (m.x1+m.x2)/2, cy = (m.y1+m.y2)/2;
+      ctx.strokeStyle = isDragged ? c.accent : 'rgba(255,255,255,.3)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]);
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = c.accent;
+      const len = Math.hypot(m.x2-m.x1, m.y2-m.y1);
+      ctx.beginPath();
+      ctx.arc(cx, cy, len/2 + 10, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    // 镜面
+    ctx.shadowBlur = isHovered || isDragged ? 22 : 15;
+    ctx.shadowColor = 'rgba(180,220,255,.5)';
+    ctx.strokeStyle = isHovered || isDragged ? 'rgba(240,248,255,1)' : 'rgba(220,235,255,.9)';
+    ctx.lineWidth = 5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(m.x1, m.y1);
+    ctx.lineTo(m.x2, m.y2);
+    ctx.stroke();
+    // 高光
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = 'rgba(255,255,255,.5)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(m.x1, m.y1);
+    ctx.lineTo(m.x2, m.y2);
+    ctx.stroke();
+    // 端点手柄
+    ctx.shadowBlur = 12;
+    ctx.shadowColor = c.accent;
+    [[m.x1,m.y1],[m.x2,m.y2]].forEach(([x,y])=>{
+      ctx.fillStyle = c.accent;
+      ctx.beginPath();
+      ctx.arc(x, y, isHovered||isDragged ? 8 : 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(x, y, 3, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+}
+
+function drawBeam(c){
+  if(beamPath.length < 2) return;
+  ctx.save();
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // 外层光晕
+  ctx.shadowBlur = 25;
+  ctx.shadowColor = c.beamGlow;
+  ctx.strokeStyle = c.beamGlow;
+  ctx.lineWidth = 10;
+  ctx.beginPath();
+  ctx.moveTo(beamPath[0].x, beamPath[0].y);
+  for(let i = 1; i < beamPath.length; i++) ctx.lineTo(beamPath[i].x, beamPath[i].y);
+  ctx.stroke();
+
+  // 中层
+  ctx.shadowBlur = 10;
+  ctx.strokeStyle = c.beam;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(beamPath[0].x, beamPath[0].y);
+  for(let i = 1; i < beamPath.length; i++) ctx.lineTo(beamPath[i].x, beamPath[i].y);
+  ctx.stroke();
+
+  // 核心
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(beamPath[0].x, beamPath[0].y);
+  for(let i = 1; i < beamPath.length; i++) ctx.lineTo(beamPath[i].x, beamPath[i].y);
+  ctx.stroke();
+
+  // 端点效果
+  if(beamEndPoint){
+    const end = beamEndPoint;
+    if(beamEndType === 'wall'){
+      // 击墙火花光晕
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = c.beam;
+      const sparkGrad = ctx.createRadialGradient(end.x, end.y, 0, end.x, end.y, 12);
+      sparkGrad.addColorStop(0, 'rgba(255,255,255,.8)');
+      sparkGrad.addColorStop(0.5, c.beamGlow);
+      sparkGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = sparkGrad;
+      ctx.fillRect(end.x - 14, end.y - 14, 28, 28);
+    } else {
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = c.beam;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(end.x, end.y, 3 + Math.sin(time * 10) * 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
+function drawCurrentSensor(c){
+  const s = level.sensors[currentMode];
+  // 接近高亮
+  let proximity = 0;
+  if(!s.activated && beamEndPoint){
+    const dist = Math.hypot(beamEndPoint.x - s.x, beamEndPoint.y - s.y);
+    proximity = Math.max(0, 1 - dist / 150);
+  }
+  drawSensor(s, s.activated, true, proximity);
+}
+
+function drawActivatedSensors(){
+  for(const [mode, s] of Object.entries(level.sensors)){
+    if(mode !== currentMode && s.activated){
+      drawSensor(s, true, false, 0);
+    }
+  }
+}
+
+function drawSensor(s, activated, isCurrent, proximity){
+  ctx.save();
+  const pulse = activated ? 1 : 0.6 + Math.sin(time * 3) * 0.2;
+  const alpha = isCurrent ? 1 : 0.25;
+  ctx.globalAlpha = alpha;
+
+  // 接近时的外层光环
+  if(proximity > 0.1 && !activated){
+    ctx.shadowBlur = 30 * proximity;
+    ctx.shadowColor = s.color;
+    ctx.strokeStyle = s.color;
+    ctx.globalAlpha = proximity * 0.5;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r * (1.5 + proximity), 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = alpha;
+  }
+
+  ctx.shadowBlur = activated ? 25 : 15;
+  ctx.shadowColor = s.color;
+  ctx.strokeStyle = s.color;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, s.r * pulse, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, s.r * 0.6, 0, Math.PI * 2);
+  ctx.stroke();
+
+  if(activated){
+    ctx.fillStyle = s.color;
+    ctx.shadowBlur = 30;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r * 0.2, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    ctx.fillStyle = 'rgba(0,0,0,.3)';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = s.color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(s.x - s.r * 0.4, s.y); ctx.lineTo(s.x + s.r * 0.4, s.y);
+    ctx.moveTo(s.x, s.y - s.r * 0.4); ctx.lineTo(s.x, s.y + s.r * 0.4);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function updateAndDrawParticles(){
+  ctx.save();
+  for(let i = particles.length - 1; i >= 0; i--){
+    const p = particles[i];
+    // 尾迹效果
+    if(p.trail && p.life > 0.3){
+      ctx.globalAlpha = p.life * 0.3;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x - p.vx * 2, p.y - p.vy * 2, p.size * p.life * 0.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    p.x += p.vx; p.y += p.vy;
+    p.vx *= 0.96; p.vy *= 0.96;
+    p.life -= 0.015;
+    if(p.life <= 0){ particles.splice(i, 1); continue; }
+    ctx.globalAlpha = p.life;
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = p.color;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawPortal(){
+  ctx.save();
+  const cx = W / 2, cy = H / 2;
+  const baseR = 80 + Math.sin(time * 2) * 10;
+
+  for(let ring = 0; ring < 5; ring++){
+    const r = baseR + ring * 25;
+    const ang = time * (1 + ring * 0.3) * (ring % 2 === 0 ? 1 : -1);
+    ctx.strokeStyle = `hsla(${280 + ring * 20}, 80%, 60%, ${0.5 - ring * 0.08})`;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = `hsl(${280 + ring * 20}, 80%, 60%)`;
+    ctx.beginPath();
+    for(let a = 0; a < Math.PI * 2; a += 0.1){
+      const wobble = Math.sin(a * 6 + time * 3) * 5;
+      const px = cx + Math.cos(a + ang) * (r + wobble);
+      const py = cy + Math.sin(a + ang) * (r + wobble);
+      if(a === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+  const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseR);
+  cg.addColorStop(0, 'rgba(255,255,255,.9)');
+  cg.addColorStop(0.3, 'rgba(200,150,255,.5)');
+  cg.addColorStop(1, 'rgba(100,50,150,0)');
+  ctx.fillStyle = cg;
+  ctx.fillRect(cx - baseR, cy - baseR, baseR * 2, baseR * 2);
+  ctx.restore();
+}
+
+// ========== 9. 游戏逻辑 ==========
+const MODE_THEME = {
+  visible: { color:'#ffdd66', soft:'rgba(255,221,102,.25)', glow:'rgba(255,221,102,.4)' },
+  ir:      { color:'#ff5544', soft:'rgba(255,85,68,.25)',   glow:'rgba(255,85,68,.4)'   },
+  uv:      { color:'#bb66ff', soft:'rgba(187,102,255,.25)', glow:'rgba(187,102,255,.4)' }
+};
+function updateModeTheme(){
+  const m = MODE_THEME[currentMode];
+  const root = document.documentElement.style;
+  root.setProperty('--mode-color', m.color);
+  root.setProperty('--mode-color-soft', m.soft);
+  root.setProperty('--mode-glow', m.glow);
+}
+function switchMode(mode){
+  if(currentMode === mode) return;
+  currentMode = mode;
+  playSwitchSound();
+  const c = getModeColors();
+  flashColor = c.flashRGB;
+  flashAlpha = 0.3;
+  updateModeTheme();
+  document.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  updateClueText();
+  updateObjective();
+  updateStatusDots();
+}
+
+function updateClueText(){
+  document.getElementById('clue-text').textContent = t('optic') + t(currentMode) + ' — ' + t('clue');
+}
+
+function updateObjective(){
+  const el = document.getElementById('objective-text');
+  const allDone = level.sensors.visible.activated && level.sensors.ir.activated && level.sensors.uv.activated;
+  if(allDone){
+    el.innerHTML = '<strong>' + t('objAllDone') + '</strong>';
+  } else if(!level.sensors[currentMode].activated){
+    const key = 'obj' + currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
+    el.innerHTML = t(key) + ' <strong>› ' + t('objHint') + '</strong>';
+  } else {
+    const remaining = [];
+    if(!level.sensors.visible.activated) remaining.push(t('visible'));
+    if(!level.sensors.ir.activated) remaining.push(t('ir'));
+    if(!level.sensors.uv.activated) remaining.push(t('uv'));
+    el.innerHTML = (lang === 'en' ? 'Remaining: ' : '剩余：') + '<strong>' + remaining.join(' / ') + '</strong>';
+  }
+}
+
+function updateStatusDots(){
+  document.querySelectorAll('.sensor-dot').forEach(dot=>{
+    const s = dot.dataset.s;
+    dot.classList.toggle('on', level.sensors[s].activated);
+    // 当前模式且未激活时添加 pending 动画
+    dot.classList.toggle('pending', s === currentMode && !level.sensors[s].activated && gameState === GameState.PLAYING);
+  });
+}
+
+function resetMirrors(){
+  level.mirrors.forEach((m, i)=>{
+    m.x1 = level.initialMirrors[i].x1;
+    m.y1 = level.initialMirrors[i].y1;
+    m.x2 = level.initialMirrors[i].x2;
+    m.y2 = level.initialMirrors[i].y2;
+  });
+}
+
+function winGame(){
+  gameState = GameState.WON;
+  playWinFanfare();
+  stopProximitySound();
+  document.getElementById('win-overlay').style.display = 'flex';
+  document.getElementById('win-title').textContent = t('win');
+  document.getElementById('win-desc').textContent = t('winDesc');
+  document.getElementById('play-again-btn').textContent = t('again');
+  for(let i = 0; i < 100; i++){
+    const ang = Math.random() * Math.PI * 2;
+    const spd = 2 + Math.random() * 6;
+    particles.push({
+      x: W/2, y: H/2,
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      life: 1, color: ['#ffdd66','#ff5544','#bb66ff','#66ffaa'][i%4], size: 3 + Math.random() * 4, trail:true
+    });
+  }
+}
+
+function startGame(){
+  gameState = GameState.PLAYING;
+  document.getElementById('start-overlay').style.display = 'none';
+  initAudio();
+  updateObjective();
+  updateStatusDots();
+}
+
+function resetGame(){
+  gameState = GameState.PLAYING;
+  document.getElementById('win-overlay').style.display = 'none';
+  for(const s of Object.values(level.sensors)) s.activated = false;
+  resetMirrors();
+  particles = [];
+  currentMode = 'visible';
+  updateModeTheme();
+  document.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.mode === 'visible');
+  });
+  updateStatusDots();
+  updateObjective();
+  updateClueText();
+}
+
+// ========== 10. UI 事件绑定 ==========
+document.querySelectorAll('.mode-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    initAudio();
+    switchMode(btn.dataset.mode);
+  });
+});
+
+document.getElementById('lang-btn').addEventListener('click', ()=>{
+  lang = (lang === 'en') ? 'zh' : 'en';
+  updateUILanguage();
+});
+
+document.getElementById('reset-btn').addEventListener('click', ()=>{
+  resetMirrors();
+});
+
+document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('play-again-btn').addEventListener('click', resetGame);
+
+function updateUILanguage(){
+  // 顶部标题
+  if(lang === 'en'){
+    document.getElementById('title').innerHTML = 'SWITCH<b> SPECTRUM</b>';
+  } else {
+    document.getElementById('title').innerHTML = '<b>' + t('title') + '</b>';
+  }
+  document.getElementById('lang-btn').innerHTML = '<span>' + t('langLabel') + '</span>';
+  // 开始界面标题
+  document.getElementById('start-title').innerHTML = lang === 'en' ? 'SWITCH<b>SPECTRUM</b>' : '<b>' + t('title') + '</b>';
+  document.getElementById('start-desc-1').textContent = t('s1');
+  document.getElementById('start-desc-2').textContent = t('s2');
+  document.getElementById('start-desc-3').textContent = t('s3');
+  document.getElementById('start-btn').innerHTML = '<span>' + t('start') + '</span>';
+  document.getElementById('reset-btn').textContent = t('reset');
+  const modeMap = { visible:'visible', ir:'ir', uv:'uv' };
+  document.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.innerHTML = '<span>' + t(modeMap[btn.dataset.mode]) + '</span>';
+  });
+  if(gameState === GameState.WON){
+    document.getElementById('win-title').innerHTML = lang === 'en' ? 'ALL<b>THREE</b>' : '<b>' + t('win') + '</b>';
+    document.getElementById('win-desc').textContent = t('winDesc');
+    document.getElementById('play-again-btn').innerHTML = '<span>' + t('again') + '</span>';
+  }
+  updateClueText();
+  updateObjective();
+}
+
+// ========== 11. 主循环 ==========
+function gameLoop(){
+  render();
+  requestAnimationFrame(gameLoop);
+}
+
+// ========== 12. 初始化 ==========
+updateModeTheme();
+updateUILanguage();
+updateStatusDots();
+resizeCanvas();
+gameLoop();
+</script>
+</body>
+</html>

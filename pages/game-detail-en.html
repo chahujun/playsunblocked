@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en" class="light" data-lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="15 free browser games that work on school Chromebooks. No downloads, no sign-up. Play puzzle, action, arcade and strategy games instantly.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <title>Block Blast - playsunblocked</title>
+        <link rel="canonical" href="https://playsunblocked.com/pages/game-detail-en.html">
+    <link rel="alternate" hreflang="en" href="https://playsunblocked.com/pages/game-detail-en.html">
+    <link rel="alternate" hreflang="zh-CN" href="https://playsunblocked.com/pages/game-detail-cn.html">
+    <link rel="alternate" hreflang="x-default" href="https://playsunblocked.com/pages/game-detail-en.html">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta property="og:site_name" content="playsunblocked">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://playsunblocked.com/pages/game-detail-en.html">
+    <meta property="og:title" content="Play Free Games - playsunblocked">
+    <meta property="og:description" content="Play free browser games on playsunblocked. No downloads, no sign-up. Works on school Chromebooks.">
+    <meta property="og:image" content="https://playsunblocked.com/assets/hero-gaming.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Play Free Games - playsunblocked">
+    <meta name="twitter:description" content="Play free browser games on playsunblocked. No downloads, no sign-up. Works on school Chromebooks.">
+    <meta name="twitter:image" content="https://playsunblocked.com/assets/hero-gaming.jpg">
+    <link rel="stylesheet" href="../colors_and_type.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  
+  @layer base {
+    body { background: var(--gh-background); color: var(--gh-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+
+<style>
+/* Responsive game player container */
+@media (max-width: 768px) {
+  [data-game-player] {
+    aspect-ratio: 3 / 4 !important;
+    min-height: 400px;
+  }
+}
+@media (max-width: 480px) {
+  [data-game-player] {
+    aspect-ratio: 9 / 12 !important;
+    min-height: 350px;
+  }
+}
+</style>
+
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+    
+
+    <!-- Shell Styles -->
+    <link rel="stylesheet" href="../shell.css">
+
+    <!-- ========================== -->
+    <!-- START PAGE STYLES           -->
+    <!-- ========================== -->
+    <style>
+      /* ---- PLAY button: animated gradient + pulse breathing ---- */
+      .play-btn {
+        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 50%, var(--color-primary) 100%);
+        background-size: 200% 200%;
+        animation: play-gradient-shift 3s ease-in-out infinite, play-pulse 2s ease-in-out infinite;
+        border: 3px solid var(--color-border);
+        box-shadow: var(--brutalist-shadow-md);
+        transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);
+        cursor: pointer;
+      }
+      .play-btn:hover {
+        transform: translate(-50%, -50%) scale(1.1);
+        box-shadow: var(--brutalist-shadow-lg);
+      }
+      .play-btn:active {
+        transform: translate(-50%, -50%) scale(0.95);
+        box-shadow: var(--brutalist-shadow-sm);
+      }
+      .play-btn:focus-visible {
+        outline: 3px solid var(--color-primary);
+        outline-offset: 4px;
+      }
+      @keyframes play-gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      @keyframes play-pulse {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); }
+        50% { transform: translate(-50%, -50%) scale(1.05); }
+      }
+
+      /* ---- Breadcrumb links ---- */
+      .crumb-link {
+        font-family: var(--font-display);
+        font-weight: var(--weight-bold);
+        font-size: var(--text-sm);
+        color: var(--color-primary);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: color 0.15s ease;
+      }
+      .crumb-link:hover { color: var(--color-primary-hover); text-decoration: underline; text-underline-offset: 3px; }
+      .crumb-link:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+      .crumb-sep { color: var(--color-text-tertiary); font-weight: var(--weight-bold); font-size: var(--text-sm); }
+      .crumb-current { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; }
+
+      /* ---- Pill tag ---- */
+      .pill-tag {
+        display: inline-flex;
+        align-items: center;
+        height: 28px;
+        padding: 0 12px;
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-full);
+        background: var(--color-surface);
+        font-family: var(--font-display);
+        font-weight: var(--weight-semibold);
+        font-size: var(--text-sm);
+        color: var(--color-text);
+        white-space: nowrap;
+      }
+      .pill-tag-primary {
+        background: var(--color-primary);
+        color: var(--color-text-inverse);
+      }
+
+      /* ---- Rating star ---- */
+      .star-filled { color: var(--color-primary); }
+
+      /* ---- Info stat row ---- */
+      .info-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--color-border-light);
+      }
+      .info-row:last-child { border-bottom: none; }
+      .info-label { font-family: var(--font-sans); font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }
+      .info-value { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); text-align: right; }
+
+      /* ---- Step number circle ---- */
+      .step-num {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        background: var(--color-primary);
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-md);
+        color: var(--color-text-inverse);
+        font-family: var(--font-display);
+        font-weight: var(--weight-extrabold);
+        font-size: var(--text-xl);
+      }
+
+      /* ---- Share button ---- */
+      .share-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 40px;
+        padding: 0 14px;
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background: var(--color-surface);
+        box-shadow: var(--brutalist-shadow-sm);
+        font-family: var(--font-display);
+        font-weight: var(--weight-bold);
+        font-size: var(--text-sm);
+        color: var(--color-text);
+        white-space: nowrap;
+        cursor: pointer;
+        transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);
+      }
+      .share-btn:hover { transform: translate(-1px, -1px); box-shadow: var(--brutalist-shadow-md); }
+      .share-btn:active { transform: scale(0.95); box-shadow: none; }
+      .share-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+      /* ---- Leaderboard row ---- */
+      .lb-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--color-border-light);
+      }
+      .lb-row:last-child { border-bottom: none; }
+      .lb-rank {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-md);
+        font-family: var(--font-display);
+        font-weight: var(--weight-extrabold);
+        font-size: var(--text-sm);
+        color: var(--color-text);
+        background: var(--color-surface-alt);
+      }
+      .lb-rank-top { background: var(--color-primary); color: var(--color-text-inverse); border-color: var(--color-border); }
+      .lb-name { font-family: var(--font-sans); font-weight: var(--weight-semibold); font-size: var(--text-sm); color: var(--color-text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .lb-score { font-family: var(--font-mono); font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }
+
+      /* ---- Like button ---- */
+      .like-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 10px;
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background: var(--color-surface);
+        font-family: var(--font-display);
+        font-weight: var(--weight-bold);
+        font-size: var(--text-sm);
+        color: var(--color-text);
+        white-space: nowrap;
+        cursor: pointer;
+        transition: transform 0.1s cubic-bezier(.2,.8,.2,1), background 0.15s ease, color 0.15s ease;
+      }
+      .like-btn:hover { background: var(--color-primary-light); }
+      .like-btn:active { transform: scale(0.95); }
+      .like-btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+      .like-btn[data-liked="true"] { background: var(--color-primary); color: var(--color-text-inverse); border-color: var(--color-border); }
+      .like-btn[data-liked="true"] svg { fill: var(--color-text-inverse); }
+
+      /* ---- Related game card ---- */
+      .related-card {
+        border: 2px solid var(--color-border);
+        box-shadow: var(--brutalist-shadow-md);
+        background: var(--color-surface);
+        transition: transform 0.15s cubic-bezier(.2,.8,.2,1), box-shadow 0.15s cubic-bezier(.2,.8,.2,1);
+      }
+      .related-card:hover { transform: translate(-2px, -2px); box-shadow: var(--brutalist-shadow-lg); }
+
+      /* ---- Play CTA on related cards ---- */
+      .play-cta {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        height: 36px;
+        border: 2px solid var(--color-border);
+        border-radius: var(--radius-md);
+        background: var(--color-primary);
+        box-shadow: var(--brutalist-shadow-sm);
+        font-family: var(--font-display);
+        font-weight: var(--weight-extrabold);
+        font-size: var(--text-sm);
+        color: var(--color-text-inverse);
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);
+      }
+      .play-cta:hover { transform: translate(-1px, -1px); box-shadow: var(--brutalist-shadow-md); }
+      .play-cta:active { transform: scale(0.95); box-shadow: none; }
+      .play-cta:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+      /* ---- Scroll reveal ---- */
+      .reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition: opacity 0.4s cubic-bezier(.3,0,0,1), transform 0.4s cubic-bezier(.3,0,0,1);
+      }
+      .reveal[data-visible="true"] {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ---- Comment input focus ---- */
+      .comment-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px var(--color-primary-light);
+      }
+
+      /* ---- Reduced motion: disable all animations ---- */
+      @media (prefers-reduced-motion: reduce) {
+        .play-btn { animation: none; }
+        .play-btn:hover { transform: translate(-50%, -50%); }
+        .play-btn:active { transform: translate(-50%, -50%) scale(0.95); }
+        .reveal { opacity: 1; transform: none; transition: none; }
+        .related-card, .share-btn, .like-btn, .play-cta, .brutalist-card {
+          transition-duration: 0.01ms !important;
+        }
+      }
+    
+      /* ---- Game cover: category gradient (no misleading photos) ---- */
+      .game-cover {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      .game-cover::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18) 0%, transparent 45%),
+          radial-gradient(circle at 80% 75%, rgba(0,0,0,0.18) 0%, transparent 50%);
+        pointer-events: none;
+      }
+      .game-cover-inner {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 16px;
+        text-align: center;
+      }
+      .game-cover-title {
+        font-family: var(--font-display);
+        font-weight: var(--weight-extrabold);
+        font-size: clamp(20px, 3.2vw, 34px);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        color: #fff;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+        word-break: break-word;
+      }
+      .game-cover-sub {
+        font-family: var(--font-sans);
+        font-weight: var(--weight-semibold);
+        font-size: clamp(11px, 1.4vw, 14px);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.85);
+        text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      }
+
+      /* ---- Click-to-play overlay for iframe player ---- */
+      .player-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, rgba(26,26,26,0.55) 0%, rgba(26,26,26,0.35) 100%);
+        transition: opacity 0.25s ease;
+      }
+      .player-overlay[data-hidden="true"] { opacity: 0; pointer-events: none; }
+      .player-iframe {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        border: 0 !important;
+        background: var(--color-text);
+      }
+      [data-game-player] {
+        position: relative;
+      }
+    </style>
+    <!-- END PAGE STYLES -->
+
+    <!-- ========================== -->
+    <!-- START HEADER               -->
+    <!-- ========================== -->
+    <header id="site-header" data-dom-id="site-header" class="sticky top-0 z-50 w-full" style="height: var(--header-height); background: var(--color-bg); border-bottom: 2px solid var(--color-border); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+      <div class="mx-auto flex h-full items-center gap-4 px-6 lg:gap-6" style="max-width: var(--max-width);">
+
+        <!-- Logo: playsunblocked + geometric controller icon -->
+        <a href="index-en.html" data-dom-id="nav-logo" class="flex shrink-0 items-center gap-2" aria-label="playsunblocked home">
+          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="6" width="20" height="12" rx="4"/>
+              <line x1="6" y1="12" x2="10" y2="12"/>
+              <line x1="8" y1="10" x2="8" y2="14"/>
+              <circle cx="15" cy="11" r="0.8" fill="currentColor" stroke="none"/>
+              <circle cx="17.5" cy="13" r="0.8" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-2xl); letter-spacing: -0.02em;">playsunblocked</span>
+        </a>
+
+        <!-- Nav links — each exposes data-nav-key + data-dom-id for leaf active-state injection -->
+        <nav class="hidden md:flex items-center gap-1" role="navigation" aria-label="Main navigation">
+          <a href="index-en.html" data-nav-key="home" data-dom-id="nav-home" class="gh-nav-link" data-en="Home" data-cn="首页">
+            <span data-lang="en">Home</span><span data-lang="cn">首页</span>
+          </a>
+          <a href="games-en.html" data-nav-key="games" data-dom-id="nav-games" class="gh-nav-link" data-active="true" data-en="Games" data-cn="游戏">
+            <span data-lang="en">Games</span><span data-lang="cn">游戏</span>
+          </a>
+          <a href="games-en.html" data-nav-key="categories" data-dom-id="nav-categories" class="gh-nav-link" data-en="Categories" data-cn="分类">
+            <span data-lang="en">Categories</span><span data-lang="cn">分类</span>
+          </a>
+          <a href="index-en.html" data-nav-key="about" data-dom-id="nav-about" class="gh-nav-link" data-en="About" data-cn="关于">
+            <span data-lang="en">About</span><span data-lang="cn">关于</span>
+          </a>
+        </nav>
+        <!-- SLOT: activeNavItem — leaf pages set data-active="true" on the matching [data-nav-key] element above -->
+
+        <!-- Search bar -->
+        <div class="relative hidden sm:flex flex-1 items-center max-w-xs">
+          <i data-lucide="search" class="absolute left-3 pointer-events-none" style="width: 18px; height: 18px; color: var(--color-text-tertiary);" aria-hidden="true"></i>
+          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="Search games..." aria-label="Search games" data-en-placeholder="Search games..." data-cn-placeholder="搜索游戏...">
+        </div>
+
+        <!-- Right cluster: language toggle + user avatar (shared center alignment) -->
+        <div class="flex shrink-0 items-center gap-3">
+          <!-- Language toggle: bordered pill, EN | 中文 -->
+          <button type="button" data-dom-id="lang-toggle" class="gh-lang-btn flex items-center gap-1.5" style="height: 36px; padding: 0 12px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-surface); font-family: var(--font-display); font-size: var(--text-sm);" aria-label="Switch language">
+            <span class="gh-lang-en">EN</span>
+            <span style="color: var(--color-text-tertiary);">|</span>
+            <span class="gh-lang-cn">中文</span>
+          </button>
+
+          <!-- User avatar: 36px circle with 2px black border -->
+          <button type="button" data-dom-id="user-avatar" class="gh-avatar-btn flex shrink-0 items-center justify-center" style="width: 36px; height: 36px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-primary-light); color: var(--color-primary);" aria-label="User account">
+            <i data-lucide="user" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- END HEADER -->
+
+    <!-- ========================== -->
+    <!-- START PAGE CONTENT          -->
+    <!-- ========================== -->
+
+    <!-- Breadcrumb -->
+    <section class="w-full" style="padding-top: 24px; padding-bottom: 8px;" aria-label="Breadcrumb">
+      <div class="mx-auto px-6" style="max-width: var(--max-width);">
+        <nav class="flex items-center gap-2 flex-wrap" aria-label="Breadcrumb">
+          <a href="#" class="crumb-link">Home</a>
+          <span class="crumb-sep" aria-hidden="true">/</span>
+          <a href="#" class="crumb-link">Games</a>
+          <span class="crumb-sep" aria-hidden="true">/</span>
+          <a href="#" class="crumb-link">Puzzle</a>
+          <span class="crumb-sep" aria-hidden="true">/</span>
+          <span class="crumb-current">Block Blast</span>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Main two-column layout: game player + sidebar -->
+    <section class="w-full" style="padding-top: 16px; padding-bottom: 48px;">
+      <div class="mx-auto px-6" style="max-width: var(--max-width);">
+        <div class="grid grid-cols-1 lg:grid-cols-10 gap-6 lg:gap-8">
+
+          <!-- ===== LEFT COLUMN: Main content (70%) ===== -->
+          <div class="lg:col-span-7 flex flex-col gap-8">
+
+            <!-- Game player area -->
+            <div class="flex flex-col gap-4">
+              <!-- 16:9 player container -->
+              <div class="relative w-full" data-game-player style="aspect-ratio: 16 / 9; border: 2px solid var(--color-border); box-shadow: var(--brutalist-shadow-md); overflow: hidden; background: var(--color-text);">
+                <img src="../assets/game-featured.jpg" alt="Block Blast puzzle game gameplay screenshot showing colorful blocks on a grid" class="absolute inset-0 w-full h-full object-cover" style="opacity: 0.85;">
+                <!-- Dark overlay for play button contrast -->
+                <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(26,26,26,0.35) 0%, rgba(26,26,26,0.2) 100%);"></div>
+
+                <!-- PLAY button overlay -->
+                <button type="button" class="play-btn absolute flex items-center justify-center" style="top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; border-radius: var(--radius-full);" aria-label="Play Block Blast">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--color-text-inverse)" aria-hidden="true">
+                    <polygon points="6 3 20 12 6 21 6 3"/>
+                  </svg>
+                </button>
+
+                <!-- Bottom-left game label overlay -->
+                <div class="absolute left-4 bottom-4 flex items-center gap-2">
+                  <span class="flex items-center justify-center" style="width: 8px; height: 8px; background: var(--state-success); border-radius: var(--radius-full);" aria-hidden="true"></span>
+                  <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text-inverse); letter-spacing: 0.02em; text-shadow: 0 1px 4px rgba(0,0,0,0.5);">NOW PLAYING</span>
+                </div>
+              </div>
+
+              <!-- Game title + category + rating + play count -->
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-col gap-2 min-w-0">
+                  <h1 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-4xl); color: var(--color-text); letter-spacing: -0.02em; line-height: 1.1; text-wrap: balance;">Block Blast</h1>
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <span class="pill-tag pill-tag-primary">Puzzle</span>
+                    <div class="flex items-center gap-1" aria-label="Rating: 4.8 out of 5">
+                      <svg class="star-filled" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="star-filled" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="star-filled" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="star-filled" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <svg class="star-filled" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true" style="opacity: 0.5;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); margin-left: 4px;">4.8/5</span>
+                    </div>
+                    <span class="flex items-center gap-1.5 font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary);">
+                      <i data-lucide="users" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+                      <span style="font-variant-numeric: tabular-nums;">2.4M plays</span>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex items-center gap-2 shrink-0">
+                  <button type="button" class="flex items-center justify-center gap-2" style="height: 40px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);" onmouseover="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" aria-label="Add to favorites">
+                    <i data-lucide="heart" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+                    <span>Favorite</span>
+                  </button>
+                  <button type="button" class="flex items-center justify-center gap-2" style="height: 40px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);" onmouseover="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" aria-label="Fullscreen">
+                    <i data-lucide="maximize" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+                    <span>Fullscreen</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Platform & difficulty badges -->
+            <div class="reveal flex items-center gap-2 flex-wrap">
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--state-success); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+                <i data-lucide="monitor" style="width: 13px; height: 13px; color: var(--state-success);" aria-hidden="true"></i>PC
+              </span>
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+                <i data-lucide="laptop" style="width: 13px; height: 13px; color: var(--color-text-secondary);" aria-hidden="true"></i>Chromebook
+                <span style="color: var(--state-success); font-size: 10px; font-weight: var(--weight-bold);">Verified</span>
+              </span>
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+                <i data-lucide="smartphone" style="width: 13px; height: 13px; color: var(--color-text-secondary);" aria-hidden="true"></i>Mobile
+              </span>
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+                <i data-lucide="gauge" style="width: 13px; height: 13px; color: var(--color-primary);" aria-hidden="true"></i>Difficulty: Easy
+              </span>
+            </div>
+
+            <!-- How to Play card -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 24px;">
+              <div class="flex items-center gap-3 mb-5">
+                <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md);">
+                  <i data-lucide="book-open" style="width: 18px; height: 18px; color: var(--color-text-inverse);" aria-hidden="true"></i>
+                </span>
+                <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em;">How to Play</h2>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Step 1 -->
+                <div class="flex items-start gap-4" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
+                  <span class="step-num">1</span>
+                  <p class="font-sans pt-1.5" style="font-size: var(--text-base); color: var(--color-text); line-height: 1.5;">Drag blocks to the grid</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="flex items-start gap-4" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
+                  <span class="step-num">2</span>
+                  <p class="font-sans pt-1.5" style="font-size: var(--text-base); color: var(--color-text); line-height: 1.5;">Complete rows to clear them</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="flex items-start gap-4" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
+                  <span class="step-num">3</span>
+                  <p class="font-sans pt-1.5" style="font-size: var(--text-base); color: var(--color-text); line-height: 1.5;">Score combos for bonus points</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="flex items-start gap-4" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
+                  <span class="step-num">4</span>
+                  <p class="font-sans pt-1.5" style="font-size: var(--text-base); color: var(--color-text); line-height: 1.5;">Don't let the grid fill up</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Best Played During -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-primary-lighter); box-shadow: var(--brutalist-shadow-sm); padding: 16px 20px;">
+              <div class="flex items-start gap-3">
+                <i data-lucide="clock" style="width: 20px; height: 20px; color: var(--color-primary); flex-shrink: 0; margin-top: 1px;" aria-hidden="true"></i>
+                <div class="flex flex-col gap-1">
+                  <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: 16px; color: var(--color-text); letter-spacing: -0.01em;">Best Played During</h3>
+                  <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6;">Quick 5-minute sessions between classes. Progress saves automatically — close the tab and pick up where you left off.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Comments section -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 24px;">
+              <div class="flex items-center gap-3 mb-5">
+                <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md);">
+                  <i data-lucide="message-square" style="width: 18px; height: 18px; color: var(--color-text-inverse);" aria-hidden="true"></i>
+                </span>
+                <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em;">Comments</h2>
+                <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-tertiary); margin-left: auto; white-space: nowrap;">3 comments</span>
+              </div>
+
+              <!-- Moderator note -->
+              <p class="font-sans" style="font-size: var(--text-xs); color: var(--color-text-tertiary); font-style: italic; margin-bottom: 16px; line-height: 1.5;">Be nice. Or don't. We're not your mom. But toxic comments get nuked. ¯\_(ツ)_/¯</p>
+
+              <!-- Comment input -->
+              <form class="mb-6" onsubmit="return false;">
+                <label for="comment-text" class="block font-sans mb-2" style="font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--color-text-secondary);">Leave a comment</label>
+                <textarea id="comment-text" class="comment-input w-full font-sans" style="min-height: 80px; padding: 12px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm); resize: vertical;" placeholder="Share your thoughts..." aria-label="Comment text"></textarea>
+                <div class="flex items-center justify-end gap-2 mt-2">
+                  <button type="button" class="flex items-center justify-center" style="height: 36px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform=''" onmouseout="this.style.transform=''" aria-label="Cancel">Cancel</button>
+                  <button type="submit" class="flex items-center justify-center gap-2" style="height: 36px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-primary); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text-inverse); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease, box-shadow 0.1s ease;" onmouseover="this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" aria-label="Post comment">
+                    <i data-lucide="send" style="width: 15px; height: 15px;" aria-hidden="true"></i>
+                    <span>Post</span>
+                  </button>
+                </div>
+              </form>
+
+              <!-- Comment list -->
+              <div class="flex flex-col gap-4">
+                <!-- Comment 1 -->
+                <div class="flex items-start gap-3" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
+                  <span class="flex shrink-0 items-center justify-center font-display" style="width: 40px; height: 40px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-primary); color: var(--color-text-inverse); font-weight: var(--weight-extrabold); font-size: var(--text-base);">G</span>
+                  <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text);">GameMaster92</span>
+                      <span class="font-sans" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">2 hours ago</span>
+                    </div>
+                    <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.6;">This game is addictive! Can't stop playing.</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <button type="button" class="like-btn" data-liked="false" aria-label="Like comment">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span class="like-count" style="font-variant-numeric: tabular-nums;">247</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Comment 2 -->
+                <div class="flex items-start gap-3" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
+                  <span class="flex shrink-0 items-center justify-center font-display" style="width: 40px; height: 40px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-primary); color: var(--color-text-inverse); font-weight: var(--weight-extrabold); font-size: var(--text-base);">P</span>
+                  <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text);">PuzzleQueen</span>
+                      <span class="font-sans" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">5 hours ago</span>
+                    </div>
+                    <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.6;">Best puzzle game I've found online. Love the combo system!</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <button type="button" class="like-btn" data-liked="false" aria-label="Like comment">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span class="like-count" style="font-variant-numeric: tabular-nums;">189</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Comment 3 -->
+                <div class="flex items-start gap-3" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
+                  <span class="flex shrink-0 items-center justify-center font-display" style="width: 40px; height: 40px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-primary); color: var(--color-text-inverse); font-weight: var(--weight-extrabold); font-size: var(--text-base);">B</span>
+                  <div class="flex flex-col gap-1.5 min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text);">BlockNinja</span>
+                      <span class="font-sans" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">1 day ago</span>
+                    </div>
+                    <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.6;">Finally beat my high score! 45,820 points!</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <button type="button" class="like-btn" data-liked="false" aria-label="Like comment">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span class="like-count" style="font-variant-numeric: tabular-nums;">156</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Load more -->
+              <div class="flex justify-center mt-5">
+                <button type="button" class="flex items-center justify-center gap-2" style="height: 36px; padding: 0 20px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease;" onmouseover="this.style.transform='translate(-1px,-1px)'" onmouseout="this.style.transform=''" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='translate(-1px,-1px)'">
+                  <i data-lucide="chevron-down" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+                  <span>Load More</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+          <!-- ===== END LEFT COLUMN ===== -->
+
+          <!-- ===== RIGHT COLUMN: Sidebar (30%) ===== -->
+          <aside class="lg:col-span-3 flex flex-col gap-6">
+
+            <!-- Game Info panel -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 20px;">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="info" style="width: 20px; height: 20px; color: var(--color-primary);" aria-hidden="true"></i>
+                <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-xl); color: var(--color-text); letter-spacing: -0.02em;">Game Info</h2>
+              </div>
+              <div class="flex flex-col">
+                <div class="info-row">
+                  <span class="info-label">Developer</span>
+                  <span class="info-value">PixelForge Studios</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Released</span>
+                  <span class="info-value">Jan 2026</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Plays</span>
+                  <span class="info-value" style="font-variant-numeric: tabular-nums;">2.4M</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Size</span>
+                  <span class="info-value">8 MB</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Updated</span>
+                  <span class="info-value">3 days ago</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Controls panel -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 20px;">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="keyboard" style="width: 20px; height: 20px; color: var(--color-primary);" aria-hidden="true"></i>
+                <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-xl); color: var(--color-text); letter-spacing: -0.02em;">Controls</h2>
+              </div>
+              <div class="flex flex-col">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
+                  <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Arrow Keys</b>: Move blocks left/right</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
+                  <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Space</b>: Drop block instantly</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
+                  <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Z</b>: Rotate counterclockwise</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
+                  <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">X</b>: Rotate clockwise</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0;">
+                  <i data-lucide="hand" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Swipe</b>: Drag blocks on mobile</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tags section -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 20px;">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="tag" style="width: 20px; height: 20px; color: var(--color-primary);" aria-hidden="true"></i>
+                <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-xl); color: var(--color-text); letter-spacing: -0.02em;">Tags</h3>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <span class="pill-tag">Puzzle</span>
+                <span class="pill-tag">Casual</span>
+                <span class="pill-tag">Single Player</span>
+                <span class="pill-tag">Mobile-friendly</span>
+              </div>
+            </div>
+
+            <!-- Share section -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 20px;">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="share-2" style="width: 20px; height: 20px; color: var(--color-primary);" aria-hidden="true"></i>
+                <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-xl); color: var(--color-text); letter-spacing: -0.02em;">Share</h3>
+              </div>
+              <div class="flex flex-col gap-2">
+                <button type="button" class="share-btn w-full">
+                  <i data-lucide="link" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+                  <span>Copy Link</span>
+                </button>
+                <button type="button" class="share-btn w-full">
+                  <i data-lucide="twitter" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+                  <span>Share to X</span>
+                </button>
+                <button type="button" class="share-btn w-full">
+                  <i data-lucide="message-circle" style="width: 16px; height: 16px;" aria-hidden="true"></i>
+                  <span>Share to Discord</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Mini leaderboard -->
+            <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 20px;">
+              <div class="flex items-center gap-2 mb-4">
+                <i data-lucide="trophy" style="width: 20px; height: 20px; color: var(--color-primary);" aria-hidden="true"></i>
+                <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-xl); color: var(--color-text); letter-spacing: -0.02em;">Top Scores</h3>
+              </div>
+              <div class="flex flex-col">
+                <div class="lb-row">
+                  <span class="lb-rank lb-rank-top">1</span>
+                  <span class="lb-name">ProGamer_X</span>
+                  <span class="lb-score">52,340 pts</span>
+                </div>
+                <div class="lb-row">
+                  <span class="lb-rank">2</span>
+                  <span class="lb-name">BlockMaster</span>
+                  <span class="lb-score">48,920 pts</span>
+                </div>
+                <div class="lb-row">
+                  <span class="lb-rank">3</span>
+                  <span class="lb-name">PuzzleKing</span>
+                  <span class="lb-score">45,820 pts</span>
+                </div>
+                <div class="lb-row">
+                  <span class="lb-rank">4</span>
+                  <span class="lb-name">GridWizard</span>
+                  <span class="lb-score">42,100 pts</span>
+                </div>
+                <div class="lb-row">
+                  <span class="lb-rank">5</span>
+                  <span class="lb-name">ComboQueen</span>
+                  <span class="lb-score">39,870 pts</span>
+                </div>
+              </div>
+              <p class="font-sans" style="font-size: var(--text-xs); color: var(--color-text-tertiary); font-style: italic; margin-top: 12px; line-height: 1.5;">Scores reset weekly. Because some of you have way too much free time.</p>
+            </div>
+
+          </aside>
+          <!-- ===== END RIGHT COLUMN ===== -->
+
+        </div>
+        <!-- END two-column layout -->
+      </div>
+    </section>
+
+    <!-- ========================== -->
+    <!-- RELATED GAMES (full width)  -->
+    <!-- ========================== -->
+    <section class="w-full reveal" style="padding-top: 16px; padding-bottom: 64px;">
+      <div class="mx-auto px-6" style="max-width: var(--max-width);">
+        <div class="flex items-center gap-3 mb-6">
+          <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md);">
+            <i data-lucide="gamepad-2" style="width: 18px; height: 18px; color: var(--color-text-inverse);" aria-hidden="true"></i>
+          </span>
+          <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em;">Related Games</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+          <!-- Card 1: Crystal Match -->
+          <article class="related-card flex flex-col">
+            <div class="relative w-full" style="aspect-ratio: 1 / 1; border-bottom: 2px solid var(--color-border); overflow: hidden; background: var(--color-surface-alt);">
+              <img src="../assets/game-puzzle.jpg" alt="Crystal Match puzzle game thumbnail" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-3 p-4">
+              <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-lg); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.2;">Crystal Match</h3>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="pill-tag" style="height: 24px; font-size: var(--text-xs); padding: 0 8px;">Puzzle</span>
+                <div class="flex items-center gap-0.5">
+                  <svg class="star-filled" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--color-text); margin-left: 2px;">4.6/5</span>
+                </div>
+              </div>
+              <button type="button" class="play-cta w-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                <span>PLAY</span>
+              </button>
+            </div>
+          </article>
+
+          <!-- Card 2: Bubble Pop -->
+          <article class="related-card flex flex-col">
+            <div class="relative w-full" style="aspect-ratio: 1 / 1; border-bottom: 2px solid var(--color-border); overflow: hidden; background: var(--color-surface-alt);">
+              <img src="../assets/game-action.jpg" alt="Bubble Pop action game thumbnail" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-3 p-4">
+              <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-lg); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.2;">Bubble Pop</h3>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="pill-tag" style="height: 24px; font-size: var(--text-xs); padding: 0 8px;">Action</span>
+                <div class="flex items-center gap-0.5">
+                  <svg class="star-filled" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--color-text); margin-left: 2px;">4.4/5</span>
+                </div>
+              </div>
+              <button type="button" class="play-cta w-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                <span>PLAY</span>
+              </button>
+            </div>
+          </article>
+
+          <!-- Card 3: Maze Runner -->
+          <article class="related-card flex flex-col">
+            <div class="relative w-full" style="aspect-ratio: 1 / 1; border-bottom: 2px solid var(--color-border); overflow: hidden; background: var(--color-surface-alt);">
+              <img src="../assets/game-racing.jpg" alt="Maze Runner racing game thumbnail" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-3 p-4">
+              <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-lg); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.2;">Maze Runner</h3>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="pill-tag" style="height: 24px; font-size: var(--text-xs); padding: 0 8px;">Racing</span>
+                <div class="flex items-center gap-0.5">
+                  <svg class="star-filled" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--color-text); margin-left: 2px;">4.7/5</span>
+                </div>
+              </div>
+              <button type="button" class="play-cta w-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                <span>PLAY</span>
+              </button>
+            </div>
+          </article>
+
+          <!-- Card 4: Tower Defense -->
+          <article class="related-card flex flex-col">
+            <div class="relative w-full" style="aspect-ratio: 1 / 1; border-bottom: 2px solid var(--color-border); overflow: hidden; background: var(--color-surface-alt);">
+              <img src="../assets/game-arcade.jpg" alt="Tower Defense strategy game thumbnail" class="w-full h-full object-cover">
+            </div>
+            <div class="flex flex-col gap-3 p-4">
+              <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-lg); color: var(--color-text); letter-spacing: -0.01em; line-height: 1.2;">Tower Defense</h3>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="pill-tag" style="height: 24px; font-size: var(--text-xs); padding: 0 8px;">Strategy</span>
+                <div class="flex items-center gap-0.5">
+                  <svg class="star-filled" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xs); color: var(--color-text); margin-left: 2px;">4.5/5</span>
+                </div>
+              </div>
+              <button type="button" class="play-cta w-full">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                <span>PLAY</span>
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+    <!-- END RELATED GAMES -->
+
+    <!-- ========================== -->
+    <!-- START FOOTER               -->
+    <!-- ========================== -->
+    <footer data-dom-id="site-footer" class="w-full" style="background: var(--color-text); color: var(--color-bg); border-top: 2px solid var(--color-primary);">
+      <div class="mx-auto px-6 py-12" style="max-width: var(--max-width);">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+
+          <!-- Column 1: About playsunblocked + social icons -->
+          <div class="flex flex-col gap-4">
+            <div class="flex items-center gap-2">
+              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--radius-md); color: var(--color-text-inverse);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="2" y="6" width="20" height="12" rx="4"/>
+                  <line x1="6" y1="12" x2="10" y2="12"/>
+                  <line x1="8" y1="10" x2="8" y2="14"/>
+                  <circle cx="15" cy="11" r="0.8" fill="currentColor" stroke="none"/>
+                  <circle cx="17.5" cy="13" r="0.8" fill="currentColor" stroke="none"/>
+                </svg>
+              </span>
+              <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-xl); letter-spacing: -0.02em;">playsunblocked</span>
+            </div>
+            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--leading-relaxed); color: var(--color-bg); opacity: 0.7;">
+              <span data-lang="en">Your daily dose of browser games. No downloads, no sign-ups — just instant play for casual gamers worldwide.</span><span data-lang="cn">每日精选浏览器小游戏。无需下载，无需注册——全球休闲玩家即开即玩。</span>
+            </p>
+            <!-- Social icons: geometric Lucide icons in bordered squares -->
+            <div class="flex items-center gap-3" role="navigation" aria-label="Social media">
+              <a href="#" data-dom-id="social-twitter" class="gh-social-btn" aria-label="Twitter / X">
+                <i data-lucide="twitter" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+              <a href="#" data-dom-id="social-discord" class="gh-social-btn" aria-label="Discord">
+                <i data-lucide="message-circle" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+              <a href="#" data-dom-id="social-youtube" class="gh-social-btn" aria-label="YouTube">
+                <i data-lucide="youtube" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+              <a href="#" data-dom-id="social-instagram" class="gh-social-btn" aria-label="Instagram">
+                <i data-lucide="instagram" style="width: 18px; height: 18px;" aria-hidden="true"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Column 2: Quick Links -->
+          <div class="flex flex-col gap-4">
+            <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-base); color: var(--color-primary); letter-spacing: -0.01em;">
+              <span data-lang="en">Quick Links</span><span data-lang="cn">快捷链接</span>
+            </h3>
+            <ul class="flex flex-col gap-3" role="list">
+              <li><a href="index-en.html" data-dom-id="footer-nav-home" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">Home</span><span data-lang="cn">首页</span></a></li>
+              <li><a href="games-en.html" data-dom-id="footer-nav-games" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">Games</span><span data-lang="cn">游戏</span></a></li>
+              <li><a href="games-en.html" data-dom-id="footer-nav-categories" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">Categories</span><span data-lang="cn">分类</span></a></li>
+              <li><a href="index-en.html" data-dom-id="footer-nav-about" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">About</span><span data-lang="cn">关于</span></a></li>
+              <li><a href="mailto:contact@playsunblocked.com" data-dom-id="footer-nav-contact" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">Contact</span><span data-lang="cn">联系我们</span></a></li>
+            </ul>
+          </div>
+
+          <!-- Column 3: Legal -->
+          <div class="flex flex-col gap-4">
+            <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-base); color: var(--color-primary); letter-spacing: -0.01em;">
+              <span data-lang="en">Legal</span><span data-lang="cn">法律信息</span>
+            </h3>
+            <ul class="flex flex-col gap-3" role="list">
+              <li><a href="#" data-dom-id="footer-privacy" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">Privacy Policy</span><span data-lang="cn">隐私政策</span></a></li>
+              <li><a href="#" data-dom-id="footer-terms" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">Terms of Service</span><span data-lang="cn">服务条款</span></a></li>
+              <li><a href="#" data-dom-id="footer-cookies" class="gh-footer-link font-sans" style="font-size: var(--text-sm);"><span data-lang="en">Cookie Policy</span><span data-lang="cn">Cookie 政策</span></a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Copyright bar -->
+        <div class="gh-footer-divider mt-10 flex flex-col items-start gap-3 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-bg); opacity: 0.6;">
+            © 2026 playsunblocked. <span data-lang="en">Play more, worry less.</span><span data-lang="cn">多玩少虑，快乐无限。</span>
+          </p>
+          <p class="font-mono" style="font-size: var(--text-xs); color: var(--color-bg); opacity: 0.4;">
+            <span data-lang="en">Made for casual gamers</span><span data-lang="cn">为休闲玩家打造</span>
+          </p>
+        </div>
+      </div>
+    </footer>
+    <!-- END FOOTER -->
+
+    <!-- ========================== -->
+    <!-- START SHELL SCRIPT         -->
+    <!-- ========================== -->
+    <script>
+      // Header scroll behavior — subtle gradient appears on scroll (not simple show/hide)
+      (function () {
+        var header = document.getElementById('site-header');
+        if (!header) return;
+        var ticking = false;
+        function onScroll() {
+          if (!ticking) {
+            window.requestAnimationFrame(function () {
+              header.setAttribute('data-scrolled', window.scrollY > 8 ? 'true' : 'false');
+              ticking = false;
+            });
+            ticking = true;
+          }
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+      })();
+
+      // Bilingual placeholder swap for CN pages
+      (function () {
+        if (document.documentElement.getAttribute('data-lang') === 'cn') {
+          document.querySelectorAll('[data-cn-placeholder]').forEach(function (el) {
+            el.setAttribute('placeholder', el.getAttribute('data-cn-placeholder'));
+          });
+        }
+      })();
+    </script>
+    <!-- END SHELL SCRIPT -->
+
+    <!-- ========================== -->
+    <!-- START PAGE SCRIPT           -->
+    <!-- ========================== -->
+    <script>
+      // ---- Scroll reveal via IntersectionObserver ----
+      (function () {
+        var reveals = document.querySelectorAll('.reveal');
+        if (!reveals.length) return;
+        if (!('IntersectionObserver' in window)) {
+          reveals.forEach(function (el) { el.setAttribute('data-visible', 'true'); });
+          return;
+        }
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.setAttribute('data-visible', 'true');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+        reveals.forEach(function (el) { observer.observe(el); });
+      })();
+
+      // ---- Comment like button toggle ----
+      (function () {
+        document.querySelectorAll('.like-btn').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var liked = btn.getAttribute('data-liked') === 'true';
+            var countEl = btn.querySelector('.like-count');
+            if (!countEl) return;
+            var count = parseInt(countEl.textContent, 10) || 0;
+            if (liked) {
+              btn.setAttribute('data-liked', 'false');
+              countEl.textContent = count - 1;
+            } else {
+              btn.setAttribute('data-liked', 'true');
+              countEl.textContent = count + 1;
+            }
+          });
+        });
+      })();
+
+      // ---- PLAY button: visual feedback on click ----
+      (function () {
+        var playBtn = document.querySelector('.play-btn');
+        if (!playBtn) return;
+        playBtn.addEventListener('click', function () {
+          // Brief scale pulse on click
+          playBtn.style.animation = 'none';
+          playBtn.style.transform = 'translate(-50%, -50%) scale(0.9)';
+          setTimeout(function () {
+            playBtn.style.animation = '';
+            playBtn.style.transform = '';
+          }, 150);
+        });
+      })();
+    </script>
+    <!-- END PAGE SCRIPT -->
+
+    </main>
+    <script>lucide.createIcons();</script>
+    <script src="../assets/games-data.js"></script>
+    <script>
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var slug = params.get('slug');
+  if (!slug || !window.PLAYSUNBLOCKED_GAMES) return;
+  var game = PLAYSUNBLOCKED_GAMES.bySlug(slug);
+  if (!game) {
+    var h1 = document.querySelector('h1');
+    if (h1) h1.innerHTML = 'Game not found. <a href="games-en.html" style="color:var(--color-primary);text-decoration:underline;">Browse all games</a>';
+    return;
+  }
+
+  document.title = game.title.en + ' - playsunblocked';
+
+  var crumb = document.querySelector('.crumb-current');
+  if (crumb) crumb.textContent = game.title.en;
+  var catLinks = document.querySelectorAll('.crumb-link');
+  if (catLinks[2]) catLinks[2].textContent = game.category;
+
+  var h1 = document.querySelector('h1');
+  if (h1) h1.textContent = game.title.en;
+
+  var pill = document.querySelector('.pill-tag-primary');
+  if (pill) pill.textContent = game.category;
+
+  var ratingEl = document.querySelector('[aria-label^="Rating"]');
+  if (ratingEl) {
+    ratingEl.innerHTML = PLAYSUNBLOCKED_GAMES.starsHtml(game.rating) + '<span class="font-display" style="font-weight:var(--weight-bold);font-size:var(--text-sm);color:var(--color-text);margin-left:4px;">' + game.rating + '/5</span>';
+    ratingEl.setAttribute('aria-label', 'Rating: ' + game.rating + ' out of 5');
+  }
+
+  var playsEl = document.querySelector('[style*="font-variant-numeric: tabular-nums"]');
+  if (playsEl) playsEl.textContent = game.plays + ' plays';
+
+  var stepsGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.gap-4');
+  if (stepsGrid && game.howToPlay && game.howToPlay.en) {
+    stepsGrid.innerHTML = game.howToPlay.en.map(function(step, i) {
+      return '<div class="flex items-start gap-4" style="padding:16px;border:2px solid var(--color-border);background:var(--color-surface-alt);">' +
+        '<span class="step-num">' + (i + 1) + '</span>' +
+        '<p class="font-sans pt-1.5" style="font-size:var(--text-base);color:var(--color-text);line-height:1.5;">' + step + '</p>' +
+        '</div>';
+    }).join('');
+  }
+
+  var bpd = document.querySelector('p[style*="color: var(--color-text-secondary); line-height: 1.6"]');
+  if (bpd) bpd.textContent = 'Perfect for ' + game.duration.en + ' sessions. No downloads, no sign-up — just open and play.';
+
+  var infoRows = document.querySelectorAll('.info-row');
+  if (infoRows.length >= 3) {
+    var playsInfo = infoRows[2].querySelector('.info-value');
+    if (playsInfo) playsInfo.textContent = game.plays;
+  }
+
+  var player = document.querySelector('[data-game-player]') || document.querySelector('[style*="aspect-ratio: 16 / 9"]');
+  if (player) {
+    player.innerHTML =
+      '<div id="player-overlay" class="player-overlay">' +
+        '<button type="button" class="play-btn absolute flex items-center justify-center" style="top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:var(--radius-full);" aria-label="Play ' + game.title.en + '">' +
+          '<svg width="32" height="32" viewBox="0 0 24 24" fill="var(--color-text-inverse)" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>' +
+        '</button>' +
+      '</div>' +
+      '<iframe id="game-iframe" class="player-iframe" style="display:none;" allow="autoplay;fullscreen;gamepad" allowfullscreen></iframe>' +
+      '<div class="absolute left-4 bottom-4 flex items-center gap-2">' +
+        '<span class="flex items-center justify-center" style="width:8px;height:8px;background:var(--state-success);border-radius:var(--radius-full);" aria-hidden="true"></span>' +
+        '<span class="font-display" style="font-weight:var(--weight-bold);font-size:var(--text-sm);color:var(--color-text-inverse);letter-spacing:0.02em;text-shadow:0 1px 4px rgba(0,0,0,0.5);">NOW PLAYING</span>' +
+      '</div>';
+
+    var overlay = document.getElementById('player-overlay');
+    var iframe = document.getElementById('game-iframe');
+    if (overlay && iframe) {
+      overlay.addEventListener('click', function() {
+        iframe.src = '../games/' + slug + '.html?lang=en';
+        iframe.style.display = 'block';
+        overlay.setAttribute('data-hidden', 'true');
+      });
+    }
+
+    var fsBtn = document.querySelector('button[aria-label="Fullscreen"]');
+    if (fsBtn && iframe) {
+      fsBtn.addEventListener('click', function() {
+        if (iframe.requestFullscreen) iframe.requestFullscreen();
+        else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+        else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
+      });
+    }
+  }
+
+  var relGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4');
+  if (relGrid) {
+    var related = PLAYSUNBLOCKED_GAMES.all.filter(function(g) {
+      return g.category === game.category && g.slug !== slug;
+    });
+    if (related.length < 4) {
+      var others = PLAYSUNBLOCKED_GAMES.all.filter(function(g) {
+        return g.category !== game.category && g.slug !== slug;
+      });
+      related = related.concat(others).slice(0, 4);
+    } else {
+      related = related.slice(0, 4);
+    }
+
+    relGrid.innerHTML = related.map(function(g) {
+      return '<article class="related-card flex flex-col">' +
+        '<div class="relative w-full" style="aspect-ratio:1/1;border-bottom:2px solid var(--color-border);overflow:hidden;">' +
+          PLAYSUNBLOCKED_GAMES.coverHtml(g) +
+        '</div>' +
+        '<div class="flex flex-col gap-3 p-4">' +
+          '<h3 class="font-display" style="font-weight:var(--weight-extrabold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;line-height:1.2;">' + g.title.en + '</h3>' +
+          '<div class="flex items-center gap-2 flex-wrap">' +
+            '<span class="pill-tag" style="height:24px;font-size:var(--text-xs);padding:0 8px;">' + g.category + '</span>' +
+            '<div class="flex items-center gap-0.5">' +
+              PLAYSUNBLOCKED_GAMES.starsHtml(g.rating) +
+              '<span class="font-display" style="font-weight:var(--weight-bold);font-size:var(--text-xs);color:var(--color-text);margin-left:2px;">' + g.rating + '/5</span>' +
+            '</div>' +
+          '</div>' +
+          '<a href="game-detail-en.html?slug=' + g.slug + '" class="play-cta w-full" style="text-decoration:none;">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>' +
+            '<span>PLAY</span>' +
+          '</a>' +
+        '</div>' +
+      '</article>';
+    }).join('');
+  }
+
+  if (window.lucide) lucide.createIcons();
+})();
+
+    </script>
+
+<script>
+// Language toggle: navigate between EN/CN page pairs
+(function() {
+  var btn = document.querySelector('[data-dom-id="lang-toggle"]');
+  if (!btn) return;
+  btn.addEventListener('click', function() {
+    var url = window.location.pathname;
+    var query = window.location.search;
+    var hash = window.location.hash;
+    if (url.indexOf('-en.html') !== -1) {
+      url = url.replace('-en.html', '-cn.html');
+    } else if (url.indexOf('-cn.html') !== -1) {
+      url = url.replace('-cn.html', '-en.html');
+    }
+    window.location.href = url + query + hash;
+  });
+})();
+</script>
+
+</body>
+</html>

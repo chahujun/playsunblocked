@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    'Mindloop | 念回路': 'Mindloop',
+    '点击中央发光核心（或这个按钮），让一道电流在网络里奔涌': 'Tap the glowing core (or this button) to send a pulse racing through the network',
+    '长出新的神经元节点，层级越高数值越猛': 'Sprout new neurons. Higher tiers pack a bigger punch',
+    '让电脉冲在连线上跑得更快': 'Make pulses travel faster along the wires',
+    '每个岔路口，一道信号裂成好几道同时跑': 'At every fork, one pulse splits into several and they all run at once',
+    '清空当前网络，把这一局累计的脑力换成奇点': 'Wipe the board. Turn your lifetime brain power into Singularity Points',
+    '环路里的电流永远不掉能量': 'Pulses keep their juice forever inside loops',
+    '所有脑力获取直接 ×2': 'All brain power gains x2',
+    '每 3 秒自动发射一道脉冲，解放双手': 'Fires a pulse every 3s, hands-free',
+    '所有 ×N 节点的倍率额外 +1': 'Every xN node gets +1 to its multiplier',
+    '需要累计脑力达到 100 万': 'Needs 1M lifetime brain power',
+    '重构心智（转生）': 'Rebuild Mind (Prestige)',
+    '▾ 点击发光的核心，发射一道脉冲 ▾': 'Tap the glowing core to fire a pulse',
+    '信号分裂': 'Signal Split',
+    '信号加速': 'Signal Speed',
+    '扩张网络': 'Grow Network',
+    '发射电脉冲': 'Fire Pulse',
+    '觉醒意识': 'Awaken',
+    '永不衰减': 'No Fade',
+    '脑力翻倍': 'Double Dip',
+    '自动放电': 'Auto-Fire',
+    '乘法强化': 'Multiplier Boost',
+    '累计脑力': 'Lifetime',
+    '可获得 ': "You'll gain ",
+    '数据面板': 'STATS',
+    '转生 // 基因': 'PRESTIGE // GENES',
+    '升级': 'UPGRADES',
+    '神经元': 'Neurons',
+    '连线': 'Links',
+    '脉冲': 'Pulses',
+    '奇点': 'Singularity',
+    '基因改造': 'GENE HACKS',
+    '脑力': 'Brain Power',
+    '念回路': 'MINDLOOP',
+    '已拥有': 'OWNED',
+    '超频': 'Overclock',
+    '消耗': 'Cost',
+    '级': 'Lv',
+    '/秒': '/sec'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    if (T[text.trim()]) return T[text.trim()];
+    var result = text;
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mindloop | 念回路</title>
+<style>
+/* ============================================================
+   MINDLOOP · HUD DESIGN SYSTEM
+   ============================================================ */
+:root{
+    --bg-deep:#03050f;
+    --bg-panel:rgba(8,16,38,0.72);
+    --bg-panel-hi:rgba(20,38,72,0.88);
+    --c-cyan:#7df9ff;
+    --c-cyan-dim:#4dd9ff;
+    --c-cyan-deep:#2a6fa5;
+    --c-magenta:#ff4dff;
+    --c-magenta-dim:#ff9dff;
+    --c-gold:#ffd166;
+    --c-green:#7dff9d;
+    --c-text-dim:#4a6fa5;
+    --c-border:rgba(125,249,255,0.18);
+    --c-border-hi:rgba(125,249,255,0.55);
+    --c-border-magenta:rgba(255,77,255,0.4);
+    --shadow-soft:0 4px 24px rgba(0,0,0,0.5),0 0 0 1px rgba(125,249,255,0.04) inset;
+    --shadow-glow:0 0 32px rgba(125,249,255,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+    background:var(--bg-deep);
+    overflow:hidden;
+    font-family:'JetBrains Mono','SF Mono','Courier New',monospace;
+    color:var(--c-cyan);
+    user-select:none;-webkit-user-select:none;
+    -webkit-font-smoothing:antialiased;
+}
+#game{display:block;position:fixed;top:0;left:0;cursor:crosshair}
+
+/* Subtle scan-line overlay across whole screen */
+#scan-overlay{
+    position:fixed;inset:0;pointer-events:none;z-index:5;
+    background:repeating-linear-gradient(180deg,transparent 0,transparent 3px,rgba(125,249,255,0.012) 3px,rgba(125,249,255,0.012) 4px);
+    mix-blend-mode:screen;
+}
+/* Vignette */
+#vignette{
+    position:fixed;inset:0;pointer-events:none;z-index:6;
+    background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.55) 100%);
+}
+
+/* UI Overlay */
+#ui{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10}
+#ui>*{pointer-events:auto}
+
+/* ===== HUD MODULE BASE (corner-bracket framed panels) ===== */
+.hud{
+    position:relative;
+    background:var(--bg-panel);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    border:1px solid var(--c-border);
+    box-shadow:var(--shadow-soft);
+}
+.hud::before,.hud::after{
+    content:"";position:absolute;width:14px;height:14px;
+    border:1.5px solid var(--c-cyan-dim);
+    pointer-events:none;
+}
+.hud::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.hud::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+.hud > .corner-tr,.hud > .corner-bl{
+    position:absolute;width:14px;height:14px;border:1.5px solid var(--c-cyan-dim);pointer-events:none;
+}
+.hud > .corner-tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+.hud > .corner-bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+
+/* Section header — small caps label + accent divider line */
+.sect-label{
+    display:flex;align-items:center;gap:8px;
+    font-size:9px;letter-spacing:3px;text-transform:uppercase;
+    color:var(--c-cyan-deep);
+    margin-bottom:8px;
+}
+.sect-label::before{
+    content:"";width:5px;height:5px;border-radius:50%;
+    background:var(--c-cyan-dim);
+    box-shadow:0 0 8px var(--c-cyan-dim);
+    animation:dotPulse 2s ease-in-out infinite;
+}
+.sect-label::after{
+    content:"";flex:1;height:1px;
+    background:linear-gradient(90deg,var(--c-border-hi),transparent);
+}
+@keyframes dotPulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
+
+/* ===== TOP BAR ===== */
+#top-bar{
+    position:absolute;top:14px;left:14px;right:14px;
+    display:grid;grid-template-columns:1fr auto 1fr;align-items:start;gap:24px;
+    pointer-events:none;
+}
+#top-bar > *{pointer-events:auto}
+#title-wrap{display:flex;flex-direction:column;gap:6px;padding:12px 18px}
+.title-mark{display:flex;align-items:center;gap:10px}
+.title-mark::before{
+    content:"";width:3px;height:28px;
+    background:linear-gradient(180deg,var(--c-cyan),var(--c-magenta));
+    box-shadow:0 0 12px var(--c-cyan);
+}
+#game-title{
+    font-size:22px;font-weight:900;letter-spacing:6px;line-height:1;
+    color:var(--c-cyan);
+    text-shadow:0 0 12px rgba(125,249,255,0.5);
+    animation:titlePulse 3.5s ease-in-out infinite;
+    font-variant-numeric:tabular-nums;
+}
+@keyframes titlePulse{
+    0%,100%{text-shadow:0 0 10px rgba(125,249,255,0.4),0 0 20px rgba(125,249,255,0.2)}
+    50%{text-shadow:0 0 16px rgba(125,249,255,0.7),0 0 32px rgba(125,249,255,0.4)}
+}
+#game-subtitle{
+    font-size:9px;letter-spacing:4px;color:var(--c-text-dim);
+    padding-left:13px;
+    display:flex;align-items:center;gap:8px;
+}
+#game-subtitle::before{content:"▸";color:var(--c-magenta-dim)}
+
+/* Hero energy display — center top */
+#energy-wrap{
+    display:flex;flex-direction:column;align-items:center;gap:2px;
+    padding:14px 32px 12px;min-width:240px;
+    background:linear-gradient(180deg,rgba(125,249,255,0.06),rgba(8,16,38,0.85));
+    border:1px solid var(--c-border);
+    position:relative;
+}
+#energy-wrap::before,#energy-wrap::after,
+#energy-wrap > .corner-tr,#energy-wrap > .corner-bl{
+    content:"";position:absolute;width:12px;height:12px;border:1.5px solid var(--c-cyan-dim);
+}
+#energy-wrap::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+#energy-wrap::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+#energy-wrap > .corner-tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+#energy-wrap > .corner-bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+#energy-label{
+    font-size:9px;letter-spacing:4px;text-transform:uppercase;
+    color:var(--c-text-dim);
+    display:flex;align-items:center;gap:6px;
+}
+#energy-label::before,#energy-label::after{
+    content:"";display:inline-block;width:18px;height:1px;
+    background:linear-gradient(90deg,transparent,var(--c-cyan-deep));
+}
+#energy-label::after{background:linear-gradient(90deg,var(--c-cyan-deep),transparent)}
+#energy-value{
+    font-size:34px;font-weight:900;letter-spacing:1px;line-height:1.1;
+    color:var(--c-cyan);
+    text-shadow:0 0 18px rgba(125,249,255,0.6),0 0 4px rgba(255,255,255,0.4);
+    font-variant-numeric:tabular-nums;
+    min-height:38px;
+    background:linear-gradient(180deg,#ffffff 0%,var(--c-cyan) 60%,var(--c-cyan-dim) 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;
+    filter:drop-shadow(0 0 12px rgba(125,249,255,0.6));
+}
+#eps-value{
+    font-size:10px;letter-spacing:1px;color:var(--c-cyan-dim);
+    opacity:0.85;font-variant-numeric:tabular-nums;
+    display:flex;align-items:center;gap:6px;
+}
+#eps-value::before{
+    content:"";width:6px;height:6px;border-radius:50%;
+    background:var(--c-green);box-shadow:0 0 8px var(--c-green);
+    animation:dotPulse 1.5s ease-in-out infinite;
+}
+
+/* Language toggle */
+#lang-toggle{
+    background:var(--bg-panel);
+    border:1px solid var(--c-border-hi);
+    color:var(--c-cyan);
+    padding:10px 14px;
+    font-family:inherit;font-size:11px;font-weight:bold;
+    cursor:pointer;letter-spacing:2px;
+    transition:all 0.25s cubic-bezier(.4,0,.2,1);
+    backdrop-filter:blur(14px);
+    position:relative;
+    justify-self:end;
+    display:flex;align-items:center;gap:8px;
+    overflow:hidden;
+}
+#lang-toggle::before{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(120deg,transparent 30%,rgba(125,249,255,0.15) 50%,transparent 70%);
+    transform:translateX(-100%);transition:transform 0.5s;
+}
+#lang-toggle:hover{
+    border-color:var(--c-cyan);
+    box-shadow:0 0 18px rgba(125,249,255,0.35);
+    color:#fff;
+}
+#lang-toggle:hover::before{transform:translateX(100%)}
+#lang-toggle .lang-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--c-magenta);box-shadow:0 0 8px var(--c-magenta);
+}
+
+/* ===== LEFT UPGRADE PANEL ===== */
+#upgrade-panel{
+    position:absolute;left:16px;top:104px;
+    display:flex;flex-direction:column;gap:10px;width:248px;
+}
+.upgrade-btn{
+    position:relative;
+    background:var(--bg-panel);
+    border:1px solid var(--c-border);
+    border-radius:2px;
+    padding:13px 14px 12px;
+    cursor:pointer;font-family:inherit;color:var(--c-cyan);
+    transition:all 0.25s cubic-bezier(.4,0,.2,1);
+    backdrop-filter:blur(14px);
+    display:flex;flex-direction:column;gap:6px;text-align:left;
+    overflow:hidden;
+}
+.upgrade-btn::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:linear-gradient(180deg,var(--c-cyan-dim),transparent);
+    opacity:0;transition:opacity 0.25s;
+}
+.upgrade-btn:hover{
+    border-color:var(--c-border-hi);
+    background:var(--bg-panel-hi);
+    box-shadow:0 6px 28px rgba(0,0,0,0.5),0 0 0 1px rgba(125,249,255,0.08) inset;
+    transform:translateX(2px);
+}
+.upgrade-btn:hover::before{opacity:1}
+.upgrade-btn:active{transform:translateX(2px) scale(0.99)}
+.upgrade-btn.disabled{opacity:0.4;cursor:not-allowed;filter:grayscale(0.5)}
+.upgrade-btn.disabled:hover{transform:none;border-color:var(--c-border);background:var(--bg-panel);box-shadow:none}
+.upgrade-btn.disabled::before{opacity:0}
+.btn-row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.btn-name{font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase}
+.btn-level{
+    font-size:9px;font-weight:bold;letter-spacing:1px;
+    color:var(--c-cyan-dim);
+    background:rgba(77,217,255,0.1);
+    border:1px solid rgba(77,217,255,0.25);
+    padding:2px 7px;border-radius:1px;
+    font-variant-numeric:tabular-nums;
+}
+.btn-desc{font-size:10px;color:var(--c-text-dim);line-height:1.5;letter-spacing:0.3px}
+.btn-cost{
+    display:flex;align-items:center;gap:6px;
+    font-size:11px;font-weight:bold;letter-spacing:0.5px;
+    color:var(--c-gold);
+    font-variant-numeric:tabular-nums;
+}
+.btn-cost::before{content:"◈";font-size:9px;opacity:0.8}
+.btn-cost.affordable{color:var(--c-green)}
+.btn-cost.affordable::before{color:var(--c-green)}
+
+/* Impulse trigger button — hero primary action */
+#btn-impulse{
+    border-color:var(--c-border-magenta);
+    background:linear-gradient(135deg,rgba(50,10,60,0.75),rgba(20,30,70,0.75));
+    padding:14px;
+    position:relative;
+}
+#btn-impulse::before{
+    content:"";position:absolute;inset:-1px;
+    background:linear-gradient(135deg,var(--c-magenta),var(--c-cyan),var(--c-magenta));
+    background-size:200% 200%;
+    opacity:0;transition:opacity 0.3s;
+    z-index:-1;animation:borderFlow 3s linear infinite;
+    border-radius:2px;
+}
+#btn-impulse:hover:not(.disabled){
+    border-color:var(--c-magenta);
+    box-shadow:0 0 24px rgba(255,77,255,0.4),0 0 0 1px rgba(255,77,255,0.2) inset;
+    transform:translateX(2px);
+}
+#btn-impulse .btn-name{color:var(--c-magenta-dim);text-shadow:0 0 8px rgba(255,77,255,0.5)}
+#btn-impulse::after{
+    content:"";position:absolute;right:10px;top:50%;transform:translateY(-50%);
+    width:8px;height:8px;border-radius:50%;
+    background:var(--c-magenta);box-shadow:0 0 12px var(--c-magenta);
+    animation:dotPulse 1.2s ease-in-out infinite;
+}
+@keyframes borderFlow{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+
+/* ===== BOTTOM-LEFT STATS ===== */
+#stats-panel{
+    position:absolute;left:16px;bottom:16px;
+    display:flex;flex-direction:column;gap:5px;
+    padding:14px 16px 14px 18px;width:248px;
+    background:var(--bg-panel);
+    border:1px solid var(--c-border);
+    backdrop-filter:blur(14px);
+    position:absolute;
+}
+#stats-panel::before,#stats-panel::after,
+#stats-panel > .corner-tr,#stats-panel > .corner-bl{
+    content:"";position:absolute;width:10px;height:10px;border:1.5px solid var(--c-cyan-deep);
+}
+#stats-panel::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+#stats-panel::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+#stats-panel > .corner-tr{top:-1px;right:-1px;border-left:none;border-bottom:none}
+#stats-panel > .corner-bl{bottom:-1px;left:-1px;border-right:none;border-top:none}
+.stats-header{
+    font-size:9px;letter-spacing:3px;text-transform:uppercase;
+    color:var(--c-cyan-deep);
+    margin-bottom:6px;padding-bottom:6px;
+    border-bottom:1px solid var(--c-border);
+    display:flex;align-items:center;gap:6px;
+}
+.stats-header::before{content:"◆";color:var(--c-cyan-dim);font-size:7px}
+.stat-row{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:20px;font-size:10px;letter-spacing:1px;
+    color:var(--c-text-dim);
+}
+.stat-val{
+    color:var(--c-cyan-dim);font-weight:bold;
+    font-variant-numeric:tabular-nums;
+    font-size:11px;
+}
+
+/* ===== PRESTIGE PANEL (bottom-right) ===== */
+#prestige-panel{
+    position:absolute;right:16px;bottom:16px;
+    display:flex;flex-direction:column;gap:10px;width:248px;
+}
+#sp-display{
+    background:linear-gradient(135deg,rgba(50,10,60,0.75),rgba(20,16,40,0.85));
+    border:1px solid var(--c-border-magenta);
+    padding:12px 16px;
+    color:var(--c-magenta-dim);
+    backdrop-filter:blur(14px);
+    display:flex;justify-content:space-between;align-items:center;
+    position:relative;
+    font-size:11px;letter-spacing:2px;text-transform:uppercase;
+}
+#sp-display::before{
+    content:"";position:absolute;top:-1px;left:-1px;width:10px;height:10px;
+    border:1.5px solid var(--c-magenta);border-right:none;border-bottom:none;
+}
+#sp-display::after{
+    content:"";position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;
+    border:1.5px solid var(--c-magenta);border-left:none;border-top:none;
+}
+#sp-value{
+    font-size:20px;font-weight:900;letter-spacing:1px;
+    color:var(--c-magenta);
+    text-shadow:0 0 12px rgba(255,77,255,0.6);
+    font-variant-numeric:tabular-nums;
+}
+#btn-prestige{
+    background:linear-gradient(135deg,rgba(60,15,70,0.7),rgba(30,20,50,0.85));
+    border:1px solid var(--c-border-magenta);
+    padding:14px;
+    cursor:pointer;font-family:inherit;color:var(--c-magenta-dim);
+    transition:all 0.3s cubic-bezier(.4,0,.2,1);
+    backdrop-filter:blur(14px);
+    text-align:left;
+    position:relative;
+    overflow:hidden;
+}
+#btn-prestige::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:linear-gradient(180deg,var(--c-magenta),transparent);
+    opacity:0.6;
+}
+#btn-prestige:hover:not(.disabled){
+    border-color:var(--c-magenta);
+    box-shadow:0 0 28px rgba(255,77,255,0.45),0 0 0 1px rgba(255,77,255,0.15) inset;
+    background:linear-gradient(135deg,rgba(80,20,90,0.85),rgba(40,20,60,0.9));
+    transform:translateY(-1px);
+}
+#btn-prestige.disabled{opacity:0.45;cursor:not-allowed;filter:grayscale(0.6)}
+.prestige-name{font-size:12px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;color:var(--c-magenta-dim);text-shadow:0 0 8px rgba(255,77,255,0.3)}
+.prestige-desc{font-size:10px;color:#aa7dca;line-height:1.5;letter-spacing:0.3px}
+.prestige-gain{
+    font-size:11px;color:var(--c-gold);margin-top:8px;font-weight:bold;
+    letter-spacing:0.5px;font-variant-numeric:tabular-nums;
+    padding-top:6px;border-top:1px dashed rgba(255,209,102,0.25);
+    display:flex;align-items:center;gap:6px;
+}
+.prestige-gain::before{content:"⟶";color:var(--c-gold);opacity:0.7}
+
+/* ===== GENE SHOP ===== */
+#gene-shop{display:flex;flex-direction:column;gap:5px}
+#gene-shop-title{
+    font-size:9px;letter-spacing:3px;text-transform:uppercase;
+    color:var(--c-cyan-deep);
+    margin-bottom:4px;
+    display:flex;align-items:center;gap:6px;
+}
+#gene-shop-title::before{
+    content:"";width:4px;height:4px;border-radius:50%;
+    background:var(--c-magenta);box-shadow:0 0 6px var(--c-magenta);
+}
+#gene-shop-title::after{
+    content:"";flex:1;height:1px;
+    background:linear-gradient(90deg,var(--c-border-hi),transparent);
+}
+.gene-btn{
+    background:rgba(8,16,38,0.6);
+    border:1px solid var(--c-border);
+    border-radius:1px;
+    padding:8px 11px;
+    cursor:pointer;font-family:inherit;color:var(--c-cyan);
+    transition:all 0.2s;text-align:left;font-size:11px;
+    display:flex;justify-content:space-between;align-items:center;
+    position:relative;overflow:hidden;
+}
+.gene-btn::before{
+    content:"";position:absolute;left:0;top:0;width:2px;height:100%;
+    background:var(--c-cyan-dim);opacity:0;transition:opacity 0.2s;
+}
+.gene-btn:hover:not(.owned):not(.disabled){
+    border-color:var(--c-border-hi);
+    background:rgba(20,38,72,0.8);
+    padding-left:13px;
+}
+.gene-btn:hover:not(.owned):not(.disabled)::before{opacity:1}
+.gene-btn.owned{
+    border-color:rgba(125,255,157,0.4);
+    background:rgba(20,40,30,0.6);
+    color:var(--c-green);
+    cursor:default;
+}
+.gene-btn.owned::before{opacity:1;background:var(--c-green)}
+.gene-btn.disabled{opacity:0.4;cursor:not-allowed}
+.gene-info{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.gene-name{font-weight:bold;font-size:11px;letter-spacing:0.8px}
+.gene-desc{font-size:9px;color:var(--c-text-dim);line-height:1.3;letter-spacing:0.2px}
+.gene-cost{
+    font-size:11px;color:var(--c-magenta);font-weight:bold;
+    white-space:nowrap;margin-left:10px;
+    font-variant-numeric:tabular-nums;
+    display:flex;align-items:center;gap:3px;
+}
+.gene-cost::before{content:"◈";font-size:8px;opacity:0.8}
+.gene-cost.owned-text{color:var(--c-green)}
+.gene-cost.owned-text::before{content:"✓";content:"✓";font-size:10px}
+
+/* ===== CLICK HINT ===== */
+#click-hint{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,90px);
+    font-size:11px;color:rgba(125,249,255,0.75);
+    letter-spacing:3px;text-align:center;
+    animation:hintFade 2.4s ease-in-out infinite;
+    pointer-events:none;
+    text-shadow:0 0 12px rgba(125,249,255,0.5);
+    text-transform:uppercase;
+    padding:8px 20px;
+    border-top:1px solid rgba(125,249,255,0.2);
+    border-bottom:1px solid rgba(125,249,255,0.2);
+    background:rgba(8,16,38,0.4);backdrop-filter:blur(6px);
+}
+@keyframes hintFade{0%,100%{opacity:0.35}50%{opacity:0.95}}
+#click-hint.hidden{display:none}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--c-border-hi);border-radius:0}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="scan-overlay"></div>
+<div id="vignette"></div>
+
+<div id="ui">
+    <div id="top-bar">
+        <div id="title-wrap" class="hud">
+            <span class="corner-tr"></span><span class="corner-bl"></span>
+            <div class="title-mark">
+                <div id="game-title"></div>
+            </div>
+            <div id="game-subtitle">v1.0 · A NEURAL IDLE GAME</div>
+        </div>
+        <div id="energy-wrap">
+            <span class="corner-tr"></span><span class="corner-bl"></span>
+            <div id="energy-label"></div>
+            <div id="energy-value">0</div>
+            <div id="eps-value"></div>
+        </div>
+        <button id="lang-toggle">
+            <span class="lang-dot"></span>
+            <span id="lang-text">EN / 简中</span>
+        </button>
+    </div>
+
+    <div id="upgrade-panel">
+        <div class="sect-label" id="sect-upgrades">SYS // UPGRADES</div>
+        <button class="upgrade-btn" id="btn-impulse">
+            <div class="btn-row"><span class="btn-name" id="impulse-name"></span></div>
+            <div class="btn-desc" id="impulse-desc"></div>
+        </button>
+        <button class="upgrade-btn" id="btn-axon">
+            <div class="btn-row"><span class="btn-name" id="axon-name"></span><span class="btn-level" id="axon-level">Lv 0</span></div>
+            <div class="btn-desc" id="axon-desc"></div>
+            <div class="btn-cost" id="axon-cost"></div>
+        </button>
+        <button class="upgrade-btn" id="btn-myelin">
+            <div class="btn-row"><span class="btn-name" id="myelin-name"></span><span class="btn-level" id="myelin-level">Lv 0</span></div>
+            <div class="btn-desc" id="myelin-desc"></div>
+            <div class="btn-cost" id="myelin-cost"></div>
+        </button>
+        <button class="upgrade-btn" id="btn-transmitter">
+            <div class="btn-row"><span class="btn-name" id="trans-name"></span><span class="btn-level" id="trans-level">Lv 0</span></div>
+            <div class="btn-desc" id="trans-desc"></div>
+            <div class="btn-cost" id="trans-cost"></div>
+        </button>
+    </div>
+
+    <div id="stats-panel">
+        <span class="corner-tr"></span><span class="corner-bl"></span>
+        <div class="stats-header" id="stats-header">TELEMETRY</div>
+        <div class="stat-row"><span id="stat-eps-label"></span><span class="stat-val" id="stat-eps">0</span></div>
+        <div class="stat-row"><span id="stat-nodes-label"></span><span class="stat-val" id="stat-nodes">0</span></div>
+        <div class="stat-row"><span id="stat-edges-label"></span><span class="stat-val" id="stat-edges">0</span></div>
+        <div class="stat-row"><span id="stat-impulses-label"></span><span class="stat-val" id="stat-impulses">0</span></div>
+        <div class="stat-row"><span id="stat-total-label"></span><span class="stat-val" id="stat-total">0</span></div>
+    </div>
+
+    <div id="prestige-panel">
+        <div class="sect-label" id="sect-singularity">SINGULARITY // GENES</div>
+        <div id="sp-display">
+            <span id="sp-label"></span>
+            <span id="sp-value">0</span>
+        </div>
+        <button id="btn-prestige">
+            <div class="prestige-name" id="prestige-name"></div>
+            <div class="prestige-desc" id="prestige-desc"></div>
+            <div class="prestige-gain" id="prestige-gain"></div>
+        </button>
+        <div id="gene-shop">
+            <div id="gene-shop-title"></div>
+            <button class="gene-btn" data-gene="noDecay"><div class="gene-info"><span class="gene-name" id="gene-noDecay-name"></span><span class="gene-desc" id="gene-noDecay-desc"></span></div><span class="gene-cost" id="gene-noDecay-cost"></span></button>
+            <button class="gene-btn" data-gene="doubleEnergy"><div class="gene-info"><span class="gene-name" id="gene-double-name"></span><span class="gene-desc" id="gene-double-desc"></span></div><span class="gene-cost" id="gene-double-cost"></span></button>
+            <button class="gene-btn" data-gene="autoImpulse"><div class="gene-info"><span class="gene-name" id="gene-auto-name"></span><span class="gene-desc" id="gene-auto-desc"></span></div><span class="gene-cost" id="gene-auto-cost"></span></button>
+            <button class="gene-btn" data-gene="overclock"><div class="gene-info"><span class="gene-name" id="gene-overclock-name"></span><span class="gene-desc" id="gene-overclock-desc"></span></div><span class="gene-cost" id="gene-overclock-cost"></span></button>
+            <button class="gene-btn" data-gene="boost"><div class="gene-info"><span class="gene-name" id="gene-boost-name"></span><span class="gene-desc" id="gene-boost-desc"></span></div><span class="gene-cost" id="gene-boost-cost"></span></button>
+        </div>
+    </div>
+
+    <div id="click-hint"></div>
+</div>
+
+<script>
+// ============================================================
+//  MINDLOOP — Neural Network Incremental Game
+//  单文件零依赖 · 图论脉冲传导 · 双语 · Web Audio
+// ============================================================
+
+// ===== CANVAS SETUP =====
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+let W = 0, H = 0, cx = 0, cy = 0, scaleFactor = 1;
+const RING_RADII_BASE = [0, 155, 275, 385, 480];
+let RING_RADII = RING_RADII_BASE;
+
+function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    cx = W / 2;
+    cy = H / 2;
+    scaleFactor = Math.max(0.55, Math.min(1.1, Math.min(W, H) / 950));
+    RING_RADII = RING_RADII_BASE.map(r => r * scaleFactor);
+    if (game.nodes) game.nodes.forEach(n => n.updatePos());
+    if (game.edges) game.edges.forEach(e => e.updateLen());
+}
+window.addEventListener('resize', resize);
+
+// ===== I18N =====
+const I18N = {
+    en: {
+        title: 'MINDLOOP',
+        energy: 'Brain Power',
+        impulse: 'Fire Pulse',
+        impulseDesc: 'Tap the glowing core (or this button) to send a pulse racing through the network',
+        axon: 'Grow Network',
+        axonDesc: 'Sprout new neurons. Higher tiers pack a bigger punch',
+        myelin: 'Signal Speed',
+        myelinDesc: 'Make pulses travel faster along the wires',
+        transmitter: 'Signal Split',
+        transDesc: 'At every fork, one pulse splits into several and they all run at once',
+        consciousness: 'Awaken',
+        rebirth: 'Rebuild Mind (Prestige)',
+        prestigeDesc: 'Wipe the board. Turn your lifetime brain power into Singularity Points',
+        prestigeReq: 'Needs 1M lifetime brain power',
+        prestigeGain: 'You\'ll gain ',
+        level: 'Lv',
+        cost: 'Cost',
+        eps: '/sec',
+        nodes: 'Neurons',
+        edges: 'Links',
+        impulses: 'Pulses',
+        totalEnergy: 'Lifetime',
+        singularity: 'Singularity',
+        genes: 'GENE HACKS',
+        geneNoDecay: 'No Fade',
+        geneNoDecayDesc: 'Pulses keep their juice forever inside loops',
+        geneDoubleEnergy: 'Double Dip',
+        geneDoubleEnergyDesc: 'All brain power gains ×2',
+        geneAutoImpulse: 'Auto-Fire',
+        geneAutoImpulseDesc: 'Fires a pulse every 3s, hands-free',
+        geneOverclock: 'Overclock',
+        geneOverclockDesc: 'Pulses move 50% faster',
+        geneBoost: 'Multiplier Boost',
+        geneBoostDesc: 'Every ×N node gets +1 to its multiplier',
+        clickHint: '▾ Tap the glowing core to fire a pulse ▾',
+        owned: 'OWNED',
+        langLabel: 'EN / 简中',
+        sectUpgrades: 'UPGRADES',
+        sectSingularity: 'PRESTIGE // GENES',
+        statsHeader: 'STATS',
+    },
+    zh: {
+        title: '念回路',
+        energy: '脑力',
+        impulse: '发射电脉冲',
+        impulseDesc: '点击中央发光核心（或这个按钮），让一道电流在网络里奔涌',
+        axon: '扩张网络',
+        axonDesc: '长出新的神经元节点，层级越高数值越猛',
+        myelin: '信号加速',
+        myelinDesc: '让电脉冲在连线上跑得更快',
+        transmitter: '信号分裂',
+        transDesc: '每个岔路口，一道信号裂成好几道同时跑',
+        consciousness: '觉醒意识',
+        rebirth: '重构心智（转生）',
+        prestigeDesc: '清空当前网络，把这一局累计的脑力换成奇点',
+        prestigeReq: '需要累计脑力达到 100 万',
+        prestigeGain: '可获得 ',
+        level: '级',
+        cost: '消耗',
+        eps: '/秒',
+        nodes: '神经元',
+        edges: '连线',
+        impulses: '脉冲',
+        totalEnergy: '累计脑力',
+        singularity: '奇点',
+        genes: '基因改造',
+        geneNoDecay: '永不衰减',
+        geneNoDecayDesc: '环路里的电流永远不掉能量',
+        geneDoubleEnergy: '脑力翻倍',
+        geneDoubleEnergyDesc: '所有脑力获取直接 ×2',
+        geneAutoImpulse: '自动放电',
+        geneAutoImpulseDesc: '每 3 秒自动发射一道脉冲，解放双手',
+        geneOverclock: '超频',
+        geneOverclockDesc: '脉冲移动速度 +50%',
+        geneBoost: '乘法强化',
+        geneBoostDesc: '所有 ×N 节点的倍率额外 +1',
+        clickHint: '▾ 点击发光的核心，发射一道脉冲 ▾',
+        owned: '已拥有',
+        langLabel: 'EN / 简中',
+        sectUpgrades: '升级',
+        sectSingularity: '转生 // 基因',
+        statsHeader: '数据面板',
+    }
+};
+let lang = 'en';
+const t = k => (I18N[lang][k] !== undefined ? I18N[lang][k] : k);
+
+// ===== AUDIO (Web Audio API) =====
+let audioCtx = null;
+let lastImpulseSound = 0;
+function initAudio() {
+    if (audioCtx) return;
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+}
+
+// Bandpass white-noise burst (0.05s) — electric crackle
+function playImpulseSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    if (now - lastImpulseSound < 0.04) return; // throttle
+    lastImpulseSound = now;
+    const sr = audioCtx.sampleRate;
+    const buf = audioCtx.createBuffer(1, sr * 0.05, sr);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const src = audioCtx.createBufferSource(); src.buffer = buf;
+    const bp = audioCtx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = 3;
+    const g = audioCtx.createGain();
+    g.gain.setValueAtTime(0.08, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    src.connect(bp); bp.connect(g); g.connect(audioCtx.destination);
+    src.start(now); src.stop(now + 0.05);
+}
+
+// Sine sweep 800→1600Hz — node activation chime
+let lastNodeSound = 0;
+function playNodeSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    if (now - lastNodeSound < 0.06) return;
+    lastNodeSound = now;
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.exponentialRampToValueAtTime(1600, now + 0.08);
+    g.gain.setValueAtTime(0.06, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc.connect(g); g.connect(audioCtx.destination);
+    osc.start(now); osc.stop(now + 0.12);
+}
+
+// Upgrade sound — double tone
+function playUpgradeSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [880, 1320].forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = f;
+        const t0 = now + i * 0.06;
+        g.gain.setValueAtTime(0.001, t0);
+        g.gain.exponentialRampToValueAtTime(0.1, t0 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.18);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(t0); osc.stop(t0 + 0.2);
+    });
+}
+
+// Prestige sound — ascending arpeggio
+function playPrestigeSound() {
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [523, 659, 784, 1047, 1319].forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = f;
+        const t0 = now + i * 0.08;
+        g.gain.setValueAtTime(0.001, t0);
+        g.gain.exponentialRampToValueAtTime(0.12, t0 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.4);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(t0); osc.stop(t0 + 0.45);
+    });
+}
+
+// ===== NUMBER FORMATTING =====
+const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+function fmt(n) {
+    if (!isFinite(n)) return '∞';
+    if (n < 0) return '-' + fmt(-n);
+    if (n < 10) return n.toFixed(2);
+    if (n < 1000) return n.toFixed(1);
+    let i = 0;
+    while (n >= 1000 && i < SUFFIXES.length - 1) { n /= 1000; i++; }
+    return n.toFixed(2) + SUFFIXES[i];
+}
+
+// ===== GAME STATE =====
+const game = {
+    energy: 0,
+    totalEnergy: 0,
+    axonDensity: 0,
+    myelinSpeed: 0,
+    transmitter: 0,
+    singularityPoints: 0,
+    totalPrestiges: 0,
+    genes: { noDecay: false, doubleEnergy: false, autoImpulse: false, overclock: false, boost: false },
+    nodes: [],
+    edges: [],
+    impulses: [],
+    mainNode: null,
+    energyThisSec: 0,
+    displayEPS: 0,
+    lastSecTime: 0,
+    lastAutoImpulse: 0,
+    firstClick: false,
+};
+
+const GENE_COSTS = { noDecay: 3, doubleEnergy: 5, autoImpulse: 4, overclock: 3, boost: 8 };
+const PRESTIGE_REQ = 1e6;
+const MAX_NODES = 45;
+const MAX_IMPUSES = 120;
+
+// ===== GRAPH: NODES & EDGES =====
+class NeuroNode {
+    constructor(ring, angle, type, effect) {
+        this.ring = ring;
+        this.angle = angle;
+        this.type = type; // 'main' | 'child'
+        this.effect = effect; // {type:'mul'|'add', value, label}
+        this.radius = (type === 'main' ? 26 : 15) * scaleFactor;
+        this.activation = 0;
+        this.scale = type === 'main' ? 1 : 0; // grow-in animation
+        this.outgoing = [];
+        this.x = 0; this.y = 0;
+        this.updatePos();
+    }
+    updatePos() {
+        const r = (RING_RADII[this.ring] || 0);
+        this.x = cx + Math.cos(this.angle) * r;
+        this.y = cy + Math.sin(this.angle) * r;
+        this.radius = (this.type === 'main' ? 26 : 15) * scaleFactor;
+    }
+}
+
+class Axon {
+    constructor(from, to) {
+        this.from = from;
+        this.to = to;
+        from.outgoing.push(this);
+        this.updateLen();
+        this.glow = 0;
+    }
+    updateLen() {
+        this.length = Math.max(1, Math.hypot(this.to.x - this.from.x, this.to.y - this.from.y));
+    }
+}
+
+function makeEffect(type, value) {
+    if (type === 'mul') return { type, value, label: '×' + (game.genes.boost ? value + 1 : value) };
+    return { type, value, label: '+' + fmt(value) };
+}
+
+function addNode(ring, angle, type, effect) {
+    const node = new NeuroNode(ring, angle, type, effect);
+    game.nodes.push(node);
+    return node;
+}
+
+function addEdge(from, to) {
+    // Avoid duplicate edges
+    for (const e of from.outgoing) if (e.to === to) return null;
+    const edge = new Axon(from, to);
+    game.edges.push(edge);
+    return edge;
+}
+
+function buildInitialGraph() {
+    game.nodes = [];
+    game.edges = [];
+    game.impulses = [];
+
+    // Main neuron at center
+    const main = addNode(0, 0, 'main', { type: 'add', value: 1, label: '◉' });
+    game.mainNode = main;
+
+    // Ring 1: 6 neurons in hexagon
+    const ring1 = [];
+    const r1Effects = [
+        ['mul', 2], ['add', 10], ['mul', 3], ['add', 25], ['mul', 2], ['add', 15]
+    ];
+    for (let i = 0; i < 6; i++) {
+        const ang = (i / 6) * Math.PI * 2 - Math.PI / 2;
+        const [et, ev] = r1Effects[i];
+        const node = addNode(1, ang, 'child', makeEffect(et, ev));
+        ring1.push(node);
+        addEdge(main, node);
+    }
+    // Hexagon loop: ring1[i] → ring1[i+1]
+    for (let i = 0; i < 6; i++) {
+        addEdge(ring1[i], ring1[(i + 1) % 6]);
+    }
+}
+
+// ===== IMPULSE SYSTEM =====
+class Impulse {
+    constructor(edge, value, hops = 0) {
+        this.edge = edge;
+        this.value = value;
+        this.progress = 0;
+        this.hops = hops;
+        this.trail = [];
+        this.alive = true;
+        this.life = 0;
+    }
+    getPos() {
+        const t = this.progress;
+        return {
+            x: this.edge.from.x + (this.edge.to.x - this.edge.from.x) * t,
+            y: this.edge.from.y + (this.edge.to.y - this.edge.from.y) * t,
+        };
+    }
+    update(dt, speed) {
+        this.life += dt;
+        this.progress += (speed * dt) / this.edge.length;
+        // Trail
+        const p = this.getPos();
+        this.trail.push({ x: p.x, y: p.y, life: 1 });
+        if (this.trail.length > 14) this.trail.shift();
+        for (const tr of this.trail) tr.life -= dt * 4;
+        this.trail = this.trail.filter(tr => tr.life > 0);
+
+        if (this.progress >= 1) this.onReach();
+    }
+    onReach() {
+        const node = this.edge.to;
+        const cameFrom = this.edge.from;
+        // Apply effect
+        const eff = node.effect;
+        let newVal = this.value;
+        if (eff.type === 'mul') {
+            const mul = game.genes.boost ? eff.value + 1 : eff.value;
+            newVal = this.value * mul;
+        } else {
+            newVal = this.value + eff.value;
+        }
+        this.value = newVal;
+        // Add energy
+        let gain = this.value;
+        if (game.genes.doubleEnergy) gain *= 2;
+        game.energy += gain;
+        game.totalEnergy += gain;
+        game.energyThisSec += gain;
+        // Visual + sound
+        node.activation = 1;
+        this.edge.glow = 1;
+        playNodeSound();
+        // Decay
+        if (!game.genes.noDecay) this.value *= 0.9;
+        this.hops++;
+        // Die conditions
+        if (this.value < 0.05 || this.hops > 60 || this.life > 12) {
+            this.alive = false;
+            return;
+        }
+        // Pick outgoing edges (don't immediately backtrack)
+        const avail = node.outgoing.filter(e => e.to !== cameFrom);
+        const choices = avail.length > 0 ? avail : node.outgoing;
+        if (choices.length === 0) { this.alive = false; return; }
+        // Split based on transmitter level
+        const splitCount = Math.min(choices.length, 1 + game.transmitter);
+        const shuffled = choices.slice().sort(() => Math.random() - 0.5);
+        const picked = shuffled.slice(0, splitCount);
+        // Reuse this impulse for first edge
+        this.edge = picked[0];
+        this.progress = 0;
+        // Create new impulses for the rest (respect cap)
+        for (let i = 1; i < picked.length; i++) {
+            if (game.impulses.length < MAX_IMPUSES) {
+                game.impulses.push(new Impulse(picked[i], this.value, this.hops));
+            }
+        }
+    }
+}
+
+function triggerImpulse() {
+    if (!audioCtx) initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if (!game.firstClick) {
+        game.firstClick = true;
+        document.getElementById('click-hint').classList.add('hidden');
+    }
+    // Create impulse on each outgoing edge of main node
+    const edges = game.mainNode.outgoing;
+    if (edges.length === 0) return;
+    const baseVal = 1;
+    for (const e of edges) {
+        if (game.impulses.length < MAX_IMPUSES) {
+            game.impulses.push(new Impulse(e, baseVal));
+        }
+    }
+    game.mainNode.activation = 1;
+    playImpulseSound();
+}
+
+// ===== UPGRADES =====
+function upgradeCost(base, level, mult) {
+    return Math.floor(base * Math.pow(mult, level));
+}
+
+function getAxonCost() { return upgradeCost(80, game.axonDensity, 2.8); }
+function getMyelinCost() { return upgradeCost(40, game.myelinSpeed, 1.9); }
+function getTransCost() { return upgradeCost(120, game.transmitter, 2.5); }
+
+// Axon density tiers — effects scale with level
+const AXON_TIERS = [
+    { mul: 4, add: 80 },
+    { mul: 5, add: 200 },
+    { mul: 7, add: 600 },
+    { mul: 10, add: 2000 },
+    { mul: 14, add: 6000 },
+    { mul: 18, add: 18000 },
+    { mul: 25, add: 50000 },
+    { mul: 35, add: 150000 },
+    { mul: 50, add: 500000 },
+    { mul: 70, add: 1500000 },
+];
+
+function buyAxon() {
+    const cost = getAxonCost();
+    if (game.energy < cost) return;
+    if (game.nodes.length >= MAX_NODES) return;
+    game.energy -= cost;
+    game.axonDensity++;
+    const level = game.axonDensity;
+    const tierIdx = Math.min(Math.floor((level - 1) / 2), AXON_TIERS.length - 1);
+    const tier = AXON_TIERS[tierIdx];
+    // Add 2 nodes
+    for (let i = 0; i < 2; i++) {
+        if (game.nodes.length >= MAX_NODES) break;
+        const isMul = (level + i) % 2 === 0;
+        const ev = isMul ? tier.mul + i : tier.add * (1 + i);
+        const eff = makeEffect(isMul ? 'mul' : 'add', ev);
+        // Determine ring
+        const ring = Math.min(1 + Math.floor(level / 2), 4);
+        // Find a free-ish angle on that ring
+        const existing = game.nodes.filter(n => n.ring === ring);
+        const angle = existing.length > 0
+            ? existing[existing.length - 1].angle + (Math.PI * 2 / Math.max(8, existing.length + 2))
+            : Math.random() * Math.PI * 2;
+        const node = addNode(ring, angle, 'child', eff);
+        // Connect from 2 random inner nodes
+        const inner = game.nodes.filter(n => n !== node && n.ring < ring);
+        if (inner.length > 0) {
+            const c1 = inner[Math.floor(Math.random() * inner.length)];
+            addEdge(c1, node);
+            if (inner.length > 1) {
+                const c2 = inner[Math.floor(Math.random() * inner.length)];
+                addEdge(c2, node);
+            }
+        } else {
+            addEdge(game.mainNode, node);
+        }
+        // Back-edge to create loop (connect new node to a random existing node)
+        const all = game.nodes.filter(n => n !== node && n !== game.mainNode);
+        if (all.length > 0) {
+            const target = all[Math.floor(Math.random() * all.length)];
+            addEdge(node, target);
+        }
+    }
+    playUpgradeSound();
+}
+
+function buyMyelin() {
+    const cost = getMyelinCost();
+    if (game.energy < cost) return;
+    game.energy -= cost;
+    game.myelinSpeed++;
+    playUpgradeSound();
+}
+
+function buyTransmitter() {
+    const cost = getTransCost();
+    if (game.energy < cost) return;
+    game.energy -= cost;
+    game.transmitter++;
+    playUpgradeSound();
+}
+
+// ===== PRESTIGE =====
+function canPrestige() {
+    return game.totalEnergy >= PRESTIGE_REQ;
+}
+
+function prestigeGain() {
+    if (game.totalEnergy < PRESTIGE_REQ) return 0;
+    return Math.floor(Math.sqrt(game.totalEnergy / PRESTIGE_REQ));
+}
+
+function doPrestige() {
+    if (!canPrestige()) return;
+    const gain = prestigeGain();
+    game.singularityPoints += gain;
+    game.totalPrestiges++;
+    // Reset
+    game.energy = 0;
+    game.totalEnergy = 0;
+    game.axonDensity = 0;
+    game.myelinSpeed = 0;
+    game.transmitter = 0;
+    game.impulses = [];
+    buildInitialGraph();
+    playPrestigeSound();
+}
+
+function buyGene(name) {
+    if (game.genes[name]) return;
+    const cost = GENE_COSTS[name];
+    if (game.singularityPoints < cost) return;
+    game.singularityPoints -= cost;
+    game.genes[name] = true;
+    // Re-label all mul nodes if boost
+    if (name === 'boost') {
+        game.nodes.forEach(n => {
+            if (n.effect.type === 'mul') n.effect.label = '×' + (n.effect.value + 1);
+        });
+    }
+    playUpgradeSound();
+}
+
+// ===== RENDERING =====
+let bgPhase = 0;
+
+function drawBackground(dt) {
+    bgPhase += dt * 0.3;
+    // Deep gradient
+    const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.7);
+    grd.addColorStop(0, '#0a1430');
+    grd.addColorStop(0.5, '#070b20');
+    grd.addColorStop(1, '#03050f');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle grid dots
+    ctx.fillStyle = 'rgba(125,249,255,0.04)';
+    const gap = 40;
+    const off = (bgPhase * 5) % gap;
+    for (let x = -off; x < W; x += gap) {
+        for (let y = -off; y < H; y += gap) {
+            ctx.fillRect(x, y, 1.5, 1.5);
+        }
+    }
+
+    // Concentric guide rings around the neural network center
+    ctx.strokeStyle = 'rgba(125,249,255,0.05)';
+    ctx.lineWidth = 1;
+    for (let r = 100; r < Math.max(W, H); r += 100) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // Cross-hair guide lines through center (very faint)
+    ctx.strokeStyle = 'rgba(125,249,255,0.04)';
+    ctx.setLineDash([4, 8]);
+    ctx.beginPath();
+    ctx.moveTo(0, cy); ctx.lineTo(W, cy);
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
+    ctx.stroke();
+    ctx.setLineDash([]);
+}
+
+function drawEdges(dt) {
+    for (const e of game.edges) {
+        e.glow *= 0.92;
+        const a = 0.12 + e.glow * 0.5;
+        // Base line
+        ctx.strokeStyle = `rgba(77,217,255,${a})`;
+        ctx.lineWidth = 1 + e.glow * 1.5;
+        ctx.beginPath();
+        ctx.moveTo(e.from.x, e.from.y);
+        ctx.lineTo(e.to.x, e.to.y);
+        ctx.stroke();
+        // Glow when active
+        if (e.glow > 0.1) {
+            ctx.strokeStyle = `rgba(125,249,255,${e.glow * 0.4})`;
+            ctx.lineWidth = 3 + e.glow * 4;
+            ctx.beginPath();
+            ctx.moveTo(e.from.x, e.from.y);
+            ctx.lineTo(e.to.x, e.to.y);
+            ctx.stroke();
+        }
+    }
+}
+
+function drawNodes(dt) {
+    const time = performance.now();
+    for (const n of game.nodes) {
+        // Grow-in
+        if (n.scale < 1) n.scale = Math.min(1, n.scale + dt * 3);
+        // Decay activation
+        n.activation *= 0.88;
+        const r = n.radius * n.scale;
+        if (r < 0.5) continue;
+
+        const isMain = n.type === 'main';
+        const baseCol = isMain ? '255,77,255' : '77,217,255';
+
+        // Outer glow
+        const glowR = r * 2.2 + n.activation * 25;
+        const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, glowR);
+        g.addColorStop(0, `rgba(${baseCol},${0.25 + n.activation * 0.5})`);
+        g.addColorStop(0.5, `rgba(${baseCol},${0.08 + n.activation * 0.2})`);
+        g.addColorStop(1, `rgba(${baseCol},0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, glowR, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Main neuron pulsing rings
+        if (isMain) {
+            const pulse = (Math.sin(time * 0.003) + 1) * 0.5;
+            for (let k = 0; k < 2; k++) {
+                const pr = r + 8 + k * 12 + pulse * 10;
+                ctx.strokeStyle = `rgba(255,77,255,${0.25 - k * 0.1 - pulse * 0.1})`;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, pr, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // Node body
+        ctx.fillStyle = `rgba(8,16,40,${0.8 + n.activation * 0.2})`;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Border
+        ctx.strokeStyle = `rgba(${baseCol},${0.7 + n.activation * 0.3})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Inner bright dot
+        ctx.fillStyle = `rgba(${baseCol},${0.4 + n.activation * 0.6})`;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Label
+        if (!isMain) {
+            ctx.fillStyle = `rgba(125,249,255,${0.85 + n.activation * 0.15})`;
+            ctx.font = `bold ${11 * scaleFactor}px Courier New`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(n.effect.label, n.x, n.y);
+        } else {
+            // Main neuron icon
+            ctx.fillStyle = `rgba(255,255,255,${0.8 + n.activation * 0.2})`;
+            ctx.font = `bold ${18 * scaleFactor}px Courier New`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('◉', n.x, n.y);
+        }
+    }
+}
+
+function drawImpulses(dt) {
+    for (const imp of game.impulses) {
+        // Trail
+        for (let i = 0; i < imp.trail.length; i++) {
+            const tr = imp.trail[i];
+            const a = tr.life * 0.6;
+            const sz = 1.5 + tr.life * 3;
+            ctx.fillStyle = `rgba(125,249,255,${a})`;
+            ctx.beginPath();
+            ctx.arc(tr.x, tr.y, sz, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // Main impulse head
+        const p = imp.getPos();
+        const headGlow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 14);
+        headGlow.addColorStop(0, 'rgba(255,255,255,1)');
+        headGlow.addColorStop(0.25, 'rgba(180,240,255,0.9)');
+        headGlow.addColorStop(0.6, 'rgba(77,217,255,0.4)');
+        headGlow.addColorStop(1, 'rgba(77,217,255,0)');
+        ctx.fillStyle = headGlow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 14, 0, Math.PI * 2);
+        ctx.fill();
+        // Bright core
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+// ===== UI UPDATE =====
+function updateUI() {
+    // Energy
+    document.getElementById('energy-label').textContent = t('energy');
+    document.getElementById('energy-value').textContent = fmt(game.energy);
+    document.getElementById('eps-value').textContent = '≈ ' + fmt(game.displayEPS) + ' ' + t('eps');
+
+    // Title
+    document.getElementById('game-title').textContent = t('title');
+    document.getElementById('click-hint').textContent = t('clickHint');
+    document.getElementById('lang-text').textContent = t('langLabel');
+    document.getElementById('sect-upgrades').textContent = t('sectUpgrades');
+    document.getElementById('sect-singularity').textContent = t('sectSingularity');
+    document.getElementById('stats-header').textContent = t('statsHeader');
+
+    // Impulse button
+    document.getElementById('impulse-name').textContent = t('impulse');
+    document.getElementById('impulse-desc').textContent = t('impulseDesc');
+
+    // Axon
+    const axonCost = getAxonCost();
+    document.getElementById('axon-name').textContent = t('axon');
+    document.getElementById('axon-desc').textContent = t('axonDesc');
+    document.getElementById('axon-level').textContent = t('level') + ' ' + game.axonDensity;
+    const axonCostEl = document.getElementById('axon-cost');
+    axonCostEl.textContent = '◈ ' + fmt(axonCost);
+    axonCostEl.className = 'btn-cost' + (game.energy >= axonCost && game.nodes.length < MAX_NODES ? ' affordable' : '');
+    document.getElementById('btn-axon').className = 'upgrade-btn' + (game.energy >= axonCost && game.nodes.length < MAX_NODES ? '' : ' disabled');
+
+    // Myelin
+    const myelinCost = getMyelinCost();
+    document.getElementById('myelin-name').textContent = t('myelin');
+    document.getElementById('myelin-desc').textContent = t('myelinDesc');
+    document.getElementById('myelin-level').textContent = t('level') + ' ' + game.myelinSpeed;
+    const myelinCostEl = document.getElementById('myelin-cost');
+    myelinCostEl.textContent = '◈ ' + fmt(myelinCost);
+    myelinCostEl.className = 'btn-cost' + (game.energy >= myelinCost ? ' affordable' : '');
+    document.getElementById('btn-myelin').className = 'upgrade-btn' + (game.energy >= myelinCost ? '' : ' disabled');
+
+    // Transmitter
+    const transCost = getTransCost();
+    document.getElementById('trans-name').textContent = t('transmitter');
+    document.getElementById('trans-desc').textContent = t('transDesc');
+    document.getElementById('trans-level').textContent = t('level') + ' ' + game.transmitter;
+    const transCostEl = document.getElementById('trans-cost');
+    transCostEl.textContent = '◈ ' + fmt(transCost);
+    transCostEl.className = 'btn-cost' + (game.energy >= transCost ? ' affordable' : '');
+    document.getElementById('btn-transmitter').className = 'upgrade-btn' + (game.energy >= transCost ? '' : ' disabled');
+
+    // Stats
+    document.getElementById('stat-eps-label').textContent = t('eps') + ':';
+    document.getElementById('stat-eps').textContent = fmt(game.displayEPS);
+    document.getElementById('stat-nodes-label').textContent = t('nodes') + ':';
+    document.getElementById('stat-nodes').textContent = game.nodes.length + '/' + MAX_NODES;
+    document.getElementById('stat-edges-label').textContent = t('edges') + ':';
+    document.getElementById('stat-edges').textContent = game.edges.length;
+    document.getElementById('stat-impulses-label').textContent = t('impulses') + ':';
+    document.getElementById('stat-impulses').textContent = game.impulses.length;
+    document.getElementById('stat-total-label').textContent = t('totalEnergy') + ':';
+    document.getElementById('stat-total').textContent = fmt(game.totalEnergy);
+
+    // Prestige
+    document.getElementById('sp-label').textContent = t('singularity');
+    document.getElementById('sp-value').textContent = game.singularityPoints;
+    document.getElementById('prestige-name').textContent = t('consciousness');
+    document.getElementById('prestige-desc').textContent = t('prestigeDesc');
+    const gain = prestigeGain();
+    const pGainEl = document.getElementById('prestige-gain');
+    const pBtn = document.getElementById('btn-prestige');
+    if (canPrestige()) {
+        pGainEl.textContent = t('prestigeGain') + gain + ' ' + t('singularity');
+        pBtn.className = '';
+    } else {
+        pGainEl.textContent = t('prestigeReq');
+        pBtn.className = 'disabled';
+    }
+
+    // Genes
+    document.getElementById('gene-shop-title').textContent = t('genes');
+    const geneMap = [
+        ['noDecay', 'gene-noDecay'],
+        ['doubleEnergy', 'gene-double'],
+        ['autoImpulse', 'gene-auto'],
+        ['overclock', 'gene-overclock'],
+        ['boost', 'gene-boost'],
+    ];
+    geneMap.forEach(([key, prefix]) => {
+        document.getElementById(prefix + '-name').textContent = t('gene' + key.charAt(0).toUpperCase() + key.slice(1));
+        document.getElementById(prefix + '-desc').textContent = t('gene' + key.charAt(0).toUpperCase() + key.slice(1) + 'Desc');
+        const costEl = document.getElementById(prefix + '-cost');
+        const btn = document.querySelector(`.gene-btn[data-gene="${key}"]`);
+        if (game.genes[key]) {
+            costEl.textContent = t('owned');
+            costEl.className = 'gene-cost owned-text';
+            btn.className = 'gene-btn owned';
+        } else {
+            costEl.textContent = '◈ ' + GENE_COSTS[key];
+            costEl.className = 'gene-cost';
+            btn.className = 'gene-btn' + (game.singularityPoints >= GENE_COSTS[key] ? '' : ' disabled');
+        }
+    });
+}
+
+// ===== INPUT =====
+canvas.addEventListener('click', (e) => {
+    const mx = e.clientX, my = e.clientY;
+    // Check if main neuron clicked
+    const dist = Math.hypot(mx - game.mainNode.x, my - game.mainNode.y);
+    if (dist <= game.mainNode.radius * 1.5) {
+        triggerImpulse();
+    }
+});
+
+document.getElementById('btn-impulse').addEventListener('click', triggerImpulse);
+document.getElementById('btn-axon').addEventListener('click', () => {
+    if (game.energy >= getAxonCost() && game.nodes.length < MAX_NODES) buyAxon();
+});
+document.getElementById('btn-myelin').addEventListener('click', () => {
+    if (game.energy >= getMyelinCost()) buyMyelin();
+});
+document.getElementById('btn-transmitter').addEventListener('click', () => {
+    if (game.energy >= getTransCost()) buyTransmitter();
+});
+document.getElementById('btn-prestige').addEventListener('click', () => {
+    if (canPrestige()) doPrestige();
+});
+
+document.querySelectorAll('.gene-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const g = btn.dataset.gene;
+        if (!game.genes[g] && game.singularityPoints >= GENE_COSTS[g]) buyGene(g);
+    });
+});
+
+document.getElementById('lang-toggle').addEventListener('click', () => {
+    lang = lang === 'en' ? 'zh' : 'en';
+    updateUI();
+});
+
+// ===== GAME LOOP =====
+let lastTime = performance.now();
+function loop(now) {
+    const dt = Math.min(0.05, (now - lastTime) / 1000);
+    lastTime = now;
+
+    // EPS tracking
+    if (now - game.lastSecTime >= 1000) {
+        game.displayEPS = game.energyThisSec;
+        game.energyThisSec = 0;
+        game.lastSecTime = now;
+    }
+
+    // Auto impulse
+    if (game.genes.autoImpulse) {
+        if (now - game.lastAutoImpulse >= 3000) {
+            game.lastAutoImpulse = now;
+            triggerImpulse();
+        }
+    }
+
+    // Conduction speed
+    let speed = 90 * (1 + game.myelinSpeed * 0.25);
+    if (game.genes.overclock) speed *= 1.5;
+
+    // Update impulses
+    for (let i = game.impulses.length - 1; i >= 0; i--) {
+        game.impulses[i].update(dt, speed);
+        if (!game.impulses[i].alive) game.impulses.splice(i, 1);
+    }
+
+    // Render
+    drawBackground(dt);
+    drawEdges(dt);
+    drawNodes(dt);
+    drawImpulses(dt);
+
+    // UI
+    updateUI();
+
+    requestAnimationFrame(loop);
+}
+
+// ===== INIT =====
+resize();
+buildInitialGraph();
+updateUI();
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

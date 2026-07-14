@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    'BREACH / 罐区失守': 'BREACH',
+    '罐区失守': 'BREACH',
+    'MK-Ⅱ · 实验室容器单元': 'MK-II · Lab Container Unit',
+    '药水存量：': 'Vial Capacity:',
+    '生命': 'HP',
+    '护盾': 'SHIELD',
+    '反应物：': 'Reactant:',
+    '水': 'WATER',
+    '当前层数：': 'Level:',
+    '尘埃：': 'DUST:',
+    '流速升级：': 'Drip Speed:',
+    '移动': 'Move',
+    '切换': 'Select',
+    '左键': 'LMB',
+    '泼洒': 'Spray',
+    '机构失守，泄漏淹没了地下层。你是最后一名技术员。泼洒试剂，引发连锁反应，找到防灾通行证，向更深处撤离。': 'A containment breach flooded the sub-levels. You are the last technician. Spray reagents, chain reactions, find the Evac Pass, descend deeper.',
+    '拿到防灾通行证才能开启隔断门。击杀敌人收集有机尘埃，在贩卖机处升级装备。': 'Find the Evacuation Pass to unlock the blast door. Kill foes to harvest Organic Dust. Spend it at vending units.',
+    '方向键': 'Arrow',
+    '切换试剂': 'Select Reagent',
+    '鼠标左键': 'Left Click',
+    '导电、灭火': 'conducts electricity, extinguishes fire',
+    '原油': 'Crude Oil',
+    '流速快，遇火成烈焰': 'flows fast, ignites into raging fire',
+    '强酸': 'Acid',
+    '腐蚀木箱铁门，熔化金属敌人': 'eats wood crates and iron doors, melts metal foes',
+    '开始': 'START',
+    '撤离成功': 'EVACUATION SUCCESS',
+    '收容失败': 'CONTAINMENT FAILED',
+    '你倒在了泄漏现场。': 'You collapsed in the leak.',
+    '本层清理完毕': 'LEVEL CLEAR',
+    '已获取防灾通行证': 'EVAC PASS ACQUIRED',
+    '隔断门已锁 — 请先找到防灾通行证': 'BLAST DOOR LOCKED — Find the Evac Pass',
+    '自动贩卖机': 'VENDING UNIT',
+    '分配元素：': 'Select Element:',
+    '喷射范围': 'Spray Range',
+    '药水容量': 'Vial Capacity',
+    '护盾电池': 'Shield Cell',
+    '流速': 'Drip Speed',
+    '喷射距离更远。': 'Throw reagents farther.',
+    '携带更多每种试剂。': 'Carry more of each reagent.',
+    '吸收一次伤害，每层恢复。': 'Absorb one hit. Recharges per level.',
+    '喷射速度更快。': 'Spray faster.',
+    '购买': 'BUY',
+    '已拥有': 'OWNED',
+    '不足': 'NOT ENOUGH',
+    '当前：': 'Cur:',
+    '尘埃': 'dust',
+    '离开': 'LEAVE',
+    '深入下一层': 'DESCEND',
+    '重试': 'RESTART',
+    '！！检测到重型单位！！': '!! HEAVY UNIT DETECTED !!',
+    '燃烧中': 'BURNING',
+    '触电中': 'SHOCKED',
+    '腐蚀中': 'MELTING',
+    '第 ': 'LEVEL ',
+    ' 层': ''
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    var result = text;
+    if (T[text.trim()]) return T[text.trim()];
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  function applyInternalLang() {
+    try { if (typeof LANG !== 'undefined') LANG = 'en'; } catch(e) {}
+    try { if (typeof applyLang === 'function') applyLang(); } catch(e) {}
+    init();
+  }
+  if (document.readyState !== 'loading') setTimeout(applyInternalLang, 0);
+  else document.addEventListener('DOMContentLoaded', function() { setTimeout(applyInternalLang, 0); });
+  setTimeout(applyInternalLang, 100);
+  setTimeout(applyInternalLang, 500);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BREACH / 罐区失守</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --screen-bg:#0a1410;
+    --screen-glow:#4ade80;
+    --amber:#fbbf24;
+    --amber-dim:#92611f;
+    --rust:#c2410c;
+    --bezel:#1a2418;
+    --bezel-hi:#2d3a28;
+    --lcd:#7ee08a;
+    --danger:#ef4444;
+    --water:#3b82f6;
+    --oil:#eab308;
+    --acid:#22c55e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{
+    height:100%;
+    background:#05080a;
+    font-family:'Share Tech Mono',monospace;
+    color:var(--lcd);
+    overflow:hidden;
+    user-select:none;
+  }
+  /* 老式化学测试仪外壳 */
+  #device{
+    position:relative;
+    width:100vw;height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(ellipse at 50% 30%, #1c2620 0%, #0a0e0c 70%),
+      repeating-linear-gradient(45deg, #0c100e 0 6px, #0a0e0c 6px 12px);
+  }
+  #device::before{
+    content:"";
+    position:absolute;inset:0;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(74,222,128,0.04), transparent 40%),
+      radial-gradient(circle at 80% 20%, rgba(251,191,36,0.04), transparent 40%);
+    pointer-events:none;
+  }
+  #bezel{
+    position:relative;
+    width:min(96vw, 1280px);
+    height:min(94vh, 820px);
+    background:linear-gradient(145deg,#232c22,#0f1410);
+    border-radius:18px;
+    padding:22px 26px 30px;
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,0.06),
+      inset 0 -3px 0 rgba(0,0,0,0.6),
+      0 24px 60px rgba(0,0,0,0.7),
+      0 0 0 2px #0a0d0b;
+  }
+  /* 仪器顶部铭牌 */
+  #nameplate{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:0 4px 10px;
+    border-bottom:1px dashed rgba(126,224,138,0.25);
+    margin-bottom:10px;
+    font-family:'VT323',monospace;
+  }
+  #nameplate .brand{
+    font-size:22px;letter-spacing:3px;color:var(--amber);
+    text-shadow:0 0 8px rgba(251,191,36,0.5);
+  }
+  #nameplate .model{font-size:14px;color:rgba(126,224,138,0.6);letter-spacing:2px;}
+  #langToggle{
+    background:transparent;border:1px solid rgba(126,224,138,0.4);
+    color:var(--lcd);font-family:'Share Tech Mono';font-size:12px;
+    padding:3px 10px;cursor:pointer;border-radius:3px;
+    letter-spacing:1px;
+  }
+  #langToggle:hover{background:rgba(126,224,138,0.12);}
+  /* 触屏显示区 */
+  #screen{
+    position:relative;
+    width:100%;height:calc(100% - 56px);
+    background:var(--screen-bg);
+    border-radius:6px;
+    overflow:hidden;
+    box-shadow:
+      inset 0 0 0 2px #061008,
+      inset 0 0 40px rgba(0,0,0,0.8),
+      inset 0 0 80px rgba(74,222,128,0.05);
+  }
+  /* CRT 扫描线 */
+  #screen::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(
+      0deg, rgba(0,0,0,0) 0 2px, rgba(0,0,0,0.18) 2px 3px
+    );
+    mix-blend-mode:multiply;z-index:50;
+  }
+  #screen::before{
+    content:"";position:absolute;inset:0;pointer-events:none;z-index:51;
+    background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+  }
+  canvas{display:block;width:100%;height:100%;image-rendering:pixelated;}
+  /* HUD 覆盖层 */
+  #hud{
+    position:absolute;left:0;right:0;top:0;z-index:40;
+    display:flex;justify-content:space-between;align-items:flex-start;
+    padding:10px 14px;pointer-events:none;
+    font-family:'Share Tech Mono';font-size:13px;
+  }
+  .hud-block{
+    background:rgba(8,18,12,0.78);
+    border:1px solid rgba(126,224,138,0.35);
+    border-radius:4px;padding:6px 10px;
+    backdrop-filter:blur(2px);
+    box-shadow:0 0 12px rgba(0,0,0,0.5);
+  }
+  .hud-block .label{color:rgba(126,224,138,0.6);font-size:11px;letter-spacing:1px;}
+  .hud-block .val{color:var(--amber);font-size:16px;font-family:'VT323';}
+  .vials{display:flex;gap:6px;margin-top:4px;}
+  .vial{
+    width:18px;height:30px;border:1px solid #555;border-radius:2px 2px 0 0;
+    position:relative;overflow:hidden;background:#0a0f0c;
+  }
+  .vial .fill{position:absolute;left:0;right:0;bottom:0;transition:height .15s;}
+  .vial.water .fill{background:var(--water);box-shadow:0 0 6px var(--water);}
+  .vial.oil  .fill{background:var(--oil);box-shadow:0 0 6px var(--oil);}
+  .vial.acid .fill{background:var(--acid);box-shadow:0 0 6px var(--acid);}
+  .vial.active{border-color:var(--amber);box-shadow:0 0 8px rgba(251,191,36,0.6);}
+  .vial .key{position:absolute;top:-2px;left:1px;font-size:9px;color:rgba(255,255,255,0.7);}
+  #reactantName{font-size:14px;color:var(--amber);font-family:'VT323';letter-spacing:1px;}
+  /* 生命/护盾条 */
+  #statusBar{display:flex;flex-direction:column;gap:4px;margin-top:4px;min-width:140px;}
+  .bar{height:8px;background:#0a0f0c;border:1px solid #333;border-radius:2px;overflow:hidden;position:relative;}
+  .bar .inner{height:100%;transition:width .2s;}
+  .bar.hp .inner{background:linear-gradient(90deg,#7f1d1d,#ef4444);}
+  .bar.sh .inner{background:linear-gradient(90deg,#1e3a8a,#60a5fa);}
+  .bar-label{font-size:10px;color:rgba(126,224,138,0.55);display:flex;justify-content:space-between;}
+  /* 中央覆盖：开始/结束/升级 */
+  #overlay{
+    position:absolute;inset:0;z-index:60;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:rgba(5,12,8,0.88);
+    text-align:center;padding:20px;
+  }
+  #overlay.hidden{display:none;}
+  #overlay h1{
+    font-family:'VT323';font-size:54px;letter-spacing:6px;color:var(--amber);
+    text-shadow:0 0 16px rgba(251,191,36,0.5), 0 0 2px var(--amber);
+    margin-bottom:6px;
+  }
+  #overlay h2{font-family:'VT323';font-size:30px;color:var(--lcd);margin-bottom:18px;letter-spacing:3px;}
+  #overlay p{font-size:14px;line-height:1.8;color:rgba(126,224,138,0.85);max-width:560px;margin-bottom:6px;}
+  #overlay .keys{font-size:12px;color:rgba(126,224,138,0.6);margin-top:14px;line-height:1.9;}
+  #overlay .keys b{color:var(--amber);}
+  .btn{
+    margin-top:22px;background:transparent;border:1px solid var(--amber);
+    color:var(--amber);font-family:'VT323';font-size:22px;letter-spacing:3px;
+    padding:8px 28px;cursor:pointer;border-radius:3px;
+    transition:all .15s;
+  }
+  .btn:hover{background:rgba(251,191,36,0.15);box-shadow:0 0 16px rgba(251,191,36,0.4);}
+  /* 升级商店 */
+  #shop{display:flex;gap:14px;margin-top:18px;flex-wrap:wrap;justify-content:center;}
+  .shop-item{
+    width:170px;background:rgba(10,20,14,0.8);
+    border:1px solid rgba(126,224,138,0.4);border-radius:5px;padding:12px;
+    cursor:pointer;transition:all .15s;
+  }
+  .shop-item:hover{border-color:var(--amber);background:rgba(251,191,36,0.08);}
+  .shop-item .si-name{color:var(--amber);font-family:'VT323';font-size:18px;letter-spacing:1px;}
+  .shop-item .si-desc{font-size:11px;color:rgba(126,224,138,0.7);margin:6px 0;min-height:32px;}
+  .shop-item .si-cost{color:var(--lcd);font-size:13px;}
+  .shop-item.disabled{opacity:0.4;cursor:not-allowed;}
+  /* 提示横幅 */
+  #banner{
+    position:absolute;left:50%;top:18%;transform:translateX(-50%);
+    z-index:45;background:rgba(8,18,12,0.9);border:1px solid var(--amber);
+    color:var(--amber);font-family:'VT323';font-size:22px;letter-spacing:2px;
+    padding:8px 22px;border-radius:4px;opacity:0;transition:opacity .3s;
+    pointer-events:none;text-shadow:0 0 8px rgba(251,191,36,0.5);
+  }
+  /* 升级面板里的元素选择/流速 */
+  #bottomHint{
+    position:absolute;left:0;right:0;bottom:0;z-index:40;
+    display:flex;justify-content:space-between;align-items:center;
+    padding:6px 14px;font-size:11px;color:rgba(126,224,138,0.55);
+    pointer-events:none;font-family:'Share Tech Mono';
+    border-top:1px dashed rgba(126,224,138,0.15);
+    background:rgba(5,10,7,0.5);
+  }
+  #bottomHint span b{color:var(--amber);}
+  .pulse{animation:pulse 1.4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:0.6}50%{opacity:1}}
+  /* 低血量红色边缘 */
+  #lowHpVignette{
+    position:absolute;inset:0;z-index:42;pointer-events:none;
+    box-shadow:inset 0 0 80px 20px rgba(239,68,68,0);
+    transition:box-shadow .3s;
+  }
+  #lowHpVignette.warn{
+    animation:lowHpPulse 1.1s ease-in-out infinite;
+  }
+  @keyframes lowHpPulse{
+    0%,100%{box-shadow:inset 0 0 60px 10px rgba(239,68,68,0.25);}
+    50%{box-shadow:inset 0 0 120px 30px rgba(239,68,68,0.5);}
+  }
+  /* Boss 血条 */
+  #bossBar{
+    position:absolute;left:50%;top:54px;transform:translateX(-50%);
+    z-index:43;width:340px;display:none;
+  }
+  #bossBar .lbl{
+    font-family:'VT323';font-size:14px;color:#ef4444;letter-spacing:2px;
+    text-shadow:0 0 6px rgba(239,68,68,0.6);text-align:center;margin-bottom:2px;
+  }
+  #bossBar .bar{
+    height:10px;background:#1a0606;border:1px solid #7f1d1d;border-radius:2px;overflow:hidden;
+  }
+  #bossBar .inner{height:100%;background:linear-gradient(90deg,#7f1d1d,#ef4444,#fca5a5);transition:width .2s;}
+</style>
+</head>
+<body>
+<div id="device">
+  <div id="bezel">
+    <div id="nameplate">
+      <div>
+        <span class="brand" id="brandTitle">罐区失守</span>
+        <span class="model" style="margin-left:14px;">MK-Ⅱ · 实验室容器单元</span>
+      </div>
+      <button id="langToggle">中文</button>
+    </div>
+    <div id="screen">
+      <canvas id="cv"></canvas>
+
+      <!-- HUD -->
+      <div id="hud">
+        <div class="hud-block">
+          <div class="label" id="lblVial">药水存量：</div>
+          <div class="vials">
+            <div class="vial water active" id="vialWater"><span class="key">1</span><div class="fill" style="height:80%"></div></div>
+            <div class="vial oil" id="vialOil"><span class="key">2</span><div class="fill" style="height:80%"></div></div>
+            <div class="vial acid" id="vialAcid"><span class="key">3</span><div class="fill" style="height:80%"></div></div>
+          </div>
+          <div id="statusBar">
+            <div>
+              <div class="bar-label"><span id="lblHp">生命</span><span id="hpTxt">100</span></div>
+              <div class="bar hp"><div class="inner" id="hpBar" style="width:100%"></div></div>
+            </div>
+            <div>
+              <div class="bar-label"><span id="lblShield">护盾</span><span id="shTxt">0</span></div>
+              <div class="bar sh"><div class="inner" id="shBar" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="hud-block" style="text-align:right;">
+          <div class="label" id="lblReactant">反应物：</div>
+          <div id="reactantName">水</div>
+          <div class="label" style="margin-top:6px;" id="lblLevel">当前层数：</div>
+          <div class="val" id="levelVal">1</div>
+          <div class="label" style="margin-top:6px;" id="lblDust">尘埃：</div>
+          <div class="val" id="dustVal" style="color:var(--lcd);">0</div>
+        </div>
+      </div>
+
+      <div id="bottomHint">
+        <span id="hintL"><b>WASD</b> 移动 · <b>1/2/3</b> 切换 · <b>左键</b> 泼洒</span>
+        <span id="hintR"><b id="lblDrip">流速升级：</b> <span id="dripVal">1.0×</span></span>
+      </div>
+
+      <div id="banner"></div>
+      <div id="lowHpVignette"></div>
+      <div id="bossBar"><div class="lbl" id="bossLbl">☣ HEAVY UNIT</div><div class="bar"><div class="inner" id="bossInner" style="width:100%"></div></div></div>
+
+      <div id="overlay">
+        <h1 id="ovTitle">罐区失守</h1>
+        <h2 id="ovSub"></h2>
+        <p id="ovDesc">机构失守，泄漏淹没了地下层。你是最后一名技术员。泼洒试剂，引发连锁反应，找到防灾通行证，向更深处撤离。</p>
+        <p id="ovDesc2" style="color:rgba(126,224,138,0.6);font-size:12px;">拿到防灾通行证才能开启隔断门。击杀敌人收集有机尘埃，在贩卖机处升级装备。</p>
+        <div class="keys" id="ovKeys">
+          <b>WASD / 方向键</b> — 移动 · <b>1 2 3</b> — 切换试剂 · <b>鼠标左键</b> — 泼洒<br>
+          <b>水</b> 导电、灭火<br>
+          <b>原油</b> 流速快，遇火成烈焰<br>
+          <b>强酸</b> 腐蚀木箱铁门，熔化金属敌人
+        </div>
+        <button class="btn" id="startBtn">开始</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   BREACH / 罐区失守
+   单文件 2D 俯视角流体沙盒 Rogue-lite
+   ===================================================================== */
+
+/* ---------- 1. I18n 双语封装 ---------- */
+const I18N = {
+  en:{
+    title:"BREACH", sub:"BREACH",
+    vialCap:"Vial Capacity:", reactant:"Reactant:", level:"Level:",
+    selectElement:"Select Element:", dripSpeed:"Drip Speed:",
+    evacSuccess:"EVACUATION SUCCESS",
+    hp:"HP", shield:"SHIELD", dust:"DUST:",
+    water:"WATER", oil:"CRUDE OIL", acid:"ACID",
+    start:"START", restart:"RESTART", continue:"DESCEND",
+    desc:"A containment breach flooded the sub-levels. You are the last technician. Spray reagents, chain reactions, find the Evac Pass, descend deeper.",
+    desc2:"Find the Evacuation Pass to unlock the blast door. Kill foes to harvest Organic Dust. Spend it at vending units.",
+    keys:"<b>WASD / Arrow</b> — Move · <b>1 2 3</b> — Select Reagent · <b>Left Click</b> — Spray<br><b>Water</b> conducts electricity, extinguishes fire<br><b>Crude Oil</b> flows fast, ignites into raging fire<br><b>Acid</b> eats wood crates and iron doors, melts metal foes",
+    hintL:"<b>WASD</b> move · <b>1/2/3</b> select · <b>LMB</b> spray",
+    dead:"CONTAINMENT FAILED", deadSub:"You collapsed in the leak.",
+    levelClear:"LEVEL CLEAR",
+    foundPass:"EVAC PASS ACQUIRED",
+    doorLocked:"BLAST DOOR LOCKED — Find the Evac Pass",
+    shopTitle:"VENDING UNIT", shopDust:"DUST:",
+    upgradeRange:"Range +", upgradeCap:"Vial Cap +", upgradeShield:"Shield +", upgradeSpeed:"Drip Speed +",
+    shopRange:"Spray Range", shopCap:"Vial Capacity", shopShield:"Shield Cell", shopSpeed:"Drip Speed",
+    shopRangeD:"Throw reagents farther.", shopCapD:"Carry more of each reagent.",
+    shopShieldD:"Absorb one hit. Recharges per level.", shopSpeedD:"Spray faster.",
+    buy:"BUY", owned:"OWNED", cant:"NOT ENOUGH",
+    cur:"Cur:", dustUnit:"dust", leave:"LEAVE", descend:"DESCEND",
+    bossWarn:"!! HEAVY UNIT DETECTED !!",
+    burning:"BURNING", shocked:"SHOCKED", melted:"MELTING"
+  },
+  zh:{
+    title:"罐区失守", sub:"罐区失守",
+    vialCap:"药水存量：", reactant:"反应物：", level:"当前层数：",
+    selectElement:"分配元素：", dripSpeed:"流速升级：",
+    evacSuccess:"撤离成功",
+    hp:"生命", shield:"护盾", dust:"尘埃：",
+    water:"水", oil:"原油", acid:"强酸",
+    start:"开始", restart:"重试", continue:"深入下一层",
+    desc:"机构失守，泄漏淹没了地下层。你是最后一名技术员。泼洒试剂，引发连锁反应，找到防灾通行证，向更深处撤离。",
+    desc2:"拿到防灾通行证才能开启隔断门。击杀敌人收集有机尘埃，在贩卖机处升级装备。",
+    keys:"<b>WASD / 方向键</b> — 移动 · <b>1 2 3</b> — 切换试剂 · <b>鼠标左键</b> — 泼洒<br><b>水</b> 导电、灭火<br><b>原油</b> 流速快，遇火成烈焰<br><b>强酸</b> 腐蚀木箱铁门，熔化金属敌人",
+    hintL:"<b>WASD</b> 移动 · <b>1/2/3</b> 切换 · <b>左键</b> 泼洒",
+    dead:"收容失败", deadSub:"你倒在了泄漏现场。",
+    levelClear:"本层清理完毕",
+    foundPass:"已获取防灾通行证",
+    doorLocked:"隔断门已锁 — 请先找到防灾通行证",
+    shopTitle:"自动贩卖机", shopDust:"尘埃：",
+    upgradeRange:"射程 +", upgradeCap:"容量 +", upgradeShield:"护盾 +", upgradeSpeed:"流速 +",
+    shopRange:"喷射射程", shopCap:"药水容量", shopShield:"护盾电池", shopSpeed:"流速升级",
+    shopRangeD:"泼洒距离更远。", shopCapD:"每种试剂携带更多。",
+    shopShieldD:"抵挡一次伤害，每层回复。", shopSpeedD:"泼洒更快。",
+    buy:"购买", owned:"已购", cant:"尘埃不足",
+    cur:"现：", dustUnit:"尘埃", leave:"离开", descend:"进入下一层",
+    bossWarn:"！！检测到重型单位！！",
+    burning:"燃烧中", shocked:"触电中", melted:"腐蚀中"
+  }
+};
+let LANG = "zh";
+function t(k){ return (I18N[LANG][k]!==undefined)?I18N[LANG][k]:k; }
+
+/* ---------- 2. 全局常量与画布 ---------- */
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W=0, H=0;
+const TILE = 26;                 // 格子像素
+const MAP_W = 56, MAP_H = 42;    // 逻辑地图格数
+let CAM = {x:0,y:0};
+
+function resize(){
+  const r = document.getElementById('screen').getBoundingClientRect();
+  cv.width = Math.floor(r.width);
+  cv.height = Math.floor(r.height);
+  W = cv.width; H = cv.height;
+}
+window.addEventListener('resize', resize);
+
+/* ---------- 3. 网格地图与流体 ---------- */
+// 格子类型
+const T_VOID=0, T_FLOOR=1, T_WALL=2, T_WOOD=3, T_IRON=4, T_DOOR=5;
+const L_NONE=0, L_WATER=1, L_OIL=2, L_ACID=3;
+
+let grid = [];        // grid[y][x] = {type, liquid, lqAmt, fire, elec, gas, hp}
+let gens = [];        // 发电机 {x,y}
+let passPos=null, doorPos=null, vendPos=null;
+let passPicked=false;
+
+function makeCell(type){
+  return {type, liquid:L_NONE, lqAmt:0, fire:0, elec:0, gas:0, hp: wallHP(type)};
+}
+function wallHP(type){
+  if(type===T_WOOD) return 40;
+  if(type===T_IRON) return 120;
+  if(type===T_WALL) return 9999;
+  return 0;
+}
+
+function idx(x,y){ return (y>=0&&y<MAP_H&&x>=0&&x<MAP_W)?grid[y][x]:null; }
+function isWalkable(x,y){
+  const c=idx(x,y); if(!c) return false;
+  if(c.type===T_WALL||c.type===T_VOID||c.type===T_IRON||c.type===T_DOOR) return false;
+  if(c.type===T_WOOD) return false;
+  return true;
+}
+
+/* ---------- 4. 关卡生成（房间+走廊） ---------- */
+const rooms = [];
+function genLevel(levelNum){
+  grid = []; rooms.length=0; gens=[]; passPicked=false;
+  for(let y=0;y<MAP_H;y++){
+    const row=[];
+    for(let x=0;x<MAP_W;x++) row.push(makeCell(T_WALL));
+    grid.push(row);
+  }
+  // 随机房间
+  const rc = 6 + Math.min(levelNum, 4);
+  let tries=0;
+  while(rooms.length<rc && tries<400){
+    tries++;
+    const rw = 5 + Math.floor(Math.random()*5);
+    const rh = 4 + Math.floor(Math.random()*4);
+    const rx = 1 + Math.floor(Math.random()*(MAP_W-rw-2));
+    const ry = 1 + Math.floor(Math.random()*(MAP_H-rh-2));
+    const nr = {x:rx,y:ry,w:rw,h:rh,cx:rx+(rw>>1),cy:ry+(rh>>1)};
+    let ok=true;
+    for(const r of rooms){
+      if(rx<=r.x+r.w+1 && rx+rw+1>=r.x && ry<=r.y+r.h+1 && ry+rh+1>=r.y){ok=false;break;}
+    }
+    if(!ok) continue;
+    rooms.push(nr);
+    for(let y=ry;y<ry+rh;y++) for(let x=rx;x<rx+rw;x++) grid[y][x].type=T_FLOOR;
+  }
+  // 兜底：若房间太少，强制补一个保证至少 3 个
+  while(rooms.length<3){
+    const rw=7, rh=5;
+    const rx=1+rooms.length*9, ry=1+rooms.length*0;
+    const safeRx=Math.min(rx, MAP_W-rw-2), safeRy=Math.max(1,Math.min(ry, MAP_H-rh-2));
+    const nr={x:safeRx,y:safeRy,w:rw,h:rh,cx:safeRx+(rw>>1),cy:safeRy+(rh>>1)};
+    rooms.push(nr);
+    for(let y=safeRy;y<safeRy+rh;y++) for(let x=safeRx;x<safeRx+rw;x++){
+      if(y>=0&&y<MAP_H&&x>=0&&x<MAP_W) grid[y][x].type=T_FLOOR;
+    }
+  }
+  // 连通房间
+  for(let i=1;i<rooms.length;i++){
+    const a=rooms[i-1], b=rooms[i];
+    carveCorridor(a.cx,a.cy,b.cx,b.cy);
+  }
+  // 放置：玩家出生在 room[0]
+  const startR=rooms[0], endR=rooms[rooms.length-1];
+  // 门放在 endR 中心
+  doorPos={x:endR.cx,y:endR.cy};
+  grid[endR.cy][endR.cx].type=T_DOOR;
+  // 通行证放在倒数第二个房间（安全索引）
+  const passIdx = Math.max(0, Math.min(rooms.length-2, rooms.length-1));
+  const passR = rooms[passIdx];
+  passPos={x:passR.cx,y:passR.cy};
+  if(grid[passR.cy][passR.cx].type!==T_FLOOR){
+    grid[passR.cy][passR.cx].type=T_FLOOR;
+  }
+  // 贩卖机：中间随机房间
+  if(rooms.length>3){
+    const vR = rooms[Math.floor(rooms.length/2)];
+    vendPos={x:vR.cx,y:vR.cy};
+  } else vendPos=null;
+  // 发电机：随机两个房间
+  const genRooms = [...rooms].sort(()=>Math.random()-0.5).slice(0,2);
+  for(const r of genRooms){
+    if(r===startR||r===endR) continue;
+    const gx=r.cx+ (Math.random()<0.5?-1:1);
+    const gy=r.cy;
+    if(idx(gx,gy)&&idx(gx,gy).type===T_FLOOR){
+      gens.push({x:gx,y:gy});
+    }
+  }
+  // 散落木箱（可被酸腐蚀）
+  let woodCount = 8 + levelNum*2;
+  while(woodCount-->0){
+    const r=rooms[Math.floor(Math.random()*rooms.length)];
+    const wx=r.x+1+Math.floor(Math.random()*(r.w-2));
+    const wy=r.y+1+Math.floor(Math.random()*(r.h-2));
+    if(grid[wy][wx].type===T_FLOOR && !(wx===startR.cx&&wy===startR.cy)){
+      grid[wy][wx]=makeCell(T_WOOD);
+    }
+  }
+  // 废料桶（铁质，可被酸腐蚀）
+  let barrelCount = 4 + levelNum;
+  while(barrelCount-->0){
+    const r=rooms[Math.floor(Math.random()*rooms.length)];
+    const wx=r.x+1+Math.floor(Math.random()*(r.w-2));
+    const wy=r.y+1+Math.floor(Math.random()*(r.h-2));
+    if(grid[wy][wx].type===T_FLOOR){
+      grid[wy][wx]=makeCell(T_IRON);
+      grid[wy][wx].hp=80;
+    }
+  }
+  // 出生点周围清空，避免玩家被木箱/桶卡死
+  for(let dy=-1;dy<=1;dy++){
+    for(let dx=-1;dx<=1;dx++){
+      const c=idx(startR.cx+dx, startR.cy+dy);
+      if(c && (c.type===T_WOOD||c.type===T_IRON)) c.type=T_FLOOR;
+    }
+  }
+  return {startR, endR};
+}
+function carveCorridor(x1,y1,x2,y2){
+  // L 型走廊
+  let x=x1,y=y1;
+  while(x!==x2){ x+= x2>x?1:-1; if(grid[y][x].type===T_WALL) grid[y][x].type=T_FLOOR; }
+  while(y!==y2){ y+= y2>y?1:-1; if(grid[y][x].type===T_WALL) grid[y][x].type=T_FLOOR; }
+}
+
+/* ---------- 5. 实体：玩家、敌人 ---------- */
+const player = {
+  x:0,y:0, vx:0,vy:0, r:9, speed:2.4,
+  hp:100, maxHp:100, shield:0, maxShield:0,
+  vials:[L_WATER,L_OIL,L_ACID],
+  cap:[60,60,60], cur:[60,60,60],
+  selected:0, range:3.2, drip:1.0,
+  dust:0, alive:true, hurtCd:0, sprayCd:0,
+  burning:0, shocked:0,
+  knockX:0, knockY:0, facing:0, trail:[]
+};
+let shakeX=0, shakeY=0, shakeMag=0;
+const enemies = [];
+const projectiles = [];
+const particles = [];
+const floats = []; // 飘字
+let levelNum=1;
+
+function spawnEnemies(startR){
+  enemies.length=0;
+  const base = 3 + levelNum;
+  for(let i=0;i<base;i++){
+    const r = rooms[1+Math.floor(Math.random()*(rooms.length-1))];
+    if(!r) continue;
+    const ex=r.x+1+Math.floor(Math.random()*(r.w-2));
+    const ey=r.y+1+Math.floor(Math.random()*(r.h-2));
+    const type = (Math.random()<0.55+levelNum*0.03)?'sentry':'iron';
+    spawnEnemy(ex*TILE+TILE/2, ey*TILE+TILE/2, type);
+  }
+  // Boss 每 3 层一只
+  if(levelNum%3===0){
+    const r = rooms[rooms.length-1];
+    if(r){
+      spawnEnemy(r.cx*TILE+TILE/2, r.cy*TILE+TILE/2, 'boss');
+      showBanner(t('bossWarn'), 2200);
+    }
+  }
+}
+function spawnEnemy(px,py,type){
+  const e={x:px,y:py,r:11,vx:0,vy:0,type,hp:0,maxHp:0,dmg:0,
+    hurtCd:0, burning:0, shocked:0, melted:0, shootCd:0, patrolT:0,
+    px:px,py:py, dir:Math.random()*Math.PI*2};
+  if(type==='iron'){ e.hp=e.maxHp=60+levelNum*8; e.dmg=14; e.speed=1.1; e.r=12; }
+  else if(type==='sentry'){ e.hp=e.maxHp=40+levelNum*5; e.dmg=10; e.speed=0.6; e.r=10; e.shootRange=260; }
+  else if(type==='boss'){ e.hp=e.maxHp=400+levelNum*40; e.dmg=26; e.speed=0.9; e.r=20; }
+  enemies.push(e);
+}
+
+/* ---------- 6. 流体物理更新 ---------- */
+function updateFluids(){
+  // 1) 液体流动：从高量向相邻低量流
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const c=grid[y][x];
+      if(c.lqAmt<=0) continue;
+      if(c.type===T_WALL||c.type===T_WOOD||c.type===T_IRON||c.type===T_DOOR) continue;
+      // 流向 4 邻
+      const flow = c.lqAmt * 0.18;
+      const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+      for(const [dx,dy] of dirs){
+        const n=idx(x+dx,y+dy);
+        if(!n) continue;
+        if(n.type===T_WALL||n.type===T_WOOD||n.type===T_IRON||n.type===T_VOID) continue;
+        if(n.type===T_DOOR) continue;
+        const diff = c.lqAmt - n.lqAmt;
+        if(diff>2){
+          const mv = Math.min(flow, diff*0.5);
+          // 同种液体才混合；不同液体接触触发反应（在反应阶段处理）
+          if(n.lqAmt===0 || n.liquid===c.liquid){
+            const tr = Math.min(mv, c.lqAmt);
+            c.lqAmt -= tr; n.lqAmt += tr; n.liquid = c.liquid;
+          }
+        }
+      }
+      // 蒸发/衰减
+      if(c.fire>0 && c.liquid===L_WATER){ c.lqAmt -= 8; if(c.lqAmt<=0){c.lqAmt=0;c.liquid=L_NONE;} }
+      if(c.lqAmt>0) c.lqAmt = Math.max(0, c.lqAmt - 0.02);
+      if(c.lqAmt<0.5){c.lqAmt=0;c.liquid=L_NONE;}
+    }
+  }
+  // 2) 火势蔓延与反应
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const c=grid[y][x];
+      // 火
+      if(c.fire>0){
+        c.fire -= 0.4;
+        // 点燃原油
+        if(c.liquid===L_OIL){
+          c.fire = Math.min(100, c.fire+18);
+          c.lqAmt -= 6; if(c.lqAmt<=0){c.lqAmt=0;c.liquid=L_NONE;}
+          // 火粒子
+          if(Math.random()<0.6) spawnParticle(x*TILE+TILE/2, y*TILE+TILE/2, 'fire');
+        }
+        // 烧木箱
+        if(c.type===T_WOOD){ c.hp -= 1.2; if(c.hp<=0){ c.type=T_FLOOR; spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'smoke'); } }
+        // 蔓延到邻居
+        if(c.fire>20){
+          const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+          for(const [dx,dy] of dirs){
+            const n=idx(x+dx,y+dy);
+            if(!n) continue;
+            if(n.liquid===L_OIL && n.fire<5) n.fire = 40;
+            else if(n.type===T_WOOD && Math.random()<0.05) n.fire = Math.max(n.fire,15);
+            else if(n.type===T_FLOOR && Math.random()<0.01) n.fire = Math.max(n.fire,8);
+          }
+        }
+        // 水灭火
+        if(c.liquid===L_WATER && c.lqAmt>5){ c.fire=0; spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'steam'); }
+        if(c.fire<=0) c.fire=0;
+      }
+      // 电传导
+      if(c.elec>0){
+        c.elec -= 0.15;
+        // 沿水传导
+        if(c.liquid===L_WATER){
+          const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+          for(const [dx,dy] of dirs){
+            const n=idx(x+dx,y+dy);
+            if(n && n.liquid===L_WATER && n.elec<5){ n.elec = 6; }
+          }
+        }
+        if(c.elec<=0) c.elec=0;
+      }
+      // 酸腐蚀
+      if(c.liquid===L_ACID && c.lqAmt>3){
+        if(c.type===T_WOOD){ c.hp-=0.8; if(Math.random()<0.3) spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'bubble'); }
+        else if(c.type===T_IRON){ c.hp-=0.4; if(Math.random()<0.3) spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'bubble'); }
+        if(c.hp<=0 && (c.type===T_WOOD||c.type===T_IRON)){ c.type=T_FLOOR; spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'smoke'); }
+        c.lqAmt -= 0.05; if(c.lqAmt<=0){c.lqAmt=0;c.liquid=L_NONE;}
+      }
+      // 毒气扩散（火产生毒气？这里让酸挥发少量毒气）
+      if(c.gas>0){
+        c.gas -= 0.05;
+        const dirs=[[1,0],[-1,0],[0,1],[0,-1]];
+        for(const [dx,dy] of dirs){
+          const n=idx(x+dx,y+dy);
+          if(n && n.type===T_FLOOR && n.gas<c.gas-1){ const mv=(c.gas-n.gas)*0.2; n.gas+=mv; c.gas-=mv; }
+        }
+      }
+    }
+  }
+  // 发电机持续带电
+  for(const g of gens){
+    const c=idx(g.x,g.y); if(c){ c.elec=10; }
+  }
+}
+
+/* ---------- 7. 粒子系统 ---------- */
+function spawnParticle(px,py,type){
+  let p={x:px,y:py,life:0,maxlife:1,vx:0,vy:0,r:2,col:'#fff',type};
+  if(type==='fire'){ p.vx=(Math.random()-0.5)*1.2; p.vy=-Math.random()*2-0.5; p.maxlife=30+Math.random()*15; p.r=3+Math.random()*3; p.col = Math.random()<0.5?'#fb923c':'#fbbf24'; }
+  else if(type==='steam'){ p.vx=(Math.random()-0.5)*0.8; p.vy=-Math.random()*1.5-0.3; p.maxlife=40; p.r=4+Math.random()*4; p.col='rgba(200,220,210,0.5)'; }
+  else if(type==='bubble'){ p.vx=(Math.random()-0.5)*0.5; p.vy=-Math.random()*1-0.2; p.maxlife=25; p.r=2+Math.random()*2; p.col='#86efac'; }
+  else if(type==='smoke'){ p.vx=(Math.random()-0.5)*0.6; p.vy=-Math.random()*0.8; p.maxlife=50; p.r=5+Math.random()*4; p.col='rgba(60,60,60,0.6)'; }
+  else if(type==='spark'){ p.vx=(Math.random()-0.5)*4; p.vy=(Math.random()-0.5)*4; p.maxlife=15; p.r=1.5; p.col='#67e8f9'; }
+  else if(type==='spray'){ p.vx=(Math.random()-0.5)*2; p.vy=(Math.random()-0.5)*2; p.maxlife=12; p.r=2; }
+  else if(type==='blood'){ p.vx=(Math.random()-0.5)*3; p.vy=(Math.random()-0.5)*3; p.maxlife=20; p.r=2; p.col='#7f1d1d'; }
+  p.life=p.maxlife;
+  particles.push(p);
+  if(particles.length>500) particles.splice(0,100);
+}
+function updateParticles(){
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx; p.y+=p.vy;
+    p.vy += (p.type==='fire'||p.type==='steam'||p.type==='smoke'||p.type==='bubble')? -0.02 : 0.05;
+    p.life--;
+    if(p.life<=0) particles.splice(i,1);
+  }
+}
+
+/* ---------- 8. 玩家逻辑 ---------- */
+const keys = {};
+let mouseDown=false, mouseWX=0, mouseWY=0;
+let doorLockCd=0, vendCd=0;
+
+function updatePlayer(){
+  if(!player.alive) return;
+  // 朝向（瞄准方向）
+  player.facing = Math.atan2(mouseWY-player.y, mouseWX-player.x);
+  // 移动
+  let mx=0,my=0;
+  if(keys['w']||keys['arrowup']) my-=1;
+  if(keys['s']||keys['arrowdown']) my+=1;
+  if(keys['a']||keys['arrowleft']) mx-=1;
+  if(keys['d']||keys['arrowright']) mx+=1;
+  if(mx||my){ const l=Math.hypot(mx,my); mx/=l; my/=l; }
+  player.vx = mx*player.speed;
+  player.vy = my*player.speed;
+  // 击退衰减与应用
+  if(Math.abs(player.knockX)>0.1||Math.abs(player.knockY)>0.1){
+    movePlayerAxis(player.knockX,0);
+    movePlayerAxis(0,player.knockY);
+    player.knockX*=0.8; player.knockY*=0.8;
+  } else { player.knockX=0; player.knockY=0; }
+  // 碰撞
+  movePlayerAxis(player.vx,0);
+  movePlayerAxis(0,player.vy);
+  // 移动残影
+  if((mx||my) && (performance.now()-(player._lastTrail||0)>60){
+    player.trail.push({x:player.x,y:player.y,life:14});
+    player._lastTrail=performance.now();
+    if(player.trail.length>6) player.trail.shift();
+  }
+  for(let i=player.trail.length-1;i>=0;i--){ player.trail[i].life--; if(player.trail[i].life<=0) player.trail.splice(i,1); }
+  // 状态衰减
+  if(player.burning>0){ player.burning--; player.hp -= 0.15; if(Math.random()<0.2) spawnParticle(player.x,player.y,'fire'); if(player.burning%30===0) sfx('burn'); }
+  if(player.shocked>0){ player.shocked--; player.hp -= 0.1; }
+  if(player.hurtCd>0) player.hurtCd--;
+  if(player.sprayCd>0) player.sprayCd--;
+  // 震屏衰减
+  if(shakeMag>0.1){ shakeMag*=0.85; } else { shakeMag=0; }
+  shakeX = (Math.random()-0.5)*shakeMag; shakeY=(Math.random()-0.5)*shakeMag;
+  // 站在火/电/酸/毒格上受伤
+  const gx = Math.floor(player.x/TILE), gy=Math.floor(player.y/TILE);
+  const c=idx(gx,gy);
+  if(c){
+    if(c.fire>5 && player.hurtCd<=0){ damagePlayer(6,'fire'); }
+    if(c.elec>0 && c.liquid===L_WATER && player.hurtCd<=0){ damagePlayer(4,'shock'); player.shocked=20; }
+    if(c.liquid===L_ACID && c.lqAmt>5 && player.hurtCd<=0){ damagePlayer(3,'acid'); }
+    if(c.gas>5 && player.hurtCd<=0){ damagePlayer(2,'gas'); }
+  }
+  // 泼洒
+  if(mouseDown && player.sprayCd<=0){
+    spray();
+  }
+  // 拾取通行证
+  if(!passPicked && passPos){
+    if(Math.hypot(player.x-passPos.x*TILE-TILE/2, player.y-passPos.y*TILE-TILE/2)<18){
+      passPicked=true;
+      showBanner(t('foundPass'),1800);
+      sfx('pickup');
+    }
+  }
+  // 接触门
+  if(doorPos){
+    const dC=Math.hypot(player.x-doorPos.x*TILE-TILE/2, player.y-doorPos.y*TILE-TILE/2);
+    if(dC<22){
+      if(passPicked){
+        grid[doorPos.y][doorPos.x].type=T_FLOOR;
+        doorPos=null;
+        enterShop();
+        return;
+      } else {
+        if(doorLockCd<=0){ showBanner(t('doorLocked'),1400); doorLockCd=120; sfx('empty'); }
+      }
+    }
+  }
+  if(doorLockCd>0) doorLockCd--;
+  // 接触贩卖机
+  if(vendCd>0) vendCd--;
+  if(vendPos && vendCd<=0 && Math.hypot(player.x-vendPos.x*TILE-TILE/2, player.y-vendPos.y*TILE-TILE/2)<22){
+    if(!shopOpen){ enterShop(true); }
+  }
+}
+function movePlayerAxis(dx,dy){
+  if(dx===0&&dy===0) return;
+  const nx=player.x+dx, ny=player.y+dy;
+  // 碰撞半径略小于视觉半径，留出滑墙余量，避免斜推墙角卡死
+  const r=player.r-2;
+  const minGx=Math.floor((nx-r)/TILE), maxGx=Math.floor((nx+r)/TILE);
+  const minGy=Math.floor((ny-r)/TILE), maxGy=Math.floor((ny+r)/TILE);
+  let ok=true;
+  for(let gy=minGy;gy<=maxGy;gy++){
+    for(let gx=minGx;gx<=maxGx;gx++){
+      if(!isWalkable(gx,gy)){ ok=false; break; }
+    }
+    if(!ok) break;
+  }
+  if(ok){ if(dx)player.x=nx; if(dy)player.y=ny; }
+}
+function damagePlayer(amt,src){
+  if(player.hurtCd>0) return;
+  // 先扣护盾
+  if(player.shield>0){
+    player.shield-=amt;
+    if(player.shield<0){ player.hp+=player.shield; player.shield=0; }
+  } else {
+    player.hp -= amt;
+  }
+  player.hurtCd=30;
+  shakeMag = Math.max(shakeMag, 6);
+  sfx('hurt');
+  spawnFloat(player.x,player.y-12, '-'+Math.round(amt), '#ef4444');
+  // 受击粒子
+  for(let i=0;i<5;i++) spawnParticle(player.x,player.y,'blood');
+  if(src==='fire') player.burning=120;
+  if(player.hp<=0){ player.hp=0; player.alive=false; onDeath(); }
+}
+function spray(){
+  if(player.cur[player.selected]<=0) { sfx('empty'); return; }
+  // 计算目标格（世界坐标→格）
+  const wx=mouseWX, wy=mouseWY;
+  const dist=Math.hypot(wx-player.x, wy-player.y);
+  const maxRange=player.range*TILE;
+  let tx=wx,ty=wy;
+  if(dist>maxRange){ tx=player.x+(wx-player.x)*maxRange/dist; ty=player.y+(wy-player.y)*maxRange/dist; }
+  const gx=Math.floor(tx/TILE), gy=Math.floor(ty/TILE);
+  const c=idx(gx,gy);
+  if(!c) return;
+  if(c.type===T_WALL||c.type===T_VOID){ return; }
+  // 泼洒量
+  const amt = Math.min(player.cur[player.selected], 14);
+  player.cur[player.selected]-=amt;
+  player.sprayCd = Math.max(4, Math.floor(10/player.drip));
+  // 液体落地
+  if(c.liquid===L_NONE || c.liquid===player.vials[player.selected]){
+    c.liquid=player.vials[player.selected];
+    c.lqAmt = Math.min(100, c.lqAmt+amt);
+  } else {
+    // 不同液体接触：水+油=不反应；水+酸=稀释；油+酸=不反应；简化为覆盖
+    c.liquid=player.vials[player.selected];
+    c.lqAmt = Math.min(100, c.lqAmt+amt);
+  }
+  // 喷射粒子
+  for(let i=0;i<6;i++) spawnParticle(tx,ty,'spray');
+  // 立即触发部分反应
+  if(c.liquid===L_OIL){
+    // 检查附近是否有火
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const n=idx(gx+dx,gy+dy);
+      if(n&&n.fire>5){ c.fire=60; break; }
+    }
+  }
+  if(c.liquid===L_WATER){
+    // 接触电
+    for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){
+      const n=idx(gx+dx,gy+dy);
+      if(n&&n.elec>0){ c.elec=6; break; }
+    }
+  }
+  sfx('spray');
+}
+
+/* ---------- 9. 敌人 AI ---------- */
+function updateEnemies(){
+  for(let i=enemies.length-1;i>=0;i--){
+    const e=enemies[i];
+    if(e.hp<=0){
+      // 死亡
+      player.dust += (e.type==='boss'?50:(e.type==='sentry'?8:12));
+      spawnFloat(e.x,e.y,'+'+(e.type==='boss'?50:(e.type==='sentry'?8:12))+' dust','#fbbf24');
+      for(let k=0;k<14;k++) spawnParticle(e.x,e.y,'blood');
+      sfx('kill');
+      enemies.splice(i,1);
+      continue;
+    }
+    // 状态
+    if(e.burning>0){ e.burning--; e.hp -= 0.25; if(Math.random()<0.3) spawnParticle(e.x,e.y,'fire'); if(e.burning%25===0) sfx('burn'); }
+    if(e.shocked>0){ e.shocked--; e.hp -= 0.4; if(Math.random()<0.3) spawnParticle(e.x,e.y,'spark'); }
+    if(e.melted>0){ e.melted--; e.hp -= 0.6; if(Math.random()<0.3) spawnParticle(e.x,e.y,'bubble'); }
+    if(e.hurtCd>0) e.hurtCd--;
+    if(e.shootCd>0) e.shootCd--;
+    // 站在格上的反应
+    const gx=Math.floor(e.x/TILE), gy=Math.floor(e.y/TILE);
+    const c=idx(gx,gy);
+    if(c){
+      if(c.fire>5 && e.burning<=0){ e.burning=120; }
+      if(c.elec>0 && c.liquid===L_WATER){ e.shocked=Math.max(e.shocked,15); }
+      if(c.liquid===L_ACID && c.lqAmt>5){ e.melted=Math.max(e.melted,15); }
+      if(c.gas>5){ e.hp-=0.1; }
+    }
+    // AI
+    const ddx=player.x-e.x, ddy=player.y-e.y;
+    const dist=Math.hypot(ddx,ddy);
+    if(e.type==='iron'||e.type==='boss'){
+      // 追击（需有视线，否则隔墙追会卡墙）
+      const hasView = e.type==='boss' || dist<60 || hasLOS(e.x,e.y,player.x,player.y);
+      if(dist<460 && player.alive && hasView){
+        const sp=e.speed*(e.shocked>0?0.3:1);
+        e.vx = ddx/dist*sp; e.vy=ddy/dist*sp;
+      } else {
+        // 失去视线：原地徘徊
+        e.patrolT--;
+        if(e.patrolT<=0){ e.dir=Math.random()*Math.PI*2; e.patrolT=60+Math.random()*40; }
+        e.vx=Math.cos(e.dir)*e.speed*0.5; e.vy=Math.sin(e.dir)*e.speed*0.5;
+      }
+      // 接触伤害
+      if(dist<e.r+player.r+2 && e.hurtCd<=0){
+        damagePlayer(e.dmg,'melee');
+        e.hurtCd=40;
+        // 击退玩家
+        const a=Math.atan2(ddy,ddx);
+        player.knockX += Math.cos(a)*5; player.knockY += Math.sin(a)*5;
+      }
+    } else if(e.type==='sentry'){
+      // 远程
+      if(dist<e.shootRange && player.alive && hasLOS(e.x,e.y,player.x,player.y)){
+        e.vx=0;e.vy=0;
+        if(e.shootCd<=0){
+          shoot(e,player.x,player.y);
+          e.shootCd=70;
+        }
+      } else {
+        // 巡逻
+        e.patrolT--;
+        if(e.patrolT<=0){ e.dir=Math.random()*Math.PI*2; e.patrolT=80+Math.random()*60; }
+        e.vx=Math.cos(e.dir)*e.speed; e.vy=Math.sin(e.dir)*e.speed;
+      }
+    }
+    // 移动+碰撞
+    if(e.shocked<=0){
+      moveEnemyAxis(e,e.vx,0);
+      moveEnemyAxis(e,0,e.vy);
+    }
+  }
+}
+function moveEnemyAxis(e,dx,dy){
+  if(dx===0&&dy===0) return;
+  const nx=e.x+dx, ny=e.y+dy, r=e.r-2;
+  const minGx=Math.floor((nx-r)/TILE), maxGx=Math.floor((nx+r)/TILE);
+  const minGy=Math.floor((ny-r)/TILE), maxGy=Math.floor((ny+r)/TILE);
+  let ok=true;
+  for(let gy=minGy;gy<=maxGy;gy++){
+    for(let gx=minGx;gx<=maxGx;gx++){
+      if(!isWalkable(gx,gy)){ ok=false; break; }
+    }
+    if(!ok) break;
+  }
+  if(ok){ if(dx)e.x=nx; if(dy)e.y=ny; }
+  else { e.patrolT=0; e.dir+=Math.PI; }
+}
+function shoot(e,tx,ty){
+  const a=Math.atan2(ty-e.y,tx-e.x);
+  projectiles.push({x:e.x,y:e.y,vx:Math.cos(a)*4.2,vy:Math.sin(a)*4.2,life:90,r:4,dmg:e.dmg,from:'enemy'});
+  sfx('shoot');
+}
+function hasLOS(x1,y1,x2,y2){
+  const steps=Math.ceil(Math.hypot(x2-x1,y2-y1)/8);
+  for(let i=1;i<steps;i++){
+    const t=i/steps;
+    const x=x1+(x2-x1)*t, y=y1+(y2-y1)*t;
+    const gx=Math.floor(x/TILE),gy=Math.floor(y/TILE);
+    const c=idx(gx,gy);
+    if(c && (c.type===T_WALL||c.type===T_WOOD||c.type===T_IRON||c.type===T_DOOR)) return false;
+  }
+  return true;
+}
+
+/* ---------- 10. 投射物 ---------- */
+function updateProjectiles(){
+  for(let i=projectiles.length-1;i>=0;i--){
+    const p=projectiles[i];
+    p.x+=p.vx; p.y+=p.vy; p.life--;
+    // 撞墙
+    const gx=Math.floor(p.x/TILE),gy=Math.floor(p.y/TILE);
+    const c=idx(gx,gy);
+    if(c && (c.type===T_WALL||c.type===T_WOOD||c.type===T_IRON||c.type===T_DOOR)){ projectiles.splice(i,1); continue; }
+    // 撞玩家
+    if(p.from==='enemy' && Math.hypot(p.x-player.x,p.y-player.y)<player.r+p.r){
+      damagePlayer(p.dmg,'shot');
+      for(let k=0;k<6;k++) spawnParticle(p.x,p.y,'spark');
+      projectiles.splice(i,1); continue;
+    }
+    // 经过火被点燃？经过水被熄？
+    if(c && c.fire>5){ spawnParticle(p.x,p.y,'fire'); }
+    if(p.life<=0) projectiles.splice(i,1);
+  }
+}
+
+/* ---------- 11. 飘字 ---------- */
+function spawnFloat(x,y,txt,col){ floats.push({x,y,txt,col,life:50,vy:-0.8}); }
+function updateFloats(){
+  for(let i=floats.length-1;i>=0;i--){
+    const f=floats[i]; f.y+=f.vy; f.life--;
+    if(f.life<=0) floats.splice(i,1);
+  }
+}
+
+/* ---------- 12. Web Audio 音效合成 ---------- */
+let audioCtx=null;
+function ensureAudio(){
+  if(!audioCtx){ try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+}
+function sfx(type){
+  if(!audioCtx) return;
+  const now=audioCtx.currentTime;
+  if(type==='spray'){
+    // 短促嘶嘶白噪声
+    const buf=audioCtx.createBuffer(1, audioCtx.sampleRate*0.12, audioCtx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+    const src=audioCtx.createBufferSource(); src.buffer=buf;
+    const f=audioCtx.createBiquadFilter(); f.type='highpass'; f.frequency.value=1800;
+    const g=audioCtx.createGain(); g.gain.value=0.18;
+    src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start();
+  } else if(type==='shock'){
+    // 电流滋滋：方波+噪声快速颤动
+    const osc=audioCtx.createOscillator(); osc.type='square'; osc.frequency.setValueAtTime(220,now);
+    osc.frequency.linearRampToValueAtTime(880,now+0.05);
+    osc.frequency.linearRampToValueAtTime(120,now+0.18);
+    const g=audioCtx.createGain(); g.gain.setValueAtTime(0.0,now);
+    g.gain.linearRampToValueAtTime(0.22,now+0.01);
+    g.gain.exponentialRampToValueAtTime(0.001,now+0.25);
+    // 叠加噪声
+    const buf=audioCtx.createBuffer(1, audioCtx.sampleRate*0.25, audioCtx.sampleRate);
+    const dd=buf.getChannelData(0);
+    for(let i=0;i<dd.length;i++) dd[i]=(Math.random()*2-1)*0.5;
+    const ns=audioCtx.createBufferSource(); ns.buffer=buf;
+    const nf=audioCtx.createBiquadFilter(); nf.type='bandpass'; nf.frequency.value=3000;
+    const ng=audioCtx.createGain(); ng.gain.value=0.15;
+    osc.connect(g); g.connect(audioCtx.destination);
+    ns.connect(nf); nf.connect(ng); ng.connect(audioCtx.destination);
+    osc.start(now); osc.stop(now+0.25); ns.start(now); ns.stop(now+0.25);
+  } else if(type==='burn'){
+    // 燃烧红噪声：低通噪声
+    const buf=audioCtx.createBuffer(1, audioCtx.sampleRate*0.5, audioCtx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1);
+    const src=audioCtx.createBufferSource(); src.buffer=buf;
+    const f=audioCtx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=500;
+    const g=audioCtx.createGain(); g.gain.setValueAtTime(0.0,now);
+    g.gain.linearRampToValueAtTime(0.2,now+0.05);
+    g.gain.exponentialRampToValueAtTime(0.001,now+0.5);
+    src.connect(f); f.connect(g); g.connect(audioCtx.destination); src.start();
+  } else if(type==='corrode'){
+    // 腐蚀气泡：随机短脉冲
+    for(let k=0;k<4;k++){
+      const o=audioCtx.createOscillator(); o.type='sine';
+      o.frequency.value=400+Math.random()*800;
+      const g=audioCtx.createGain(); g.gain.value=0.0;
+      const st=now+k*0.04;
+      g.gain.setValueAtTime(0,st);
+      g.gain.linearRampToValueAtTime(0.12,st+0.005);
+      g.gain.exponentialRampToValueAtTime(0.001,st+0.06);
+      o.connect(g); g.connect(audioCtx.destination);
+      o.start(st); o.stop(st+0.07);
+    }
+  } else if(type==='hurt'){
+    const o=audioCtx.createOscillator(); o.type='sawtooth'; o.frequency.setValueAtTime(180,now);
+    o.frequency.exponentialRampToValueAtTime(60,now+0.2);
+    const g=audioCtx.createGain(); g.gain.setValueAtTime(0.25,now);
+    g.gain.exponentialRampToValueAtTime(0.001,now+0.22);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(now+0.23);
+  } else if(type==='shoot'){
+    const o=audioCtx.createOscillator(); o.type='square'; o.frequency.setValueAtTime(880,now);
+    o.frequency.exponentialRampToValueAtTime(220,now+0.08);
+    const g=audioCtx.createGain(); g.gain.setValueAtTime(0.15,now);
+    g.gain.exponentialRampToValueAtTime(0.001,now+0.1);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(now+0.11);
+  } else if(type==='kill'){
+    const o=audioCtx.createOscillator(); o.type='triangle'; o.frequency.setValueAtTime(440,now);
+    o.frequency.exponentialRampToValueAtTime(110,now+0.3);
+    const g=audioCtx.createGain(); g.gain.setValueAtTime(0.2,now);
+    g.gain.exponentialRampToValueAtTime(0.001,now+0.32);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(now+0.33);
+  } else if(type==='pickup'){
+    [660,880,1320].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(); o.type='sine'; o.frequency.value=f;
+      const g=audioCtx.createGain(); g.gain.setValueAtTime(0,now+i*0.06);
+      g.gain.linearRampToValueAtTime(0.15,now+i*0.06+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*0.06+0.18);
+      o.connect(g); g.connect(audioCtx.destination); o.start(now+i*0.06); o.stop(now+i*0.06+0.2);
+    });
+  } else if(type==='empty'){ 
+    const o=audioCtx.createOscillator(); o.type='square'; o.frequency.value=120;
+    const g=audioCtx.createGain(); g.gain.setValueAtTime(0.1,now);
+    g.gain.exponentialRampToValueAtTime(0.001,now+0.08);
+    o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(now+0.09);
+  } else if(type==='buy'){
+    [523,659,784].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(); o.type='triangle'; o.frequency.value=f;
+      const g=audioCtx.createGain(); g.gain.setValueAtTime(0,now+i*0.05);
+      g.gain.linearRampToValueAtTime(0.16,now+i*0.05+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*0.05+0.15);
+      o.connect(g); g.connect(audioCtx.destination); o.start(now+i*0.05); o.stop(now+i*0.05+0.17);
+    });
+  } else if(type==='win'){
+    [523,659,784,1047].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(); o.type='triangle'; o.frequency.value=f;
+      const g=audioCtx.createGain(); g.gain.setValueAtTime(0,now+i*0.12);
+      g.gain.linearRampToValueAtTime(0.18,now+i*0.12+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,now+i*0.12+0.3);
+      o.connect(g); g.connect(audioCtx.destination); o.start(now+i*0.12); o.stop(now+i*0.12+0.32);
+    });
+  }
+}
+// 周期性环境音
+let ambientCd=0;
+function ambientTick(){
+  if(!audioCtx) return;
+  ambientCd--;
+  if(ambientCd>0) return;
+  ambientCd=40+Math.floor(Math.random()*40);
+  // 检查附近是否有反应，触发对应音效
+  let hasFire=false,hasElec=false,hasAcid=false;
+  for(let y=0;y<MAP_H;y++) for(let x=0;x<MAP_W;x++){
+    const c=grid[y][x];
+    if(c.fire>5) hasFire=true;
+    if(c.elec>0 && c.liquid===L_WATER) hasElec=true;
+    if(c.liquid===L_ACID && c.lqAmt>5) hasAcid=true;
+  }
+  if(hasFire && Math.random()<0.5) sfx('burn');
+  if(hasElec && Math.random()<0.5) sfx('shock');
+  if(hasAcid && Math.random()<0.4) sfx('corrode');
+}
+
+/* ---------- 13. 渲染 ---------- */
+function worldToScreen(wx,wy){ return [wx-CAM.x, wy-CAM.y]; }
+function screenToWorld(sx,sy){ return [sx+CAM.x, sy+CAM.y]; }
+
+function render(){
+  // 背景
+  ctx.fillStyle='#0a1410';
+  ctx.fillRect(0,0,W,H);
+  // 标题/死亡/胜利等非游戏状态下不渲染世界（grid 可能未初始化）
+  if(state===ST_TITLE || state===ST_DEAD || state===ST_WIN){
+    return;
+  }
+  // 商店状态下，世界冻结但仍渲染一帧作为背景
+  // 相机跟随 + 震屏
+  CAM.x = player.x - W/2 + shakeX;
+  CAM.y = player.y - H/2 + shakeY;
+  // 地图渲染范围
+  const x0=Math.floor(CAM.x/TILE)-1, x1=Math.ceil((CAM.x+W)/TILE)+1;
+  const y0=Math.floor(CAM.y/TILE)-1, y1=Math.ceil((CAM.y+H)/TILE)+1;
+  // 地板与墙
+  for(let y=y0;y<y1;y++){
+    for(let x=x0;x<x1;x++){
+      const c=idx(x,y); if(!c) continue;
+      drawCell(c,x,y);
+    }
+  }
+  // 流体覆盖层（半透明）
+  for(let y=y0;y<y1;y++){
+    for(let x=x0;x<x1;x++){
+      const c=idx(x,y); if(!c) continue;
+      drawFluid(c,x,y);
+    }
+  }
+  // 火/电叠加
+  for(let y=y0;y<y1;y++){
+    for(let x=x0;x<x1;x++){
+      const c=idx(x,y); if(!c) continue;
+      drawFireElec(c,x,y);
+    }
+  }
+  // 发电机
+  for(const g of gens) drawGen(g);
+  // 通行证
+  if(!passPicked && passPos) drawPass(passPos);
+  // 贩卖机
+  if(vendPos) drawVend(vendPos);
+  // 门
+  if(doorPos) drawDoor(doorPos);
+  // 投射物
+  for(const p of projectiles) drawProj(p);
+  // 敌人
+  for(const e of enemies) drawEnemy(e);
+  // 玩家
+  drawPlayer();
+  // 粒子
+  drawParticles();
+  // 飘字
+  drawFloats();
+  // 瞄准线
+  drawAimer();
+  // 火光照明层：远处变暗，火/发电机/玩家周围有光圈
+  drawLighting(x0,x1,y0,y1);
+  // 小地图
+  drawMinimap();
+}
+function drawLighting(x0,x1,y0,y1){
+  // 全屏暗色覆盖，再用 destination-out 挖出光圈
+  ctx.save();
+  ctx.fillStyle='rgba(2,6,4,0.42)';
+  ctx.fillRect(0,0,W,H);
+  ctx.globalCompositeOperation='destination-out';
+  // 玩家光圈
+  const psx=player.x-CAM.x, psy=player.y-CAM.y;
+  let pg=ctx.createRadialGradient(psx,psy,0,psx,psy,170);
+  pg.addColorStop(0,'rgba(0,0,0,1)'); pg.addColorStop(0.6,'rgba(0,0,0,0.7)'); pg.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=pg; ctx.beginPath(); ctx.arc(psx,psy,170,0,Math.PI*2); ctx.fill();
+  // 火光
+  for(let y=y0;y<y1;y++){
+    for(let x=x0;x<x1;x++){
+      const c=idx(x,y); if(!c) continue;
+      if(c.fire>5){
+        const fx=x*TILE-CAM.x+TILE/2, fy=y*TILE-CAM.y+TILE/2;
+        const rad=60+c.fire*0.8;
+        const g=ctx.createRadialGradient(fx,fy,0,fx,fy,rad);
+        g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(fx,fy,rad,0,Math.PI*2); ctx.fill();
+      }
+    }
+  }
+  // 发电机光圈
+  for(const g of gens){
+    const gx=g.x*TILE-CAM.x+TILE/2, gy=g.y*TILE-CAM.y+TILE/2;
+    const grd=ctx.createRadialGradient(gx,gy,0,gx,gy,90);
+    grd.addColorStop(0,'rgba(0,0,0,1)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(gx,gy,90,0,Math.PI*2); ctx.fill();
+  }
+  // 通行证/门光圈
+  if(!passPicked && passPos){
+    const px=passPos.x*TILE-CAM.x+TILE/2, py=passPos.y*TILE-CAM.y+TILE/2;
+    const grd=ctx.createRadialGradient(px,py,0,px,py,70);
+    grd.addColorStop(0,'rgba(0,0,0,1)'); grd.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(px,py,70,0,Math.PI*2); ctx.fill();
+  }
+  ctx.restore();
+}
+function drawMinimap(){
+  const mw=120, mh=Math.floor(mw*MAP_H/MAP_W);
+  const mx=W-mw-12, my=H-mh-28;
+  ctx.save();
+  ctx.fillStyle='rgba(5,12,8,0.85)';
+  ctx.fillRect(mx-3,my-3,mw+6,mh+6);
+  ctx.strokeStyle='rgba(126,224,138,0.4)'; ctx.lineWidth=1;
+  ctx.strokeRect(mx-3,my-3,mw+6,mh+6);
+  const sx=mw/MAP_W, sy=mh/MAP_H;
+  // 地图格子
+  for(let y=0;y<MAP_H;y++){
+    for(let x=0;x<MAP_W;x++){
+      const c=grid[y][x];
+      if(c.type===T_FLOOR||c.type===T_WOOD||c.type===T_IRON||c.type===T_DOOR){
+        ctx.fillStyle = c.type===T_DOOR?'#fbbf24':'#1e3a28';
+        ctx.fillRect(mx+x*sx, my+y*sy, Math.ceil(sx), Math.ceil(sy));
+      }
+      if(c.fire>5){ ctx.fillStyle='#fb923c'; ctx.fillRect(mx+x*sx, my+y*sy, Math.ceil(sx), Math.ceil(sy)); }
+    }
+  }
+  // 通行证
+  if(!passPicked && passPos){
+    ctx.fillStyle='#fbbf24';
+    ctx.fillRect(mx+passPos.x*sx-1, my+passPos.y*sy-1, 3, 3);
+  }
+  // 玩家
+  ctx.fillStyle='#7ee08a';
+  ctx.fillRect(mx+(player.x/TILE)*sx-1, my+(player.y/TILE)*sy-1, 3, 3);
+  // 敌人
+  ctx.fillStyle='#ef4444';
+  for(const e of enemies){
+    ctx.fillRect(mx+(e.x/TILE)*sx-0.5, my+(e.y/TILE)*sy-0.5, 2, 2);
+  }
+  ctx.restore();
+}
+function drawCell(c,gx,gy){
+  const sx=gx*TILE-CAM.x, sy=gy*TILE-CAM.y;
+  if(c.type===T_VOID||c.type===T_WALL){
+    ctx.fillStyle='#0d1714'; ctx.fillRect(sx,sy,TILE,TILE);
+    ctx.fillStyle='#13201c'; ctx.fillRect(sx+1,sy+1,TILE-2,TILE-2);
+    ctx.strokeStyle='rgba(126,224,138,0.06)'; ctx.strokeRect(sx+0.5,sy+0.5,TILE-1,TILE-1);
+  } else if(c.type===T_FLOOR){
+    ctx.fillStyle='#101a16'; ctx.fillRect(sx,sy,TILE,TILE);
+    // 细网格
+    ctx.strokeStyle='rgba(126,224,138,0.05)'; ctx.strokeRect(sx+0.5,sy+0.5,TILE-1,TILE-1);
+  } else if(c.type===T_WOOD){
+    ctx.fillStyle='#5b3a1a'; ctx.fillRect(sx,sy,TILE,TILE);
+    ctx.fillStyle='#6b4423'; ctx.fillRect(sx+2,sy+2,TILE-4,TILE-4);
+    ctx.strokeStyle='#3d2510'; ctx.beginPath();
+    ctx.moveTo(sx,sy+TILE/2); ctx.lineTo(sx+TILE,sy+TILE/2); ctx.stroke();
+  } else if(c.type===T_IRON){
+    ctx.fillStyle='#3a3f44'; ctx.fillRect(sx,sy,TILE,TILE);
+    ctx.fillStyle='#4a5056'; ctx.fillRect(sx+2,sy+2,TILE-4,TILE-4);
+    ctx.strokeStyle='#2a2e32'; ctx.strokeRect(sx+0.5,sy+0.5,TILE-1,TILE-1);
+    // 铆钉
+    ctx.fillStyle='#6a7076';
+    ctx.fillRect(sx+3,sy+3,2,2); ctx.fillRect(sx+TILE-5,sy+3,2,2);
+    ctx.fillRect(sx+3,sy+TILE-5,2,2); ctx.fillRect(sx+TILE-5,sy+TILE-5,2,2);
+  } else if(c.type===T_DOOR){
+    ctx.fillStyle='#7a3b1a'; ctx.fillRect(sx,sy,TILE,TILE);
+    ctx.fillStyle='#9a4a22'; ctx.fillRect(sx+2,sy+2,TILE-4,TILE-4);
+    ctx.strokeStyle='#fbbf24'; ctx.strokeRect(sx+1,sy+1,TILE-2,TILE-2);
+    ctx.fillStyle='#fbbf24'; ctx.beginPath(); ctx.arc(sx+TILE-6,sy+TILE/2,2,0,Math.PI*2); ctx.fill();
+  }
+}
+function drawFluid(c,gx,gy){
+  if(c.lqAmt<=0) return;
+  const sx=gx*TILE-CAM.x, sy=gy*TILE-CAM.y;
+  const h=Math.min(TILE, (c.lqAmt/100)*TILE);
+  let col;
+  if(c.liquid===L_WATER) col='rgba(59,130,246,0.55)';
+  else if(c.liquid===L_OIL) col='rgba(234,179,8,0.55)';
+  else if(c.liquid===L_ACID) col='rgba(34,197,94,0.55)';
+  ctx.fillStyle=col;
+  ctx.fillRect(sx, sy+TILE-h, TILE, h);
+  // 液面波动高光
+  const tt=performance.now()/300;
+  const wave = Math.sin(tt + gx*0.6 + gy*0.4) * 1.2;
+  ctx.fillStyle = col.replace('0.55','0.85');
+  ctx.fillRect(sx, sy+TILE-h+wave, TILE, 1.5);
+  // 液面反光点
+  if(Math.random()<0.04){
+    ctx.fillStyle = col.replace('0.55','0.9');
+    ctx.fillRect(sx+Math.random()*TILE, sy+TILE-h+wave, 2, 1);
+  }
+}
+function drawFireElec(c,gx,gy){
+  const sx=gx*TILE-CAM.x, sy=gy*TILE-CAM.y;
+  if(c.fire>0){
+    const a=Math.min(0.7,c.fire/100);
+    ctx.fillStyle=`rgba(251,146,60,${a*0.4})`;
+    ctx.fillRect(sx,sy,TILE,TILE);
+    if(Math.random()<0.4){
+      spawnParticle(sx+CAM.x+Math.random()*TILE, sy+CAM.y+TILE, 'fire');
+    }
+  }
+  if(c.elec>0){
+    ctx.strokeStyle = `rgba(103,232,249,${0.5+Math.random()*0.5})`;
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    const cx=sx+TILE/2, cy=sy+TILE/2;
+    ctx.moveTo(cx,cy);
+    for(let i=0;i<3;i++){
+      ctx.lineTo(cx+(Math.random()-0.5)*TILE, cy+(Math.random()-0.5)*TILE);
+    }
+    ctx.stroke();
+    if(Math.random()<0.2) spawnParticle(cx+CAM.x,cy+CAM.y,'spark');
+  }
+}
+function drawGen(g){
+  const sx=g.x*TILE-CAM.x+TILE/2, sy=g.y*TILE-CAM.y+TILE/2;
+  ctx.fillStyle='#2a2a2a'; ctx.fillRect(sx-10,sy-10,20,20);
+  ctx.fillStyle='#444'; ctx.fillRect(sx-8,sy-8,16,16);
+  // 闪电符号
+  ctx.fillStyle = Math.random()<0.5?'#67e8f9':'#a5f3fc';
+  ctx.font='14px VT323'; ctx.textAlign='center';
+  ctx.fillText('⚡',sx,sy+5);
+  // 光晕
+  ctx.fillStyle='rgba(103,232,249,0.15)';
+  ctx.beginPath(); ctx.arc(sx,sy,18,0,Math.PI*2); ctx.fill();
+}
+function drawPass(p){
+  const sx=p.x*TILE-CAM.x+TILE/2, sy=p.y*TILE-CAM.y+TILE/2;
+  const bob=Math.sin(Date.now()/300)*2;
+  ctx.fillStyle='rgba(251,191,36,0.2)';
+  ctx.beginPath(); ctx.arc(sx,sy+bob,14,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fbbf24'; ctx.fillRect(sx-6,sy-4+bob,12,8);
+  ctx.fillStyle='#92611f'; ctx.fillRect(sx-6,sy-2+bob,12,2);
+  ctx.fillStyle='#fde68a'; ctx.font='8px Share Tech Mono'; ctx.textAlign='center';
+  ctx.fillText('PASS',sx,sy+bob+1);
+}
+function drawVend(v){
+  const sx=v.x*TILE-CAM.x+TILE/2, sy=v.y*TILE-CAM.y+TILE/2;
+  ctx.fillStyle='#1e3a2a'; ctx.fillRect(sx-11,sy-14,22,28);
+  ctx.fillStyle='#2d5a3f'; ctx.fillRect(sx-9,sy-12,18,24);
+  ctx.fillStyle='#fbbf24'; ctx.font='10px VT323'; ctx.textAlign='center';
+  ctx.fillText('VEND',sx,sy-2);
+  ctx.fillStyle='#7ee08a'; ctx.font='7px Share Tech Mono';
+  ctx.fillText('SHOP',sx,sy+6);
+  // 提示光
+  if(Math.sin(Date.now()/300)>0){
+    ctx.fillStyle='rgba(126,224,138,0.2)';
+    ctx.beginPath(); ctx.arc(sx,sy,20,0,Math.PI*2); ctx.fill();
+  }
+}
+function drawDoor(d){
+  const sx=d.x*TILE-CAM.x+TILE/2, sy=d.y*TILE-CAM.y+TILE/2;
+  ctx.fillStyle='#7a3b1a'; ctx.fillRect(sx-13,sy-18,26,36);
+  ctx.fillStyle='#9a4a22'; ctx.fillRect(sx-11,sy-16,22,32);
+  ctx.strokeStyle=passPicked?'#4ade80':'#ef4444';
+  ctx.lineWidth=2; ctx.strokeRect(sx-12,sy-17,24,34);
+  ctx.fillStyle=passPicked?'#4ade80':'#ef4444';
+  ctx.font='9px Share Tech Mono'; ctx.textAlign='center';
+  ctx.fillText(passPicked?'OPEN':'LOCK',sx,sy+2);
+}
+function drawProj(p){
+  const sx=p.x-CAM.x, sy=p.y-CAM.y;
+  ctx.fillStyle='#ef4444'; ctx.shadowColor='#ef4444'; ctx.shadowBlur=8;
+  ctx.beginPath(); ctx.arc(sx,sy,p.r,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+}
+function drawEnemy(e){
+  const sx=e.x-CAM.x, sy=e.y-CAM.y;
+  // 受伤闪烁
+  const flash = e.hurtCd>0 && (e.hurtCd%4<2);
+  if(e.type==='iron'){
+    ctx.fillStyle= flash?'#fff':'#64748b';
+    ctx.fillRect(sx-e.r,sy-e.r,e.r*2,e.r*2);
+    ctx.fillStyle= flash?'#fff':'#475569';
+    ctx.fillRect(sx-e.r+2,sy-e.r+2,e.r*2-4,e.r*2-4);
+    // 履带
+    ctx.fillStyle='#1e293b';
+    ctx.fillRect(sx-e.r-2,sy-e.r-1,e.r*2+4,3);
+    ctx.fillRect(sx-e.r-2,sy+e.r-2,e.r*2+4,3);
+    // 眼
+    ctx.fillStyle='#ef4444'; ctx.fillRect(sx-4,sy-3,3,3); ctx.fillRect(sx+1,sy-3,3,3);
+  } else if(e.type==='sentry'){
+    ctx.fillStyle= flash?'#fff':'#334155';
+    ctx.beginPath(); ctx.arc(sx,sy,e.r,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle= flash?'#fff':'#1e293b';
+    ctx.beginPath(); ctx.arc(sx,sy,e.r-3,0,Math.PI*2); ctx.fill();
+    // 瞄准玩家
+    const a=Math.atan2(player.y-e.y, player.x-e.x);
+    ctx.strokeStyle='#ef4444'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx+Math.cos(a)*e.r,sy+Math.sin(a)*e.r); ctx.stroke();
+    ctx.fillStyle='#ef4444'; ctx.beginPath(); ctx.arc(sx+Math.cos(a)*(e.r-2),sy+Math.sin(a)*(e.r-2),2,0,Math.PI*2); ctx.fill();
+  } else if(e.type==='boss'){
+    ctx.fillStyle= flash?'#fff':'#7f1d1d';
+    ctx.beginPath(); ctx.arc(sx,sy,e.r,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle= flash?'#fff':'#991b1b';
+    ctx.beginPath(); ctx.arc(sx,sy,e.r-4,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle='#fbbf24';
+    ctx.font='12px VT323'; ctx.textAlign='center';
+    ctx.fillText('☣',sx,sy+4);
+  }
+  // 血条
+  const bw=e.r*2+4;
+  ctx.fillStyle='#000'; ctx.fillRect(sx-bw/2,sy-e.r-7,bw,3);
+  ctx.fillStyle='#22c55e'; ctx.fillRect(sx-bw/2,sy-e.r-7,bw*(e.hp/e.maxHp),3);
+  // 状态图标
+  if(e.burning>0){ ctx.fillStyle='#fb923c'; ctx.font='8px VT323'; ctx.fillText('🔥',sx-e.r,sy-e.r-10); }
+  if(e.shocked>0){ ctx.fillStyle='#67e8f9'; ctx.font='8px VT323'; ctx.fillText('⚡',sx,sy-e.r-10); }
+  if(e.melted>0){ ctx.fillStyle='#86efac'; ctx.font='8px VT323'; ctx.fillText('✦',sx+e.r,sy-e.r-10); }
+}
+function drawPlayer(){
+  if(!player.alive) return;
+  const sx=player.x-CAM.x, sy=player.y-CAM.y;
+  // 移动残影
+  for(const tr of player.trail){
+    const a=tr.life/14*0.25;
+    ctx.globalAlpha=a;
+    ctx.fillStyle='#e2e8f0';
+    ctx.beginPath(); ctx.arc(tr.x-CAM.x,tr.y-CAM.y,player.r-2,0,Math.PI*2); ctx.fill();
+    ctx.globalAlpha=1;
+  }
+  // 护盾光环
+  if(player.shield>0){
+    ctx.strokeStyle='rgba(96,165,250,0.6)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(sx,sy,player.r+4,0,Math.PI*2); ctx.stroke();
+  }
+  // 身体（防护服）
+  ctx.fillStyle= player.hurtCd>0&&player.hurtCd%4<2?'#fff':'#e2e8f0';
+  ctx.beginPath(); ctx.arc(sx,sy,player.r,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#94a3b8';
+  ctx.beginPath(); ctx.arc(sx,sy,player.r-3,0,Math.PI*2); ctx.fill();
+  // 面罩
+  ctx.fillStyle = ['#3b82f6','#eab308','#22c55e'][player.selected];
+  ctx.fillRect(sx-4,sy-3,8,4);
+  // 朝向（喷嘴）
+  const a=player.facing;
+  ctx.strokeStyle='#fbbf24'; ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(sx+Math.cos(a)*player.r, sy+Math.sin(a)*player.r);
+  ctx.lineTo(sx+Math.cos(a)*(player.r+6), sy+Math.sin(a)*(player.r+6));
+  ctx.stroke();
+  // 状态
+  if(player.burning>0){ ctx.fillStyle='#fb923c'; ctx.font='10px VT323'; ctx.textAlign='center'; ctx.fillText('🔥',sx,sy-player.r-6); }
+  if(player.shocked>0){ ctx.fillStyle='#67e8f9'; ctx.font='10px VT323'; ctx.fillText('⚡',sx+8,sy-player.r-6); }
+}
+function drawParticles(){
+  for(const p of particles){
+    const sx=p.x-CAM.x, sy=p.y-CAM.y;
+    const a=Math.max(0,p.life/p.maxlife);
+    ctx.globalAlpha=a;
+    if(p.type==='fire'){
+      ctx.fillStyle=p.col;
+      ctx.beginPath(); ctx.arc(sx,sy,p.r*a,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='steam'||p.type==='smoke'){
+      ctx.fillStyle=p.col;
+      ctx.beginPath(); ctx.arc(sx,sy,p.r,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='bubble'){
+      ctx.fillStyle=p.col;
+      ctx.beginPath(); ctx.arc(sx,sy,p.r,0,Math.PI*2); ctx.fill();
+    } else if(p.type==='spark'){
+      ctx.fillStyle=p.col;
+      ctx.fillRect(sx-1,sy-1,2,2);
+    } else if(p.type==='spray'){
+      const col=['#3b82f6','#eab308','#22c55e'][player.selected];
+      ctx.fillStyle=col;
+      ctx.fillRect(sx,sy,2,2);
+    } else if(p.type==='blood'){
+      ctx.fillStyle=p.col;
+      ctx.beginPath(); ctx.arc(sx,sy,p.r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha=1;
+  }
+}
+function drawFloats(){
+  ctx.textAlign='center';
+  for(const f of floats){
+    const sx=f.x-CAM.x, sy=f.y-CAM.y;
+    ctx.globalAlpha=Math.min(1,f.life/30);
+    ctx.fillStyle=f.col;
+    ctx.font='12px VT323';
+    ctx.fillText(f.txt,sx,sy);
+    ctx.globalAlpha=1;
+  }
+}
+function drawAimer(){
+  if(!player.alive) return;
+  const sx=player.x-CAM.x, sy=player.y-CAM.y;
+  const a=Math.atan2(mouseWY-player.y, mouseWX-player.x);
+  const range=player.range*TILE;
+  // 射程圈
+  ctx.strokeStyle='rgba(251,191,36,0.15)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.arc(sx,sy,range,0,Math.PI*2); ctx.stroke();
+  // 瞄准点
+  const tx=sx+Math.cos(a)*range, ty=sy+Math.sin(a)*range;
+  ctx.strokeStyle='rgba(251,191,36,0.5)'; ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(tx,ty); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(251,191,36,0.6)';
+  ctx.beginPath(); ctx.arc(tx,ty,3,0,Math.PI*2); ctx.fill();
+}
+
+/* ---------- 14. HUD 更新 ---------- */
+function updateHUD(){
+  // 药水存量
+  const fills=document.querySelectorAll('.vial .fill');
+  for(let i=0;i<3;i++){
+    const pct=Math.max(0, player.cur[i]/player.cap[i])*100;
+    fills[i].style.height=pct+'%';
+    document.querySelectorAll('.vial')[i].classList.toggle('active', player.selected===i);
+  }
+  // 反应物
+  const names=[t('water'),t('oil'),t('acid')];
+  document.getElementById('reactantName').textContent=names[player.selected];
+  // 层数
+  document.getElementById('levelVal').textContent=levelNum;
+  // 尘埃
+  document.getElementById('dustVal').textContent=player.dust;
+  // HP/Shield
+  document.getElementById('hpBar').style.width=Math.max(0,player.hp/player.maxHp*100)+'%';
+  document.getElementById('hpTxt').textContent=Math.ceil(player.hp);
+  document.getElementById('shBar').style.width=(player.maxShield>0?player.shield/player.maxShield*100:0)+'%';
+  document.getElementById('shTxt').textContent=Math.ceil(player.shield);
+  // 流速
+  document.getElementById('dripVal').textContent=player.drip.toFixed(1)+'×';
+  // 低血量红边
+  const lowHp = player.alive && player.hp>0 && player.hp/player.maxHp < 0.3;
+  document.getElementById('lowHpVignette').classList.toggle('warn', lowHp);
+  // Boss 血条
+  const boss = enemies.find(e=>e.type==='boss');
+  const bb = document.getElementById('bossBar');
+  if(boss){
+    bb.style.display='block';
+    document.getElementById('bossInner').style.width = Math.max(0,boss.hp/boss.maxHp*100)+'%';
+  } else {
+    bb.style.display='none';
+  }
+}
+
+/* ---------- 15. Banner ---------- */
+let bannerTimer=0;
+function showBanner(txt,dur){
+  const b=document.getElementById('banner');
+  b.textContent=txt; b.style.opacity='1';
+  bannerTimer=dur;
+}
+function updateBanner(){
+  if(bannerTimer>0){ bannerTimer--; if(bannerTimer<=0){ document.getElementById('banner').style.opacity='0'; } }
+}
+
+/* ---------- 16. 游戏状态机 ---------- */
+const ST_TITLE=0, ST_PLAY=1, ST_SHOP=2, ST_DEAD=3, ST_WIN=4;
+let state=ST_TITLE;
+let shopOpen=false;
+let shopFromVend=false; // 是否从贩卖机进入
+
+function startGame(){
+  ensureAudio();
+  if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  levelNum=1;
+  player.hp=player.maxHp=100;
+  player.shield=player.maxShield=0;
+  player.cap=[60,60,60]; player.cur=[60,60,60];
+  player.range=3.2; player.drip=1.0;
+  player.dust=0; player.alive=true; player.burning=0; player.shocked=0;
+  player.selected=0;
+  player.knockX=0; player.knockY=0; player.trail.length=0; player._lastTrail=0;
+  shakeMag=0; shakeX=0; shakeY=0;
+  try{
+    enterLevel();
+    state=ST_PLAY;
+    document.getElementById('overlay').classList.add('hidden');
+  }catch(err){
+    console.error('[BREACH] startGame error:', err);
+    showOverlay({
+      title:(LANG==='zh'?'启动失败':'START FAILED'),
+      sub:String(err && err.message? err.message : err),
+      desc:LANG==='zh'?'关卡生成异常，请重新开始。':'Level generation failed, please restart.',
+      btn:t('restart'), btnAct:startGame
+    });
+  }
+}
+function enterLevel(){
+  const r=genLevel(levelNum);
+  player.x=r.startR.cx*TILE+TILE/2;
+  player.y=r.startR.cy*TILE+TILE/2;
+  // 补满药水
+  for(let i=0;i<3;i++) player.cur[i]=player.cap[i];
+  // 护盾回复
+  if(player.maxShield>0) player.shield=player.maxShield;
+  spawnEnemies(r.startR);
+  showBanner((LANG==='zh'?'第 ':'LEVEL ')+levelNum+(LANG==='zh'?' 层':''),1500);
+}
+function enterLevelNext(){
+  levelNum++;
+  try{
+    enterLevel();
+    state=ST_PLAY;
+    document.getElementById('overlay').classList.add('hidden');
+    shopOpen=false;
+  }catch(err){
+    console.error('[BREACH] enterLevelNext error:', err);
+    showOverlay({
+      title:(LANG==='zh'?'生成失败':'GEN FAILED'),
+      sub:String(err && err.message? err.message : err),
+      desc:LANG==='zh'?'关卡生成异常。':'Level generation failed.',
+      btn:t('restart'), btnAct:startGame
+    });
+  }
+}
+function onDeath(){
+  state=ST_DEAD;
+  sfx('hurt');
+  showOverlay({
+    title:t('dead'), sub:t('deadSub'),
+    desc:`${LANG==='zh'?'你坚持到了第':'You reached Level '}${levelNum}${LANG==='zh'?'层':'.'}<br>${LANG==='zh'?'收集了 ':'Collected '}${player.dust}${LANG==='zh'?' 点有机尘埃':' Organic Dust.'}`,
+    btn:t('restart'), btnAct:startGame
+  });
+}
+function enterShop(fromVend){
+  if(state===ST_SHOP) return;
+  shopFromVend = !!fromVend;
+  state=ST_SHOP;
+  shopOpen=true;
+  renderShop();
+  document.getElementById('overlay').classList.remove('hidden');
+}
+function renderShop(){
+  const ov=document.getElementById('overlay');
+  const costs={range:40, cap:50, shield:60, speed:35};
+  const owned={range:player.range>=6, cap:player.cap[0]>=150, shield:player.maxShield>=50, speed:player.drip>=2.5};
+  ov.innerHTML=`
+    <h1 id="ovTitle">${t('shopTitle')}</h1>
+    <h2 id="ovSub">${t('shopDust')} <span style="color:var(--amber)">${player.dust}</span></h2>
+    <div id="shop">
+      <div class="shop-item ${owned.range?'disabled':''}" data="range">
+        <div class="si-name">${t('shopRange')}</div>
+        <div class="si-desc">${t('shopRangeD')} <br>${t('cur')} ${player.range.toFixed(1)}</div>
+        <div class="si-cost">${owned.range?t('owned'):costs.range+' '+t('dustUnit')}</div>
+      </div>
+      <div class="shop-item ${owned.cap?'disabled':''}" data="cap">
+        <div class="si-name">${t('shopCap')}</div>
+        <div class="si-desc">${t('shopCapD')} <br>${t('cur')} ${player.cap[0]}</div>
+        <div class="si-cost">${owned.cap?t('owned'):costs.cap+' '+t('dustUnit')}</div>
+      </div>
+      <div class="shop-item ${owned.shield?'disabled':''}" data="shield">
+        <div class="si-name">${t('shopShield')}</div>
+        <div class="si-desc">${t('shopShieldD')} <br>${t('cur')} ${player.maxShield}</div>
+        <div class="si-cost">${owned.shield?t('owned'):costs.shield+' '+t('dustUnit')}</div>
+      </div>
+      <div class="shop-item ${owned.speed?'disabled':''}" data="speed">
+        <div class="si-name">${t('shopSpeed')}</div>
+        <div class="si-desc">${t('shopSpeedD')} <br>${t('cur')} ${player.drip.toFixed(1)}×</div>
+        <div class="si-cost">${owned.speed?t('owned'):costs.speed+' '+t('dustUnit')}</div>
+      </div>
+    </div>
+    <button class="btn" id="leaveShopBtn">${shopFromVend?t('leave'):t('descend')}</button>
+  `;
+  ov.querySelectorAll('.shop-item').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const k=el.getAttribute('data');
+      if(owned[k]) return;
+      if(player.dust<costs[k]){ sfx('empty'); return; }
+      player.dust-=costs[k];
+      if(k==='range') player.range=Math.min(6, player.range+0.6);
+      else if(k==='cap'){ const add=30; for(let i=0;i<3;i++){player.cap[i]+=add; player.cur[i]+=add;} }
+      else if(k==='shield'){ player.maxShield+=25; player.shield=player.maxShield; }
+      else if(k==='speed') player.drip=Math.min(2.5, player.drip+0.3);
+      sfx('buy');
+      renderShop();
+    });
+  });
+  document.getElementById('leaveShopBtn').addEventListener('click',()=>{
+    if(shopFromVend){
+      shopFromVend=false; shopOpen=false; state=ST_PLAY; vendCd=90;
+      document.getElementById('overlay').classList.add('hidden');
+    } else {
+      // 通关本层进下一层
+      if(levelNum>=8){
+        // 全部通关
+        state=ST_WIN;
+        sfx('win');
+        showOverlay({
+          title:t('evacSuccess'), sub:LANG==='zh'?'你冲出了最深层':'You escaped the deepest level',
+          desc:LANG==='zh'?'最终尘埃：':'Final Dust: '+player.dust,
+          btn:t('restart'), btnAct:startGame
+        });
+      } else {
+        enterLevelNext();
+      }
+    }
+  });
+}
+function showOverlay(o){
+  const ov=document.getElementById('overlay');
+  ov.classList.remove('hidden');
+  ov.innerHTML=`
+    <h1 id="ovTitle">${o.title}</h1>
+    <h2 id="ovSub">${o.sub}</h2>
+    <p id="ovDesc">${o.desc||''}</p>
+    ${o.desc2?`<p id="ovDesc2" style="color:rgba(126,224,138,0.6);font-size:12px;">${o.desc2}</p>`:''}
+    ${o.keys?`<div class="keys">${o.keys}</div>`:''}
+    <button class="btn" id="startBtn">${o.btn}</button>
+  `;
+  document.getElementById('startBtn').addEventListener('click', o.btnAct);
+}
+
+/* ---------- 17. 主循环 ---------- */
+function tick(){
+  try{
+    if(state===ST_PLAY){
+      updatePlayer();
+      updateEnemies();
+      updateProjectiles();
+      updateFluids();
+      updateParticles();
+      updateFloats();
+      ambientTick();
+    } else {
+      updateParticles();
+      updateFloats();
+    }
+    updateBanner();
+    updateHUD();
+    render();
+  }catch(err){
+    console.error('[BREACH] frame error:', err);
+    // 致命错误时回退到标题界面，避免画面永久冻结
+    if(state===ST_PLAY){
+      state=ST_TITLE;
+      try{ showOverlay({
+        title:(LANG==='zh'?'运行错误':'RUNTIME ERROR'),
+        sub:(LANG==='zh'?'已自动返回标题':'Returned to title'),
+        desc:String(err && err.message? err.message : err),
+        btn:t('restart'), btnAct:startGame
+      }); document.getElementById('overlay').classList.remove('hidden'); }catch(e){}
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ---------- 18. 输入 ---------- */
+window.addEventListener('keydown',e=>{
+  const k=e.key.toLowerCase();
+  keys[k]=true;
+  if(k==='1'||k==='2'||k==='3'){
+    const n=parseInt(k)-1;
+    if(player.selected!==n){ player.selected=n; ensureAudio(); sfx('pickup'); }
+  }
+  if(k==='escape' && state===ST_SHOP){ /* 不允许 ESC 退出 */ }
+});
+window.addEventListener('keyup',e=>{ keys[e.key.toLowerCase()]=false; });
+cv.addEventListener('mousedown',e=>{ if(e.button===0) mouseDown=true; ensureAudio(); });
+window.addEventListener('mouseup',e=>{ if(e.button===0) mouseDown=false; });
+cv.addEventListener('mousemove',e=>{
+  const r=cv.getBoundingClientRect();
+  const sx=(e.clientX-r.left)*(cv.width/r.width);
+  const sy=(e.clientY-r.top)*(cv.height/r.height);
+  mouseWX=sx+CAM.x; mouseWY=sy+CAM.y;
+});
+// 防右键菜单
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+
+/* ---------- 19. 语言切换 ---------- */
+function applyLang(){
+  document.getElementById('brandTitle').textContent=t('title');
+  document.getElementById('lblVial').textContent=t('vialCap');
+  document.getElementById('lblReactant').textContent=t('reactant');
+  document.getElementById('lblLevel').textContent=t('level');
+  document.getElementById('lblDust').textContent=t('dust');
+  document.getElementById('lblDrip').textContent=t('dripSpeed');
+  document.getElementById('lblHp').textContent=t('hp');
+  document.getElementById('lblShield').textContent=t('shield');
+  document.getElementById('hintL').innerHTML=t('hintL');
+  document.getElementById('langToggle').textContent = LANG==='zh'?'EN':'中文';
+  // 标题界面（纯单语，不再混杂另一语言）
+  if(state===ST_TITLE){
+    showOverlay({
+      title:t('title'), sub:'',
+      desc:t('desc'), desc2:t('desc2'), keys:t('keys'),
+      btn:t('start'), btnAct:startGame
+    });
+  }
+}
+document.getElementById('langToggle').addEventListener('click',()=>{
+  LANG = LANG==='zh'?'en':'zh';
+  applyLang();
+});
+
+/* ---------- 20. 启动 ---------- */
+resize();
+applyLang();
+tick();
+</script>
+</body>
+</html>

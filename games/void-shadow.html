@@ -1,0 +1,4174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+
+<script id="i18n-script">
+(function(){
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
+  if (lang !== 'en') return;
+
+  var T = {
+    '你在卧室中完成了祭祀仪式,虚空之影消散于晨光之中。你幸存了下来,但沃特里宅邸的秘密将永远萦绕在你心头。YOU SURVIVED.': 'You completed the ritual in the bedroom. The shadow of the void dissolves in the dawn light. You survived — but the secrets of the Wentworth manor will haunt you forever. YOU SURVIVED.',
+    '代币类型:+1/0/-1/-2(数值)、骷髅(减末日数)、古老印记(+2抽牌)、混沌触手(自动失败)': 'Token types: +1/0/-1/-2 (numeric), Skull (minus doom), Elder Sign (+2 & draw), Tentacle (auto-fail)',
+    '你必须在理智与生命耗尽之前,搜集足够线索揭开真相,并在卧室内执行祭祀仪式,方能消解这场虚空之影。': 'Before your sanity or life runs dry, you must gather enough clues to uncover the truth, and perform the ritual in the Master Bedroom to dispel the shadow of the void.',
+    '理智崩溃,你的心智被虚空彻底侵蚀。从此你只能在阿卡姆疗养院的墙壁间,喃喃自语着无人能懂的低语。': 'Sanity shattered. Your mind is wholly corrupted by the void. Now you can only wander the halls of the Arkham Asylum, muttering whispers no one understands.',
+    '你奉命独自前往调查。宅邸内弥漫着不洁的气息,墙壁上的符文渗出黑色液体,虚空的低语在耳畔回响。': 'You have been sent alone to investigate. The air within reeks of the unclean. Sigils on the walls weep black fluid. The whispers of the void echo in your ears.',
+    '抽1枚代币。+1/-1/-2修正检定。骷髅=减末日数。触手=自动失败。远古印记=自动成功。': 'Draw a token. +1/-1/-2 modify your roll. Skull = doom. Tentacle = auto-fail. Elder Sign = auto-success.',
+    '末日降临,虚空彻底吞噬了沃特里宅邸。你的灵魂被永远封印在虚空的彼岸,无人知晓你的故事。': 'The doom arrives. The void devours the Wentworth manor whole. Your soul is sealed beyond the void, your tale lost to all.',
+    '一九二六年深秋,阿卡姆镇郊外的沃特里宅邸传出诡异声响。三名调查员进入其中后下落不明。': 'In late autumn of 1926, eerie sounds drift from the Wentworth manor on the outskirts of Arkham. Three investigators entered — and vanished.',
+    '集齐线索推进三幕剧情,第三幕在主卧室执行祭祀仪式即可通关。生命或理智归零则失败。': 'Gather clues to advance through three acts. Perform the ritual in the Master Bedroom during Act III to win. Health or Sanity at 0 means defeat.',
+    '行动按钮。每轮3行动力:调查(智力vs遮蔽)、战斗、闪避、祭祀(终幕专用)。': 'Action buttons. 3 actions per round: Investigate (Intellect vs Shroud), Fight, Evade, Mend, Strategy, and Ritual (final act).',
+    '混沌袋。每次判定随机抽一枚代币,抽完不放回。骷髅=减末日数,触手=自动失败。': 'The chaos bag. Each test randomly draws a token (no replacement). Skull = -doom, Tentacle = auto-fail.',
+    '欢迎来到《诡秘调查:虚空之影》。这是一款致敬《诡镇奇谈卡牌版》的单人桌游。': 'Welcome to Eldritch Investigation: Shadows of the Void. This is a solo card game inspired by Arkham Horror: The Card Game.',
+    '密谋卡(左)记录末日标记。每回合+1,满额触发灾难事件。三幕密谋=失败。': 'The Agenda card (left) tracks doom. Each round +1 doom; when full, a disaster strikes. Three agendas = defeat.',
+    '地点地图。绿色高亮的是可移动的相邻地点,金色的"前往探索"是未探索地点。': 'The location map. Green-highlighted locations are adjacent and clickable. Gold "Explore" marks unexplored rooms.',
+    '你的生命在虚空的侵蚀中耗尽。宅邸吞噬了又一个灵魂,你的故事在此终结。': 'Your life was consumed by the encroaching void. The manor has claimed another soul — your story ends here.',
+    '场景卡(右)记录线索。集齐线索可推进剧情,第三幕在卧室祭祀通关。': 'The Act card (right) tracks clues. Gather clues to advance the story. Complete 3 acts and perform the ritual in the Bedroom.',
+    '阴暗潮湿的地下密室,空气中弥漫着腐朽气息,深藏着被遗忘的禁忌。': 'A dark, damp underground chamber. The air reeks of decay. Forbidden secrets sleep here.',
+    ':敏捷 vs 敌人战力,成功后敌人移至当前地点,本回合不再追击': ': Agility vs enemy combat, success moves enemy to current location, no pursuit this round',
+    '调查员面板。生命/理智归零即失败。红色或紫色呼吸光表示危险。': 'Investigator panel. Health or Sanity reaching 0 = defeat. Red or purple breathing glow signals danger.',
+    '这是阶段指示器。游戏按神话→调查→敌人→维护四阶段循环推进。': 'This is the phase indicator. The game cycles through Mythos → Investigator → Enemy → Upkeep.',
+    '敏捷 vs 敌人战力,成功后敌人移至当前地点,本回合不再追击': 'Agility vs enemy combat, success moves enemy to current location, no pursuit this round',
+    '虚空的低语在墙壁间游走,末日标记每达到上限便唤醒沉睡之物。': 'Whispers of the void glide through the walls. When doom reaches its limit, something stirs.',
+    '场景卡记录线索。集齐线索可推进剧情,第三幕在卧室祭祀通关。': 'The Act card tracks clues. Gather clues to advance; perform the ritual in the Bedroom during Act III to win.',
+    '属性值 + 装备加成 + 混沌代币 ≥ 难度 = 成功。': 'Skill value + equipment bonus + chaos token ≥ difficulty = success.',
+    '生命0=死亡。理智0=疯狂。末日满(第3幕)=虚空吞噬。': 'Health 0 = Killed. Sanity 0 = Madness. Doom full (3rd agenda) = Void consumes all.',
+    '完成3幕场景(集齐线索),终幕在卧室执行祭祀仪式通关。': 'Complete 3 Acts by gathering clues, then perform the ritual in the Master Bedroom.',
+    '立即抽 1 张额外遭遇卡,获得 4 资源。勇气可嘉。': 'Draw 1 extra encounter, gain 4 resources. Brave.',
+    '战力2,生命2。每回合+1末日标记,造成1生命伤害。': 'Combat 2, Health 2. +1 doom each round, deals 1 Health damage.',
+    '战力5,生命3。精英怪,每回合造成2生命2理智伤害。': 'Combat 5, Health 3. Elite. Deals 2 Health and 2 Sanity each round. Fast.',
+    '手牌区。左键打出,右键查看详情。事件卡使用前会确认。': 'Hand area. Left-click to play. Right-click for details. Event cards confirm before playing.',
+    '搜集线索以揭开宅邸真相,集齐五枚线索方可执行祭祀。': 'Gather clues to uncover the truth of the manor. Five clues are needed to perform the ritual.',
+    '技能卡:判定时自动询问使用,加属性+2不消耗行动力': 'Skill cards: auto-prompted during tests, +2 to any stat, no action cost',
+    ':战斗 vs 敌人战力,成功造成伤害(武器可加成)': ': Combat vs enemy combat, success deals damage (weapon boosts)',
+    '密谋卡记录末日标记。每回合+1,满额触发灾难事件。': 'The Agenda card tracks doom. +1 each round; when full, a disaster triggers.',
+    '本回合可选一项战略,消耗1行动力。每回合仅一次。': 'Choose one strategy this round. Costs 1 action. Once per round.',
+    '图书管理员,智力超群。调查得心应手,但不擅战斗。': 'A librarian with exceptional intellect. Investigation comes naturally, but combat does not.',
+    '校验时丢弃,先查看混沌袋顶部2枚代币,选择1枚。': 'Discard during a test. Peek at the top 2 chaos tokens, keep 1.',
+    ':打出后持续生效,有槽位限制(手部/配饰各2件)': ': stays in play, slot limits (2 hand / 2 accessory)',
+    '— 3行动力。调查/战斗/闪避/疗伤/打出卡牌。': '— 3 actions. Investigate, Fight, Evade, Mend, or play cards.',
+    '战斗 vs 敌人战力,成功造成伤害(武器可加成)': 'Combat vs enemy combat, success deals damage (weapon boosts)',
+    '末日标记 +1,获得 3 资源。危险但收益高。': '+1 doom, gain 3 resources. Risky but profitable.',
+    '前联邦探员,擅长肉搏战。意志坚定,但理智脆弱。': 'A former federal agent, skilled in combat. Strong-willed but fragile sanity.',
+    '战力3,生命3。每回合造成1生命和1理智伤害。': 'Combat 3, Health 3. Deals 1 Health and 1 Sanity damage each round.',
+    '战力4,生命4。每回合造成2生命和1理智伤害。': 'Combat 4, Health 4. Deals 2 Health and 1 Sanity damage each round.',
+    '成功闪避 {N}!已脱离交战(本回合不会追击)': 'Evaded {N}! Disengaged (no pursuit this round)',
+    '打出后持续生效,有槽位限制(手部/配饰各2件)': 'stays in play, slot limits (2 hand / 2 accessory)',
+    '抽 2 张玩家牌,无负面效果。安全但收益少。': 'Draw 2 player cards. Safe but small gain.',
+    '满是旧书与尘土的书房,墙上挂着一幅诡异画像。': 'A study of old books and dust. A disturbing portrait hangs on the wall.',
+    '潮湿阴冷的长廊,脚步声在回荡,通往宅邸深处。': 'A damp, cold corridor. Footsteps echo endlessly. Leads deeper into the manor.',
+    '举行祭祀仪式的关键地点,终幕可在此执行祭祀。': 'The ritual site. The ritual may be performed here in the final act.',
+    '战斗判定时战斗+2,造成2点伤害。弹药3发。': '+2 Combat during combat tests. Deals 2 damage. 3 ammo.',
+    '战斗判定时战斗+3,造成3点伤害。弹药2发。': '+3 Combat during combat tests. Deals 3 damage. 2 ammo.',
+    '--- 第 {N} 轮 · 神话阶段 ---': '--- Round {N} · Mythos Phase ---',
+    '3行动力。调查/战斗/闪避/疗伤/打出卡牌。': '3 actions. Investigate, Fight, Evade, Mend, or play cards.',
+    '本回合敌人无法主动攻击你,并移至相邻地点。': 'Enemies cannot attack you this round. They move to an adjacent location.',
+    '立即进行意志(4)检验,失败则理智扣减3。': 'Willpower (4) test. Fail: -3 Sanity.',
+    '立即进行智力(3)检验,失败则失去2资源。': 'Intellect (3) test. Fail: lose 2 resources.',
+    '自动调查成功!获得线索 ({C}/{M})': 'Clue found! ({C}/{M})',
+    '选择恢复 {V} 点生命或 {V} 点理智': 'Choose: restore {V} Health or {V} Sanity',
+    ':3行动力,可移动/调查/战斗/闪避/打牌': ': 3 actions — move, investigate, fight, evade, or play cards',
+    '老练的赏金猎人,各项能力均衡,资源充足。': 'A seasoned bounty hunter, balanced in all traits, well-supplied.',
+    '进行意志(3)检验,失败则末日标记+1。': 'Willpower (3) test. Fail: +1 doom.',
+    '即将进行 {S} 判定 · 难度 {D}': '{S} test · Difficulty {D}',
+    '❦ 教程结束。祝你在沃特里宅邸好运...': '❦ Tutorial complete. Good luck in the Wentworth manor...',
+    '场景推进!第{N}幕 · 地点线索已补充': 'Act advances! Act {N} · location clues replenished',
+    '战略:直面恐惧 · 资源+4,遭遇卡来袭': 'Strategy: Face the Terror · resources+4, encounter incoming',
+    '移动/调查/战斗/闪避/打牌:各1行动力': 'Move/Investigate/Fight/Evade/Play card: 1 action each',
+    '敏捷vs敌人战力。成功:敌人移走并疲惫。': 'Agility vs enemy Combat. Success: enemy moves away, exhausted.',
+    '3行动力,可移动/调查/战斗/闪避/打牌': '3 actions — move, investigate, fight, evade, or play cards',
+    '意志+1。每回合可花费1资源抽1张牌。': '+1 Willpower. Each round, spend 1 resource to draw a card.',
+    '尝试闪避 {N}... 敏捷vs{C}': 'Evading {N}... Agility vs {C}',
+    '终幕降临!集齐线索后前往主卧室执行祭祀': 'The final act descends! Gather clues and perform the ritual in the Master Bedroom.',
+    '战略:末日献祭 · 末日+1,资源+3': 'Strategy: Doom Offering · doom+1, resources+3',
+    '战斗vs敌人战力。成功:造成武器伤害。': 'Combat vs enemy Combat. Success: deal weapon damage.',
+    '右键手牌卡可查看详情;手牌满8张需弃牌': 'Right-click a hand card for details; hand size limit 8',
+    '密斯卡托尼克图书馆员 · 知识探寻者': 'Miskatonic Librarian · Knowledge Seeker',
+    '布满蛛网的阁楼,藏着不为人知的秘密。': 'A cobwebbed attic hiding unspeakable secrets.',
+    '{C}/{T} · 点击任意位置继续': '{C}/{T} · Click anywhere to continue',
+    '确定重新开始游戏?当前进度将丢失。': 'Restart the game? Current progress will be lost.',
+    '校验时丢弃,本次判定任意属性+2。': 'Discard during a test. +2 to any attribute.',
+    '命中! {N} 受到 {D} 伤害': 'Hit! {N} takes {D} damage',
+    '战略:沉思冥想 · 抽取2张玩家牌': 'Strategy: Meditate · drew 2 player cards',
+    '难度 {V} · 是否使用技能卡?': 'Difficulty {V} · Use a skill card?',
+    ':末日+1,抽遭遇卡(怪兽或陷阱)': ': Doom +1, draw an encounter card (monster or treachery)',
+    ':地点敌人向玩家移动,交战敌人攻击': ': enemies at locations move toward you; engaged enemies attack',
+    '共15枚代币抽完不放回,用尽重置。': '15 tokens total, drawn without replacement; refilled when empty.',
+    ':打出后立即结算效果,使用前会确认': ': resolves immediately, prompted before use',
+    ':判定时丢弃,临时加成任意属性+2': ': discarded during tests for +2 to any stat',
+    '调查时智力+1。装备后持续生效。': '+1 Intellect when investigating.',
+    '恢复3点生命或3点理智(选择)。': 'Restore 3 Health or 3 Sanity (your choice).',
+    '攻击 {N}... 战力 {C}': 'Fighting {N}... Combat {C}',
+    '使用技能卡 {N} (+{V})': 'Used skill card {N} (+{V})',
+    '{N} 从虚空中现身并与你交战!': '{N} emerges from the void and engages you!',
+    '{N} 攻击你! ({I}/2)': '{N} attacks you! ({I}/2)',
+    '{N} 有 {V} 枚线索可调查': '{N} has {V} clue(s) to investigate',
+    '智力vs遮蔽。成功:获得1线索。': 'Intellect vs Shroud. Success: gain 1 clue.',
+    '末日+1,抽遭遇卡(怪兽或陷阱)': 'Doom +1, draw an encounter card (monster or treachery)',
+    '地点敌人向玩家移动,交战敌人攻击': 'enemies at locations move toward you; engaged enemies attack',
+    '打出后立即结算效果,使用前会确认': 'resolves immediately, prompted before use',
+    '判定时丢弃,临时加成任意属性+2': 'discarded during tests for +2 to any stat',
+    '{N} 攻击你!({I}/2)': '{N} attacks you! ({I}/2)',
+    '线索已集齐!前往主卧室执行祭祀': 'All clues gathered! Proceed to the Master Bedroom for the ritual.',
+    '{N} 召唤虚空! 末日 +1': '{N} summons the void! Doom +1',
+    ':行动力重置,+1资源,抽1牌': ': reset actions, +1 resource, draw 1 card',
+    '意志+1。防止首次理智伤害。': '+1 Willpower. Prevents the first Sanity damage.',
+    '立即闪避当前交战的一个敌人。': 'Immediately evade one engaged enemy.',
+    '立即调查当前地点,自动成功。': 'Investigate current location automatically (success).',
+    '在当前地点放置一个末日标记。': 'Place a doom token at the current location.',
+    '进行意志({V})检验...': 'Willpower ({V}) test...',
+    '进行智力({V})检验...': 'Intellect ({V}) test...',
+    '末日标记已满!黑暗事件触发!': 'Doom track full! A dark event triggers!',
+    '紧急包扎:资源-2,生命+1': 'Field dressing: resources-2, health+1',
+    '可查看详情;手牌满8张需弃牌': 'a hand card for details; hand size limit 8',
+    '选择一张牌弃掉,方可继续抽牌': 'Select a card to discard before drawing',
+    '— 末日+1,抽1张遭遇卡。': '— +1 doom, draw 1 encounter card.',
+    '— 资源+1,抽1张玩家牌。': '— +1 resource, draw 1 player card.',
+    '古老印记 · +2并抽一张牌': 'Elder Sign · +2 and draw a card',
+    '行动力重置,+1资源,抽1牌': 'reset actions, +1 resource, draw 1 card',
+    '无交战 · 点击敌人可选中': 'None engaged · click an enemy to select',
+    '调查员阶段 · 行动力3点': 'Investigator Phase · 3 Actions',
+    '交战中无法祭祀!先解决敌人': 'Cannot ritual while engaged!',
+    '联邦调查员 · 虚空追猎者': 'Federal Agent · Void Hunter',
+    '技能卡在判定时自动询问使用': 'Skill cards prompt automatically during tests',
+    '线索进度: {C}/{M}': 'Total clues: {C}/{M}',
+    '调查中... 遮蔽 {S}': 'Investigating... Shroud {S}',
+    '所有敌人疲惫,本回合无攻击': 'All enemies exhausted — no attacks this round',
+    '调查员踏入沃特里宅邸...': 'The investigator steps into the Wentworth manor...',
+    '{S} 槽位已满(限2件)': '{S} slot full (max 2)',
+    '骷髅 · 减去场上末日总数': 'Skull · Minus total doom in play',
+    '赏金猎人 · 全能生存者': 'Bounty Hunter · All-Round Survivor',
+    '{N} 出现在 {L}!': '{N} appears at {L}!',
+    '避难所生效,敌人无法攻击': 'Sanctuary active — enemies cannot attack',
+    '资源 +1,抽取一张手牌': '+1 resource, drew a card',
+    '末日降临!灾难事件触发!': 'Doom arrives! Disaster triggered!',
+    '古老印记!+2并抽一张牌': 'Elder Sign! +2 and draw a card',
+    '右键手牌卡可查看卡牌详情': 'Right-click a hand card for details',
+    '末日+1,抽1张遭遇卡。': '+1 doom, draw 1 encounter card.',
+    '资源+1,抽1张玩家牌。': '+1 resource, draw 1 player card.',
+    '调查成功! 线索 +1': 'Investigation success! Clue +1',
+    '{N} 移动至 {L}': '{N} moves to {L}',
+    '{N} 从虚空中现身!': '{N} emerges from the void!',
+    '开始执行祭祀仪式...': 'Beginning the ritual...',
+    '场景推进至第{N}幕!': 'Act advances to {N}!',
+    '终幕:前往卧室执行祭祀': 'Final act: ritual available in the Bedroom',
+    '即将进行 {S} 判定': 'Upcoming {S} Test',
+    '继续阶段 / 结束行动': 'Continue Phase / End Action',
+    '混沌触手 · 自动失败': 'Tentacle · Auto-fail',
+    '诡秘调查 · 虚空之影': 'ELDRITCH INVESTIGATION · Shadows of the Void',
+    '资源不足(需2资源)': 'Need 2 resources',
+    '虚空之影的真正征服者': 'True Conqueror of the Void',
+    '虚空吞噬了一切...': 'The void consumes all...',
+    '敌人被驱散至 {L}': 'Enemies dispersed to {L}',
+    '前往主卧室执行祭祀!': 'Proceed to the Master Bedroom for the ritual',
+    '· 任意属性+{V}': '· Any stat +{V}',
+    '混沌袋已空,重新填满': 'Chaos bag empty — refilled',
+    '手牌已满 (8/8)': 'Hand full (8/8)',
+    '— 敌人移动并攻击。': '— Enemies move and attack.',
+    '立即获得3个资源。': 'Gain 3 resources immediately.',
+    '开始下一轮神话阶段': 'Begin next Mythos Phase',
+    '成功闪避 {N}!': 'Evaded {N}!',
+    '{N} 与你交战!': '{N} engages you!',
+    '检验成功,资源无恙': 'Test passed, resources safe',
+    '失去 {V} 资源': 'Lost {V} resources',
+    '前往主卧室执行祭祀': 'Go to the Master Bedroom for the ritual',
+    '密谋 · 末日将至': 'Agenda · Doom Approaches',
+    '场景 · 虚空之影': 'Act · Shadows of the Void',
+    '混沌袋 · 15枚': 'Chaos Bag · 15',
+    '守护护符抵消伤害!': 'Guardian amulet absorbs damage!',
+    '装备(Asset)': 'Asset',
+    '事件(Event)': 'Event',
+    '技能(Skill)': 'Skill',
+    '诡秘调查：虚空之影': 'Eldritch Investigation: Shadows of the Void',
+    '本回合已使用战略': 'Strategy already used this round',
+    '任意属性+{V}': '+{V} to any attribute',
+    '是否使用技能卡?': 'Use a skill card?',
+    '已探索: {N}': 'Explored: {N}',
+    '{N} 攻击你!': '{N} attacks you!',
+    '检验成功,无伤害': 'Test passed, no damage',
+    '{N} 弹药耗尽': '{N} is out of ammo',
+    '— 虚空之影 —': '— Shadows of the Void —',
+    '敌人移动并攻击。': 'Enemies move and attack.',
+    '需在主卧室执行': 'Must be in the Master Bedroom',
+    '温菲尔德·科特': 'Winfield Cort',
+    '点38左轮手枪': '.38 Revolver',
+    '进入调查员阶段': 'Proceed to Investigator Phase',
+    '末日标记 +1': '+1 doom token',
+    '遭遇: {N}': 'Encounter: {N}',
+    '移动至 {N}': 'Moved to {N}',
+    '{N} 被击败': '{N} is defeated',
+    '资源 +{V}': 'Resources +{V}',
+    '资源 -{V}': 'Resources -{V}',
+    '生命 +{V}': 'Health +{V}',
+    '生命 -{V}': 'Health -{V}',
+    '理智 +{V}': 'Sanity +{V}',
+    '理智 -{V}': 'Sanity -{V}',
+    '抽到: {N}': 'Drew: {N}',
+    '末日标记已满!': 'Doom at maximum!',
+    '已无线索可调查': 'No clues left to gather',
+    '无法到达该地点': 'Cannot reach that location',
+    '获得一枚线索!': 'Gained a clue!',
+    '◆ 混沌袋判定': '◆ Chaos Bag Test',
+    '◆ 战斗与闪避': '◆ Combat & Evade',
+    '抽牌: {N}': 'Drew: {N}',
+    '弃牌: {N}': 'Discarded: {N}',
+    '阶段(每轮):': 'Phases (each round):',
+    '确定重新开始?': 'Restart?',
+    '空格 / 回车': 'Space / Enter',
+    '音频初始化失败': 'Audio init failed',
+    '非调查员阶段': 'Not in investigator phase',
+    '尚未进入终幕': 'Final act not reached',
+    '罗兰·班克斯': 'Roland Banks',
+    '强力生存毅力': 'Perseverance',
+    '廷达洛斯猎犬': 'Hound of Tindalos',
+    '进入敌人阶段': 'Proceed to Enemy Phase',
+    '进入维护阶段': 'Proceed to Upkeep Phase',
+    '收集线索总数': 'Total Clues Found',
+    '打出 {N}': 'Played {N}',
+    '发现:{N}': 'Discovered: {N}',
+    '❤ 恢复生命': '❤ Restore Health',
+    '✦ 恢复理智': '✦ Restore Sanity',
+    '📜 游戏规则': '📜 Game Rules',
+    '◆ 游戏目标': '◆ Objective',
+    '◆ 四大阶段': '◆ Four Phases',
+    '◆ 行动消耗': '◆ Action Costs',
+    '◆ 卡牌类型': '◆ Card Types',
+    '祭祀(终幕)': 'Ritual (Final Act)',
+    '· 打出卡牌': '· Play card',
+    '· 结束回合': '· End turn',
+    '调查员阶段': 'Investigator',
+    '选择调查员': 'Choose Your Investigator',
+    '行动力不足': 'No actions left',
+    '黛蕾·沃克': 'Daisy Walker',
+    '古尸食尸鬼': 'Ghoul',
+    '存活至终幕': 'Survived to Final Act',
+    '剩余行动力': 'Remaining Actions',
+    '回合数惩罚': 'Round Penalty',
+    '传奇调查员': 'Legendary Investigator',
+    '阿卡姆英雄': 'Hero of Arkham',
+    '线索已集齐': 'All clues already gathered',
+    '此地无线索': 'No clues here',
+    '无交战敌人': 'No enemy engaged',
+    '攻击未命中': 'Attack missed',
+    '右键手牌卡': 'Right-click',
+    '⌘ 快捷键': '⌘ Shortcuts',
+    '弃牌堆为空': 'Discard empty',
+    '战斗与闪避': 'Combat & Evade',
+    '混沌袋判定': 'Chaos Bag Test',
+    '诡秘调查': 'ELDRITCH INVESTIGATION',
+    '虚空之影': 'Shadows of the Void',
+    '神话阶段': 'Mythos',
+    '敌人阶段': 'Enemy',
+    '维护阶段': 'Upkeep',
+    '交战敌人': 'Engaged Enemies',
+    '结束回合': 'End Turn',
+    '踏入宅邸': 'Enter the Manor',
+    '资源不足': 'Not enough resources',
+    '生命已满': 'Health is full',
+    '线索不足': 'Not enough clues',
+    '战略抉择': 'Strategic Decision',
+    '末日献祭': 'Doom Offering',
+    '直面恐惧': 'Face the Terror',
+    '沉思冥想': 'Meditate',
+    '恢复生命': 'Restore Health',
+    '恢复理智': 'Restore Sanity',
+    '幽暗长廊': 'Dim Corridor',
+    '未知房间': 'Unknown Room',
+    '前往探索': 'Explore here',
+    '紧急资助': 'Emergency Funding',
+    '守护护符': 'Guardian Amulet',
+    '直觉闪避': 'Instinctive Dodge',
+    '洞察之眼': 'Eye of Insight',
+    '古老咒典': 'Ancient Tome',
+    '冰冷尖啸': 'Cold Shriek',
+    '虚空蔓延': 'Void Spread',
+    '虚空低语': 'Void Whispers',
+    '虚空教徒': 'Void Cultist',
+    '腐朽之息': 'Breath of Rot',
+    '重新开始': 'Restart',
+    '最终评级': 'Final Grade',
+    '剩余生命': 'Remaining Health',
+    '剩余理智': 'Remaining Sanity',
+    '剩余资源': 'Remaining Resources',
+    '完成幕数': 'Acts Completed',
+    '末日压力': 'Doom Pressure',
+    '勉强幸存': 'Barely Survived',
+    '险象环生': 'By the Skin of Your Teeth',
+    '虽败犹荣': 'Glorious in Defeat',
+    '徒劳无功': 'All in Vain',
+    '化为虚无': 'Lost to the Void',
+    '游戏规则': 'Rules of the Game',
+    '调查失败': 'Investigation failed',
+    '闪避失败': 'Evade failed',
+    '检验成功': 'Test passed',
+    '检验失败': 'Test failed',
+    '查看规则': 'View Rules',
+    '费{V}': 'Cost {V}',
+    '混沌袋:': 'Chaos bag:',
+    '· 规则': '· Rules',
+    '· 教程': '· Tutorial',
+    '· 重开': '· Restart',
+    '神圣加护': 'Divine Blessing',
+    '平衡之刻': 'Balanced Moment',
+    '阴霾笼罩': 'Shrouded',
+    '虚空侵蚀': 'Void Erosion',
+    '📜 规则': '📜 Rules',
+    '❦ 教程': '❦ Tutorial',
+    '↻ 重开': '↻ Restart',
+    '手牌为空': 'Empty hand',
+    '打出卡牌': 'Play card',
+    '行动消耗': 'Action Costs',
+    '卡牌类型': 'Card Types',
+    '四大阶段': 'Four Phases',
+    '游戏目标': 'Objective',
+    '快捷键': 'Hotkeys',
+    '行动力': 'Actions',
+    '无交战': 'None engaged',
+    '急救包': 'First Aid Kit',
+    '主卧室': 'Master Bedroom',
+    '地下室': 'Cellar',
+    '可移动': 'Move here',
+    '放大镜': 'Magnifying Glass',
+    '避难所': 'Sanctuary',
+    '霰弹枪': 'Shotgun',
+    '不使用': 'Do not use',
+    '目标:': 'Goal:',
+    '调查:': 'Investigate:',
+    '战斗:': 'Combat:',
+    '闪避:': 'Evade:',
+    '失败:': 'Defeat:',
+    '槽位满': 'Slot Full',
+    '无装备': 'No assets',
+    '规则': 'Rules',
+    '教程': 'Tutorial',
+    '重开': 'Restart',
+    '密谋': 'Agenda',
+    '场景': 'Act',
+    '遮蔽': 'Shroud',
+    '线索': 'Clues',
+    '生命': 'Health',
+    '理智': 'Sanity',
+    '资源': 'Resources',
+    '意志': 'Willpower',
+    '智力': 'Intellect',
+    '战斗': 'Combat',
+    '敏捷': 'Agility',
+    '装备': 'Equipped',
+    '调查': 'Investigate',
+    '闪避': 'Evade',
+    '疗伤': 'Mend',
+    '战略': 'Strategy',
+    '祭祀': 'Ritual',
+    '手牌': 'Hand',
+    '弃牌': 'Discard',
+    '书房': 'Study',
+    '阁楼': 'Attic',
+    '预兆': 'Premonition',
+    '使用': 'Use',
+    '继续': 'Continue',
+    '总评': 'TOTAL',
+    '取消': 'Cancel',
+    '关闭': 'Close',
+    '成功': 'Success',
+    '失败': 'Failed',
+    '事件': 'Event',
+    '技能': 'Skill',
+    '空格': 'Space',
+    '回车': 'Enter',
+    '手部': 'Hand',
+    '身体': 'Body',
+    '配饰': 'Accessory',
+    '秘术': 'Arcane',
+    '第': 'Round',
+    '弃': 'Discard'
+  };
+
+  function tr(text) {
+    if (!text) return text;
+    if (T[text.trim()]) return T[text.trim()];
+    var result = text;
+    for (var cn in T) {
+      if (result.indexOf(cn) !== -1) {
+        result = result.split(cn).join(T[cn]);
+      }
+    }
+    return result;
+  }
+
+  var origFillText = CanvasRenderingContext2D.prototype.fillText;
+  CanvasRenderingContext2D.prototype.fillText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origFillText.call(this, text, x, y, maxWidth);
+    return origFillText.call(this, text, x, y);
+  };
+  var origStrokeText = CanvasRenderingContext2D.prototype.strokeText;
+  CanvasRenderingContext2D.prototype.strokeText = function(text, x, y, maxWidth) {
+    if (typeof text === 'string') text = tr(text);
+    if (maxWidth !== undefined) return origStrokeText.call(this, text, x, y, maxWidth);
+    return origStrokeText.call(this, text, x, y);
+  };
+
+  function translateDOM(root) {
+    if (!root) root = document.body;
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      var translated = tr(node.nodeValue);
+      if (translated !== node.nodeValue) node.nodeValue = translated;
+    }
+    var els = root.querySelectorAll('[title],[alt],[placeholder]');
+    for (var i = 0; i < els.length; i++) {
+      ['title','alt','placeholder'].forEach(function(attr){
+        if (els[i].hasAttribute(attr)) {
+          var v = els[i].getAttribute(attr);
+          var t = tr(v);
+          if (t !== v) els[i].setAttribute(attr, t);
+        }
+      });
+    }
+  }
+
+  if (document.title) {
+    var newTitle = tr(document.title);
+    if (newTitle !== document.title) document.title = newTitle;
+  }
+
+  function init() { translateDOM(document.body); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'childList') {
+        m.addedNodes.forEach(function(node) {
+          if (node.nodeType === 3) {
+            var t = tr(node.nodeValue);
+            if (t !== node.nodeValue) node.nodeValue = t;
+          } else if (node.nodeType === 1) {
+            translateDOM(node);
+          }
+        });
+      } else if (m.type === 'characterData') {
+        var t = tr(m.target.nodeValue);
+        if (t !== m.target.nodeValue) m.target.nodeValue = t;
+      }
+    });
+  });
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', function() {
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    });
+  }
+  setTimeout(init, 500);
+  setTimeout(init, 2000);
+})();
+</script>
+<style id="auto-fit">
+html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
+</style>
+<script id="auto-fit-script">
+(function(){
+  function fitGame(){
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
+    if(!stage)return;
+    var sw=stage.scrollWidth,sh=stage.scrollHeight;
+    if(!sw||!sh)return;
+    var vw=window.innerWidth,vh=window.innerHeight;
+    var scale=Math.min(vw/sw,vh/sh);
+    stage.style.transformOrigin='top left';
+    stage.style.transform='scale('+scale+')';
+    stage.style.position='absolute';
+    stage.style.left=((vw-sw*scale)/2)+'px';
+    stage.style.top=((vh-sh*scale)/2)+'px';
+  }
+  if(document.readyState==='complete')fitGame();
+  else window.addEventListener('load',fitGame);
+  window.addEventListener('resize',fitGame);
+  setTimeout(fitGame,100);
+  setTimeout(fitGame,500);
+  setTimeout(fitGame,1500);
+})();
+</script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>诡秘调查：虚空之影</title>
+<style>
+:root{
+  --bg-black:#0a0508;
+  --parchment:#d2b48c;
+  --parchment-dark:#a0895e;
+  --parchment-dim:#7a6a4a;
+  --blood:#8b0000;
+  --blood-bright:#b71d1d;
+  --void-purple:#1a0d2e;
+  --void-deep:#0d0617;
+  --gold:#c9a96e;
+  --gold-dim:#8a7548;
+  --ink:#1a1410;
+  --line:rgba(201,169,110,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{
+  width:100%;height:100%;overflow:hidden;
+  background:#0a0508;
+  font-family:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,'Times New Roman',serif;
+  color:var(--parchment);
+  user-select:none;
+  letter-spacing:0.3px;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  background:
+    radial-gradient(circle at 15% 20%,rgba(139,0,0,0.06) 0%,transparent 35%),
+    radial-gradient(circle at 85% 80%,rgba(26,13,46,0.5) 0%,transparent 45%),
+    repeating-linear-gradient(45deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.7) 100%);
+}
+/* 哥特装饰角 */
+.corner-deco{
+  position:absolute;width:24px;height:24px;
+  border:1px solid var(--gold-dim);pointer-events:none;
+}
+.corner-deco.tl{top:4px;left:4px;border-right:none;border-bottom:none;}
+.corner-deco.tr{top:4px;right:4px;border-left:none;border-bottom:none;}
+.corner-deco.bl{bottom:4px;left:4px;border-right:none;border-top:none;}
+.corner-deco.br{bottom:4px;right:4px;border-left:none;border-top:none;}
+#app{
+  position:relative;width:100%;height:100%;z-index:3;
+  display:grid;
+  grid-template-columns:1fr 320px;
+  grid-template-rows:32px auto 1fr auto;
+  gap:8px;padding:8px;
+}
+/* ===== 顶部危机区 ===== */
+#threat-area{
+  grid-column:1/3;grid-row:2;
+  display:flex;gap:12px;justify-content:center;align-items:stretch;
+  padding:8px;
+}
+.threat-card{
+  flex:1;max-width:380px;
+  background:#1a0d08;
+  border:1px solid var(--gold-dim);
+  border-radius:2px;padding:12px 16px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.6),inset 0 0 30px rgba(0,0,0,0.4);
+  position:relative;overflow:hidden;
+}
+.threat-card::before{
+  content:"";position:absolute;inset:4px;
+  border:1px solid var(--line);border-radius:1px;pointer-events:none;
+}
+.threat-card.agenda{border-color:var(--blood-bright);background:#1c0808;}
+.threat-card.act{border-color:#4a7c59;background:#0c140c;}
+.threat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line);}
+.threat-title{
+  font-size:15px;font-weight:bold;letter-spacing:2px;
+  text-shadow:0 0 6px currentColor;
+  font-variant:small-caps;
+}
+.agenda .threat-title{color:var(--blood-bright);}
+.act .threat-title{color:#6fae7f;}
+.threat-desc{font-size:11px;color:var(--parchment-dark);font-style:italic;line-height:1.3;}
+.threat-track{
+  display:flex;gap:4px;margin-top:6px;align-items:center;
+}
+.token-slot{
+  width:20px;height:20px;border-radius:50%;
+  border:1px solid var(--gold-dim);
+  background:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:bold;
+  transition:all 0.3s;
+}
+.token-slot.filled{
+  background:radial-gradient(circle,#8b0000 30%,#3a0000 100%);
+  box-shadow:0 0 8px var(--blood),inset 0 0 4px #ff0000;
+  border-color:var(--blood-bright);
+  animation:doomPulse 2s infinite;
+}
+.token-slot.clue-filled{
+  background:radial-gradient(circle,#d2b48c 30%,#6f5a3a 100%);
+  box-shadow:0 0 6px var(--gold),inset 0 0 4px #ffd700;
+}
+@keyframes doomPulse{0%,100%{box-shadow:0 0 8px var(--blood),inset 0 0 4px #ff0000;}50%{box-shadow:0 0 14px var(--blood),inset 0 0 6px #ff3333;}}
+.phase-indicator{
+  flex:0 0 160px;text-align:center;padding:8px 12px;
+  background:#0d0617;border:1px solid var(--gold-dim);
+  border-radius:2px;font-size:13px;letter-spacing:3px;
+  font-variant:small-caps;
+  text-shadow:0 0 4px currentColor;
+}
+/* ===== 中部场景地图 ===== */
+#locations-map{
+  grid-column:1;grid-row:3;
+  display:grid;
+  grid-template-columns:1fr 1.15fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:10px;padding:10px;
+  background:#0d0617;
+  border:1px solid var(--line);
+  border-radius:2px;
+  position:relative;
+}
+/* 让长廊作为枢纽居中放置 */
+.location-card[data-loc-id="hallway"]{grid-column:2;grid-row:1;}
+.location-card[data-loc-id="study"]{grid-column:1;grid-row:1;}
+.location-card[data-loc-id="attic"]{grid-column:3;grid-row:1;}
+.location-card[data-loc-id="bedroom"]{grid-column:1;grid-row:2;}
+.location-card[data-loc-id="cellar"]{grid-column:3;grid-row:2;}
+#locations-map::before,#locations-map::after{
+  content:"";position:absolute;
+  width:60px;height:1px;background:var(--gold-dim);
+}
+#locations-map::before{top:0;left:50%;transform:translateX(-50%);}
+#locations-map::after{bottom:0;left:50%;transform:translateX(-50%);}
+/* 连通线 SVG 层 */
+#connection-svg{
+  position:absolute;inset:0;pointer-events:none;z-index:3;
+}
+.location-card{
+  background:#221a10;
+  border:1px solid var(--parchment-dim);
+  border-radius:2px;padding:12px;
+  position:relative;cursor:default;
+  transition:all 0.25s;overflow:hidden;
+  display:flex;flex-direction:column;
+  z-index:2;
+}
+.location-card:hover{border-color:var(--gold);box-shadow:0 0 12px rgba(201,169,110,0.3);}
+.location-card.unexplored{
+  background:#0d0617;border-color:#2a2040;
+}
+.location-card.unexplored:hover{border-color:#3a2a5a;box-shadow:none;}
+/* 未探索但可前往(相邻)的状态 */
+.location-card.unexplored.adjacent{
+  border-color:#5a8a6a;
+  cursor:pointer;
+  background:linear-gradient(145deg,#0d0617 0%,#0a1008 100%);
+  box-shadow:0 0 8px rgba(90,138,106,0.3);
+}
+.location-card.unexplored.adjacent:hover{
+  border-color:#8fcf9f;
+  box-shadow:0 0 16px rgba(111,174,127,0.5);
+  transform:translateY(-2px);
+}
+.location-card.unexplored.adjacent::before{
+  content:"?";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:42px;
+  color:#3a5a4a;text-shadow:0 0 12px #5a8a6a;
+  font-family:Georgia,serif;font-weight:bold;
+  opacity:0.6;
+}
+.location-card.unexplored:not(.adjacent)::before{
+  content:"?";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);font-size:54px;
+  color:#2a1f4a;text-shadow:0 0 16px #3a2a6a;
+  font-family:Georgia,serif;font-weight:bold;
+}
+.location-card.current{
+  border-color:var(--gold);
+  box-shadow:0 0 16px rgba(201,169,110,0.4),inset 0 0 20px rgba(201,169,110,0.05);
+}
+.location-card.unexplored .loc-content{display:none;}
+.location-card.unexplored .loc-header,
+.location-card.unexplored .loc-stats,
+.location-card.unexplored .clue-icons,
+.location-card.unexplored .loc-enemies{display:none;}
+.loc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--line);}
+.loc-name{font-size:15px;font-weight:bold;color:var(--parchment);text-shadow:0 0 4px #000;letter-spacing:1px;font-variant:small-caps;}
+.shroud-badge{
+  background:#0a0508;border:1px solid var(--blood);
+  color:var(--blood-bright);font-size:10px;font-weight:bold;
+  padding:2px 8px;border-radius:1px;letter-spacing:1px;
+}
+.loc-stats{display:flex;gap:10px;font-size:11px;margin-bottom:6px;}
+.stat-item{color:var(--parchment-dim);}
+.stat-item b{color:var(--gold);font-weight:bold;}
+.clue-icons{display:flex;gap:3px;margin:4px 0;}
+.clue-icon{
+  width:12px;height:12px;border-radius:50%;
+  background:radial-gradient(circle,var(--gold) 30%,#6f5a3a 100%);
+  box-shadow:0 0 3px var(--gold);
+}
+.enemy-badge{
+  position:absolute;top:8px;right:8px;
+  background:var(--blood);color:#fff;font-size:10px;
+  padding:2px 6px;border-radius:1px;font-weight:bold;
+  box-shadow:0 0 6px var(--blood);
+}
+.loc-content{flex:1;font-size:10px;color:var(--parchment-dim);font-style:italic;line-height:1.4;}
+.investigator-token{
+  position:absolute;bottom:10px;right:10px;
+  width:34px;height:34px;border-radius:50%;
+  background:radial-gradient(circle,#c9a96e 0%,#8b6914 100%);
+  border:1px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--void-deep);font-weight:bold;
+  font-family:Georgia,serif;
+  box-shadow:0 0 12px var(--gold);
+  animation:tokenFloat 3s ease-in-out infinite;
+}
+@keyframes tokenFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+/* ===== 右侧调查员面板 ===== */
+#investigator-panel{
+  grid-column:2;grid-row:3;
+  background:#0d0617;
+  border:1px solid var(--gold-dim);
+  border-radius:2px;padding:14px;
+  display:flex;flex-direction:column;gap:10px;overflow-y:auto;
+  position:relative;
+  box-shadow:0 2px 12px rgba(0,0,0,0.6);
+}
+.inv-header{text-align:center;border-bottom:1px solid var(--gold-dim);padding-bottom:10px;position:relative;}
+.inv-header::after{
+  content:"❦";position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);
+  background:#0d0617;padding:0 6px;color:var(--gold-dim);font-size:14px;
+}
+.inv-name{font-size:19px;font-weight:bold;letter-spacing:3px;color:var(--gold);text-shadow:0 0 8px rgba(201,169,110,0.4);font-variant:small-caps;}
+.inv-title{font-size:10px;color:var(--parchment-dim);font-style:italic;margin-top:4px;letter-spacing:1px;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.stat-bar{
+  background:#000;border:1px solid var(--parchment-dim);
+  border-radius:1px;padding:6px 8px;text-align:center;
+  position:relative;
+}
+.stat-label{font-size:9px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:2px;}
+.stat-value{font-size:18px;font-weight:bold;margin-top:2px;font-family:Georgia,serif;}
+.stat-bar.health .stat-value{color:var(--blood-bright);text-shadow:0 0 4px rgba(183,29,29,0.4);}
+.stat-bar.sanity .stat-value{color:#6a8acf;text-shadow:0 0 4px rgba(106,138,207,0.4);}
+.stat-bar.resources .stat-value{color:var(--gold);}
+.stat-bar.actions .stat-value{color:#c9a96e;}
+.attributes{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.attr-card{
+  background:#000;border:1px solid var(--parchment-dim);
+  border-radius:1px;padding:6px;text-align:center;position:relative;
+}
+.attr-card .attr-icon{font-size:14px;line-height:1;}
+.attr-card .attr-name{font-size:9px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:2px;margin-top:2px;}
+.attr-card .attr-val{font-size:17px;font-weight:bold;color:var(--parchment);font-family:Georgia,serif;margin-top:2px;}
+.attr-card.willpower .attr-val{color:#9a7fbf;}
+.attr-card.intellect .attr-val{color:#7faacf;}
+.attr-card.combat .attr-val{color:var(--blood-bright);}
+.attr-card.agility .attr-val{color:#7fcf9a;}
+.equipped-section{border-top:1px solid var(--line);padding-top:8px;}
+.section-title{font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:3px;margin-bottom:6px;font-variant:small-caps;}
+.equipped-list{display:flex;flex-direction:column;gap:4px;}
+.equipped-item{
+  background:#1a0d08;border:1px solid var(--line);
+  border-radius:1px;padding:5px 8px;font-size:10px;
+  display:flex;justify-content:space-between;align-items:center;
+  transition:all 0.2s;
+}
+.enemy-item:hover{border-color:var(--blood-bright);}
+.enemy-item.selected{border-color:var(--blood-bright);background:#2a0808;box-shadow:0 0 6px rgba(183,29,29,0.4);}
+.enemy-item.exhausted{opacity:0.5;text-decoration:line-through;}
+.equipped-item .eq-name{color:var(--parchment);}
+.equipped-item .eq-effect{color:var(--parchment-dark);font-style:italic;}
+/* ===== 底部手牌区 ===== */
+#bottom-area{
+  grid-column:1/3;grid-row:4;
+  display:grid;grid-template-columns:170px 1fr 220px;gap:10px;
+  background:#0d0617;border:1px solid var(--line);
+  border-radius:2px;padding:10px;min-height:170px;
+}
+#hand-container{
+  display:flex;flex-direction:column;gap:4px;min-height:148px;
+}
+.hand-tabs{
+  display:flex;gap:4px;border-bottom:1px solid var(--gold-dim);
+  padding-bottom:4px;
+}
+.hand-tab{
+  background:transparent;border:none;color:var(--parchment-dim);
+  font-size:11px;padding:4px 12px;cursor:pointer;
+  font-family:Georgia,serif;letter-spacing:1px;
+  border-bottom:2px solid transparent;
+  transition:all 0.2s;
+}
+.hand-tab:hover{color:var(--parchment);}
+.hand-tab.active{
+  color:var(--gold);border-bottom-color:var(--gold);
+}
+.tab-count{
+  background:#2a1a0a;border:1px solid var(--gold-dim);
+  color:var(--gold);font-size:9px;padding:1px 5px;
+  border-radius:8px;margin-left:4px;
+}
+.hand-tab-content{
+  display:none;flex:1;overflow-x:auto;overflow-y:hidden;
+  padding:4px 0;
+}
+.hand-tab-content.active{display:flex;gap:6px;align-items:flex-start;}
+/* 可用牌高亮(资源足够+阶段正确) */
+.hand-card.playable{
+  border-color:#6fae7f;
+  box-shadow:0 0 8px rgba(111,174,127,0.3);
+}
+.hand-card.unaffordable{
+  opacity:0.55;
+}
+/* 弃牌堆/装备展示的简化卡片 */
+.mini-card{
+  width:90px;height:128px;flex-shrink:0;
+  background:#1a0d08;border:1px solid var(--parchment-dark);
+  border-radius:2px;padding:6px;font-size:9px;
+  position:relative;cursor:default;
+  display:flex;flex-direction:column;gap:3px;
+}
+.mini-card .mini-name{
+  color:var(--gold);font-size:10px;font-weight:bold;
+  border-bottom:1px solid var(--parchment-dark);padding-bottom:2px;
+}
+.mini-card .mini-text{color:var(--parchment-dim);font-size:8px;line-height:1.4;}
+.mini-card .mini-cost{
+  position:absolute;top:-4px;right:-4px;
+  width:18px;height:18px;line-height:18px;text-align:center;
+  background:#8b0000;color:#d2b48c;border-radius:50%;
+  font-size:10px;font-weight:bold;border:1px solid var(--gold-dim);
+}
+#chaos-bag-area{
+  background:#000;
+  border:1px solid var(--blood);
+  border-radius:2px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;cursor:pointer;padding:10px;
+}
+.chaos-bag-visual{
+  width:74px;height:74px;border-radius:50%;
+  background:#0a0000;
+  border:1px solid var(--blood);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:var(--blood-bright);
+  box-shadow:0 0 12px rgba(139,0,0,0.4),inset 0 0 16px rgba(0,0,0,0.8);
+  transition:all 0.3s;
+}
+#chaos-bag-area:hover .chaos-bag-visual{transform:scale(1.05);box-shadow:0 0 18px var(--blood);}
+.chaos-bag-visual.shaking{animation:bagShake 0.5s ease-in-out;}
+@keyframes bagShake{
+  0%,100%{transform:translate(0,0) rotate(0);}
+  10%{transform:translate(-3px,-2px) rotate(-5deg);}
+  20%{transform:translate(3px,-1px) rotate(5deg);}
+  30%{transform:translate(-3px,1px) rotate(-5deg);}
+  40%{transform:translate(3px,2px) rotate(5deg);}
+  50%{transform:translate(-2px,-2px) rotate(-3deg);}
+  60%{transform:translate(2px,1px) rotate(3deg);}
+  70%{transform:translate(-2px,2px) rotate(-2deg);}
+  80%{transform:translate(2px,-1px) rotate(2deg);}
+  90%{transform:translate(-1px,1px) rotate(-1deg);}
+}
+.chaos-bag-label{font-size:9px;color:var(--parchment-dim);text-align:center;margin-top:8px;text-transform:uppercase;letter-spacing:2px;font-variant:small-caps;}
+#hand-area{
+  display:flex;gap:8px;align-items:center;justify-content:center;
+  flex-wrap:wrap;padding:4px;overflow-x:auto;
+}
+.hand-card{
+  width:108px;height:148px;
+  background:#1a0d08;
+  border:1px solid var(--parchment-dim);border-radius:2px;
+  padding:7px;cursor:grab;position:relative;
+  transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s;
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+}
+.hand-card::before{
+  content:"";position:absolute;inset:3px;
+  border:1px solid var(--line);border-radius:1px;pointer-events:none;
+}
+.hand-card:hover{
+  transform:translateY(-10px) scale(1.06);
+  box-shadow:0 8px 20px rgba(0,0,0,0.8),0 0 16px rgba(201,169,110,0.5);
+  border-color:var(--gold);z-index:10;
+}
+.hand-card.dragging{opacity:0.5;cursor:grabbing;}
+.card-type{
+  font-size:8px;text-transform:uppercase;letter-spacing:1px;
+  padding:1px 4px;border-radius:1px;text-align:center;margin-bottom:4px;
+  border:1px solid currentColor;
+}
+.card-type.asset{color:#7faacf;}
+.card-type.event{color:#7fcf9a;}
+.card-type.skill{color:#9a7fbf;}
+.card-name{font-size:11px;font-weight:bold;color:var(--parchment);text-align:center;margin-bottom:4px;line-height:1.15;font-variant:small-caps;letter-spacing:0.5px;}
+.card-cost{
+  position:absolute;top:5px;right:5px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);color:#000;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:bold;font-family:Georgia,serif;
+  border:1px solid #8b6914;
+}
+.card-text{font-size:8px;color:var(--parchment-dim);line-height:1.25;flex:1;font-style:italic;}
+.card-uses{font-size:9px;color:var(--gold);text-align:center;margin-top:2px;border-top:1px solid var(--line);padding-top:2px;}
+#action-log{
+  background:#000;border:1px solid var(--line);
+  border-radius:1px;padding:8px;overflow-y:auto;
+  font-size:10px;color:var(--parchment-dim);
+  max-height:150px;
+  font-family:'Consolas','Monaco',monospace;
+}
+#action-log::-webkit-scrollbar{width:4px;}
+#action-log::-webkit-scrollbar-thumb{background:var(--parchment-dark);border-radius:2px;}
+.log-entry{margin-bottom:3px;line-height:1.3;}
+.log-entry.event{color:var(--blood-bright);}
+.log-entry.success{color:#6fae7f;}
+.log-entry.warn{color:var(--gold);}
+.log-entry.phase{color:#9a7fbf;font-weight:bold;border-top:1px dashed #3a2a4a;padding-top:3px;margin-top:3px;}
+/* ===== 弹出层 ===== */
+.overlay{
+  position:fixed;inset:0;z-index:100;
+  background:rgba(0,0,0,0.92);
+  display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(6px);
+}
+.overlay.hidden{display:none;}
+.overlay-content{
+  background:#0d0617;
+  border:1px solid var(--gold);border-radius:2px;
+  padding:40px 60px;text-align:center;max-width:600px;
+  box-shadow:0 0 40px rgba(201,169,110,0.3);
+  position:relative;
+}
+.overlay-content::before{
+  content:"";position:absolute;inset:8px;
+  border:1px solid var(--line);border-radius:1px;pointer-events:none;
+}
+.overlay-content .corner-deco{width:20px;height:20px;}
+.game-title{
+  font-size:46px;font-weight:bold;letter-spacing:8px;
+  color:var(--gold);
+  text-shadow:0 0 20px rgba(201,169,110,0.5),0 2px 4px #000;
+  margin-bottom:6px;
+  font-variant:small-caps;
+}
+.game-subtitle{font-size:15px;color:var(--blood-bright);font-style:italic;letter-spacing:4px;margin-bottom:24px;font-variant:small-caps;}
+.story-text{font-size:13px;color:var(--parchment);line-height:1.7;margin-bottom:24px;text-align:justify;text-indent:2em;}
+.btn{
+  background:#8b0000;
+  border:1px solid var(--gold);color:var(--parchment);
+  padding:12px 36px;font-size:14px;font-weight:bold;letter-spacing:4px;
+  cursor:pointer;border-radius:1px;font-family:inherit;
+  transition:all 0.2s;text-transform:uppercase;
+  font-variant:small-caps;
+  box-shadow:0 2px 8px rgba(0,0,0,0.6);
+}
+.btn:hover{background:var(--blood-bright);transform:translateY(-1px);box-shadow:0 4px 12px rgba(139,0,0,0.6),0 0 12px rgba(201,169,110,0.4);}
+.btn:active{transform:translateY(0);}
+.btn.secondary{background:#2a2418;}
+/* 混沌代币显示 */
+.chaos-token-display{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  width:130px;height:130px;border-radius:50%;
+  background:#000;
+  border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;z-index:90;
+  box-shadow:0 0 50px var(--gold),0 0 80px var(--blood);
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.chaos-token-display.show{transform:translate(-50%,-50%) scale(1);}
+.chaos-token-display.fail{border-color:var(--blood-bright);box-shadow:0 0 50px var(--blood);}
+.chaos-token-display.success{border-color:#6fae7f;box-shadow:0 0 50px #6fae7f;}
+.chaos-token-symbol{font-size:42px;font-weight:bold;font-family:Georgia,serif;}
+.chaos-token-text{font-size:11px;color:var(--parchment-dim);margin-top:4px;letter-spacing:1px;text-align:center;padding:0 8px;}
+/* 结局界面 */
+.ending-title{
+  font-size:34px;font-weight:bold;letter-spacing:4px;margin-bottom:16px;
+  font-variant:small-caps;
+}
+.ending-title.victory{
+  color:var(--gold);
+  text-shadow:0 0 30px rgba(255,215,0,0.6),0 0 60px rgba(201,169,110,0.4);
+}
+.ending-title.defeat{color:var(--blood-bright);text-shadow:0 0 24px var(--blood);}
+.ending-desc{font-size:13px;color:var(--parchment);line-height:1.7;margin-bottom:28px;font-style:italic;}
+/* 评分等级徽章 */
+.ending-grade{
+  display:flex;flex-direction:column;align-items:center;
+  margin:8px 0 18px;padding:14px 24px;
+  border:1px solid var(--gold-dim);border-radius:2px;
+  background:linear-gradient(180deg,rgba(26,13,8,0.6) 0%,rgba(13,6,23,0.8) 100%);
+  position:relative;
+}
+.ending-grade.hidden{display:none;}
+.ending-grade::before,.ending-grade::after{
+  content:"❦";position:absolute;top:50%;transform:translateY(-50%);
+  color:var(--gold-dim);font-size:14px;
+}
+.ending-grade::before{left:6px;}
+.ending-grade::after{right:6px;}
+.grade-label{
+  font-size:9px;letter-spacing:4px;color:var(--parchment-dim);
+  text-transform:uppercase;font-variant:small-caps;margin-bottom:4px;
+}
+.grade-letter{
+  font-size:54px;font-weight:bold;font-family:Georgia,serif;
+  line-height:1;margin:2px 0 4px;
+  text-shadow:0 0 24px currentColor;
+  animation:gradeGlow 2s ease-in-out infinite alternate;
+}
+@keyframes gradeGlow{from{filter:drop-shadow(0 0 4px currentColor);}to{filter:drop-shadow(0 0 14px currentColor);}}
+.grade-letter.S{color:#ffd700;}
+.grade-letter.A{color:#c9a96e;}
+.grade-letter.B{color:#7fcf9a;}
+.grade-letter.C{color:#7faacf;}
+.grade-letter.D{color:#8b0000;}
+.grade-title{
+  font-size:11px;color:var(--parchment-dark);font-style:italic;letter-spacing:2px;
+}
+/* 评分明细 */
+.score-breakdown{
+  margin-bottom:20px;padding:12px 16px;
+  border:1px solid var(--line);border-radius:2px;
+  background:rgba(0,0,0,0.4);
+  display:grid;grid-template-columns:1fr auto;gap:4px 16px;
+  font-size:11px;
+}
+.score-breakdown.hidden{display:none;}
+.score-breakdown .sb-label{color:var(--parchment-dim);}
+.score-breakdown .sb-value{color:var(--gold);text-align:right;font-family:Georgia,serif;}
+.score-breakdown .sb-total{
+  grid-column:1/3;border-top:1px solid var(--gold-dim);
+  margin-top:6px;padding-top:6px;display:flex;justify-content:space-between;
+}
+.score-breakdown .sb-total .sb-label{color:var(--gold);letter-spacing:2px;text-transform:uppercase;font-variant:small-caps;}
+.score-breakdown .sb-total .sb-value{font-size:16px;font-weight:bold;color:var(--gold);}
+.score-breakdown .sb-value.neg{color:var(--blood-bright);}
+/* 行动按钮 */
+.action-buttons{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.action-btn{
+  background:#1a0d2e;border:1px solid var(--gold-dim);
+  color:var(--parchment);padding:6px 12px;font-size:11px;
+  cursor:pointer;border-radius:1px;font-family:inherit;
+  transition:all 0.2s;letter-spacing:1px;
+}
+.action-btn:hover:not(:disabled){background:var(--gold);color:#000;border-color:var(--gold);}
+.action-btn:disabled{opacity:0.35;cursor:not-allowed;}
+/* 通知 */
+#toast{
+  position:fixed;top:80px;left:50%;transform:translateX(-50%);
+  background:#0d0617;border:1px solid var(--blood);
+  color:var(--parchment);padding:12px 28px;border-radius:1px;
+  font-size:13px;z-index:80;opacity:0;transition:opacity 0.3s;
+  pointer-events:none;text-align:center;max-width:80%;
+  letter-spacing:2px;font-variant:small-caps;
+  box-shadow:0 4px 16px rgba(0,0,0,0.8),0 0 20px rgba(139,0,0,0.4);
+}
+#toast.show{opacity:1;}
+.scrollbar::-webkit-scrollbar{width:6px;}
+.scrollbar::-webkit-scrollbar-track{background:#000;}
+.scrollbar::-webkit-scrollbar-thumb{background:var(--parchment-dim);border-radius:3px;}
+#investigator-panel::-webkit-scrollbar{width:6px;}
+#investigator-panel::-webkit-scrollbar-track{background:#000;}
+#investigator-panel::-webkit-scrollbar-thumb{background:var(--parchment-dim);border-radius:3px;}
+#hand-area::-webkit-scrollbar{height:6px;}
+#hand-area::-webkit-scrollbar-track{background:#000;}
+#hand-area::-webkit-scrollbar-thumb{background:var(--parchment-dim);border-radius:3px;}
+/* 拖拽放置区 */
+.drop-zone{
+  border:2px dashed transparent;border-radius:6px;
+  transition:all 0.2s;
+}
+.drop-zone.active{border-color:var(--gold);background:rgba(201,169,110,0.1);}
+/* 雾气粒子 */
+#fog-canvas{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:0.25;}
+/* 地点卡装饰角 */
+.location-card .corner-deco{width:14px;height:14px;border-color:var(--gold-dim);}
+/* 当前地点高亮动画 */
+.location-card.current::after{
+  content:"";position:absolute;inset:-1px;
+  border:1px solid var(--gold);border-radius:2px;pointer-events:none;
+  box-shadow:0 0 12px rgba(201,169,110,0.3);
+  animation:currentGlow 2s ease-in-out infinite;
+}
+@keyframes currentGlow{0%,100%{opacity:0.6;}50%{opacity:1;}}
+/* 相邻可移动地点高亮 */
+.location-card.adjacent{
+  border-color:#6fae7f;
+  box-shadow:0 0 10px rgba(111,174,127,0.4);
+}
+.location-card.adjacent:hover{
+  border-color:#8fcf9f;
+  box-shadow:0 0 16px rgba(111,174,127,0.6);
+  transform:translateY(-2px);
+}
+.move-hint{
+  position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  background:#6fae7f;color:#0a0508;font-size:9px;
+  padding:1px 8px;border-radius:1px;letter-spacing:1px;
+  font-weight:bold;animation:moveBlink 1.5s infinite;
+  z-index:5;
+}
+.move-hint.explore{
+  background:#c9a96e;color:#0a0508;
+  animation:exploreBlink 1.2s infinite;
+}
+@keyframes exploreBlink{
+  0%,100%{opacity:1;box-shadow:0 0 6px rgba(201,169,110,0.6);}
+  50%{opacity:0.7;box-shadow:0 0 12px rgba(201,169,110,0.9);}
+}
+/* 调查员 token 移动动画 */
+.investigator-token.moving{
+  animation:tokenMove 0.5s ease-out;
+}
+@keyframes tokenMove{
+  0%{transform:scale(1);opacity:1;}
+  50%{transform:scale(1.4);opacity:0.6;}
+  100%{transform:scale(1);opacity:1;}
+}
+@keyframes moveBlink{0%,100%{opacity:1;}50%{opacity:0.5;}}
+/* 地点上的敌人标签 */
+.loc-enemies{
+  display:flex;flex-wrap:wrap;gap:3px;margin:4px 0;
+}
+.loc-enemy-tag{
+  background:#2a0808;border:1px solid var(--blood);
+  color:#ff9999;font-size:9px;padding:1px 5px;border-radius:1px;
+}
+.loc-enemy-tag.exhausted{opacity:0.5;text-decoration:line-through;}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 2px 8px rgba(0,0,0,0.6),0 0 0 rgba(201,169,110,0);}
+  50%{box-shadow:0 2px 8px rgba(0,0,0,0.6),0 0 20px rgba(201,169,110,0.6);}
+}
+/* ===== 战斗伤害反馈 ===== */
+/* 屏幕红色闪光 */
+.screen-flash{
+  position:fixed;inset:0;z-index:9999;pointer-events:none;
+  background:radial-gradient(ellipse at center,rgba(183,29,29,0) 30%,rgba(183,29,29,0.4) 100%);
+  animation:flashFade 0.5s ease-out forwards;
+}
+@keyframes flashFade{
+  0%{opacity:1;}
+  100%{opacity:0;}
+}
+/* 整个游戏容器抖动 */
+.screen-shake{
+  animation:shake 0.4s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes shake{
+  10%,90%{transform:translate3d(-2px,0,0);}
+  20%,80%{transform:translate3d(3px,0,0);}
+  30%,50%,70%{transform:translate3d(-4px,0,0);}
+  40%,60%{transform:translate3d(4px,0,0);}
+}
+/* 调查员面板抖动 */
+.panel-shake{
+  animation:panelShake 0.4s;
+}
+@keyframes panelShake{
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-6px);}
+  75%{transform:translateX(6px);}
+}
+/* 伤害飘字 */
+.damage-float{
+  position:absolute;top:40%;left:50%;
+  transform:translateX(-50%);
+  font-size:36px;font-weight:bold;
+  color:#ff3333;
+  text-shadow:0 0 12px #ff0000,2px 2px 4px #000;
+  font-family:Georgia,serif;
+  pointer-events:none;z-index:100;
+  animation:damageFloat 1.2s ease-out forwards;
+}
+@keyframes damageFloat{
+  0%{opacity:0;transform:translate(-50%,0) scale(0.5);}
+  20%{opacity:1;transform:translate(-50%,-20px) scale(1.3);}
+  100%{opacity:0;transform:translate(-50%,-80px) scale(1);}
+}
+/* 低血量警示 */
+.investigator-panel.low-health{
+  animation:lowHealthPulse 1.5s ease-in-out infinite;
+}
+.investigator-panel.low-sanity{
+  animation:lowSanityPulse 1.5s ease-in-out infinite;
+}
+.investigator-panel.low-health.low-sanity{
+  animation:lowBothPulse 1.5s ease-in-out infinite;
+}
+@keyframes lowHealthPulse{
+  0%,100%{box-shadow:inset 0 0 0 rgba(183,29,29,0);}
+  50%{box-shadow:inset 0 0 30px rgba(183,29,29,0.5),0 0 16px rgba(183,29,29,0.4);}
+}
+@keyframes lowSanityPulse{
+  0%,100%{box-shadow:inset 0 0 0 rgba(102,51,153,0);}
+  50%{box-shadow:inset 0 0 30px rgba(102,51,153,0.6),0 0 16px rgba(102,51,153,0.5);}
+}
+@keyframes lowBothPulse{
+  0%,100%{box-shadow:inset 0 0 0 rgba(183,29,29,0);}
+  33%{box-shadow:inset 0 0 30px rgba(183,29,29,0.5);}
+  66%{box-shadow:inset 0 0 30px rgba(102,51,153,0.6);}
+}
+/* 槽位已满的手牌卡 */
+.hand-card.slot-full{
+  opacity:0.5;
+  border-color:#5a3a3a;
+}
+.hand-card.slot-full::after{
+  content:"槽位满";position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%) rotate(-15deg);
+  color:#8b0000;font-size:14px;font-weight:bold;
+  text-shadow:0 0 4px #000;
+}
+/* ===== 顶部工具栏 ===== */
+#top-toolbar{
+  grid-column:1/3;grid-row:1;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:4px 16px;background:#0a0508;
+  border-bottom:1px solid var(--gold-dim);
+  height:32px;
+}
+.toolbar-title{
+  font-size:14px;color:var(--gold);letter-spacing:3px;
+  font-variant:small-caps;text-shadow:0 0 6px rgba(201,169,110,0.4);
+}
+.toolbar-buttons{display:flex;gap:6px;}
+.toolbar-btn{
+  background:#1a0d08;border:1px solid var(--gold-dim);
+  color:var(--parchment);font-size:11px;
+  padding:3px 10px;border-radius:1px;cursor:pointer;
+  transition:all 0.2s;font-family:Georgia,serif;
+}
+.toolbar-btn:hover{
+  border-color:var(--gold);color:var(--gold);
+  background:#2a1a0a;
+}
+/* ===== 教程提示气泡 ===== */
+.tutorial-tip{
+  position:fixed;background:#1a0d2e;border:1px solid var(--gold);
+  color:var(--parchment);padding:10px 14px;font-size:11px;
+  border-radius:2px;z-index:200;max-width:240px;
+  box-shadow:0 0 16px rgba(201,169,110,0.4),2px 2px 8px rgba(0,0,0,0.6);
+  animation:tipFadeIn 0.3s ease-out;
+  pointer-events:none;line-height:1.5;
+}
+.tutorial-tip::before{
+  content:"❦";position:absolute;top:-10px;left:8px;
+  color:var(--gold);font-size:12px;
+}
+@keyframes tipFadeIn{
+  from{opacity:0;transform:translateY(8px);}
+  to{opacity:1;transform:translateY(0);}
+}
+/* 阶段高亮(教程第一轮) */
+.phase-indicator.tutorial-highlight{
+  animation:tutorialBlink 1.2s infinite;
+}
+@keyframes tutorialBlink{
+  0%,100%{box-shadow:0 0 8px rgba(201,169,110,0.5);}
+  50%{box-shadow:0 0 20px rgba(201,169,110,1);}
+}
+/* ===== 动画细节 ===== */
+/* 末日标记震动 */
+.doom-shake{
+  animation:doomShake 0.5s;
+}
+@keyframes doomShake{
+  0%,100%{transform:translateX(0);}
+  10%,30%,50%,70%,90%{transform:translateX(-3px);}
+  20%,40%,60%,80%{transform:translateX(3px);}
+}
+/* 线索金币飘落 */
+.clue-coin{
+  position:fixed;width:16px;height:16px;
+  background:radial-gradient(circle at 30% 30%,#ffe680,#c9a96e 60%,#8b6f3a);
+  border-radius:50%;z-index:500;pointer-events:none;
+  box-shadow:0 0 8px rgba(201,169,110,0.8);
+  animation:coinFall 1.5s ease-out forwards;
+}
+@keyframes coinFall{
+  0%{opacity:1;transform:translateY(0) rotate(0); }
+  50%{opacity:1;transform:translateY(40px) rotate(180deg);}
+  100%{opacity:0;transform:translateY(80px) rotate(360deg);}
+}
+/* 资源金币向上飘 */
+.resource-coin{
+  position:fixed;width:14px;height:14px;
+  background:radial-gradient(circle at 30% 30%,#ffe680,#c9a96e 60%,#8b6f3a);
+  border-radius:50%;z-index:500;pointer-events:none;
+  box-shadow:0 0 6px rgba(201,169,110,0.8);
+  animation:resourceFloat 1.2s ease-out forwards;
+}
+@keyframes resourceFloat{
+  0%{opacity:1;transform:translateY(0) scale(1);}
+  100%{opacity:0;transform:translateY(-40px) scale(0.5);}
+}
+/* 装备入场展开动画 */
+.hand-card.equip-in{
+  animation:equipIn 0.5s ease-out;
+}
+@keyframes equipIn{
+  0%{transform:translateY(-20px) scale(0.8);opacity:0;}
+  50%{transform:translateY(0) scale(1.1);opacity:1;}
+  100%{transform:translateY(0) scale(1);opacity:1;}
+}
+/* 翻牌火光(地点揭示) */
+.location-card.reveal-flash::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle,rgba(255,200,100,0.6) 0%,rgba(255,200,100,0) 70%);
+  animation:revealFlash 0.8s ease-out forwards;
+  pointer-events:none;z-index:10;
+}
+@keyframes revealFlash{
+  0%{opacity:1;}
+  100%{opacity:0;}
+}
+/* ===== 调查员选择卡片 ===== */
+.inv-select-card{
+  flex:1;min-width:0;background:#1a0d08;
+  border:1px solid var(--parchment-dim);border-radius:2px;
+  padding:10px;cursor:pointer;transition:all 0.2s;
+  text-align:center;
+}
+.inv-select-card:hover{
+  border-color:var(--gold);
+  box-shadow:0 0 12px rgba(201,169,110,0.3);
+}
+.inv-select-card.selected{
+  border-color:var(--gold);
+  background:#2a1a0a;
+  box-shadow:0 0 16px rgba(201,169,110,0.5);
+}
+.inv-select-card .isc-name{
+  color:var(--gold);font-size:13px;font-weight:bold;
+  letter-spacing:1px;margin-bottom:4px;
+  font-variant:small-caps;
+}
+.inv-select-card .isc-title{
+  color:var(--parchment-dim);font-size:9px;
+  font-style:italic;margin-bottom:6px;
+}
+.inv-select-card .isc-desc{
+  color:var(--parchment);font-size:10px;
+  line-height:1.5;margin-bottom:6px;
+}
+.inv-select-card .isc-stats{
+  font-size:9px;color:var(--gold-dim);
+  line-height:1.6;border-top:1px solid var(--gold-dim);
+  padding-top:4px;
+}
+</style>
+</head>
+<body>
+<canvas id="fog-canvas"></canvas>
+<div id="app">
+  <!-- 顶部工具栏 -->
+  <div id="top-toolbar">
+    <div class="toolbar-title">诡秘调查 · 虚空之影</div>
+    <div class="toolbar-buttons">
+      <button class="toolbar-btn" id="btn-rules" title="H">📜 规则</button>
+      <button class="toolbar-btn" id="btn-tutorial" title="T">❦ 教程</button>
+      <button class="toolbar-btn" id="btn-shortcuts" title="Hotkeys">⌘ 快捷键</button>
+      <button class="toolbar-btn" id="btn-lang" title="Switch Language">中文</button>
+      <button class="toolbar-btn" id="btn-restart" title="R">↻ 重开</button>
+    </div>
+  </div>
+  <!-- 顶部危机区 -->
+  <div id="threat-area">
+    <div class="threat-card agenda">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div class="threat-header">
+        <span class="threat-title" data-i18n="agenda_title">Agenda · Doom Approaches</span>
+        <span id="agenda-num" style="font-size:10px;color:var(--parchment-dim);letter-spacing:2px;">I / III</span>
+      </div>
+      <div class="threat-desc" id="agenda-desc" data-i18n="agenda_desc">Whispers of the void glide through the walls. When doom reaches its limit, something stirs.</div>
+      <div class="threat-track" id="doom-track"></div>
+    </div>
+    <div class="phase-indicator" id="phase-indicator" data-i18n="phase_mythos">Mythos</div>
+    <div class="threat-card act">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div class="threat-header">
+        <span class="threat-title" data-i18n="act_title">Act · Shadows of the Void</span>
+        <span id="act-num" style="font-size:10px;color:var(--parchment-dim);letter-spacing:2px;">I / III</span>
+      </div>
+      <div class="threat-desc" id="act-desc" data-i18n="act_desc">Gather clues to uncover the truth of the manor. Five clues are needed to perform the ritual.</div>
+      <div class="threat-track" id="clue-track"></div>
+    </div>
+  </div>
+
+  <!-- 中部场景地图 -->
+  <div id="locations-map"></div>
+
+  <!-- 右侧调查员面板 -->
+  <div id="investigator-panel" class="investigator-panel">
+    <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+    <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+    <div class="inv-header">
+      <div class="inv-name" id="inv-name">Roland Banks</div>
+      <div class="inv-title" id="inv-title">Federal Agent · Void Hunter</div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-bar health"><div class="stat-label" data-i18n="inv_health">Health</div><div class="stat-value" id="stat-health">8/8</div></div>
+      <div class="stat-bar sanity"><div class="stat-label" data-i18n="inv_sanity">Sanity</div><div class="stat-value" id="stat-sanity">8/8</div></div>
+      <div class="stat-bar resources"><div class="stat-label" data-i18n="inv_resources">Resources</div><div class="stat-value" id="stat-resources">5</div></div>
+      <div class="stat-bar actions"><div class="stat-label" data-i18n="inv_actions">Actions</div><div class="stat-value" id="stat-actions">3</div></div>
+    </div>
+    <div class="attributes">
+      <div class="attr-card willpower"><div class="attr-icon">✚</div><div class="attr-name" data-i18n="attr_willpower">Willpower</div><div class="attr-val" id="attr-will">4</div></div>
+      <div class="attr-card intellect"><div class="attr-icon">✦</div><div class="attr-name" data-i18n="attr_intellect">Intellect</div><div class="attr-val" id="attr-int">3</div></div>
+      <div class="attr-card combat"><div class="attr-icon">⚔</div><div class="attr-name" data-i18n="attr_combat">Combat</div><div class="attr-val" id="attr-combat">4</div></div>
+      <div class="attr-card agility"><div class="attr-icon">➤</div><div class="attr-name" data-i18n="attr_agility">Agility</div><div class="attr-val" id="attr-agi">3</div></div>
+    </div>
+    <div class="equipped-section">
+      <div class="section-title" data-i18n="equipped_section">Equipped</div>
+      <div class="equipped-list" id="equipped-list"><div style="font-size:10px;color:var(--parchment-dim);font-style:italic;">No assets</div></div>
+    </div>
+    <div class="equipped-section">
+      <div class="section-title" data-i18n="engaged_section">Engaged Enemies</div>
+      <div class="equipped-list" id="engaged-list"><div style="font-size:10px;color:var(--parchment-dim);font-style:italic;">None engaged</div></div>
+    </div>
+    <div class="action-buttons">
+      <button class="action-btn" id="btn-investigate">Investigate</button>
+      <button class="action-btn" id="btn-fight">Fight</button>
+      <button class="action-btn" id="btn-evade">Evade</button>
+      <button class="action-btn" id="btn-heal" style="border-color:#7fcf9a;color:#7fcf9a;">Mend</button>
+      <button class="action-btn" id="btn-strategy" style="border-color:#9a7fbf;color:#9a7fbf;">Strategy</button>
+      <button class="action-btn" id="btn-ritual" style="border-color:var(--gold);color:var(--gold);">Ritual</button>
+      <button class="action-btn" id="btn-end-round">End Turn</button>
+    </div>
+  </div>
+
+  <!-- 底部区域 -->
+  <div id="bottom-area">
+    <div id="chaos-bag-area" title="Click to draw a chaos token">
+      <div class="chaos-bag-visual" id="chaos-bag-visual">☠</div>
+      <div class="chaos-bag-label" data-i18n="chaos_bag_label">Chaos Bag · 15</div>
+    </div>
+    <div id="hand-container">
+      <div class="hand-tabs">
+        <button class="hand-tab active" data-tab="hand"><span data-i18n="tab_hand">Hand</span> <span class="tab-count" id="hand-count">0</span></button>
+        <button class="hand-tab" data-tab="equipped"><span data-i18n="tab_equipped">Assets</span> <span class="tab-count" id="equipped-count">0</span></button>
+        <button class="hand-tab" data-tab="discard"><span data-i18n="tab_discard">Discard</span> <span class="tab-count" id="discard-count">0</span></button>
+      </div>
+      <div id="hand-area" class="hand-tab-content active"></div>
+      <div id="equipped-display" class="hand-tab-content"></div>
+      <div id="discard-display" class="hand-tab-content"></div>
+    </div>
+    <div id="action-log" class="scrollbar"></div>
+  </div>
+</div>
+
+<!-- 开始界面 -->
+<div class="overlay" id="start-overlay">
+  <div class="overlay-content">
+    <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+    <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+    <div class="game-title">诡秘调查</div>
+    <div class="game-subtitle">— 虚空之影 —</div>
+    <div class="story-text">
+      一九二六年深秋,阿卡姆镇郊外的沃特里宅邸传出诡异声响。三名调查员进入其中后下落不明。<br><br>
+      你奉命独自前往调查。宅邸内弥漫着不洁的气息,墙壁上的符文渗出黑色液体,虚空的低语在耳畔回响。<br><br>
+      你必须在理智与生命耗尽之前,搜集足够线索揭开真相,并在卧室内执行祭祀仪式,方能消解这场虚空之影。
+    </div>
+    <div style="font-size:13px;color:var(--gold);margin:14px 0 8px;letter-spacing:2px;font-variant:small-caps;">选择调查员</div>
+    <div id="investigator-select" style="display:flex;gap:10px;margin-bottom:16px;"></div>
+    <button class="btn" id="btn-start" disabled>踏入宅邸</button>
+  </div>
+</div>
+
+<!-- 混沌代币显示 -->
+<div class="chaos-token-display" id="chaos-token-display">
+  <div class="chaos-token-symbol" id="chaos-symbol">+1</div>
+  <div class="chaos-token-text" id="chaos-text"></div>
+</div>
+
+<!-- 通知 -->
+<div id="toast"></div>
+
+<!-- 结局界面 -->
+<div class="overlay hidden" id="ending-overlay">
+  <div class="overlay-content">
+    <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+    <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+    <div class="ending-title" id="ending-title"></div>
+    <div class="ending-desc" id="ending-desc"></div>
+    <!-- 评分等级徽章 -->
+    <div id="ending-grade" class="ending-grade hidden">
+      <div class="grade-label">最终评级</div>
+      <div class="grade-letter" id="grade-letter">S</div>
+      <div class="grade-title" id="grade-title"></div>
+    </div>
+    <!-- 评分明细 -->
+    <div id="score-breakdown" class="score-breakdown hidden"></div>
+    <button class="btn" id="btn-restart-ending">重新开始</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 诡秘调查：虚空之影 - 完整游戏逻辑
+// ============================================================
+
+// ===== Web Audio API 音效合成引擎 =====
+const AudioEngine = {
+  ctx:null,
+  masterGain:null,
+  init(){
+    if(this.ctx) return;
+    try{
+      this.ctx = new (window.AudioContext||window.webkitAudioContext)();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.value = 0.4;
+      this.masterGain.connect(this.ctx.destination);
+    }catch(e){console.warn('音频初始化失败',e);}
+  },
+  // 理智受损:低频正弦波+噪音
+  playSanityTrauma(){
+    if(!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    osc.type='sine'; osc.frequency.value=60;
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0,t);
+    gain.gain.linearRampToValueAtTime(0.5,t+0.1);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+2);
+    // 噪音
+    const noiseBuf = this.ctx.createBuffer(1,this.ctx.sampleRate*2,this.ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*0.3;
+    const noise = this.ctx.createBufferSource(); noise.buffer=noiseBuf;
+    const noiseFilter = this.ctx.createBiquadFilter();
+    noiseFilter.type='bandpass'; noiseFilter.frequency.value=200; noiseFilter.Q.value=5;
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.3,t);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001,t+1.5);
+    osc.connect(gain); gain.connect(this.masterGain);
+    noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(this.masterGain);
+    osc.start(t); osc.stop(t+2);
+    noise.start(t); noise.stop(t+1.5);
+  },
+  // 神话之钟:多重正弦波+混响
+  playMythosBell(){
+    if(!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const freqs = [300,440,720];
+    freqs.forEach((f,i)=>{
+      const osc = this.ctx.createOscillator();
+      osc.type='sine'; osc.frequency.value=f;
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0,t+i*0.05);
+      gain.gain.linearRampToValueAtTime(0.3,t+0.02+i*0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001,t+4);
+      // 延迟混响
+      const delay = this.ctx.createDelay(); delay.delayTime.value=0.3;
+      const feedback = this.ctx.createGain(); feedback.gain.value=0.5;
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+      gain.connect(delay); delay.connect(feedback); feedback.connect(delay); delay.connect(this.masterGain);
+      osc.start(t+i*0.05); osc.stop(t+4);
+    });
+  },
+  // 翻牌声:高通滤波噪音脉冲
+  playCardFlip(){
+    if(!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const noiseBuf = this.ctx.createBuffer(1,this.ctx.sampleRate*0.1,this.ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i]=Math.random()*2-1;
+    const noise = this.ctx.createBufferSource(); noise.buffer=noiseBuf;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type='highpass'; filter.frequency.value=2000;
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.4,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+0.08);
+    noise.connect(filter); filter.connect(gain); gain.connect(this.masterGain);
+    noise.start(t); noise.stop(t+0.1);
+  },
+  // 成功音效
+  playSuccess(){
+    if(!this.ctx) return;
+    const t = this.ctx.currentTime;
+    [523,659,784].forEach((f,i)=>{
+      const osc = this.ctx.createOscillator();
+      osc.type='sine'; osc.frequency.value=f;
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0,t+i*0.08);
+      gain.gain.linearRampToValueAtTime(0.3,t+0.02+i*0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001,t+0.4+i*0.08);
+      osc.connect(gain); gain.connect(this.masterGain);
+      osc.start(t+i*0.08); osc.stop(t+0.5+i*0.08);
+    });
+  },
+  // 失败音效
+  playFail(){
+    if(!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    osc.type='sawtooth'; osc.frequency.setValueAtTime(220,t);
+    osc.frequency.exponentialRampToValueAtTime(55,t+0.6);
+    const gain = this.ctx.createGain();
+    gain.gain.setValueAtTime(0.4,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+0.6);
+    osc.connect(gain); gain.connect(this.masterGain);
+    osc.start(t); osc.stop(t+0.6);
+  },
+  // 战斗音效
+  playAttack(){
+    if(!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const noiseBuf = this.ctx.createBuffer(1,this.ctx.sampleRate*0.2,this.ctx.sampleRate);
+    const data = noiseBuf.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,2);
+    const noise = this.ctx.createBufferSource(); noise.buffer=noiseBuf;
+    const filter = this.ctx.createBiquadFilter();
+    filter.type='lowpass'; filter.frequency.value=800;
+    const gain = this.ctx.createGain(); gain.gain.value=0.6;
+    noise.connect(filter); filter.connect(gain); gain.connect(this.masterGain);
+    noise.start(t); noise.stop(t+0.2);
+  },
+  // 胜利音效
+  playVictory(){
+    if(!this.ctx) return;
+    const t = this.ctx.currentTime;
+    [523,659,784,1047].forEach((f,i)=>{
+      const osc = this.ctx.createOscillator();
+      osc.type='triangle'; osc.frequency.value=f;
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0,t+i*0.15);
+      gain.gain.linearRampToValueAtTime(0.3,t+0.05+i*0.15);
+      gain.gain.exponentialRampToValueAtTime(0.001,t+1+i*0.15);
+      osc.connect(gain); gain.connect(this.masterGain);
+      osc.start(t+i*0.15); osc.stop(t+1.2+i*0.15);
+    });
+  }
+};
+
+// ===== 国际化系统(i18n) =====
+// 默认英文(海外玩家),可切换中文
+let currentLang = new URLSearchParams(window.location.search).get('lang') || localStorage.getItem('ah_game_lang') || 'zh';
+
+// UI 静态文本字典
+const STRINGS = {
+  // 顶部工具栏
+  game_title:        {en:'ELDRITCH INVESTIGATION', zh:'诡秘调查'},
+  game_subtitle:     {en:'Shadows of the Void',   zh:'虚空之影'},
+  btn_rules:         {en:'Rules',   zh:'规则'},
+  btn_tutorial:      {en:'Tutorial',zh:'教程'},
+  btn_shortcuts:     {en:'Hotkeys', zh:'快捷键'},
+  btn_restart:       {en:'Restart', zh:'重开'},
+  btn_lang:           {en:'中文',    zh:'EN'},
+  // 危机卡
+  threat_agenda:     {en:'Agenda',   zh:'密谋'},
+  threat_act:        {en:'Act',      zh:'场景'},
+  phase_mythos:     {en:'Mythos',   zh:'神话阶段'},
+  phase_investigator:{en:'Investigator',zh:'调查员阶段'},
+  phase_enemy:       {en:'Enemy',   zh:'敌人阶段'},
+  phase_upkeep:      {en:'Upkeep',  zh:'维护阶段'},
+  shroud:            {en:'Shroud',  zh:'遮蔽'},
+  clues:             {en:'Clues',   zh:'线索'},
+  // 调查员面板
+  inv_health:        {en:'Health',  zh:'生命'},
+  inv_sanity:        {en:'Sanity',  zh:'理智'},
+  inv_resources:     {en:'Resources',zh:'资源'},
+  inv_actions:       {en:'Actions', zh:'行动力'},
+  attr_willpower:    {en:'Willpower',zh:'意志'},
+  attr_intellect:    {en:'Intellect',zh:'智力'},
+  attr_combat:       {en:'Combat',  zh:'战斗'},
+  attr_agility:      {en:'Agility', zh:'敏捷'},
+  equipped_section:  {en:'Equipped',zh:'装备'},
+  engaged_section:   {en:'Engaged Enemies',zh:'交战敌人'},
+  no_engaged:        {en:'None engaged',zh:'无交战'},
+  no_engaged_hint:   {en:'None engaged · click an enemy to select',zh:'无交战 · 点击敌人可选中'},
+  // 行动按钮
+  act_investigate:   {en:'Investigate',zh:'调查'},
+  act_fight:         {en:'Fight',  zh:'战斗'},
+  act_evade:         {en:'Evade',  zh:'闪避'},
+  act_heal:          {en:'Mend',   zh:'疗伤'},
+  act_strategy:      {en:'Strategy',zh:'战略'},
+  act_ritual:        {en:'Ritual', zh:'祭祀'},
+  act_end_round:     {en:'End Turn',zh:'结束回合'},
+  // 手牌区
+  tab_hand:          {en:'Hand',   zh:'手牌'},
+  tab_equipped:      {en:'Assets', zh:'装备'},
+  tab_discard:       {en:'Discard',zh:'弃牌'},
+  // 调查员选择
+  select_investigator:{en:'Choose Your Investigator',zh:'选择调查员'},
+  btn_start:         {en:'Enter the Manor',zh:'踏入宅邸'},
+  // 阶段日志
+  phase_mythos_log:  {en:'Mythos Phase',zh:'神话阶段'},
+  phase_inv_log:     {en:'Investigator Phase · 3 Actions',zh:'调查员阶段 · 行动力3点'},
+  phase_enemy_log:   {en:'Enemy Phase',zh:'敌人阶段'},
+  phase_upkeep_log:  {en:'Upkeep Phase',zh:'维护阶段'},
+  round_label:       {en:'Round',zh:'第'},
+  // 提示信息
+  not_inv_phase:     {en:'Not in investigator phase',zh:'非调查员阶段'},
+  no_actions:        {en:'No actions left',zh:'行动力不足'},
+  no_resources:      {en:'Not enough resources',zh:'资源不足'},
+  health_full:       {en:'Health is full',zh:'生命已满'},
+  strategy_used:     {en:'Strategy already used this round',zh:'本回合已使用战略'},
+  not_final_act:     {en:'Final act not reached',zh:'尚未进入终幕'},
+  no_clues:          {en:'Not enough clues',zh:'线索不足'},
+  not_in_bedroom:    {en:'Must be in the Master Bedroom',zh:'需在主卧室执行'},
+  engaged_cant_ritual:{en:'Cannot ritual while engaged!',zh:'交战中无法祭祀!先解决敌人'},
+  need_2_resources:  {en:'Need 2 resources',zh:'资源不足(需2资源)'},
+  restart_confirm:   {en:'Restart the game? Current progress will be lost.',zh:'确定重新开始游戏?当前进度将丢失。'},
+  // 战略面板
+  strategy_title:    {en:'Strategic Decision',zh:'战略抉择'},
+  strategy_desc:     {en:'Choose one strategy this round. Costs 1 action. Once per round.',zh:'本回合可选一项战略,消耗1行动力。每回合仅一次。'},
+  strategy_doom:     {en:'Doom Offering',zh:'末日献祭'},
+  strategy_doom_desc:{en:'+1 doom, gain 3 resources. Risky but profitable.',zh:'末日标记 +1,获得 3 资源。危险但收益高。'},
+  strategy_encounter:{en:'Face the Terror',zh:'直面恐惧'},
+  strategy_encounter_desc:{en:'Draw 1 extra encounter, gain 4 resources. Brave.',zh:'立即抽 1 张额外遭遇卡,获得 4 资源。勇气可嘉。'},
+  strategy_draw:     {en:'Meditate',zh:'沉思冥想'},
+  strategy_draw_desc:{en:'Draw 2 player cards. Safe but small gain.',zh:'抽 2 张玩家牌,无负面效果。安全但收益少。'},
+  // 治疗选择
+  heal_title:        {en:'First Aid Kit',zh:'急救包'},
+  heal_desc:         {en:`Choose: restore {V} Health or {V} Sanity`,zh:'选择恢复 {V} 点生命或 {V} 点理智'},
+  heal_hp_btn:       {en:'Restore Health',zh:'恢复生命'},
+  heal_sanity_btn:   {en:'Restore Sanity',zh:'恢复理智'},
+  // 调查员名称
+  inv_roland_name:   {en:"Roland Banks",zh:'罗兰·班克斯'},
+  inv_roland_title:  {en:'Federal Agent · Void Hunter',zh:'联邦调查员 · 虚空追猎者'},
+  inv_roland_desc:   {en:'A former federal agent, skilled in combat. Strong-willed but fragile sanity.',zh:'前联邦探员,擅长肉搏战。意志坚定,但理智脆弱。'},
+  inv_daisy_name:    {en:'Daisy Walker',zh:'黛蕾·沃克'},
+  inv_daisy_title:   {en:'Miskatonic Librarian · Knowledge Seeker',zh:'密斯卡托尼克图书馆员 · 知识探寻者'},
+  inv_daisy_desc:    {en:'A librarian with exceptional intellect. Investigation comes naturally, but combat does not.',zh:'图书管理员,智力超群。调查得心应手,但不擅战斗。'},
+  inv_winfield_name: {en:'Winfield Cort',zh:'温菲尔德·科特'},
+  inv_winfield_title:{en:'Bounty Hunter · All-Round Survivor',zh:'赏金猎人 · 全能生存者'},
+  inv_winfield_desc: {en:'A seasoned bounty hunter, balanced in all traits, well-supplied.',zh:'老练的赏金猎人,各项能力均衡,资源充足。'},
+  // 地点
+  loc_study_name:    {en:'Study',zh:'书房'},
+  loc_hallway_name:  {en:'Dim Corridor',zh:'幽暗长廊'},
+  loc_attic_name:    {en:'Attic',zh:'阁楼'},
+  loc_bedroom_name:  {en:'Master Bedroom',zh:'主卧室'},
+  loc_cellar_name:   {en:'Cellar',zh:'地下室'},
+  loc_unknown:       {en:'Unknown Room',zh:'未知房间'},
+  loc_move_hint:     {en:'Move here',zh:'可移动'},
+  loc_move_explore:  {en:'Explore here',zh:'前往探索'},
+  loc_study_desc:    {en:'A study of old books and dust. A disturbing portrait hangs on the wall.',zh:'满是旧书与尘土的书房,墙上挂着一幅诡异画像。'},
+  loc_hallway_desc:  {en:'A damp, cold corridor. Footsteps echo endlessly. Leads deeper into the manor.',zh:'潮湿阴冷的长廊,脚步声在回荡,通往宅邸深处。'},
+  loc_attic_desc:    {en:'A cobwebbed attic hiding unspeakable secrets.',zh:'布满蛛网的阁楼,藏着不为人知的秘密。'},
+  loc_bedroom_desc:  {en:'The ritual site. The ritual may be performed here in the final act.',zh:'举行祭祀仪式的关键地点,终幕可在此执行祭祀。'},
+  loc_cellar_desc:   {en:'A dark, damp underground chamber. The air reeks of decay. Forbidden secrets sleep here.',zh:'阴暗潮湿的地下密室,空气中弥漫着腐朽气息,深藏着被遗忘的禁忌。'},
+  // 玩家卡牌名/文本
+  card_magnifier:    {en:'Magnifying Glass',zh:'放大镜'},
+  card_magnifier_txt:{en:'+1 Intellect when investigating.',zh:'调查时智力+1。装备后持续生效。'},
+  card_revolver:     {en:'.38 Revolver',zh:'点38左轮手枪'},
+  card_revolver_txt: {en:'+2 Combat during combat tests. Deals 2 damage. 3 ammo.',zh:'战斗判定时战斗+2,造成2点伤害。弹药3发。'},
+  card_funding:      {en:'Emergency Funding',zh:'紧急资助'},
+  card_funding_txt:  {en:'Gain 3 resources immediately.',zh:'立即获得3个资源。'},
+  card_sanctuary:    {en:'Sanctuary',zh:'避难所'},
+  card_sanctuary_txt:{en:'Enemies cannot attack you this round. They move to an adjacent location.',zh:'本回合敌人无法主动攻击你,并移至相邻地点。'},
+  card_perseverance: {en:'Perseverance',zh:'强力生存毅力'},
+  card_perseverance_txt:{en:'Discard during a test. +2 to any attribute.',zh:'校验时丢弃,本次判定任意属性+2。'},
+  card_guardian:     {en:'Guardian Amulet',zh:'守护护符'},
+  card_guardian_txt: {en:'+1 Willpower. Prevents the first Sanity damage.',zh:'意志+1。防止首次理智伤害。'},
+  card_dodge:        {en:'Instinctive Dodge',zh:'直觉闪避'},
+  card_dodge_txt:    {en:'Immediately evade one engaged enemy.',zh:'立即闪避当前交战的一个敌人。'},
+  card_insight:      {en:'Eye of Insight',zh:'洞察之眼'},
+  card_insight_txt:  {en:'Investigate current location automatically (success).',zh:'立即调查当前地点,自动成功。'},
+  card_shotgun:      {en:'Shotgun',zh:'霰弹枪'},
+  card_shotgun_txt:  {en:'+3 Combat during combat tests. Deals 3 damage. 2 ammo.',zh:'战斗判定时战斗+3,造成3点伤害。弹药2发。'},
+  card_tome:         {en:'Ancient Tome',zh:'古老咒典'},
+  card_tome_txt:     {en:'+1 Willpower. Each round, spend 1 resource to draw a card.',zh:'意志+1。每回合可花费1资源抽1张牌。'},
+  card_heal:         {en:'First Aid Kit',zh:'急救包'},
+  card_heal_txt:     {en:'Restore 3 Health or 3 Sanity (your choice).',zh:'恢复3点生命或3点理智(选择)。'},
+  card_premonition:  {en:'Premonition',zh:'预兆'},
+  card_premonition_txt:{en:'Discard during a test. Peek at the top 2 chaos tokens, keep 1.',zh:'校验时丢弃,先查看混沌袋顶部2枚代币,选择1枚。'},
+  // 遭遇卡牌
+  enc_ghoul:         {en:'Ghoul',zh:'古尸食尸鬼'},
+  enc_ghoul_txt:     {en:'Combat 3, Health 3. Deals 1 Health and 1 Sanity damage each round.',zh:'战力3,生命3。每回合造成1生命和1理智伤害。'},
+  enc_shriek:        {en:'Cold Shriek',zh:'冰冷尖啸'},
+  enc_shriek_txt:    {en:'Willpower (4) test. Fail: -3 Sanity.',zh:'立即进行意志(4)检验,失败则理智扣减3。'},
+  enc_voidspread:    {en:'Void Spread',zh:'虚空蔓延'},
+  enc_voidspread_txt:{en:'Place a doom token at the current location.',zh:'在当前地点放置一个末日标记。'},
+  enc_shadowbeast:   {en:'Shadow of the Void',zh:'虚空之影'},
+  enc_shadowbeast_txt:{en:'Combat 4, Health 4. Deals 2 Health and 1 Sanity damage each round.',zh:'战力4,生命4。每回合造成2生命和1理智伤害。'},
+  enc_whispers:      {en:'Void Whispers',zh:'虚空低语'},
+  enc_whispers_txt:  {en:'Willpower (3) test. Fail: +1 doom.',zh:'进行意志(3)检验,失败则末日标记+1。'},
+  enc_cultist:       {en:'Void Cultist',zh:'虚空教徒'},
+  enc_cultist_txt:   {en:'Combat 2, Health 2. +1 doom each round, deals 1 Health damage.',zh:'战力2,生命2。每回合+1末日标记,造成1生命伤害。'},
+  enc_hounds:        {en:'Hound of Tindalos',zh:'廷达洛斯猎犬'},
+  enc_hounds_txt:    {en:'Combat 5, Health 3. Elite. Deals 2 Health and 2 Sanity each round. Fast.',zh:'战力5,生命3。精英怪,每回合造成2生命2理智伤害。'},
+  enc_rot:           {en:'Breath of Rot',zh:'腐朽之息'},
+  enc_rot_txt:       {en:'Intellect (3) test. Fail: lose 2 resources.',zh:'立即进行智力(3)检验,失败则失去2资源。'},
+  // 通用
+  card_skill_hint:   {en:'Skill cards prompt automatically during tests',zh:'技能卡在判定时自动询问使用'},
+  skill_card_skip:   {en:'Do not use',zh:'不使用'},
+  skill_card_use:    {en:'Use',zh:'使用'},
+  skill_card_use_label:{en:'+{V} to any attribute',zh:'任意属性+{V}'},
+  will_test:         {en:'Willpower',zh:'意志'},
+  int_test:          {en:'Intellect',zh:'智力'},
+  combat_test:       {en:'Combat',zh:'战斗'},
+  agility_test:      {en:'Agility',zh:'敏捷'},
+  test_label:        {en:'{S} test · Difficulty {D}',zh:'即将进行 {S} 判定 · 难度 {D}'},
+  test_use_skill:    {en:'Use a skill card?',zh:'是否使用技能卡?'},
+  continue_btn:      {en:'Continue',zh:'继续'},
+  // 阶段切换按钮
+  btn_to_investigator:{en:'Proceed to Investigator Phase',zh:'进入调查员阶段'},
+  btn_to_enemy:       {en:'Proceed to Enemy Phase',zh:'进入敌人阶段'},
+  btn_to_upkeep:      {en:'Proceed to Upkeep Phase',zh:'进入维护阶段'},
+  btn_to_mythos:      {en:'Begin next Mythos Phase',zh:'开始下一轮神话阶段'},
+  // 结局
+  ending_victory_title:{en:'SHADOW DISPELLED',zh:'SHADOW DISPELLED'},
+  ending_victory_desc:{en:'You completed the ritual in the bedroom. The shadow of the void dissolves in the dawn light. You survived — but the secrets of the Wentworth manor will haunt you forever. YOU SURVIVED.',zh:'你在卧室中完成了祭祀仪式,虚空之影消散于晨光之中。你幸存了下来,但沃特里宅邸的秘密将永远萦绕在你心头。YOU SURVIVED.'},
+  ending_killed_title:{en:'KILLED IN ACTION',zh:'KILLED IN ACTION'},
+  ending_killed_desc:{en:'Your life was consumed by the encroaching void. The manor has claimed another soul — your story ends here.',zh:'你的生命在虚空的侵蚀中耗尽。宅邸吞噬了又一个灵魂,你的故事在此终结。'},
+  ending_agenda_title:{en:'THE VOID CONSUMES ALL',zh:'THE VOID CONSUMES ALL'},
+  ending_agenda_desc:{en:'The doom arrives. The void devours the Wentworth manor whole. Your soul is sealed beyond the void, your tale lost to all.',zh:'末日降临,虚空彻底吞噬了沃特里宅邸。你的灵魂被永远封印在虚空的彼岸,无人知晓你的故事。'},
+  ending_madness_title:{en:'CRIPPLED BY MADNESS',zh:'CRIPPLED BY MADNESS'},
+  ending_madness_desc:{en:'Sanity shattered. Your mind is wholly corrupted by the void. Now you can only wander the halls of the Arkham Asylum, muttering whispers no one understands.',zh:'理智崩溃,你的心智被虚空彻底侵蚀。从此你只能在阿卡姆疗养院的墙壁间,喃喃自语着无人能懂的低语。'},
+  btn_restart_ending: {en:'Restart',zh:'重新开始'},
+  // 评分
+  grade_label:       {en:'Final Grade',zh:'最终评级'},
+  score_survive:     {en:'Survived to Final Act',zh:'存活至终幕'},
+  score_health:      {en:'Remaining Health',zh:'剩余生命'},
+  score_sanity:      {en:'Remaining Sanity',zh:'剩余理智'},
+  score_resources:   {en:'Remaining Resources',zh:'剩余资源'},
+  score_clues:       {en:'Total Clues Found',zh:'收集线索总数'},
+  score_actions:     {en:'Remaining Actions',zh:'剩余行动力'},
+  score_acts:        {en:'Acts Completed',zh:'完成幕数'},
+  score_round_pen:   {en:'Round Penalty',zh:'回合数惩罚'},
+  score_doom_pen:    {en:'Doom Pressure',zh:'末日压力'},
+  score_total:       {en:'TOTAL',zh:'总评'},
+  // 评级称号
+  grade_S:           {en:'True Conqueror of the Void',zh:'虚空之影的真正征服者'},
+  grade_A:           {en:'Legendary Investigator',zh:'传奇调查员'},
+  grade_B:           {en:'Hero of Arkham',zh:'阿卡姆英雄'},
+  grade_C:           {en:'Barely Survived',zh:'勉强幸存'},
+  grade_D:           {en:'By the Skin of Your Teeth',zh:'险象环生'},
+  grade_B_fail:      {en:'Glorious in Defeat',zh:'虽败犹荣'},
+  grade_C_fail:      {en:'All in Vain',zh:'徒劳无功'},
+  grade_D_fail:      {en:'Lost to the Void',zh:'化为虚无'},
+  // 快捷键弹窗
+  shortcuts_title:   {en:'Keyboard Shortcuts',zh:'快捷键'},
+  shortcuts_list:    {en:`<b>1-5</b> · Play card<br><b>Space</b> · End turn<br><b>H</b> · Rules<br><b>T</b> · Tutorial<br><b>R</b> · Restart`,zh:'<b>1-5</b> · 打出卡牌<br><b>空格</b> · 结束回合<br><b>H</b> · 规则<br><b>T</b> · 教程<br><b>R</b> · 重开'},
+  // 教程步骤
+  tutorial_1:        {en:'Welcome to Eldritch Investigation: Shadows of the Void. This is a solo card game inspired by Arkham Horror: The Card Game.',zh:'欢迎来到《诡秘调查:虚空之影》。这是一款致敬《诡镇奇谈卡牌版》的单人桌游。'},
+  tutorial_2:        {en:'The Agenda card (left) tracks doom. Each round +1 doom; when full, a disaster strikes. Three agendas = defeat.',zh:'密谋卡(左)记录末日标记。每回合+1,满额触发灾难事件。三幕密谋=失败。'},
+  tutorial_3:        {en:'The Act card (right) tracks clues. Gather clues to advance the story. Complete 3 acts and perform the ritual in the Bedroom.',zh:'场景卡(右)记录线索。集齐线索可推进剧情,第三幕在卧室祭祀通关。'},
+  tutorial_4:        {en:'The location map. Green-highlighted locations are adjacent and clickable. Gold "Explore" marks unexplored rooms.',zh:'地点地图。绿色高亮的是可移动的相邻地点,金色的"前往探索"是未探索地点。'},
+  tutorial_5:        {en:'Investigator panel. Health or Sanity reaching 0 = defeat. Red or purple breathing glow signals danger.',zh:'调查员面板。生命/理智归零即失败。红色或紫色呼吸光表示危险。'},
+  tutorial_6:        {en:'Action buttons. 3 actions per round: Investigate (Intellect vs Shroud), Fight, Evade, Mend, Strategy, and Ritual (final act).',zh:'行动按钮。每轮3行动力:调查(智力vs遮蔽)、战斗、闪避、祭祀(终幕专用)。'},
+  tutorial_7:        {en:'Hand area. Left-click to play. Right-click for details. Event cards confirm before playing.',zh:'手牌区。左键打出,右键查看详情。事件卡使用前会确认。'},
+  tutorial_8:        {en:'The chaos bag. Each test randomly draws a token (no replacement). Skull = -doom, Tentacle = auto-fail.',zh:'混沌袋。每次判定随机抽一枚代币,抽完不放回。骷髅=减末日数,触手=自动失败。'},
+  tutorial_end:      {en:'❦ Tutorial complete. Good luck in the Wentworth manor...',zh:'❦ 教程结束。祝你在沃特里宅邸好运...'},
+  // 起始故事
+  story_text:        {en:`In late autumn of 1926, eerie sounds drift from the Wentworth manor on the outskirts of Arkham. Three investigators entered — and vanished.<br><br>You have been sent alone to investigate. The air within reeks of the unclean. Sigils on the walls weep black fluid. The whispers of the void echo in your ears.<br><br>Before your sanity or life runs dry, you must gather enough clues to uncover the truth, and perform the ritual in the Master Bedroom to dispel the shadow of the void.`,zh:'一九二六年深秋,阿卡姆镇郊外的沃特里宅邸传出诡异声响。三名调查员进入其中后下落不明。<br><br>你奉命独自前往调查。宅邸内弥漫着不洁的气息,墙壁上的符文渗出黑色液体,虚空的低语在耳畔回响。<br><br>你必须在理智与生命耗尽之前,搜集足够线索揭开真相,并在卧室内执行祭祀仪式,方能消解这场虚空之影。'},
+  // 规则书
+  rules_title:       {en:'Rules of the Game',zh:'游戏规则'},
+  rules_content:     {en:`<p style="margin-bottom:8px;"><b style="color:var(--gold);">Goal:</b> Complete 3 Acts by gathering clues, then perform the ritual in the Master Bedroom.</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Phases (each round):</b></p>
+    <p style="margin-left:12px;margin-bottom:6px;">1. <b>Mythos</b> — +1 doom, draw 1 encounter card.</p>
+    <p style="margin-left:12px;margin-bottom:6px;">2. <b>Investigator</b> — 3 actions. Investigate, Fight, Evade, Mend, or play cards.</p>
+    <p style="margin-left:12px;margin-bottom:6px;">3. <b>Enemy</b> — Enemies move and attack.</p>
+    <p style="margin-left:12px;margin-bottom:8px;">4. <b>Upkeep</b> — +1 resource, draw 1 player card.</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Investigate:</b> Intellect vs Shroud. Success: gain 1 clue.</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Combat:</b> Combat vs enemy Combat. Success: deal weapon damage.</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Evade:</b> Agility vs enemy Combat. Success: enemy moves away, exhausted.</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Chaos bag:</b> Draw a token. +1/-1/-2 modify your roll. Skull = doom. Tentacle = auto-fail. Elder Sign = auto-success.</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Defeat:</b> Health 0 = Killed. Sanity 0 = Madness. Doom full (3rd agenda) = Void consumes all.</p>`,zh:`<p style="margin-bottom:8px;"><b style="color:var(--gold);">目标:</b>完成3幕场景(集齐线索),终幕在卧室执行祭祀仪式通关。</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">阶段(每轮):</b></p>
+    <p style="margin-left:12px;margin-bottom:6px;">1. <b>神话阶段</b> — 末日+1,抽1张遭遇卡。</p>
+    <p style="margin-left:12px;margin-bottom:6px;">2. <b>调查员阶段</b> — 3行动力。调查/战斗/闪避/疗伤/打出卡牌。</p>
+    <p style="margin-left:12px;margin-bottom:6px;">3. <b>敌人阶段</b> — 敌人移动并攻击。</p>
+    <p style="margin-left:12px;margin-bottom:8px;">4. <b>维护阶段</b> — 资源+1,抽1张玩家牌。</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">调查:</b>智力vs遮蔽。成功:获得1线索。</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">战斗:</b>战斗vs敌人战力。成功:造成武器伤害。</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">闪避:</b>敏捷vs敌人战力。成功:敌人移走并疲惫。</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">混沌袋:</b>抽1枚代币。+1/-1/-2修正检定。骷髅=减末日数。触手=自动失败。远古印记=自动成功。</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">失败:</b>生命0=死亡。理智0=疯狂。末日满(第3幕)=虚空吞噬。</p>`},
+  // 日志消息
+  log_doom_plus:     {en:'+1 doom token',zh:'末日标记 +1'},
+  log_clue_gained:   {en:'Clue found! ({C}/{M})',zh:'自动调查成功!获得线索 ({C}/{M})'},
+  log_clue_total:    {en:'Total clues: {C}/{M}',zh:'线索进度: {C}/{M}'},
+  log_encounter:     {en:'Encounter: {N}',zh:'遭遇: {N}'},
+  log_play_card:     {en:'Played {N}',zh:'打出 {N}'},
+  log_move:          {en:'Moved to {N}',zh:'移动至 {N}'},
+  log_explored:      {en:'Explored: {N}',zh:'已探索: {N}'},
+  log_investigate_start:{en:'Investigating... Shroud {S}',zh:'调查中... 遮蔽 {S}'},
+  log_investigate_success:{en:'Investigation success! Clue +1',zh:'调查成功! 线索 +1'},
+  log_investigate_fail:{en:'Investigation failed',zh:'调查失败'},
+  log_fight_start:   {en:'Fighting {N}... Combat {C}',zh:'攻击 {N}... 战力 {C}'},
+  log_fight_hit:     {en:'Hit! {N} takes {D} damage',zh:'命中! {N} 受到 {D} 伤害'},
+  log_enemy_killed:  {en:'{N} is defeated',zh:'{N} 被击败'},
+  log_evade_start:   {en:'Evading {N}... Agility vs {C}',zh:'尝试闪避 {N}... 敏捷vs{C}'},
+  log_evade_success: {en:'Evaded {N}!',zh:'成功闪避 {N}!'},
+  log_evade_fail:    {en:'Evade failed',zh:'闪避失败'},
+  log_enemy_attack:  {en:'{N} attacks you!',zh:'{N} 攻击你!'},
+  log_enemy_attack_dual:{en:'{N} attacks you! ({I}/2)',zh:'{N} 攻击你!({I}/2)'},
+  log_enemy_move:    {en:'{N} moves to {L}',zh:'{N} 移动至 {L}'},
+  log_enemy_engage:  {en:'{N} engages you!',zh:'{N} 与你交战!'},
+  log_enemy_appear:  {en:'{N} appears at {L}!',zh:'{N} 出现在 {L}!'},
+  log_enemy_spawn:   {en:'{N} emerges from the void!',zh:'{N} 从虚空中现身!'},
+  log_resource_plus: {en:'Resources +{V}',zh:'资源 +{V}'},
+  log_resource_minus:{en:'Resources -{V}',zh:'资源 -{V}'},
+  log_health_plus:   {en:'Health +{V}',zh:'生命 +{V}'},
+  log_health_minus:  {en:'Health -{V}',zh:'生命 -{V}'},
+  log_sanity_plus:   {en:'Sanity +{V}',zh:'理智 +{V}'},
+  log_sanity_minus:  {en:'Sanity -{V}',zh:'理智 -{V}'},
+  log_test_will:     {en:'Willpower ({V}) test...',zh:'进行意志({V})检验...'},
+  log_test_int:      {en:'Intellect ({V}) test...',zh:'进行智力({V})检验...'},
+  log_test_success:  {en:'Test passed',zh:'检验成功'},
+  log_test_success_no_dmg:{en:'Test passed, no damage',zh:'检验成功,无伤害'},
+  log_test_success_resource_safe:{en:'Test passed, resources safe',zh:'检验成功,资源无恙'},
+  log_test_fail:     {en:'Test failed',zh:'检验失败'},
+  log_skill_used:    {en:'Used skill card {N} (+{V})',zh:'使用技能卡 {N} (+{V})'},
+  log_card_drawn:    {en:'Drew: {N}',zh:'抽到: {N}'},
+  log_act_advance:   {en:'Act advances! Act {N} · location clues replenished',zh:'场景推进!第{N}幕 · 地点线索已补充'},
+  log_final_act:     {en:'The final act descends! Gather clues and perform the ritual in the Master Bedroom.',zh:'终幕降临!集齐线索后前往主卧室执行祭祀'},
+  log_clues_complete:{en:'All clues gathered! Proceed to the Master Bedroom for the ritual.',zh:'线索已集齐!前往主卧室执行祭祀'},
+  log_ritual_start:  {en:'Beginning the ritual...',zh:'开始执行祭祀仪式...'},
+  log_void_consumes: {en:'The void consumes all...',zh:'虚空吞噬了一切...'},
+  log_agenda_full:   {en:'Doom track full! A dark event triggers!',zh:'末日标记已满!黑暗事件触发!'},
+  log_enemy_spawn_engage:{en:'{N} emerges from the void and engages you!',zh:'{N} 从虚空中现身并与你交战!'},
+  log_willpower_test_start:{en:'Willpower ({V}) test...',zh:'进行意志({V})检验...'},
+  log_intellect_test_start:{en:'Intellect ({V}) test...',zh:'进行智力({V})检验...'},
+  toast_resource_lost:{en:'Lost {V} resources',zh:'失去 {V} 资源'},
+  log_disaster:      {en:'Doom track is full! A disaster strikes!',zh:'末日标记已满!黑暗事件触发!'},
+  log_sanctuary_active:{en:'Sanctuary active — enemies cannot attack',zh:'避难所生效,敌人无法攻击'},
+  log_enemies_disperse:{en:'Enemies dispersed to {L}',zh:'敌人被驱散至 {L}'},
+  log_all_exhausted: {en:'All enemies exhausted — no attacks this round',zh:'所有敌人疲惫,本回合无攻击'},
+  log_cultist_doom:  {en:'{N} summons the void! Doom +1',zh:'{N} 召唤虚空! 末日 +1'},
+  log_fast_attack:   {en:'{N} attacks you! ({I}/2)',zh:'{N} 攻击你! ({I}/2)'},
+  log_strategy_doom: {en:'Strategy: Doom Offering · doom+1, resources+3',zh:'战略:末日献祭 · 末日+1,资源+3'},
+  log_strategy_encounter:{en:'Strategy: Face the Terror · resources+4, encounter incoming',zh:'战略:直面恐惧 · 资源+4,遭遇卡来袭'},
+  log_strategy_draw:{en:'Strategy: Meditate · drew 2 player cards',zh:'战略:沉思冥想 · 抽取2张玩家牌'},
+  log_mend:          {en:'Field dressing: resources-2, health+1',zh:'紧急包扎:资源-2,生命+1'},
+  log_round_start:   {en:'--- Round {N} · Mythos Phase ---',zh:'--- 第 {N} 轮 · 神话阶段 ---'},
+  log_upkeep_resource:{en:'+1 resource, drew a card',zh:'资源 +1,抽取一张手牌'},
+  log_doom_max:      {en:'Doom at maximum!',zh:'末日标记已满!'},
+  log_go_bedroom:    {en:'Go to the Master Bedroom for the ritual',zh:'前往主卧室执行祭祀'},
+  log_already_max_clues:{en:'All clues already gathered',zh:'线索已集齐'},
+  log_no_clues_here: {en:'No clues here',zh:'此地无线索'},
+  log_no_enemy:      {en:'No enemy engaged',zh:'无交战敌人'},
+  log_no_clues_left: {en:'No clues left to gather',zh:'已无线索可调查'},
+  // Toast
+  toast_to_bedroom:  {en:'Proceed to the Master Bedroom for the ritual',zh:'前往主卧室执行祭祀!'},
+  toast_act_advance: {en:'Act advances to {N}!',zh:'场景推进至第{N}幕!'},
+  toast_final_act:   {en:'Final act: ritual available in the Bedroom',zh:'终幕:前往卧室执行祭祀'},
+  toast_doom_full:   {en:'Doom arrives! Disaster triggered!',zh:'末日降临!灾难事件触发!'},
+  toast_lost_resource:{en:'Lost {V} resources',zh:'失去 {V} 资源'},
+  toast_test_failed: {en:'Test failed',zh:'检验失败'},
+  toast_test_success:{en:'Test passed',zh:'检验成功'},
+  toast_card_played: {en:'Played {N}',zh:'打出 {N}'},
+  // 通用按钮
+  btn_cancel:        {en:'Cancel',zh:'取消'},
+  btn_continue_phase:{en:'Continue',zh:'继续'},
+  btn_close:         {en:'Close',zh:'关闭'},
+  // HTML 静态标签 data-i18n
+  agenda_title:      {en:'Agenda · Doom Approaches',zh:'密谋 · 末日将至'},
+  agenda_desc:       {en:'Whispers of the void glide through the walls. When doom reaches its limit, something stirs.',zh:'虚空的低语在墙壁间游走,末日标记每达到上限便唤醒沉睡之物。'},
+  act_title:         {en:'Act · Shadows of the Void',zh:'场景 · 虚空之影'},
+  act_desc:          {en:'Gather clues to uncover the truth of the manor. Five clues are needed to perform the ritual.',zh:'搜集线索以揭开宅邸真相,集齐五枚线索方可执行祭祀。'},
+  chaos_bag_label:   {en:'Chaos Bag · 15',zh:'混沌袋 · 15枚'},
+  attr_willpower:    {en:'Willpower',zh:'意志'},
+  stat_willpower:    {en:'Willpower',zh:'意志'},
+  stat_intellect:    {en:'Intellect',zh:'智力'},
+  stat_combat:       {en:'Combat',zh:'战斗'},
+  stat_agility:      {en:'Agility',zh:'敏捷'},
+  skill_prompt_title:{en:'Upcoming {S} Test',zh:'即将进行 {S} 判定'},
+  skill_prompt_sub:  {en:'Difficulty {V} · Use a skill card?',zh:'难度 {V} · 是否使用技能卡?'},
+  skill_skip:        {en:'Skip',zh:'不使用'},
+  skill_use_card_hint:{en:'· Any stat +{V}',zh:'· 任意属性+{V}'},
+  log_skill_card_used:{en:'Used skill card {N} (+{V})',zh:'使用技能卡 {N} (+{V})'},
+  log_chaos_refill:  {en:'Chaos bag empty — refilled',zh:'混沌袋已空,重新填满'},
+  log_elder_sign:    {en:'Elder Sign! +2 and draw a card',zh:'古老印记!+2并抽一张牌'},
+  log_test_result:  {en:'{S} {B} {M} = {F} vs {D} · {R}',zh:'{S} {B} {M} = {F} vs {D} · {R}'},
+  test_success_label:{en:'Success',zh:'成功'},
+  test_fail_label:   {en:'Failed',zh:'失败'},
+  toast_not_inv_phase:{en:'Not in Investigator Phase',zh:'非调查员阶段'},
+  toast_no_actions:  {en:'Not enough actions',zh:'行动力不足'},
+  toast_unreachable:{en:'Cannot reach that location',zh:'无法到达该地点'},
+  toast_no_clues:    {en:'No clues here',zh:'此地无线索'},
+  toast_no_enemy:    {en:'No engaged enemies',zh:'无交战敌人'},
+  toast_skill_auto:  {en:'Skill cards are auto-prompted during tests',zh:'技能卡在判定时自动询问使用'},
+  toast_no_resource: {en:'Not enough resources',zh:'资源不足'},
+  toast_discovered:  {en:'Discovered: {N}',zh:'发现:{N}'},
+  toast_clue_gain:   {en:'Gained a clue!',zh:'获得一枚线索!'},
+  log_attack_miss:   {en:'Attack missed',zh:'攻击未命中'},
+  log_weapon_empty:  {en:'{N} is out of ammo',zh:'{N} 弹药耗尽'},
+  log_loc_clues_available:{en:'{N} has {V} clue(s) to investigate',zh:'{N} 有 {V} 枚线索可调查'},
+  log_evade_success_disengage:{en:'Evaded {N}! Disengaged (no pursuit this round)',zh:'成功闪避 {N}!已脱离交战(本回合不会追击)'},
+  heal_choice_title: {en:'First Aid Kit',zh:'急救包'},
+  heal_choice_sub:   {en:'Choose: restore {V} Health or {V} Sanity',zh:'选择恢复 {V} 点生命或 {V} 点理智'},
+  heal_hp_btn:       {en:'❤ Restore Health',zh:'❤ 恢复生命'},
+  heal_sanity_btn:   {en:'✦ Restore Sanity',zh:'✦ 恢复理智'},
+  toast_health_full: {en:'Health already full',zh:'生命已满'},
+  toast_not_final_act:{en:'Not yet in the Final Act',zh:'尚未进入终幕'},
+  toast_clues_insufficient:{en:'Not enough clues',zh:'线索不足'},
+  toast_bedroom_only:{en:'Must be in the Master Bedroom',zh:'需在主卧室执行'},
+  toast_engaged_no_ritual:{en:'Cannot perform ritual while engaged — deal with enemies first',zh:'交战中无法祭祀!先解决敌人'},
+  toast_no_resource_heal:{en:'Not enough resources (need 2)',zh:'资源不足(需2资源)'},
+  log_heal_emergency:{en:'Emergency bandage: resources -2, health +1',zh:'紧急包扎:资源-2,生命+1'},
+  log_guardian_block:{en:'Guardian amulet absorbs damage!',zh:'守护护符抵消伤害!'},
+  strategy_cancel:   {en:'Cancel',zh:'取消'},
+  rules_title:       {en:'📜 Game Rules',zh:'📜 游戏规则'},
+  rules_objective_title:{en:'◆ Objective',zh:'◆ 游戏目标'},
+  rules_objective:   {en:'Gather clues to advance through three acts. Perform the ritual in the Master Bedroom during Act III to win. Health or Sanity at 0 means defeat.',zh:'集齐线索推进三幕剧情,第三幕在主卧室执行祭祀仪式即可通关。生命或理智归零则失败。'},
+  rules_phases_title:{en:'◆ Four Phases',zh:'◆ 四大阶段'},
+  rules_phase_mythos:{en:'<b style="color:#b71d1d;">Mythos</b>: Doom +1, draw an encounter card (monster or treachery)',zh:'<b style="color:#b71d1d;">神话阶段</b>:末日+1,抽遭遇卡(怪兽或陷阱)'},
+  rules_phase_investigator:{en:'<b style="color:#c9a96e;">Investigator</b>: 3 actions — move, investigate, fight, evade, or play cards',zh:'<b style="color:#c9a96e;">调查员阶段</b>:3行动力,可移动/调查/战斗/闪避/打牌'},
+  rules_phase_enemy: {en:'<b style="color:#8b0000;">Enemy</b>: enemies at locations move toward you; engaged enemies attack',zh:'<b style="color:#8b0000;">敌人阶段</b>:地点敌人向玩家移动,交战敌人攻击'},
+  rules_phase_upkeep: {en:'<b style="color:#7faacf;">Upkeep</b>: reset actions, +1 resource, draw 1 card',zh:'<b style="color:#7faacf;">维护阶段</b>:行动力重置,+1资源,抽1牌'},
+  rules_chaos_title: {en:'◆ Chaos Bag Test',zh:'◆ 混沌袋判定'},
+  rules_chaos:       {en:'Skill value + equipment bonus + chaos token ≥ difficulty = success.<br>Token types: +1/0/-1/-2 (numeric), Skull (minus doom), Elder Sign (+2 & draw), Tentacle (auto-fail)<br>15 tokens total, drawn without replacement; refilled when empty.',zh:'属性值 + 装备加成 + 混沌代币 ≥ 难度 = 成功。<br>代币类型:+1/0/-1/-2(数值)、骷髅(减末日数)、古老印记(+2抽牌)、混沌触手(自动失败)<br>共15枚代币抽完不放回,用尽重置。'},
+  rules_actions_title:{en:'◆ Action Costs',zh:'◆ 行动消耗'},
+  rules_actions:     {en:'Move/Investigate/Fight/Evade/Play card: 1 action each<br>Skill cards: auto-prompted during tests, +2 to any stat, no action cost',zh:'移动/调查/战斗/闪避/打牌:各1行动力<br>技能卡:判定时自动询问使用,加属性+2不消耗行动力'},
+  rules_card_types_title:{en:'◆ Card Types',zh:'◆ 卡牌类型'},
+  rules_asset:       {en:'<b>Asset</b>: stays in play, slot limits (2 hand / 2 accessory)',zh:'<b>装备(Asset)</b>:打出后持续生效,有槽位限制(手部/配饰各2件)'},
+  rules_event:       {en:'<b>Event</b>: resolves immediately, prompted before use',zh:'<b>事件(Event)</b>:打出后立即结算效果,使用前会确认'},
+  rules_skill:       {en:'<b>Skill</b>: discarded during tests for +2 to any stat',zh:'<b>技能(Skill)</b>:判定时丢弃,临时加成任意属性+2'},
+  rules_combat_title:{en:'◆ Combat & Evade',zh:'◆ 战斗与闪避'},
+  rules_combat:      {en:'<b>Fight</b>: Combat vs enemy combat, success deals damage (weapon boosts)<br><b>Evade</b>: Agility vs enemy combat, success moves enemy to current location, no pursuit this round<br><b>Right-click</b> a hand card for details; hand size limit 8',zh:'<b>战斗</b>:战斗 vs 敌人战力,成功造成伤害(武器可加成)<br><b>闪避</b>:敏捷 vs 敌人战力,成功后敌人移至当前地点,本回合不再追击<br><b>右键手牌卡</b>可查看详情;手牌满8张需弃牌'},
+  rules_close:       {en:'Close',zh:'关闭'},
+  shortcuts_title:  {en:'⌘ Shortcuts',zh:'⌘ 快捷键'},
+  shortcut_investigate:{en:'Investigate',zh:'调查'},
+  shortcut_fight:   {en:'Fight',zh:'战斗'},
+  shortcut_evade:    {en:'Evade',zh:'闪避'},
+  shortcut_ritual:   {en:'Ritual (Final Act)',zh:'祭祀(终幕)'},
+  shortcut_end_turn: {en:'End Turn',zh:'结束回合'},
+  shortcut_continue: {en:'Continue Phase / End Action',zh:'继续阶段 / 结束行动'},
+  shortcut_rules:    {en:'View Rules',zh:'查看规则'},
+  shortcut_tutorial: {en:'Tutorial',zh:'教程'},
+  shortcut_restart:  {en:'Restart',zh:'重新开始'},
+  shortcut_hint:     {en:'Right-click a hand card for details',zh:'右键手牌卡可查看卡牌详情'},
+  shortcuts_close:   {en:'Close',zh:'关闭'},
+  tutorial_1:        {en:'This is the phase indicator. The game cycles through Mythos → Investigator → Enemy → Upkeep.',zh:'这是阶段指示器。游戏按神话→调查→敌人→维护四阶段循环推进。'},
+  tutorial_2:        {en:'The Agenda card tracks doom. +1 each round; when full, a disaster triggers.',zh:'密谋卡记录末日标记。每回合+1,满额触发灾难事件。'},
+  tutorial_3:        {en:'The Act card tracks clues. Gather clues to advance; perform the ritual in the Bedroom during Act III to win.',zh:'场景卡记录线索。集齐线索可推进剧情,第三幕在卧室祭祀通关。'},
+  tutorial_4:        {en:'The location map. Green highlights are adjacent movable locations; the golden "Explore" marks unexplored locations.',zh:'地点地图。绿色高亮的是可移动的相邻地点,金色的"前往探索"是未探索地点。'},
+  tutorial_5:        {en:'Investigator panel. Health/Sanity at 0 means defeat. Red or purple breathing glow signals danger.',zh:'调查员面板。生命/理智归零即失败。红色或紫色呼吸光表示危险。'},
+  tutorial_6:        {en:'Action buttons. 3 actions per round: Investigate (Intellect vs Shroud), Fight, Evade, Ritual (Final Act only).',zh:'行动按钮。每轮3行动力:调查(智力vs遮蔽)、战斗、闪避、祭祀(终幕专用)。'},
+  tutorial_7:        {en:'Hand area. Left-click to play, right-click for details. Event cards prompt for confirmation.',zh:'手牌区。左键打出,右键查看详情。事件卡使用前会确认。'},
+  tutorial_8:        {en:'Chaos bag. Each test draws one token without replacement. Skull = minus doom, Tentacle = auto-fail.',zh:'混沌袋。每次判定随机抽一枚代币,抽完不放回。骷髅=减末日数,触手=自动失败。'},
+  tutorial_end:      {en:'❦ Tutorial complete. Good luck in the Wentworth manor...',zh:'❦ 教程结束。祝你在沃特里宅邸好运...'},
+  tutorial_progress:{en:'{C}/{T} · Click anywhere to continue',zh:'{C}/{T} · 点击任意位置继续'},
+  log_enter_manor:  {en:'The investigator steps into the Wentworth manor...',zh:'调查员踏入沃特里宅邸...'},
+  toast_slot_full:  {en:'{S} slot full (max 2)',zh:'{S} 槽位已满(限2件)'},
+  log_drew_card:    {en:'Drew: {N}',zh:'抽牌: {N}'},
+  log_discard_card: {en:'Discarded: {N}',zh:'弃牌: {N}'},
+  prompt_hand_full_title:{en:'Hand full (8/8)',zh:'手牌已满 (8/8)'},
+  prompt_hand_full_sub:{en:'Select a card to discard before drawing',zh:'选择一张牌弃掉,方可继续抽牌'},
+  card_label_asset: {en:'Asset',zh:'装备'},
+  card_label_event: {en:'Event',zh:'事件'},
+  card_label_skill: {en:'Skill',zh:'技能'},
+  card_label_cost: {en:'Cost {V}',zh:'费{V}'},
+  discard_btn:      {en:'Discard',zh:'弃'},
+};
+
+// 翻译函数 - 返回当前语言的字符串,支持 {V} 占位符替换
+function t(key, params){
+  const entry = STRINGS[key];
+  if(!entry){
+    console.warn('Missing i18n key:', key);
+    return key;
+  }
+  let s = entry[currentLang] || entry.en || key;
+  if(params){
+    Object.keys(params).forEach(k=>{
+      s = s.replace(new RegExp('\\{'+k+'\\}','g'), params[k]);
+    });
+  }
+  return s;
+}
+
+// 对象字段国际化:返回 obj[fieldEn] 或 obj[field]
+// propBase 不带 En 后缀,如 'name' 会查找 nameEn 或 name
+function tl(obj, propBase){
+  if(!obj) return '';
+  const enField = propBase + 'En';
+  if(currentLang === 'en' && obj[enField] !== undefined) return obj[enField];
+  return obj[propBase];
+}
+
+// 切换语言
+function toggleLanguage(){
+  currentLang = currentLang === 'en' ? 'zh' : 'en';
+  localStorage.setItem('ah_game_lang', currentLang);
+  // 更新按钮文字
+  const btn = document.getElementById('btn-lang');
+  if(btn) btn.textContent = t('btn_lang');
+  // 重新渲染静态 UI
+  renderStaticUI();
+  // 重新渲染游戏状态
+  if(typeof renderAll === 'function') renderAll();
+}
+
+// 渲染静态 UI 文本(顶部工具栏等)
+function renderStaticUI(){
+  // 顶部工具栏
+  const titleEl = document.querySelector('.toolbar-title');
+  if(titleEl) titleEl.innerHTML = currentLang === 'en' ? 'ELDRITCH INVESTIGATION' : '诡秘调查 · 虚空之影';
+  document.getElementById('btn-rules').textContent = '📜 ' + t('btn_rules');
+  document.getElementById('btn-tutorial').textContent = '❦ ' + t('btn_tutorial');
+  document.getElementById('btn-shortcuts').textContent = '⌘ ' + t('btn_shortcuts');
+  document.getElementById('btn-restart').textContent = '↻ ' + t('btn_restart');
+  const langBtn = document.getElementById('btn-lang');
+  if(langBtn) langBtn.textContent = t('btn_lang');
+  // 批量更新所有带 data-i18n 属性的元素
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key = el.getAttribute('data-i18n');
+    if(STRINGS[key]) el.textContent = t(key);
+  });
+  // 起始界面
+  const startOverlay = document.getElementById('start-overlay');
+  if(startOverlay && !startOverlay.classList.contains('hidden')){
+    renderStartScreen();
+  }
+  // 行动按钮
+  document.getElementById('btn-investigate').textContent = t('act_investigate');
+  document.getElementById('btn-fight').textContent = t('act_fight');
+  document.getElementById('btn-evade').textContent = t('act_evade');
+  document.getElementById('btn-heal').textContent = t('act_heal');
+  document.getElementById('btn-strategy').textContent = t('act_strategy');
+  document.getElementById('btn-ritual').textContent = t('act_ritual');
+  document.getElementById('btn-end-round').textContent = t('act_end_round');
+  // 结局重启按钮
+  const endRestart = document.getElementById('btn-restart-ending');
+  if(endRestart) endRestart.textContent = t('btn_restart_ending');
+  // 危机卡的标题/描述也可通过 data-i18n 自动更新,无需额外处理
+}
+
+// 渲染起始界面
+function renderStartScreen(){
+  const startOverlay = document.getElementById('start-overlay');
+  if(!startOverlay || startOverlay.classList.contains('hidden')) return;
+  // 标题
+  document.querySelector('.game-title').textContent = t('game_title');
+  document.querySelector('.game-subtitle').textContent = currentLang === 'en' ? '— Shadows of the Void —' : '— 虚空之影 —';
+  document.querySelector('.story-text').innerHTML = t('story_text');
+  // 选择调查员标题
+  const selectLabel = startOverlay.querySelector('div[style*="font-variant:small-caps"]');
+  if(selectLabel) selectLabel.textContent = t('select_investigator');
+  // 按钮
+  document.getElementById('btn-start').textContent = t('btn_start');
+  // 重新生成调查员选择卡片
+  if(typeof renderInvestigatorSelect === 'function') renderInvestigatorSelect();
+}
+
+// ===== 卡牌数据库 =====
+const CARD_DB = {
+  // 调查员定义
+  investigators:[
+    {
+      id:'roland',
+      name:'罗兰·班克斯',
+      nameEn:"Roland Banks",
+      title:'联邦调查员 · 虚空追猎者',
+      titleEn:'Federal Agent · Void Hunter',
+      desc:'前联邦探员,擅长肉搏战。意志坚定,但理智脆弱。',
+      descEn:'A former federal agent, skilled in combat. Strong-willed but fragile sanity.',
+      stats:{health:8,maxHealth:8,sanity:6,maxSanity:6,resources:5,willpower:4,intellect:3,combat:5,agility:3},
+      startCards:['magnifier','revolver','perseverance'] // 起始装备卡id
+    },
+    {
+      id:'daisy',
+      name:'黛蕾·沃克',
+      nameEn:'Daisy Walker',
+      title:'密斯卡托尼克图书馆员 · 知识探寻者',
+      titleEn:'Miskatonic Librarian · Knowledge Seeker',
+      desc:'图书管理员,智力超群。调查得心应手,但不擅战斗。',
+      descEn:'A librarian with exceptional intellect. Investigation comes naturally, but combat does not.',
+      stats:{health:6,maxHealth:6,sanity:8,maxSanity:8,resources:6,willpower:4,intellect:5,combat:2,agility:3},
+      startCards:['magnifier','guardian','insight']
+    },
+    {
+      id:'winfield',
+      name:'温菲尔德·科特',
+      nameEn:'Winfield Cort',
+      title:'赏金猎人 · 全能生存者',
+      titleEn:'Bounty Hunter · All-Round Survivor',
+      desc:'老练的赏金猎人,各项能力均衡,资源充足。',
+      descEn:'A seasoned bounty hunter, balanced in all traits, well-supplied.',
+      stats:{health:7,maxHealth:7,sanity:7,maxSanity:7,resources:7,willpower:3,intellect:3,combat:4,agility:4},
+      startCards:['revolver','guardian','funding']
+    }
+  ],
+  // 玩家牌堆 - 12种卡牌
+  player:[
+    {id:'magnifier',name:'放大镜',nameEn:'Magnifying Glass',type:'asset',cost:1,icon:'🔍',slot:'accessory',text:'调查时智力+1。装备后持续生效。',textEn:'+1 Intellect when investigating.',effect:{type:'stat_boost',stat:'intellect',value:1}},
+    {id:'revolver',name:'点38左轮手枪',nameEn:'.38 Revolver',type:'asset',cost:3,icon:'🔫',slot:'hand',text:'战斗判定时战斗+2,造成2点伤害。弹药3发。',textEn:'+2 Combat during combat tests. Deals 2 damage. 3 ammo.',uses:3,effect:{type:'combat_weapon',damage:2,boost:2}},
+    {id:'funding',name:'紧急资助',nameEn:'Emergency Funding',type:'event',cost:0,icon:'💰',text:'立即获得3个资源。',textEn:'Gain 3 resources immediately.',effect:{type:'gain_resources',value:3}},
+    {id:'sanctuary',name:'避难所',nameEn:'Sanctuary',type:'event',cost:1,icon:'🛡',text:'本回合敌人无法主动攻击你,并移至相邻地点。',textEn:'Enemies cannot attack you this round. They move to an adjacent location.',effect:{type:'sanctuary'}},
+    {id:'perseverance',name:'强力生存毅力',nameEn:'Perseverance',type:'skill',cost:0,icon:'💪',text:'校验时丢弃,本次判定任意属性+2。',textEn:'Discard during a test. +2 to any attribute.',effect:{type:'skill_boost',value:2}},
+    {id:'guardian',name:'守护护符',nameEn:'Guardian Amulet',type:'asset',cost:2,icon:'⚜',slot:'accessory',text:'意志+1。防止首次理智伤害。',textEn:'+1 Willpower. Prevents the first Sanity damage.',uses:1,effect:{type:'stat_boost',stat:'willpower',value:1}},
+    {id:'dodge',name:'直觉闪避',nameEn:'Instinctive Dodge',type:'event',cost:0,icon:'💨',text:'立即闪避当前交战的一个敌人。',textEn:'Immediately evade one engaged enemy.',effect:{type:'evade_enemy'}},
+    {id:'insight',name:'洞察之眼',nameEn:'Eye of Insight',type:'event',cost:1,icon:'👁',text:'立即调查当前地点,自动成功。',textEn:'Investigate current location automatically (success).',effect:{type:'auto_investigate'}},
+    // 新增卡牌
+    {id:'shotgun',name:'霰弹枪',nameEn:'Shotgun',type:'asset',cost:4,icon:'💥',slot:'hand',text:'战斗判定时战斗+3,造成3点伤害。弹药2发。',textEn:'+3 Combat during combat tests. Deals 3 damage. 2 ammo.',uses:2,effect:{type:'combat_weapon',damage:3,boost:3}},
+    {id:'tome',name:'古老咒典',nameEn:'Ancient Tome',type:'asset',cost:2,icon:'📕',slot:'accessory',text:'意志+1。每回合可花费1资源抽1张牌。',textEn:'+1 Willpower. Each round, spend 1 resource to draw a card.',effect:{type:'stat_boost',stat:'willpower',value:1}},
+    {id:'heal',name:'急救包',nameEn:'First Aid Kit',type:'event',cost:2,icon:'✚',text:'恢复3点生命或3点理智(选择)。',textEn:'Restore 3 Health or 3 Sanity (your choice).',effect:{type:'heal',value:3}},
+    {id:'premonition',name:'预兆',nameEn:'Premonition',type:'skill',cost:0,icon:'🔮',text:'校验时丢弃,先查看混沌袋顶部2枚代币,选择1枚。',textEn:'Discard during a test. Peek at the top 2 chaos tokens, keep 1.',effect:{type:'skill_boost',value:1}}
+  ],
+  // 遭遇牌堆 - 8种危机
+  encounter:[
+    {id:'ghoul',name:'古尸食尸鬼',nameEn:'Ghoul',type:'monster',icon:'👹',combat:3,health:3,damage:1,sanityDamage:1,text:'战力3,生命3。每回合造成1生命和1理智伤害。',textEn:'Combat 3, Health 3. Deals 1 Health and 1 Sanity damage each round.'},
+    {id:'shriek',name:'冰冷尖啸',nameEn:'Cold Shriek',type:'treachery',icon:'❄',text:'立即进行意志(4)检验,失败则理智扣减3。',textEn:'Willpower (4) test. Fail: -3 Sanity.',willpowerTest:4,sanityDamage:3},
+    {id:'voidspread',name:'虚空蔓延',nameEn:'Void Spread',type:'treachery',icon:'🌀',text:'在当前地点放置一个末日标记。',textEn:'Place a doom token at the current location.',addDoom:1},
+    {id:'shadowbeast',name:'虚空之影',nameEn:'Shadow of the Void',type:'monster',icon:'🐉',combat:4,health:4,damage:2,sanityDamage:1,text:'战力4,生命4。每回合造成2生命和1理智伤害。',textEn:'Combat 4, Health 4. Deals 2 Health and 1 Sanity damage each round.'},
+    {id:'whispers',name:'虚空低语',nameEn:'Void Whispers',type:'treachery',icon:'💀',text:'进行意志(3)检验,失败则末日标记+1。',textEn:'Willpower (3) test. Fail: +1 doom.',willpowerTest:3,addDoomOnFail:1},
+    // 新增敌人/事件
+    {id:'cultist',name:'虚空教徒',nameEn:'Void Cultist',type:'monster',icon:'🧙',combat:2,health:2,damage:1,sanityDamage:0,text:'战力2,生命2。每回合+1末日标记,造成1生命伤害。',textEn:'Combat 2, Health 2. +1 doom each round, deals 1 Health damage.',addDoomEachRound:true},
+    {id:'hounds',name:'廷达洛斯猎犬',nameEn:'Hound of Tindalos',type:'monster',icon:'🐺',combat:5,health:3,damage:2,sanityDamage:2,text:'战力5,生命3。精英怪,每回合造成2生命2理智伤害。',textEn:'Combat 5, Health 3. Elite. Deals 2 Health and 2 Sanity each round. Fast.',fast:true},
+    {id:'rot',name:'腐朽之息',nameEn:'Breath of Rot',type:'treachery',icon:'☣',text:'立即进行智力(3)检验,失败则失去2资源。',textEn:'Intellect (3) test. Fail: lose 2 resources.',intellectTest:3,resourceLoss:2}
+  ]
+};
+
+// ===== 地点数据 =====
+const LOCATIONS = [
+  {id:'study',name:'书房',nameEn:'Study',shroud:2,clues:2,maxClues:2,explored:true,connections:['hallway','attic'],desc:'满是旧书与尘土的书房,墙上挂着一幅诡异画像。',descEn:'A study of old books and dust. A disturbing portrait hangs on the wall.'},
+  {id:'hallway',name:'幽暗长廊',nameEn:'Dim Corridor',shroud:3,clues:2,maxClues:2,explored:false,connections:['study','attic','bedroom','cellar'],desc:'潮湿阴冷的长廊,脚步声在回荡,通往宅邸深处。',descEn:'A damp, cold corridor. Footsteps echo endlessly. Leads deeper into the manor.'},
+  {id:'attic',name:'阁楼',nameEn:'Attic',shroud:4,clues:2,maxClues:2,explored:false,connections:['study','hallway'],desc:'布满蛛网的阁楼,藏着不为人知的秘密。',descEn:'A cobwebbed attic hiding unspeakable secrets.'},
+  {id:'bedroom',name:'主卧室',nameEn:'Master Bedroom',shroud:3,clues:2,maxClues:2,explored:false,connections:['hallway','cellar'],desc:'举行祭祀仪式的关键地点,终幕可在此执行祭祀。',descEn:'The ritual site. The ritual may be performed here in the final act.'},
+  {id:'cellar',name:'地下室',nameEn:'Cellar',shroud:5,clues:3,maxClues:3,explored:false,connections:['hallway','bedroom'],desc:'阴暗潮湿的地下密室,空气中弥漫着腐朽气息,深藏着被遗忘的禁忌。',descEn:'A dark, damp underground chamber. The air reeks of decay. Forbidden secrets sleep here.'}
+];
+
+// ===== 混沌袋代币 =====
+const CHAOS_TOKENS = [
+  {symbol:'+1',value:1,type:'number',text:'神圣加护',textEn:'Divine Blessing'},
+  {symbol:'+1',value:1,type:'number',text:'神圣加护',textEn:'Divine Blessing'},
+  {symbol:'0',value:0,type:'number',text:'平衡之刻',textEn:'Balanced Moment'},
+  {symbol:'0',value:0,type:'number',text:'平衡之刻',textEn:'Balanced Moment'},
+  {symbol:'0',value:0,type:'number',text:'平衡之刻',textEn:'Balanced Moment'},
+  {symbol:'-1',value:-1,type:'number',text:'阴霾笼罩',textEn:'Shrouded'},
+  {symbol:'-1',value:-1,type:'number',text:'阴霾笼罩',textEn:'Shrouded'},
+  {symbol:'-2',value:-2,type:'number',text:'虚空侵蚀',textEn:'Void Erosion'},
+  {symbol:'-2',value:-2,type:'number',text:'虚空侵蚀',textEn:'Void Erosion'},
+  {symbol:'☠',type:'skull',text:'骷髅 · 减去场上末日总数',textEn:'Skull · Minus total doom in play'},
+  {symbol:'☠',type:'skull',text:'骷髅 · 减去场上末日总数',textEn:'Skull · Minus total doom in play'},
+  {symbol:'☆',type:'elder_sign',value:2,text:'古老印记 · +2并抽一张牌',textEn:'Elder Sign · +2 and draw a card'},
+  {symbol:'☆',type:'elder_sign',value:2,text:'古老印记 · +2并抽一张牌',textEn:'Elder Sign · +2 and draw a card'},
+  {symbol:'🅾',type:'auto_fail',text:'混沌触手 · 自动失败',textEn:'Tentacle · Auto-fail'},
+  {symbol:'🅾',type:'auto_fail',text:'混沌触手 · 自动失败',textEn:'Tentacle · Auto-fail'}
+];
+
+// ===== 游戏状态 =====
+let game = {
+  phase:'mythos', // mythos, investigation, enemy, upkeep
+  round:1,
+  selectedInvestigator:null, // 当前选择的调查员对象
+  investigator:{
+    health:8, maxHealth:8,
+    sanity:8, maxSanity:8,
+    resources:5,
+    actions:3,
+    willpower:4, intellect:3, combat:4, agility:3,
+    hand:[], equipped:[], engaged:[],
+    currentLocation:'study'
+  },
+  agenda:{num:1, doom:0, maxDoom:5, total:3},
+  act:{num:1, clues:0, maxClues:5, total:3},
+  locations:[],
+  playerDeck:[],
+  encounterDeck:[],
+  enemiesAtLocations:{}, // {locationId: [enemy, ...]} 未交战的地点敌人
+  chaosBag:[], // 混沌袋代币(消耗后不返回)
+  discardPile:[], // 弃牌堆
+  skillCardUsed:null,
+  sanctuaryActive:false,
+  strategyUsedThisRound:false,
+  pendingTest:null,
+  gameOver:false
+};
+
+// ===== 规则书弹窗 =====
+function showRules(){
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.style.zIndex=94;
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:560px;padding:24px 32px;max-height:80vh;overflow-y:auto;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="font-size:20px;color:var(--gold);text-align:center;margin-bottom:14px;letter-spacing:3px;font-variant:small-caps;border-bottom:1px solid var(--gold-dim);padding-bottom:10px;">${t('rules_title')}</div>
+      <div style="font-size:11px;color:var(--parchment);line-height:1.8;">
+        <div style="margin-bottom:12px;">
+          <div style="color:var(--gold);font-size:12px;margin-bottom:4px;letter-spacing:1px;">${t('rules_objective_title')}</div>
+          ${t('rules_objective')}
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="color:var(--gold);font-size:12px;margin-bottom:4px;letter-spacing:1px;">${t('rules_phases_title')}</div>
+          ${t('rules_phase_mythos')}<br>
+          ${t('rules_phase_investigator')}<br>
+          ${t('rules_phase_enemy')}<br>
+          ${t('rules_phase_upkeep')}
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="color:var(--gold);font-size:12px;margin-bottom:4px;letter-spacing:1px;">${t('rules_chaos_title')}</div>
+          ${t('rules_chaos')}
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="color:var(--gold);font-size:12px;margin-bottom:4px;letter-spacing:1px;">${t('rules_actions_title')}</div>
+          ${t('rules_actions')}
+        </div>
+        <div style="margin-bottom:12px;">
+          <div style="color:var(--gold);font-size:12px;margin-bottom:4px;letter-spacing:1px;">${t('rules_card_types_title')}</div>
+          ${t('rules_asset')}<br>
+          ${t('rules_event')}<br>
+          ${t('rules_skill')}
+        </div>
+        <div>
+          <div style="color:var(--gold);font-size:12px;margin-bottom:4px;letter-spacing:1px;">${t('rules_combat_title')}</div>
+          ${t('rules_combat')}
+        </div>
+      </div>
+      <button class="btn" id="rules-close" style="margin-top:16px;width:100%;padding:8px;font-size:12px;">${t('rules_close')}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#rules-close').onclick=()=>overlay.remove();
+  overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+}
+
+// ===== 快捷键说明 =====
+function showShortcuts(){
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.style.zIndex=94;
+  const kbdStyle='background:#2a1a0a;border:1px solid var(--gold-dim);color:var(--gold);padding:2px 8px;border-radius:2px;font-family:monospace;';
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:420px;padding:24px 32px;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="font-size:18px;color:var(--gold);text-align:center;margin-bottom:14px;letter-spacing:2px;font-variant:small-caps;border-bottom:1px solid var(--gold-dim);padding-bottom:8px;">${t('shortcuts_title')}</div>
+      <div style="font-size:11px;color:var(--parchment);line-height:2;">
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_investigate')}</span><kbd style="${kbdStyle}">1</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_fight')}</span><kbd style="${kbdStyle}">2</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_evade')}</span><kbd style="${kbdStyle}">3</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_ritual')}</span><kbd style="${kbdStyle}">4</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_end_turn')}</span><kbd style="${kbdStyle}">5</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_continue')}</span><kbd style="${kbdStyle}">${currentLang==='en'?'Space / Enter':'空格 / 回车'}</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_rules')}</span><kbd style="${kbdStyle}">H</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;border-bottom:1px dashed var(--gold-dim);padding:4px 0;">
+          <span>${t('shortcut_tutorial')}</span><kbd style="${kbdStyle}">T</kbd>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:4px 0;">
+          <span>${t('shortcut_restart')}</span><kbd style="${kbdStyle}">R</kbd>
+        </div>
+        <div style="margin-top:10px;font-size:10px;color:var(--parchment-dim);font-style:italic;">${t('shortcut_hint')}</div>
+      </div>
+      <button class="btn" id="shortcuts-close" style="margin-top:14px;width:100%;padding:8px;font-size:12px;">${t('shortcuts_close')}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#shortcuts-close').onclick=()=>overlay.remove();
+  overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+}
+
+// ===== 教程提示系统 =====
+let tutorialStep = 0;
+const TUTORIAL_STEPS = [
+  {target:'#phase-indicator',key:'tutorial_1'},
+  {target:'.threat-card.agenda',key:'tutorial_2'},
+  {target:'.threat-card.act',key:'tutorial_3'},
+  {target:'#locations-map',key:'tutorial_4'},
+  {target:'#investigator-panel',key:'tutorial_5'},
+  {target:'.action-buttons',key:'tutorial_6'},
+  {target:'#hand-area',key:'tutorial_7'},
+  {target:'#chaos-bag-visual',key:'tutorial_8'}
+];
+
+function showTutorial(){
+  tutorialStep = 0;
+  showTutorialStep();
+}
+
+function showTutorialStep(){
+  // 移除已有提示
+  const old=document.querySelector('.tutorial-tip');
+  if(old) old.remove();
+  document.querySelectorAll('.tutorial-highlight').forEach(e=>e.classList.remove('tutorial-highlight'));
+  if(tutorialStep>=TUTORIAL_STEPS.length){
+    const tip=document.createElement('div');
+    tip.className='tutorial-tip';
+    tip.style.top='50%';tip.style.left='50%';
+    tip.style.transform='translate(-50%,-50%)';
+    tip.innerHTML=t('tutorial_end');
+    document.body.appendChild(tip);
+    setTimeout(()=>tip.remove(),3000);
+    return;
+  }
+  const step=TUTORIAL_STEPS[tutorialStep];
+  const target=document.querySelector(step.target);
+  if(!target){tutorialStep++;showTutorialStep();return;}
+  target.classList.add('tutorial-highlight');
+  const rect=target.getBoundingClientRect();
+  const tip=document.createElement('div');
+  tip.className='tutorial-tip';
+  // 智能定位:优先在目标下方,空间不足则上方
+  const tipWidth=260,tipHeight=80;
+  let top=rect.bottom+12;
+  let left=rect.left+rect.width/2-tipWidth/2;
+  if(top+tipHeight>window.innerHeight) top=rect.top-tipHeight-12;
+  if(left<8) left=8;
+  if(left+tipWidth>window.innerWidth-8) left=window.innerWidth-tipWidth-8;
+  tip.style.top=top+'px';
+  tip.style.left=left+'px';
+  tip.style.maxWidth=tipWidth+'px';
+  tip.innerHTML=`${t(step.key)}<br><div style="margin-top:6px;font-size:10px;color:var(--gold);">${t('tutorial_progress',{C:tutorialStep+1,T:TUTORIAL_STEPS.length})}</div>`;
+  tip.style.pointerEvents='auto';
+  tip.style.cursor='pointer';
+  document.body.appendChild(tip);
+  const advance=()=>{
+    tip.remove();
+    target.classList.remove('tutorial-highlight');
+    tutorialStep++;
+    document.removeEventListener('click',advance);
+    setTimeout(showTutorialStep,200);
+  };
+  setTimeout(()=>document.addEventListener('click',advance),100);
+}
+
+// ===== 初始化游戏 =====
+function initGame(investigatorId){
+  game.phase='mythos';
+  game.round=1;
+  // 选择调查员
+  const inv = investigatorId
+    ? CARD_DB.investigators.find(i=>i.id===investigatorId)
+    : CARD_DB.investigators[0];
+  game.selectedInvestigator = inv;
+  const s = inv.stats;
+  game.investigator={
+    health:s.health,maxHealth:s.maxHealth,
+    sanity:s.sanity,maxSanity:s.maxSanity,
+    resources:s.resources,actions:3,
+    willpower:s.willpower,intellect:s.intellect,combat:s.combat,agility:s.agility,
+    hand:[],equipped:[],engaged:[],currentLocation:'study'
+  };
+  // 给起始装备(直接装备上)
+  inv.startCards.forEach(cardId=>{
+    const card = CARD_DB.player.find(c=>c.id===cardId);
+    if(card && card.type==='asset'){
+      const eq={...card};
+      if(eq.uses) eq.currentUses=eq.uses;
+      game.investigator.equipped.push(eq);
+    }else if(card){
+      // 非装备卡加入手牌
+      game.investigator.hand.push({...card});
+    }
+  });
+  game.agenda={num:1,doom:0,maxDoom:5,total:3};
+  game.act={num:1,clues:0,maxClues:5,total:3};
+  game.locations = JSON.parse(JSON.stringify(LOCATIONS));
+  game.locations[0].explored=true; // 书房已探索
+  // 构建牌堆(每种2张)
+  game.playerDeck=[];
+  CARD_DB.player.forEach(c=>{game.playerDeck.push({...c});game.playerDeck.push({...c});});
+  shuffleDeck(game.playerDeck);
+  // 遭遇牌堆(每种3张)
+  game.encounterDeck=[];
+  CARD_DB.encounter.forEach(c=>{for(let i=0;i<3;i++)game.encounterDeck.push({...c});});
+  shuffleDeck(game.encounterDeck);
+  game.skillCardUsed=null;
+  game.sanctuaryActive=false;
+  game.pendingTest=null;
+  game.gameOver=false;
+  game.enemiesAtLocations = {}; // 重置地点敌人
+  game.discardPile = []; // 重置弃牌堆
+  // 初始化混沌袋(15枚代币,消耗后用完重置)
+  game.chaosBag = CHAOS_TOKENS.map(t=>({...t}));
+  selectedEnemyIdx = 0;
+  hideContinueBtn();
+  // 抽5张起手牌
+  for(let i=0;i<5;i++) drawPlayerCard();
+  log(t('log_enter_manor'),'phase');
+  renderAll();
+}
+
+function shuffleDeck(deck){
+  for(let i=deck.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [deck[i],deck[j]]=[deck[j],deck[i]];
+  }
+}
+
+function drawPlayerCard(){
+  if(game.playerDeck.length===0) return false;
+  if(game.investigator.hand.length>=8){
+    // 手牌满,提示弃牌
+    promptDiscard();
+    return false;
+  }
+  const card=game.playerDeck.pop();
+  game.investigator.hand.push(card);
+  AudioEngine.playCardFlip();
+  log(t('log_drew_card',{N:tl(card,'name')}));
+  return true;
+}
+
+// 手牌满时弃牌选择
+function promptDiscard(){
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.style.zIndex=95;
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:520px;padding:30px 40px;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="font-size:16px;color:var(--blood-bright);margin-bottom:8px;letter-spacing:2px;font-variant:small-caps;">${t('prompt_hand_full_title')}</div>
+      <div style="font-size:12px;color:var(--parchment-dim);margin-bottom:16px;">${t('prompt_hand_full_sub')}</div>
+      <div id="discard-choices" style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const choices=overlay.querySelector('#discard-choices');
+  game.investigator.hand.forEach((card,idx)=>{
+    const btn=document.createElement('button');
+    btn.className='action-btn';
+    btn.style.cssText='padding:8px 12px;font-size:11px;width:100%;text-align:left;display:flex;justify-content:space-between;';
+    const typeLabel = card.type==='asset'?t('card_label_asset'):card.type==='event'?t('card_label_event'):t('card_label_skill');
+    btn.innerHTML=`<span><b style="color:var(--gold);">${card.icon} ${tl(card,'name')}</b> <span style="color:var(--parchment-dim);">(${typeLabel} · ${t('card_label_cost',{V:card.cost})})</span></span><span style="color:var(--blood-bright);">${t('discard_btn')}</span>`;
+    btn.onclick=()=>{
+      game.investigator.hand.splice(idx,1);
+      game.discardPile.push(card);
+      log(t('log_discard_card',{N:tl(card,'name')}),'event');
+      AudioEngine.playCardFlip();
+      document.body.removeChild(overlay);
+      drawPlayerCard();
+      renderAll();
+    };
+    choices.appendChild(btn);
+  });
+}
+
+// ===== 游戏阶段循环 =====
+function nextPhase(){
+  if(game.gameOver) return;
+  switch(game.phase){
+    case 'mythos': startInvestigationPhase(); break;
+    case 'investigation': startEnemyPhase(); break;
+    case 'enemy': startUpkeepPhase(); break;
+    case 'upkeep': startMythosPhase(); break;
+  }
+  renderAll();
+}
+
+function startMythosPhase(){
+  game.phase='mythos';
+  document.getElementById('phase-indicator').textContent=t('phase_mythos');
+  document.getElementById('phase-indicator').style.color='#b71d1d';
+  log(t('log_round_start',{N:game.round}),'phase');
+  AudioEngine.playMythosBell();
+  // 放置末日标记
+  game.agenda.doom++;
+  log(t('log_doom_plus'),'event');
+  animateDoom(); // 末日震动动画
+  if(game.agenda.doom>=game.agenda.maxDoom){
+    triggerAgenda();
+  }
+  renderAll();
+  // 抽遭遇卡(短延迟保留仪式感)
+  setTimeout(()=>{
+    if(game.gameOver) return;
+    drawEncounterCard();
+    setTimeout(()=>{
+      if(!game.gameOver){
+        showContinueBtn(t('btn_to_investigator'),()=>startInvestigationPhase());
+      }
+    },1200);
+  },600);
+}
+
+function startInvestigationPhase(){
+  game.phase='investigation';
+  document.getElementById('phase-indicator').textContent=t('phase_investigator');
+  document.getElementById('phase-indicator').style.color='#c9a96e';
+  log(t('phase_inv_log'),'phase');
+  game.investigator.actions=3;
+  // 重置战略使用标记
+  game.strategyUsedThisRound=false;
+  // 清除敌人疲惫标记
+  game.investigator.engaged.forEach(e=>e.exhausted=false);
+  hideContinueBtn();
+  renderAll();
+}
+
+function startEnemyPhase(){
+  game.phase='enemy';
+  document.getElementById('phase-indicator').textContent=t('phase_enemy');
+  document.getElementById('phase-indicator').style.color='#8b0000';
+  log(t('phase_enemy_log'),'phase');
+  // 0. 处理"每回合加末日"的敌人(如虚空教徒)
+  const doomAdders=game.investigator.engaged.filter(e=>e.addDoomEachRound);
+  if(doomAdders.length>0){
+    doomAdders.forEach(e=>{
+      game.agenda.doom++;
+      log(t('log_cultist_doom',{N:tl(e,'name')}),'warn');
+    });
+    animateDoom();
+    if(game.agenda.doom>=game.agenda.maxDoom){
+      triggerAgenda();
+    }
+  }
+  // 1. 未交战的地点敌人向玩家移动
+  moveEnemiesTowardPlayer();
+  // 2. 到达玩家地点的敌人发起交战
+  engageEnemiesAtPlayerLocation();
+  // 3. 交战敌人攻击(疲惫的不攻击;fast 敌人攻击两次)
+  const attackingEnemies = game.investigator.engaged.filter(e=>!e.exhausted);
+  if(attackingEnemies.length>0){
+    if(game.sanctuaryActive){
+      log(t('log_sanctuary_active'),'success');
+      game.sanctuaryActive=false;
+    }else{
+      attackingEnemies.forEach(enemy=>{
+        const attacks = enemy.fast?2:1;
+        for(let i=0;i<attacks;i++){
+          if(game.gameOver) break;
+          log(attacks>1?t('log_enemy_attack_dual',{N:tl(enemy,'name'),I:i+1}):t('log_enemy_attack',{N:tl(enemy,'name')}),'event');
+          damageInvestigator(enemy.damage,enemy.sanityDamage);
+          AudioEngine.playAttack();
+          showDamageNumber(enemy.damage+enemy.sanityDamage);
+          shakeScreen();
+          checkGameOver();
+          if(game.gameOver) break;
+        }
+        // fast 敌人攻击后不疲劳(下一回合继续)
+        if(!enemy.fast) enemy.exhausted=true;
+      });
+    }
+  }else if(game.investigator.engaged.length>0){
+    log(t('log_all_exhausted'),'success');
+  }
+  checkGameOver();
+  renderAll();
+  if(!game.gameOver){
+    showContinueBtn(t('btn_to_upkeep'),()=>startUpkeepPhase());
+  }
+}
+
+// 敌人朝玩家移动(沿连通路径一步)
+function moveEnemiesTowardPlayer(){
+  const playerId=game.investigator.currentLocation;
+  Object.keys(game.enemiesAtLocations).forEach(locId=>{
+    if(locId===playerId) return; // 已在玩家地点
+    const enemies=game.enemiesAtLocations[locId];
+    if(!enemies||enemies.length===0) return;
+    // 用 BFS 找出下一步最短路径
+    const nextHop = findNextHop(locId,playerId);
+    if(!nextHop) return;
+    const destLoc = LOCATIONS.find(l=>l.id===nextHop);
+    // 移动
+    enemies.forEach(e=>{
+      e.location=nextHop;
+      log(t('log_enemy_move',{N:tl(e,'name'),L:tl(destLoc,'name')}),'event');
+    });
+    if(!game.enemiesAtLocations[nextHop]) game.enemiesAtLocations[nextHop]=[];
+    game.enemiesAtLocations[nextHop].push(...enemies);
+    game.enemiesAtLocations[locId]=[];
+  });
+}
+
+// BFS 查找从 from 到 to 的下一跳
+function findNextHop(from,to){
+  const visited=new Set([from]);
+  const queue=[[from,null]];
+  while(queue.length){
+    const [cur,firstHop]=queue.shift();
+    if(cur===to) return firstHop;
+    const loc=LOCATIONS.find(l=>l.id===cur);
+    if(!loc) continue;
+    for(const conn of loc.connections){
+      if(visited.has(conn)) continue;
+      visited.add(conn);
+      const hop = firstHop||conn;
+      queue.push([conn,hop]);
+    }
+  }
+  return null;
+}
+
+// 玩家地点的敌人发起交战
+function engageEnemiesAtPlayerLocation(){
+  const playerId=game.investigator.currentLocation;
+  const here = game.enemiesAtLocations[playerId]||[];
+  if(here.length===0) return;
+  here.forEach(e=>{
+    e.engaged=true;
+    e.location=undefined;
+    game.investigator.engaged.push(e);
+    log(t('log_enemy_engage',{N:tl(e,'name')}),'warn');
+    shakeInvestigator();
+  });
+  game.enemiesAtLocations[playerId]=[];
+}
+
+function startUpkeepPhase(){
+  game.phase='upkeep';
+  document.getElementById('phase-indicator').textContent=t('phase_upkeep');
+  document.getElementById('phase-indicator').style.color='#7faacf';
+  log(t('phase_upkeep_log'),'phase');
+  game.investigator.actions=3;
+  game.investigator.resources++;
+  drawPlayerCard();
+  log(t('log_upkeep_resource'),'success');
+  animateResource(); // 资源获得动画
+  checkGameOver();
+  renderAll();
+  if(!game.gameOver){
+    game.round++;
+    showContinueBtn(t('btn_to_mythos'),()=>startMythosPhase());
+  }
+}
+
+// 显示"继续"按钮
+function showContinueBtn(text,onclick){
+  hideContinueBtn();
+  const btn=document.createElement('button');
+  btn.id='btn-continue-phase';
+  btn.className='btn';
+  btn.style.cssText='position:fixed;bottom:200px;left:50%;transform:translateX(-50%);z-index:50;padding:10px 28px;font-size:13px;letter-spacing:2px;animation:btnPulse 2s infinite;';
+  btn.textContent=text;
+  btn.onclick=()=>{
+    hideContinueBtn();
+    onclick();
+  };
+  document.body.appendChild(btn);
+}
+function hideContinueBtn(){
+  const b=document.getElementById('btn-continue-phase');
+  if(b) b.remove();
+}
+
+// ===== 战斗伤害反馈系统 =====
+// 屏幕红色震屏
+function shakeScreen(){
+  const flash=document.createElement('div');
+  flash.className='screen-flash';
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),500);
+  // 整个游戏容器抖动
+  const main=document.querySelector('.main-grid');
+  if(main){
+    main.classList.add('screen-shake');
+    setTimeout(()=>main.classList.remove('screen-shake'),400);
+  }
+}
+
+// 调查员头像抖动
+function shakeInvestigator(){
+  const panel=document.querySelector('.investigator-panel');
+  if(panel){
+    panel.classList.add('panel-shake');
+    setTimeout(()=>panel.classList.remove('panel-shake'),400);
+  }
+}
+
+// 伤害飘字
+function showDamageNumber(amount){
+  if(amount<=0) return;
+  const panel=document.querySelector('.investigator-panel');
+  if(!panel) return;
+  const num=document.createElement('div');
+  num.className='damage-float';
+  num.textContent='-'+amount;
+  panel.appendChild(num);
+  setTimeout(()=>num.remove(),1200);
+}
+
+function triggerAgenda(){
+  log(t('log_agenda_full'),'event');
+  toast(t('toast_doom_full'));
+  AudioEngine.playMythosBell();
+  if(game.agenda.num<3){
+    game.agenda.num++;
+    game.agenda.doom=0;
+    game.agenda.maxDoom+=2;
+    // 灾难:扣理智+生成敌人
+    damageInvestigator(0,2);
+    const enemy = CARD_DB.encounter.find(c=>c.type==='monster');
+    if(enemy){
+      const e={...enemy};
+      game.investigator.engaged.push(e);
+      log(t('log_enemy_spawn',{N:tl(e,'name')}),'event');
+    }
+  }else{
+    // 最终灾难:虚空吞噬一切
+    log(t('log_void_consumes'),'event');
+    gameOver('agenda');
+    return;
+  }
+  checkGameOver();
+}
+
+function drawEncounterCard(){
+  if(game.encounterDeck.length===0){
+    CARD_DB.encounter.forEach(c=>{for(let i=0;i<3;i++)game.encounterDeck.push({...c});});
+    shuffleDeck(game.encounterDeck);
+  }
+  const card=game.encounterDeck.pop();
+  AudioEngine.playCardFlip();
+  log(t('log_encounter',{N:tl(card,'name')}),'event');
+  handleEncounterCard(card);
+}
+
+function handleEncounterCard(card){
+  if(card.type==='monster'){
+    const enemy={...card,currentHealth:card.health};
+    // 若玩家当前无交战敌人,则直接交战;否则敌人出现在当前地点
+    if(game.investigator.engaged.length===0){
+      enemy.engaged=true;
+      game.investigator.engaged.push(enemy);
+      log(t('log_enemy_spawn_engage',{N:tl(card,'name')}),'warn');
+      shakeInvestigator();
+    }else{
+      const locId=game.investigator.currentLocation;
+      if(!game.enemiesAtLocations[locId]) game.enemiesAtLocations[locId]=[];
+      enemy.location=locId;
+      game.enemiesAtLocations[locId].push(enemy);
+      log(t('log_enemy_appear',{N:tl(card,'name'),L:tl(LOCATIONS.find(l=>l.id===locId),'name')}),'warn');
+    }
+  }else if(card.type==='treachery'){
+    if(card.willpowerTest){
+      log(t('log_willpower_test_start',{V:card.willpowerTest}),'warn');
+      chaosTest('willpower',card.willpowerTest,(success)=>{
+        if(success){
+          log(t('log_test_success_no_dmg'),'success');
+        }else{
+          if(card.sanityDamage){
+            damageInvestigator(0,card.sanityDamage);
+            log(t('log_sanity_minus',{V:card.sanityDamage}),'event');
+          }
+          if(card.addDoomOnFail){
+            game.agenda.doom++;
+            log(t('log_doom_plus'),'event');
+            animateDoom();
+            if(game.agenda.doom>=game.agenda.maxDoom) triggerAgenda();
+          }
+        }
+        checkGameOver();
+        renderAll();
+      });
+      return;
+    }
+    if(card.intellectTest){
+      log(t('log_intellect_test_start',{V:card.intellectTest}),'warn');
+      chaosTest('intellect',card.intellectTest,(success)=>{
+        if(success){
+          log(t('log_test_success_resource_safe'),'success');
+        }else{
+          const loss=Math.min(card.resourceLoss,game.investigator.resources);
+          game.investigator.resources-=loss;
+          log(t('log_resource_minus',{V:loss}),'event');
+          toast(t('toast_resource_lost',{V:loss}));
+        }
+        renderAll();
+      });
+      return;
+    }
+    if(card.addDoom){
+      game.agenda.doom++;
+      log(t('log_doom_plus'),'event');
+      animateDoom();
+      if(game.agenda.doom>=game.agenda.maxDoom) triggerAgenda();
+    }
+  }
+  checkGameOver();
+}
+
+// ===== 混沌袋判定引擎 =====
+function chaosTest(stat,difficulty,callback){
+  // 判定前检查是否有技能卡可用
+  const skillCards = game.investigator.hand.filter(c=>c.type==='skill');
+  if(skillCards.length>0){
+    showSkillPrompt(skillCards,stat,difficulty,callback);
+  }else{
+    rollChaosToken(stat,difficulty,callback);
+  }
+}
+
+// 显示技能卡使用询问
+function showSkillPrompt(skillCards,stat,difficulty,callback){
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.style.zIndex=95;
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:420px;padding:30px 40px;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="font-size:16px;color:var(--gold);margin-bottom:8px;letter-spacing:2px;font-variant:small-caps;">${t('skill_prompt_title',{S:statName(stat)})}</div>
+      <div style="font-size:12px;color:var(--parchment-dim);margin-bottom:16px;">${t('skill_prompt_sub',{V:difficulty})}</div>
+      <div id="skill-choices" style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;"></div>
+      <button class="btn secondary" id="skill-skip" style="padding:8px 20px;font-size:12px;">${t('skill_skip')}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  const choices=overlay.querySelector('#skill-choices');
+  skillCards.forEach((card,idx)=>{
+    const btn=document.createElement('button');
+    btn.className='action-btn';
+    btn.style.cssText='padding:8px 12px;font-size:11px;width:100%;text-align:left;';
+    btn.innerHTML=`<b style="color:var(--gold);">${card.icon} ${tl(card,'name')}</b> <span style="color:var(--parchment-dim);">${t('skill_use_card_hint',{V:card.effect.value})}</span>`;
+    btn.onclick=()=>{
+      game.investigator.hand=game.investigator.hand.filter(c=>c!==card);
+      game.skillCardUsed=card;
+      log(t('log_skill_card_used',{N:tl(card,'name'),V:card.effect.value}),'success');
+      AudioEngine.playCardFlip();
+      document.body.removeChild(overlay);
+      rollChaosToken(stat,difficulty,callback);
+    };
+    choices.appendChild(btn);
+  });
+  overlay.querySelector('#skill-skip').onclick=()=>{
+    document.body.removeChild(overlay);
+    rollChaosToken(stat,difficulty,callback);
+  };
+}
+
+function rollChaosToken(stat,difficulty,callback){
+  // 袋空则重置
+  if(game.chaosBag.length===0){
+    game.chaosBag = CHAOS_TOKENS.map(t=>({...t}));
+    log(t('log_chaos_refill'),'warn');
+  }
+  // 随机抽取一枚并移除
+  const idx = Math.floor(Math.random()*game.chaosBag.length);
+  const token = game.chaosBag.splice(idx,1)[0];
+  // 更新剩余数显示
+  const bagLabel = document.querySelector('.chaos-bag-label');
+  if(bagLabel) bagLabel.textContent = currentLang==='en' ? `Chaos Bag · ${game.chaosBag.length}` : `混沌袋 · ${game.chaosBag.length}枚`;
+  const bag = document.getElementById('chaos-bag-visual');
+  bag.classList.add('shaking');
+  AudioEngine.playCardFlip();
+  setTimeout(()=>{
+    bag.classList.remove('shaking');
+    showChaosToken(token,()=>{
+      let modifier=0;
+      let autoFail=false;
+      switch(token.type){
+        case 'number': modifier=token.value; break;
+        case 'skull': modifier=-game.agenda.doom; break;
+        case 'elder_sign': modifier=token.value; drawPlayerCard(); log(t('log_elder_sign'),'success'); break;
+        case 'auto_fail': autoFail=true; break;
+      }
+      const baseValue=game.investigator[stat]+getStatBoost(stat);
+      const finalValue=autoFail?0:baseValue+modifier;
+      const success=!autoFail && finalValue>=difficulty;
+      const modStr = (modifier>=0?'+':'')+modifier;
+      log(t('log_test_result',{S:statName(stat),B:baseValue,M:modStr,F:finalValue,D:difficulty,R:success?t('test_success_label'):t('test_fail_label')}),success?'success':'event');
+      if(success) AudioEngine.playSuccess(); else AudioEngine.playFail();
+      callback(success);
+    });
+  },500);
+}
+
+function getStatBoost(stat){
+  let boost=0;
+  game.investigator.equipped.forEach(eq=>{
+    if(eq.effect&&eq.effect.type==='stat_boost'&&eq.effect.stat===stat){
+      boost+=eq.effect.value;
+    }
+    // 武器提供战斗属性加成(boost字段)
+    if(eq.effect&&eq.effect.type==='combat_weapon'&&stat==='combat'){
+      boost+=eq.effect.boost||0;
+    }
+  });
+  if(game.skillCardUsed){
+    boost+=game.skillCardUsed.effect.value;
+    game.investigator.hand=game.investigator.hand.filter(c=>c!==game.skillCardUsed);
+    game.skillCardUsed=null;
+  }
+  return boost;
+}
+
+function statName(stat){
+  return t('stat_'+(stat||'')) || stat;
+}
+
+function showChaosToken(token,callback){
+  const display=document.getElementById('chaos-token-display');
+  const symbol=document.getElementById('chaos-symbol');
+  const text=document.getElementById('chaos-text');
+  display.classList.remove('fail','success');
+  symbol.textContent=token.symbol;
+  text.textContent=token.text;
+  if(token.type==='auto_fail') display.classList.add('fail');
+  if(token.type==='elder_sign') display.classList.add('success');
+  display.classList.add('show');
+  setTimeout(()=>{
+    display.classList.remove('show');
+    if(callback) setTimeout(callback,300);
+  },1800);
+}
+
+// ===== 玩家行动 =====
+function moveAction(locId){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(game.investigator.actions<=0){toast(t('toast_no_actions'));return;}
+  const loc=game.locations.find(l=>l.id===locId);
+  const curr=game.locations.find(l=>l.id===game.investigator.currentLocation);
+  if(!curr || !curr.connections.includes(locId)){toast(t('toast_unreachable'));return;}
+  game.investigator.actions--;
+  const wasUnexplored = !loc.explored;
+  // 播放翻面动画(如果未探索)
+  if(wasUnexplored){
+    playFlipAnimation(locId,()=>{
+      loc.explored=true;
+      game.investigator.currentLocation=locId;
+      AudioEngine.playCardFlip();
+      log(t('log_explored',{N:tl(loc,'name')}),'success');
+      toast(t('toast_discovered',{N:tl(loc,'name')}));
+      log(t('log_move',{N:tl(loc,'name')}));
+      renderAll();
+      // 检查是否遭遇敌人(新地点可能触发)
+      checkLocationEvent(loc);
+    });
+  }else{
+    game.investigator.currentLocation=locId;
+    AudioEngine.playCardFlip();
+    log(t('log_move',{N:tl(loc,'name')}));
+    renderAll();
+    checkLocationEvent(loc);
+  }
+}
+
+// 翻面动画
+function playFlipAnimation(locId,callback){
+  const cards=document.querySelectorAll('.location-card');
+  const map=document.getElementById('locations-map');
+  const cardEls=Array.from(cards);
+  // 根据 LOCATIONS 顺序找到对应索引
+  const idx=LOCATIONS.findIndex(l=>l.id===locId);
+  if(idx<0||!cardEls[idx]){callback();return;}
+  const card=cardEls[idx];
+  card.style.transition='transform 0.4s';
+  card.style.transform='rotateY(90deg)';
+  setTimeout(()=>{
+    callback();
+    card.style.transform='rotateY(0deg)';
+    // 火光揭示效果
+    card.classList.add('reveal-flash');
+    setTimeout(()=>{
+      card.style.transition='';
+      card.style.transform='';
+      card.classList.remove('reveal-flash');
+    },800);
+  },400);
+}
+
+// 进入地点时的事件检查
+function checkLocationEvent(loc){
+  // 留作扩展:未来可在进入特定地点时触发事件
+  // 当前仅做提示
+  if(loc.clues>0){
+    log(t('log_loc_clues_available',{N:tl(loc,'name'),V:loc.clues}),'warn');
+  }
+}
+
+function investigateAction(){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(game.investigator.actions<=0){toast(t('toast_no_actions'));return;}
+  const loc=game.locations.find(l=>l.id===game.investigator.currentLocation);
+  if(loc.clues<=0){toast(t('toast_no_clues'));return;}
+  game.investigator.actions--;
+  log(t('log_investigate_start',{S:loc.shroud}),'warn');
+  chaosTest('intellect',loc.shroud,(success)=>{
+    if(success){
+      loc.clues--;
+      game.act.clues++;
+      log(t('log_clue_gained',{C:game.act.clues,M:game.act.maxClues}),'success');
+      toast(t('toast_clue_gain'));
+      animateClueGain(); // 金币飘落动画
+      if(game.act.clues>=game.act.maxClues){
+        triggerActComplete();
+      }
+    }else{
+      log(t('log_investigate_fail'),'event');
+    }
+    checkGameOver();
+    renderAll();
+  });
+}
+
+// 金币飘落动画(线索获得)
+function animateClueGain(){
+  const act=document.querySelector('.threat-card.act');
+  if(!act) return;
+  const rect=act.getBoundingClientRect();
+  for(let i=0;i<6;i++){
+    const coin=document.createElement('div');
+    coin.className='clue-coin';
+    coin.style.left=(rect.left+rect.width/2-10+(Math.random()*60-30))+'px';
+    coin.style.top=(rect.top+rect.height/2-10)+'px';
+    coin.style.animationDelay=(i*0.05)+'s';
+    document.body.appendChild(coin);
+    setTimeout(()=>coin.remove(),1500);
+  }
+}
+
+// 末日标记震动动画
+function animateDoom(){
+  const agenda=document.querySelector('.threat-card.agenda');
+  if(agenda){
+    agenda.classList.add('doom-shake');
+    setTimeout(()=>agenda.classList.remove('doom-shake'),500);
+  }
+}
+
+// 资源获得动画
+function animateResource(){
+  const panel=document.getElementById('stat-resources');
+  if(!panel) return;
+  const rect=panel.getBoundingClientRect();
+  const coin=document.createElement('div');
+  coin.className='resource-coin';
+  coin.style.left=(rect.left+rect.width/2-8)+'px';
+  coin.style.top=rect.top+'px';
+  document.body.appendChild(coin);
+  setTimeout(()=>coin.remove(),1200);
+}
+
+// 选中的敌人索引
+let selectedEnemyIdx = 0;
+
+function fightAction(){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(game.investigator.actions<=0){toast(t('toast_no_actions'));return;}
+  if(game.investigator.engaged.length===0){toast(t('toast_no_enemy'));return;}
+  if(selectedEnemyIdx>=game.investigator.engaged.length) selectedEnemyIdx=0;
+  const enemy=game.investigator.engaged[selectedEnemyIdx];
+  game.investigator.actions--;
+  log(t('log_fight_start',{N:tl(enemy,'name'),C:enemy.combat}),'warn');
+  chaosTest('combat',enemy.combat,(success)=>{
+    if(success){
+      let dmg=1;
+      // 检查武器
+      const weapon=game.investigator.equipped.find(e=>e.effect&&e.effect.type==='combat_weapon'&&e.uses>0);
+      if(weapon){
+        dmg=weapon.effect.damage;
+        weapon.uses--;
+        if(weapon.uses<=0){
+          game.investigator.equipped=game.investigator.equipped.filter(e=>e!==weapon);
+          log(t('log_weapon_empty',{N:tl(weapon,'name')}),'warn');
+        }
+      }
+      enemy.currentHealth=(enemy.currentHealth||enemy.health)-dmg;
+      log(t('log_fight_hit',{N:tl(enemy,'name'),D:dmg}),'success');
+      AudioEngine.playAttack();
+      if(enemy.currentHealth<=0){
+        game.investigator.engaged=game.investigator.engaged.filter(e=>e!==enemy);
+        log(t('log_enemy_killed',{N:tl(enemy,'name')}),'success');
+        if(selectedEnemyIdx>=game.investigator.engaged.length) selectedEnemyIdx=0;
+      }
+    }else{
+      log(t('log_attack_miss'),'event');
+    }
+    renderAll();
+  });
+}
+
+function evadeAction(){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(game.investigator.actions<=0){toast(t('toast_no_actions'));return;}
+  if(game.investigator.engaged.length===0){toast(t('toast_no_enemy'));return;}
+  if(selectedEnemyIdx>=game.investigator.engaged.length) selectedEnemyIdx=0;
+  const enemy=game.investigator.engaged[selectedEnemyIdx];
+  game.investigator.actions--;
+  log(t('log_evade_start',{N:tl(enemy,'name'),C:enemy.combat}),'warn');
+  chaosTest('agility',enemy.combat,(success)=>{
+    if(success){
+      // 闪避成功:脱离交战,敌人移至当前地点(成为未交战地点敌人)
+      game.investigator.engaged.splice(selectedEnemyIdx,1);
+      if(selectedEnemyIdx>=game.investigator.engaged.length) selectedEnemyIdx=Math.max(0,game.investigator.engaged.length-1);
+      const locId=game.investigator.currentLocation;
+      enemy.engaged=false;
+      enemy.exhausted=true; // 本回合不再追击
+      enemy.location=locId;
+      if(!game.enemiesAtLocations[locId]) game.enemiesAtLocations[locId]=[];
+      game.enemiesAtLocations[locId].push(enemy);
+      log(t('log_evade_success_disengage',{N:tl(enemy,'name')}),'success');
+    }else{
+      log(t('log_evade_fail'),'event');
+    }
+    renderAll();
+  });
+}
+
+function playCard(card){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(card.type==='skill'){toast(t('toast_skill_auto'));return;}
+  if(game.investigator.actions<=0){toast(t('toast_no_actions'));return;}
+  if(game.investigator.resources<card.cost){toast(t('toast_no_resource'));return;}
+  game.investigator.resources-=card.cost;
+  game.investigator.actions--;
+  // 从手牌移除
+  game.investigator.hand=game.investigator.hand.filter(c=>c!==card);
+  AudioEngine.playCardFlip();
+  log(t('log_play_card',{N:tl(card,'name')}),'success');
+  // 处理效果
+  if(card.type==='asset'){
+    const eq={...card};
+    if(eq.uses) eq.currentUses=eq.uses;
+    game.investigator.equipped.push(eq);
+    // 装备入场动画
+    setTimeout(()=>animateEquip(),50);
+  }else if(card.type==='event'){
+    handleEventCard(card);
+    // 事件卡进入弃牌堆
+    game.discardPile.push(card);
+  }
+  renderAll();
+}
+
+// 装备入场动画
+function animateEquip(){
+  const cards=document.querySelectorAll('.hand-card.playable');
+  // 留作扩展,后续添加
+}
+
+function handleEventCard(card){
+  switch(card.effect.type){
+    case 'gain_resources':
+      game.investigator.resources+=card.effect.value;
+      log(t('log_resource_plus',{V:card.effect.value}),'success');
+      animateResource();
+      break;
+    case 'sanctuary':
+      game.sanctuaryActive=true;
+      // 移动敌人至相邻地点
+      if(game.investigator.engaged.length>0){
+        // 移交至相邻地点
+        const curr=game.locations.find(l=>l.id===game.investigator.currentLocation);
+        if(curr&&curr.connections.length>0){
+          const target=curr.connections[0];
+          if(!game.enemiesAtLocations[target]) game.enemiesAtLocations[target]=[];
+          game.investigator.engaged.forEach(e=>{e.engaged=false;e.location=target;game.enemiesAtLocations[target].push(e);});
+          const tName=tl(LOCATIONS.find(l=>l.id===target),'name');
+          log(t('log_enemies_disperse',{L:tName}),'success');
+        }
+        game.investigator.engaged=[];
+      }
+      break;
+    case 'evade_enemy':
+      if(game.investigator.engaged.length>0){
+        const e=game.investigator.engaged.shift();
+        log(t('log_evade_success',{N:tl(e,'name')}),'success');
+        AudioEngine.playCardFlip();
+      }
+      break;
+    case 'auto_investigate':
+      const loc=game.locations.find(l=>l.id===game.investigator.currentLocation);
+      if(loc&&loc.clues>0){
+        loc.clues--;
+        game.act.clues++;
+        log(t('log_clue_gained',{C:game.act.clues,M:game.act.maxClues}),'success');
+        animateClue();
+        if(game.act.clues>=game.act.maxClues) triggerActComplete();
+      }
+      break;
+    case 'heal':
+      showHealChoice(card.effect.value);
+      break;
+  }
+}
+
+// 弹出治疗选择对话框
+function showHealChoice(value){
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.style.zIndex=95;
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:380px;padding:30px 40px;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="font-size:16px;color:var(--gold);margin-bottom:8px;letter-spacing:2px;font-variant:small-caps;">${t('heal_choice_title')}</div>
+      <div style="font-size:12px;color:var(--parchment-dim);margin-bottom:20px;">${t('heal_choice_sub',{V:value})}</div>
+      <div style="display:flex;gap:10px;justify-content:center;">
+        <button class="btn" id="heal-hp" style="padding:10px 24px;font-size:12px;letter-spacing:2px;">${t('heal_hp_btn')}</button>
+        <button class="btn" id="heal-sanity" style="padding:10px 24px;font-size:12px;letter-spacing:2px;">${t('heal_sanity_btn')}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#heal-hp').onclick=()=>{
+    const healAmt=Math.min(value,game.investigator.maxHealth-game.investigator.health);
+    game.investigator.health+=healAmt;
+    log(t('log_health_plus',{V:healAmt}),'success');
+    AudioEngine.playSuccess();
+    document.body.removeChild(overlay);
+    renderAll();
+  };
+  overlay.querySelector('#heal-sanity').onclick=()=>{
+    const healAmt=Math.min(value,game.investigator.maxSanity-game.investigator.sanity);
+    game.investigator.sanity+=healAmt;
+    log(t('log_sanity_plus',{V:healAmt}),'success');
+    AudioEngine.playSuccess();
+    document.body.removeChild(overlay);
+    renderAll();
+  };
+}
+
+function triggerActComplete(){
+  if(game.act.num<3){
+    game.act.num++;
+    game.act.clues=0;
+    game.act.maxClues+=1; // 5→6→7,总需求18,地点可补充
+    // 每幕推进时重新补充地点线索
+    game.locations.forEach(loc=>{
+      loc.clues = loc.maxClues;
+      loc.explored = false; // 需要重新探索
+    });
+    // 当前地点自动探索
+    const curr = game.locations.find(l=>l.id===game.investigator.currentLocation);
+    if(curr) curr.explored = true;
+    log(t('log_act_advance',{N:toRoman(game.act.num)}),'success');
+    toast(t('toast_act_advance',{N:toRoman(game.act.num)}));
+    if(game.act.num===3){
+      log(t('log_final_act'),'warn');
+      toast(t('toast_final_act'));
+    }
+  }else{
+    // 第三幕线索集齐,检查是否在卧室
+    const curr = game.locations.find(l=>l.id===game.investigator.currentLocation);
+    if(curr && curr.id==='bedroom'){
+      victory();
+    }else{
+      log(t('log_clues_complete'),'warn');
+      toast(t('toast_to_bedroom'));
+    }
+  }
+}
+
+// 执行祭祀(终幕在卧室时可用)
+function ritualAction(){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(game.act.num<3){toast(t('toast_not_final_act'));return;}
+  if(game.act.clues<game.act.maxClues){toast(t('toast_clues_insufficient'));return;}
+  const curr = game.locations.find(l=>l.id===game.investigator.currentLocation);
+  if(!curr || curr.id!=='bedroom'){toast(t('toast_bedroom_only'));return;}
+  if(game.investigator.engaged.length>0){toast(t('toast_engaged_no_ritual'));return;}
+  log(t('log_ritual_start'),'warn');
+  AudioEngine.playMythosBell();
+  setTimeout(()=>{
+    victory();
+  },1500);
+}
+
+// 疗伤:2资源+1行动力换1生命
+function healAction(){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(game.investigator.actions<=0){toast(t('toast_no_actions'));return;}
+  if(game.investigator.resources<2){toast(t('toast_no_resource_heal'));return;}
+  if(game.investigator.health>=game.investigator.maxHealth){toast(t('toast_health_full'));return;}
+  game.investigator.resources-=2;
+  game.investigator.actions--;
+  game.investigator.health=Math.min(game.investigator.maxHealth,game.investigator.health+1);
+  log(t('log_heal_emergency'),'success');
+  AudioEngine.playSuccess();
+  renderAll();
+}
+
+// 战略面板:每轮一次三选一(推进末日换资源 / 抽遭遇卡换资源 / 加速抽牌)
+function openStrategyPanel(){
+  if(game.phase!=='investigation'){toast(t('toast_not_inv_phase'));return;}
+  if(game.investigator.actions<=0){toast(t('toast_no_actions'));return;}
+  if(game.strategyUsedThisRound){toast(t('strategy_used'));return;}
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.style.zIndex=95;
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:520px;padding:30px 36px;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="font-size:16px;color:var(--gold);text-align:center;margin-bottom:6px;letter-spacing:3px;font-variant:small-caps;">${t('strategy_title')}</div>
+      <div style="font-size:11px;color:var(--parchment-dim);text-align:center;margin-bottom:18px;font-style:italic;">${t('strategy_desc')}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="action-btn strategy-opt" data-opt="doom" style="padding:12px 14px;font-size:12px;text-align:left;line-height:1.5;">
+          <b style="color:var(--blood-bright);">☠ ${t('strategy_doom')}</b><br>
+          <span style="color:var(--parchment-dim);font-size:10px;">${t('strategy_doom_desc')}</span>
+        </button>
+        <button class="action-btn strategy-opt" data-opt="encounter" style="padding:12px 14px;font-size:12px;text-align:left;line-height:1.5;">
+          <b style="color:#9a7fbf;">🌀 ${t('strategy_encounter')}</b><br>
+          <span style="color:var(--parchment-dim);font-size:10px;">${t('strategy_encounter_desc')}</span>
+        </button>
+        <button class="action-btn strategy-opt" data-opt="draw" style="padding:12px 14px;font-size:12px;text-align:left;line-height:1.5;">
+          <b style="color:#7faacf;">📚 ${t('strategy_draw')}</b><br>
+          <span style="color:var(--parchment-dim);font-size:10px;">${t('strategy_draw_desc')}</span>
+        </button>
+      </div>
+      <button class="btn secondary" id="strategy-cancel" style="margin-top:14px;padding:8px 20px;font-size:11px;width:100%;">${t('strategy_cancel')}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelectorAll('.strategy-opt').forEach(btn=>{
+    btn.onclick=()=>{
+      const opt=btn.dataset.opt;
+      document.body.removeChild(overlay);
+      executeStrategy(opt);
+    };
+  });
+  overlay.querySelector('#strategy-cancel').onclick=()=>{
+    document.body.removeChild(overlay);
+  };
+}
+
+function executeStrategy(opt){
+  game.investigator.actions--;
+  game.strategyUsedThisRound=true;
+  if(opt==='doom'){
+    game.agenda.doom++;
+    game.investigator.resources+=3;
+    log(t('log_strategy_doom'),'warn');
+    animateDoom();
+    animateResource();
+    if(game.agenda.doom>=game.agenda.maxDoom) triggerAgenda();
+  }else if(opt==='encounter'){
+    game.investigator.resources+=4;
+    log(t('log_strategy_encounter'),'warn');
+    animateResource();
+    drawEncounterCard();
+  }else if(opt==='draw'){
+    drawPlayerCard();
+    drawPlayerCard();
+    log(t('log_strategy_draw'),'success');
+    AudioEngine.playCardFlip();
+  }
+  renderAll();
+}
+
+// ===== 伤害与结算 =====
+function damageInvestigator(healthDmg,sanityDmg){
+  if(healthDmg>0){
+    // 检查守护护符
+    const guardian=game.investigator.equipped.find(e=>e.id==='guardian'&&e.currentUses>0);
+    if(guardian&&guardian.currentUses>0){
+      guardian.currentUses--;
+      log(t('log_guardian_block'),'success');
+      if(guardian.currentUses<=0){
+        game.investigator.equipped=game.investigator.equipped.filter(e=>e!==guardian);
+      }
+    }else{
+      game.investigator.health-=healthDmg;
+      log(t('log_health_minus',{V:healthDmg}),'event');
+      shakeInvestigator();
+      shakeScreen();
+      showDamageNumber(healthDmg);
+    }
+  }
+  if(sanityDmg>0){
+    game.investigator.sanity-=sanityDmg;
+    log(t('log_sanity_minus',{V:sanityDmg}),'event');
+    AudioEngine.playSanityTrauma();
+    shakeInvestigator();
+    shakeScreen();
+    showDamageNumber(sanityDmg);
+  }
+}
+
+function checkGameOver(){
+  if(game.investigator.health<=0){
+    gameOver('killed');
+  }else if(game.investigator.sanity<=0){
+    gameOver('madness');
+  }
+}
+
+function victory(){
+  game.gameOver=true;
+  AudioEngine.playVictory();
+  const ov=document.getElementById('ending-overlay');
+  ov.classList.remove('hidden');
+  document.getElementById('ending-title').textContent=t('ending_victory_title');
+  document.getElementById('ending-title').className='ending-title victory';
+  document.getElementById('ending-desc').textContent=t('ending_victory_desc');
+  // 评分(胜利)
+  const score=computeScore(true);
+  renderEndingScore(score,true);
+}
+
+function gameOver(type){
+  game.gameOver=true;
+  const ov=document.getElementById('ending-overlay');
+  ov.classList.remove('hidden');
+  const title=document.getElementById('ending-title');
+  const desc=document.getElementById('ending-desc');
+  if(type==='killed'){
+    title.textContent=t('ending_killed_title');
+    title.className='ending-title defeat';
+    desc.textContent=t('ending_killed_desc');
+  }else if(type==='agenda'){
+    title.textContent=t('ending_agenda_title');
+    title.className='ending-title defeat';
+    desc.textContent=t('ending_agenda_desc');
+  }else{
+    title.textContent=t('ending_madness_title');
+    title.className='ending-title defeat';
+    desc.textContent=t('ending_madness_desc');
+  }
+  // 评分(失败 - 进度报告)
+  const score=computeScore(false);
+  renderEndingScore(score,false);
+}
+
+// 计算最终得分
+function computeScore(victorious){
+  const inv=game.investigator;
+  // 累计线索:已收集到幕池中的 + 地点残留的
+  const totalCluesCollected = (game.act.num-1)*5 + game.act.clues + (victorious?game.act.maxClues:0);
+  const breakdown=[
+    {label:t('score_survive'),value:victorious?300:0,base:true},
+    {label:t('score_health'),value:inv.health*20,base:false},
+    {label:t('score_sanity'),value:inv.sanity*20,base:false},
+    {label:t('score_resources'),value:inv.resources*10,base:false},
+    {label:t('score_clues'),value:totalCluesCollected*30,base:false},
+    {label:t('score_actions'),value:inv.actions*15,base:false},
+    {label:t('score_acts'),value:(game.act.num-1)*100,base:false},
+    {label:t('score_round_pen'),value:-game.round*8,base:false,neg:true},
+    {label:t('score_doom_pen'),value:-game.agenda.doom*15,base:false,neg:true}
+  ];
+  const total=breakdown.reduce((s,b)=>s+b.value,0);
+  let grade,gradeTitle;
+  if(victorious){
+    if(total>=900){grade='S';gradeTitle=t('grade_S');}
+    else if(total>=700){grade='A';gradeTitle=t('grade_A');}
+    else if(total>=500){grade='B';gradeTitle=t('grade_B');}
+    else if(total>=300){grade='C';gradeTitle=t('grade_C');}
+    else{grade='D';gradeTitle=t('grade_D');}
+  }else{
+    if(total>=400){grade='B';gradeTitle=t('grade_B_fail');}
+    else if(total>=200){grade='C';gradeTitle=t('grade_C_fail');}
+    else{grade='D';gradeTitle=t('grade_D_fail');}
+  }
+  return {breakdown,total,grade,gradeTitle,victorious,totalCluesCollected};
+}
+
+// 渲染结局评分
+function renderEndingScore(score,victorious){
+  const gradeEl=document.getElementById('ending-grade');
+  const letterEl=document.getElementById('grade-letter');
+  const titleEl=document.getElementById('grade-title');
+  const breakdownEl=document.getElementById('score-breakdown');
+  gradeEl.classList.remove('hidden');
+  breakdownEl.classList.remove('hidden');
+  letterEl.textContent=score.grade;
+  letterEl.className='grade-letter '+score.grade;
+  titleEl.textContent=score.gradeTitle;
+  // 明细表
+  let html='';
+  score.breakdown.forEach(b=>{
+    if(b.value===0) return;
+    html+=`<div class="sb-label">${b.label}</div><div class="sb-value${b.neg?' neg':''}">${b.value>=0?'+':''}${b.value}</div>`;
+  });
+  html+=`<div class="sb-total"><span class="sb-label">${t('score_total')}</span><span class="sb-value">${score.total}</span></div>`;
+  breakdownEl.innerHTML=html;
+}
+
+// ===== UI 渲染 =====
+function renderAll(){
+  renderThreatArea();
+  renderLocations();
+  renderInvestigator();
+  renderHand();
+  renderEquipped();
+  renderEngaged();
+  renderButtons();
+}
+
+function renderThreatArea(){
+  // 末日标记
+  const doomTrack=document.getElementById('doom-track');
+  doomTrack.innerHTML='';
+  for(let i=0;i<game.agenda.maxDoom;i++){
+    const slot=document.createElement('div');
+    slot.className='token-slot'+(i<game.agenda.doom?' filled':'');
+    slot.textContent='☠';
+    doomTrack.appendChild(slot);
+  }
+  document.getElementById('agenda-num').textContent=`${toRoman(game.agenda.num)} / ${toRoman(game.agenda.total)}`;
+  // 线索
+  const clueTrack=document.getElementById('clue-track');
+  clueTrack.innerHTML='';
+  for(let i=0;i<game.act.maxClues;i++){
+    const slot=document.createElement('div');
+    slot.className='token-slot'+(i<game.act.clues?' clue-filled':'');
+    slot.textContent='✦';
+    clueTrack.appendChild(slot);
+  }
+  document.getElementById('act-num').textContent=`${toRoman(game.act.num)} / ${toRoman(game.act.total)}`;
+}
+
+function toRoman(n){return ['','I','II','III','IV','V'][n]||n;}
+
+function renderLocations(){
+  const map=document.getElementById('locations-map');
+  map.innerHTML='';
+  // 创建 SVG 连通线层
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.id='connection-svg';
+  svg.setAttribute('width','100%');
+  svg.setAttribute('height','100%');
+  map.appendChild(svg);
+  const curr=game.locations.find(l=>l.id===game.investigator.currentLocation);
+  const cardEls=[];
+  game.locations.forEach(loc=>{
+    const card=document.createElement('div');
+    card.setAttribute('data-loc-id',loc.id);
+    const isAdjacent = curr && curr.connections.includes(loc.id) && loc.id!==game.investigator.currentLocation;
+    card.className='location-card'+(loc.explored?'':' unexplored')+(loc.id===game.investigator.currentLocation?' current':'')+(isAdjacent?' adjacent':'');
+    // 统计此地点的敌人
+    const isPlayerHere = loc.id===game.investigator.currentLocation;
+    const enemiesHere = isPlayerHere
+      ? [...game.investigator.engaged, ...(game.enemiesAtLocations[loc.id]||[])]
+      : (game.enemiesAtLocations[loc.id]||[]);
+    let enemyHtml = enemiesHere.length>0 ? `<div class="loc-enemies">${enemiesHere.map(e=>`<span class="loc-enemy-tag${e.exhausted?' exhausted':''}">${e.icon} ${tl(e,'name')}${e.exhausted?'•':''}</span>`).join('')}</div>` : '';
+    let moveHint='';
+    if(isAdjacent){
+      moveHint = loc.explored ? `<div class="move-hint">${t('loc_move_hint')}</div>` : `<div class="move-hint explore">${t('loc_move_explore')}</div>`;
+    }
+    const locName = loc.explored ? tl(loc,'name') : t('loc_unknown');
+    const locDesc = tl(loc,'desc');
+    card.innerHTML=`
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      ${moveHint}
+      <div class="loc-header">
+        <span class="loc-name">${locName}</span>
+        ${loc.explored?`<span class="shroud-badge">${t('shroud')} ${loc.shroud}</span>`:''}
+      </div>
+      ${loc.explored?`
+      <div class="loc-stats">
+        <span class="stat-item">${t('clues')}: <b>${loc.clues}</b></span>
+        <span class="stat-item">${locDesc.substring(0,18)}...</span>
+      </div>
+      <div class="clue-icons">${Array(loc.clues).fill('<div class="clue-icon"></div>').join('')}</div>
+      ${enemyHtml}
+      <div class="loc-content">${locDesc}</div>
+      `:''}
+    `;
+    // 相邻即可点击(无论是否探索)
+    if(isAdjacent){
+      card.style.cursor='pointer';
+      card.onclick=()=>moveAction(loc.id);
+    }
+    if(loc.id===game.investigator.currentLocation){
+      const token=document.createElement('div');
+      token.className='investigator-token';
+      token.textContent='R';
+      card.appendChild(token);
+    }
+    map.appendChild(card);
+    cardEls.push(card);
+  });
+  // 绘制连通线
+  drawConnections(svg,cardEls);
+}
+
+// 绘制地点连通线
+function drawConnections(svg,cardEls){
+  const mapEl=document.getElementById('locations-map');
+  const mapRect=mapEl.getBoundingClientRect();
+  const centers=cardEls.map(c=>{
+    const r=c.getBoundingClientRect();
+    return {x:r.left+r.width/2-mapRect.left, y:r.top+r.height/2-mapRect.top};
+  });
+  const drawn=new Set();
+  const currId=game.investigator.currentLocation;
+  game.locations.forEach((loc,i)=>{
+    loc.connections.forEach(connId=>{
+      const j=game.locations.findIndex(l=>l.id===connId);
+      const key=[i,j].sort().join('-');
+      if(drawn.has(key)||j<0) return;
+      drawn.add(key);
+      // 高亮:连线有一端是当前地点
+      const isReachable = (loc.id===currId)||(connId===currId);
+      const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+      line.setAttribute('x1',centers[i].x);
+      line.setAttribute('y1',centers[i].y);
+      line.setAttribute('x2',centers[j].x);
+      line.setAttribute('y2',centers[j].y);
+      line.setAttribute('stroke', isReachable ? '#6fae7f' : '#3a2a4a');
+      line.setAttribute('stroke-width', isReachable ? '2' : '1');
+      line.setAttribute('stroke-dasharray', isReachable ? 'none' : '4,4');
+      line.setAttribute('opacity', isReachable ? '0.7' : '0.35');
+      svg.appendChild(line);
+    });
+  });
+}
+
+function renderInvestigator(){
+  // 更新调查员名称
+  if(game.selectedInvestigator){
+    document.getElementById('inv-name').textContent=tl(game.selectedInvestigator,'name');
+    document.getElementById('inv-title').textContent=tl(game.selectedInvestigator,'title');
+  }
+  document.getElementById('stat-health').textContent=`${game.investigator.health}/${game.investigator.maxHealth}`;
+  document.getElementById('stat-sanity').textContent=`${game.investigator.sanity}/${game.investigator.maxSanity}`;
+  document.getElementById('stat-resources').textContent=game.investigator.resources;
+  document.getElementById('stat-actions').textContent=game.investigator.actions;
+  // 低血量警示(<=2 触发)
+  const panel=document.querySelector('.investigator-panel');
+  if(panel){
+    panel.classList.toggle('low-health', game.investigator.health<=2);
+    panel.classList.toggle('low-sanity', game.investigator.sanity<=2);
+  }
+  document.getElementById('attr-will').textContent=game.investigator.willpower+getStatBoost('willpower');
+  document.getElementById('attr-int').textContent=game.investigator.intellect+getStatBoost('intellect');
+  document.getElementById('attr-combat').textContent=game.investigator.combat+getStatBoost('combat');
+  document.getElementById('attr-agi').textContent=game.investigator.agility+getStatBoost('agility');
+}
+
+function renderHand(){
+  const hand=document.getElementById('hand-area');
+  hand.innerHTML='';
+  document.getElementById('hand-count').textContent=game.investigator.hand.length;
+  document.getElementById('equipped-count').textContent=game.investigator.equipped.length;
+  document.getElementById('discard-count').textContent=game.discardPile.length;
+  game.investigator.hand.forEach((card,idx)=>{
+    const c=document.createElement('div');
+    c.className='hand-card';
+    c.draggable=true;
+    // 检查装备槽是否已满(同槽位装备最多2件)
+    const slotFull = card.type==='asset'&&card.slot&&game.investigator.equipped.filter(e=>e.slot===card.slot).length>=2;
+    if(slotFull) c.classList.add('slot-full');
+    // 可用牌高亮:资源足够 + 阶段正确 + (装备无槽位满)
+    const canPlay = game.phase==='investigation'&&game.investigator.actions>0&&
+      card.cost<=game.investigator.resources&&!slotFull&&card.type!=='skill';
+    if(canPlay) c.classList.add('playable');
+    // 资源不足的牌淡化
+    if(card.type!=='skill'&&card.cost>game.investigator.resources&&game.phase==='investigation'){
+      c.classList.add('unaffordable');
+    }
+    c.innerHTML=`
+      ${card.cost!==undefined?`<div class="card-cost">${card.cost}</div>`:''}
+      <div class="card-type ${card.type}">${card.type==='asset'?t('tab_equipped'):card.type==='event'?(currentLang==='en'?'Event':'事件'):(currentLang==='en'?'Skill':'技能')}${card.slot?' · '+slotName(card.slot):''}</div>
+      <div class="card-name">${card.icon} ${tl(card,'name')}</div>
+      <div class="card-text">${tl(card,'text')}</div>
+      ${card.uses?`<div class="card-uses">${currentLang==='en'?'Ammo':'弹药'}: ${card.uses}</div>`:''}
+    `;
+    c.onclick=()=>{
+      // 事件卡使用前确认
+      if(card.type==='event'){
+        confirmPlayCard(card);
+      }else if(card.type==='skill'){
+        toast(t('card_skill_hint'));
+      }else{
+        // 装备卡检查槽位
+        if(card.slot && game.investigator.equipped.filter(e=>e.slot===card.slot).length>=2){
+          toast(t('toast_slot_full',{S:slotName(card.slot)}));
+          return;
+        }
+        playCard(card);
+      }
+    };
+    // 右键查看详情
+    c.oncontextmenu=(e)=>{
+      e.preventDefault();
+      showCardDetail(card);
+    };
+    c.ondragstart=(e)=>{e.dataTransfer.setData('card',idx);c.classList.add('dragging');};
+    c.ondragend=()=>c.classList.remove('dragging');
+    hand.appendChild(c);
+  });
+  if(game.investigator.hand.length===0){
+    hand.innerHTML=`<div style="color:var(--parchment-dark);font-style:italic;align-self:center;margin:0 auto;">${currentLang==='en'?'Empty hand':'手牌为空'}</div>`;
+  }
+  // 同步渲染装备/弃牌堆视图
+  renderEquippedDisplay();
+  renderDiscardDisplay();
+}
+
+// 渲染装备视图(底部标签页)
+function renderEquippedDisplay(){
+  const el=document.getElementById('equipped-display');
+  el.innerHTML='';
+  if(game.investigator.equipped.length===0){
+    el.innerHTML=`<div style="color:var(--parchment-dark);font-style:italic;align-self:center;margin:0 auto;">${currentLang==='en'?'No assets':'无装备'}</div>`;
+    return;
+  }
+  game.investigator.equipped.forEach(card=>{
+    const c=document.createElement('div');
+    c.className='mini-card';
+    c.innerHTML=`
+      ${card.cost!==undefined?`<div class="mini-cost">${card.cost}</div>`:''}
+      <div class="mini-name">${card.icon} ${tl(card,'name')}</div>
+      <div class="mini-text">${tl(card,'text')}</div>
+      ${card.uses?`<div class="mini-text" style="color:var(--blood-bright);">${currentLang==='en'?'Ammo':'弹药'}: ${card.currentUses!==undefined?card.currentUses:card.uses}</div>`:''}
+      ${card.slot?`<div class="mini-text" style="color:var(--gold-dim);">[${slotName(card.slot)}]</div>`:''}
+    `;
+    c.oncontextmenu=(e)=>{e.preventDefault();showCardDetail(card);};
+    el.appendChild(c);
+  });
+}
+
+// 渲染弃牌堆视图
+function renderDiscardDisplay(){
+  const el=document.getElementById('discard-display');
+  el.innerHTML='';
+  if(game.discardPile.length===0){
+    el.innerHTML=`<div style="color:var(--parchment-dark);font-style:italic;align-self:center;margin:0 auto;">${currentLang==='en'?'Discard empty':'弃牌堆为空'}</div>`;
+    return;
+  }
+  // 显示最近10张
+  const recent=game.discardPile.slice(-10).reverse();
+  recent.forEach(card=>{
+    const c=document.createElement('div');
+    c.className='mini-card';
+    c.style.opacity='0.7';
+    c.innerHTML=`
+      ${card.cost!==undefined?`<div class="mini-cost">${card.cost}</div>`:''}
+      <div class="mini-name">${card.icon} ${tl(card,'name')}</div>
+      <div class="mini-text">${tl(card,'text')}</div>
+    `;
+    c.oncontextmenu=(e)=>{e.preventDefault();showCardDetail(card);};
+    el.appendChild(c);
+  });
+}
+
+// 装备槽位名称
+function slotName(slot){
+  const map = {
+    hand:    {en:'Hand',     zh:'手部'},
+    body:    {en:'Body',     zh:'身体'},
+    accessory:{en:'Accessory',zh:'配饰'},
+    arcane:  {en:'Arcane',   zh:'秘术'}
+  };
+  return (map[slot] && map[slot][currentLang]) || slot;
+}
+
+// 卡牌详情弹窗
+function showCardDetail(card){
+  // 移除已有弹窗
+  const old=document.getElementById('card-detail-overlay');
+  if(old) old.remove();
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.id='card-detail-overlay';
+  overlay.style.zIndex=92;
+  const typeText = card.type==='asset' ? t('tab_equipped') : (card.type==='event' ? (currentLang==='en'?'Event':'事件') : (currentLang==='en'?'Skill':'技能'));
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:360px;padding:24px 28px;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="text-align:center;margin-bottom:12px;">
+        ${card.cost!==undefined?`<div class="card-cost" style="margin:0 auto 8px;width:32px;height:32px;line-height:32px;font-size:18px;">${card.cost}</div>`:''}
+        <div class="card-type ${card.type}" style="display:inline-block;padding:2px 10px;">${typeText}${card.slot?' · '+slotName(card.slot):''}</div>
+        <div style="font-size:20px;color:var(--gold);margin:8px 0;letter-spacing:2px;font-variant:small-caps;">${card.icon} ${tl(card,'name')}</div>
+      </div>
+      <div style="font-size:12px;color:var(--parchment);line-height:1.7;margin-bottom:16px;border-top:1px solid var(--gold-dim);border-bottom:1px solid var(--gold-dim);padding:10px 4px;">${tl(card,'text')}</div>
+      ${card.uses?`<div style="text-align:center;font-size:11px;color:var(--blood-bright);margin-bottom:12px;">${currentLang==='en'?'Ammo':'弹药'}: ${card.uses}</div>`:''}
+      <div style="display:flex;gap:8px;">
+        ${(card.type==='asset'||card.type==='event')?`<button class="btn" id="detail-play" style="flex:1;padding:8px;font-size:11px;">${currentLang==='en'?'Play':'打出'}</button>`:''}
+        <button class="btn secondary" id="detail-close" style="flex:1;padding:8px;font-size:11px;">${t('btn_close')}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#detail-close').onclick=()=>overlay.remove();
+  overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+  const playBtn=overlay.querySelector('#detail-play');
+  if(playBtn){
+    playBtn.onclick=()=>{
+      overlay.remove();
+      if(card.type==='event'){
+        confirmPlayCard(card);
+      }else{
+        if(card.slot && game.investigator.equipped.filter(e=>e.slot===card.slot).length>=2){
+          toast(t('toast_slot_full',{S:slotName(card.slot)}));
+          return;
+        }
+        playCard(card);
+      }
+    };
+  }
+}
+
+// 事件卡使用确认
+function confirmPlayCard(card){
+  const overlay=document.createElement('div');
+  overlay.className='overlay';
+  overlay.style.zIndex=92;
+  overlay.innerHTML=`
+    <div class="overlay-content" style="max-width:380px;padding:24px 28px;">
+      <span class="corner-deco tl"></span><span class="corner-deco tr"></span>
+      <span class="corner-deco bl"></span><span class="corner-deco br"></span>
+      <div style="font-size:16px;color:var(--gold);margin-bottom:8px;text-align:center;letter-spacing:2px;font-variant:small-caps;">${currentLang==='en'?'Play':'使用'} ${tl(card,'name')}?</div>
+      <div style="font-size:11px;color:var(--parchment-dim);text-align:center;margin-bottom:8px;">${currentLang==='en'?`Cost ${card.cost} · 1 Action`:`费用 ${card.cost} 资源 · 1 行动力`}</div>
+      <div style="font-size:12px;color:var(--parchment);line-height:1.6;margin-bottom:16px;border-top:1px solid var(--gold-dim);padding-top:10px;">${tl(card,'text')}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" id="confirm-yes" style="flex:1;padding:8px;font-size:11px;">${currentLang==='en'?'Confirm':'确认使用'}</button>
+        <button class="btn secondary" id="confirm-no" style="flex:1;padding:8px;font-size:11px;">${t('btn_cancel')}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirm-yes').onclick=()=>{
+    overlay.remove();
+    playCard(card);
+  };
+  overlay.querySelector('#confirm-no').onclick=()=>overlay.remove();
+  overlay.onclick=(e)=>{if(e.target===overlay)overlay.remove();};
+}
+
+function renderEquipped(){
+  const list=document.getElementById('equipped-list');
+  list.innerHTML='';
+  if(game.investigator.equipped.length===0){
+    list.innerHTML=`<div style="font-size:10px;color:var(--parchment-dark);font-style:italic;">${currentLang==='en'?'No assets':'无装备'}</div>`;
+    return;
+  }
+  game.investigator.equipped.forEach(eq=>{
+    const item=document.createElement('div');
+    item.className='equipped-item';
+    item.innerHTML=`<span class="eq-name">${eq.icon} ${tl(eq,'name')}</span><span class="eq-effect">${eq.uses?(currentLang==='en'?'Ammo':'弹药')+eq.uses:''}</span>`;
+    list.appendChild(item);
+  });
+}
+
+function renderEngaged(){
+  const list=document.getElementById('engaged-list');
+  list.innerHTML='';
+  if(game.investigator.engaged.length===0){
+    list.innerHTML=`<div style="font-size:10px;color:var(--parchment-dim);font-style:italic;">${t('no_engaged_hint')}</div>`;
+    return;
+  }
+  game.investigator.engaged.forEach((e,idx)=>{
+    const item=document.createElement('div');
+    item.className='equipped-item enemy-item'+(idx===selectedEnemyIdx?' selected':'')+(e.exhausted?' exhausted':'');
+    item.style.cursor='pointer';
+    item.innerHTML=`<span class="eq-name">${e.icon} ${tl(e,'name')}${e.exhausted?(currentLang==='en'?' (exhausted)':' (疲惫)'):''}</span><span class="eq-effect">${t('inv_health')}${e.currentHealth||e.health}/${e.health}</span>`;
+    item.onclick=()=>{
+      selectedEnemyIdx=idx;
+      renderAll();
+    };
+    list.appendChild(item);
+  });
+}
+
+function renderButtons(){
+  document.getElementById('btn-investigate').disabled = game.phase!=='investigation'||game.investigator.actions<=0;
+  document.getElementById('btn-fight').disabled = game.phase!=='investigation'||game.investigator.actions<=0||game.investigator.engaged.length===0;
+  document.getElementById('btn-evade').disabled = game.phase!=='investigation'||game.investigator.actions<=0||game.investigator.engaged.length===0;
+  document.getElementById('btn-heal').disabled = game.phase!=='investigation'||game.investigator.actions<=0||game.investigator.resources<2||game.investigator.health>=game.investigator.maxHealth;
+  document.getElementById('btn-strategy').disabled = game.phase!=='investigation'||game.investigator.actions<=0||game.strategyUsedThisRound;
+  document.getElementById('btn-end-round').disabled = game.phase!=='investigation';
+  // 祭祀按钮:终幕+线索满+在卧室+无交战
+  const curr = game.locations.find(l=>l.id===game.investigator.currentLocation);
+  const canRitual = game.phase==='investigation'&&game.act.num>=3&&game.act.clues>=game.act.maxClues&&curr&&curr.id==='bedroom'&&game.investigator.engaged.length===0;
+  document.getElementById('btn-ritual').disabled = !canRitual;
+}
+
+// ===== 日志与通知 =====
+function log(msg,cls=''){
+  const logEl=document.getElementById('action-log');
+  const entry=document.createElement('div');
+  entry.className='log-entry '+cls;
+  entry.textContent=msg;
+  logEl.appendChild(entry);
+  logEl.scrollTop=logEl.scrollHeight;
+  while(logEl.children.length>50) logEl.removeChild(logEl.firstChild);
+}
+
+let toastTimer=null;
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ===== 雾气粒子背景 =====
+const fogCanvas=document.getElementById('fog-canvas');
+const fogCtx=fogCanvas.getContext('2d');
+let fogParticles=[];
+function initFog(){
+  fogCanvas.width=window.innerWidth;
+  fogCanvas.height=window.innerHeight;
+  fogParticles=[];
+  for(let i=0;i<30;i++){
+    fogParticles.push({
+      x:Math.random()*fogCanvas.width,
+      y:Math.random()*fogCanvas.height,
+      r:80+Math.random()*120,
+      vx:(Math.random()-0.5)*0.3,
+      vy:(Math.random()-0.5)*0.2,
+      opacity:0.02+Math.random()*0.05
+    });
+  }
+}
+function animateFog(){
+  fogCtx.clearRect(0,0,fogCanvas.width,fogCanvas.height);
+  fogParticles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<-p.r) p.x=fogCanvas.width+p.r;
+    if(p.x>fogCanvas.width+p.r) p.x=-p.r;
+    if(p.y<-p.r) p.y=fogCanvas.height+p.r;
+    if(p.y>fogCanvas.height+p.r) p.y=-p.r;
+    const grad=fogCtx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
+    grad.addColorStop(0,`rgba(100,80,120,${p.opacity})`);
+    grad.addColorStop(1,'rgba(0,0,0,0)');
+    fogCtx.fillStyle=grad;
+    fogCtx.beginPath();
+    fogCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    fogCtx.fill();
+  });
+  requestAnimationFrame(animateFog);
+}
+
+// ===== 事件绑定 =====
+let selectedInvId = null;
+// 生成调查员选择卡片
+function renderInvestigatorSelect(){
+  const container=document.getElementById('investigator-select');
+  container.innerHTML='';
+  CARD_DB.investigators.forEach(inv=>{
+    const card=document.createElement('div');
+    card.className='inv-select-card';
+    card.dataset.id=inv.id;
+    const s=inv.stats;
+    const invName = tl(inv,'name');
+    const invTitle = tl(inv,'title');
+    const invDesc = tl(inv,'desc');
+    card.innerHTML=`
+      <div class="isc-name">${invName}</div>
+      <div class="isc-title">${invTitle}</div>
+      <div class="isc-desc">${invDesc}</div>
+      <div class="isc-stats">
+        <div>${t('inv_health')} ${s.health} · ${t('inv_sanity')} ${s.sanity}</div>
+        <div>${t('attr_willpower')} ${s.willpower} · ${t('attr_intellect')} ${s.intellect}</div>
+        <div>${t('attr_combat')} ${s.combat} · ${t('attr_agility')} ${s.agility}</div>
+        <div>${t('inv_resources')} ${s.resources}</div>
+      </div>
+    `;
+    card.onclick=()=>{
+      document.querySelectorAll('.inv-select-card').forEach(c=>c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedInvId=inv.id;
+      document.getElementById('btn-start').disabled=false;
+    };
+    container.appendChild(card);
+  });
+}
+renderInvestigatorSelect();
+
+document.getElementById('btn-start').onclick=()=>{
+  if(!selectedInvId) return;
+  AudioEngine.init();
+  document.getElementById('start-overlay').classList.add('hidden');
+  initGame(selectedInvId);
+  startMythosPhase();
+};
+document.getElementById('btn-restart-ending').onclick=()=>{
+  document.getElementById('ending-overlay').classList.add('hidden');
+  document.getElementById('ending-grade').classList.add('hidden');
+  document.getElementById('score-breakdown').classList.add('hidden');
+  initGame(game.selectedInvestigator?game.selectedInvestigator.id:null);
+  startMythosPhase();
+};
+document.getElementById('btn-investigate').onclick=investigateAction;
+document.getElementById('btn-fight').onclick=fightAction;
+document.getElementById('btn-evade').onclick=evadeAction;
+document.getElementById('btn-heal').onclick=healAction;
+document.getElementById('btn-strategy').onclick=openStrategyPanel;
+document.getElementById('btn-ritual').onclick=ritualAction;
+// 规则书按钮
+document.getElementById('btn-rules').onclick=showRules;
+// 教程按钮
+document.getElementById('btn-tutorial').onclick=showTutorial;
+// 快捷键按钮
+document.getElementById('btn-shortcuts').onclick=showShortcuts;
+// 语言切换按钮
+document.getElementById('btn-lang').onclick=toggleLanguage;
+// 重开按钮
+document.getElementById('btn-restart').onclick=()=>{
+  if(confirm('确定重新开始游戏?当前进度将丢失。')){
+    document.getElementById('ending-overlay').classList.add('hidden');
+    document.getElementById('ending-grade').classList.add('hidden');
+    document.getElementById('score-breakdown').classList.add('hidden');
+    initGame(game.selectedInvestigator?game.selectedInvestigator.id:null);
+    startMythosPhase();
+  }
+};
+document.getElementById('btn-end-round').onclick=()=>{
+  if(game.phase==='investigation'){
+    game.investigator.actions=0;
+    nextPhase();
+  }
+};
+// 手牌区标签切换
+document.querySelectorAll('.hand-tab').forEach(tab=>{
+  tab.onclick=()=>{
+    document.querySelectorAll('.hand-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.hand-tab-content').forEach(c=>c.classList.remove('active'));
+    tab.classList.add('active');
+    const target=tab.dataset.tab;
+    if(target==='hand') document.getElementById('hand-area').classList.add('active');
+    else if(target==='equipped') document.getElementById('equipped-display').classList.add('active');
+    else if(target==='discard') document.getElementById('discard-display').classList.add('active');
+  };
+});
+document.getElementById('chaos-bag-area').onclick=()=>{
+  // 仅用于展示混沌袋效果
+  const bag=document.getElementById('chaos-bag-visual');
+  bag.classList.add('shaking');
+  AudioEngine.playCardFlip();
+  setTimeout(()=>bag.classList.remove('shaking'),500);
+};
+
+window.addEventListener('resize',()=>{
+  initFog();
+  // 窗口变化时重绘连通线
+  if(!game.gameOver){
+    const svg=document.getElementById('connection-svg');
+    if(svg){
+      const cards=document.querySelectorAll('.location-card');
+      if(cards.length>0){
+        svg.innerHTML='';
+        drawConnections(svg,Array.from(cards));
+      }
+    }
+  }
+});
+window.addEventListener('keydown',(e)=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  // 回车/空格:在调查阶段如果行动力为0则结束回合;有"继续"按钮则点击
+  if(e.key==='Enter'||e.key===' '){
+    e.preventDefault();
+    const cont=document.getElementById('btn-continue-phase');
+    if(cont){cont.click();return;}
+    if(game.phase==='investigation'&&game.investigator.actions<=0){
+      nextPhase();
+    }
+  }
+  // 数字键 1-5 对应行动按钮
+  if(game.phase==='investigation'&&game.investigator.actions>0){
+    const map={'1':'btn-investigate','2':'btn-fight','3':'btn-evade','4':'btn-ritual','5':'btn-end-round'};
+    const btn=document.getElementById(map[e.key]);
+    if(btn&&!btn.disabled) btn.click();
+  }
+  // R 键重开
+  if(e.key==='r'||e.key==='R'){
+    if(confirm('确定重新开始?')){initGame();startMythosPhase();}
+  }
+  // H 键查看规则
+  if(e.key==='h'||e.key==='H'){showRules();}
+  // T 键教程
+  if(e.key==='t'||e.key==='T'){showTutorial();}
+});
+
+// 启动
+initFog();
+animateFog();
+// 应用保存的语言(默认英文,针对海外玩家)
+renderStaticUI();
+if(!document.getElementById('start-overlay').classList.contains('hidden')){
+  renderStartScreen();
+}
+</script>
+</body>
+</html>

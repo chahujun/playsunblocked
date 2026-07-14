@@ -1,0 +1,5 @@
+﻿User-agent: *
+Allow: /
+Disallow: /games/
+
+Sitemap: https://playsunblocked.com/sitemap.xml
