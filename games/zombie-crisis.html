@@ -620,9 +620,10 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     position: fixed; right: 16px; bottom: 16px;
     display: flex; gap: 3px;
     font-family: 'JetBrains Mono', monospace;
+    z-index: 10;
   }
   .slot {
-    width: 52px; padding: 5px 3px 4px;
+    width: 48px; padding: 4px 2px 3px;
     background: rgba(13,16,19,0.88);
     border: 1px solid #2a3036;
     border-top: 2px solid #2a3036;
@@ -642,11 +643,11 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
   }
   .slot .key-num {
     font-size: 8px; color: #5a6268;
-    letter-spacing: 1px; display: block; margin-bottom: 2px;
+    letter-spacing: 1px; display: block; margin-bottom: 1px;
   }
   .slot.active .key-num { color: #e8b04a; }
   .slot .slot-name {
-    font-size: 9px; font-weight: 800;
+    font-size: 8px; font-weight: 800;
     letter-spacing: 0.3px;
     text-transform: uppercase;
     display: block;
@@ -654,21 +655,23 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
   .slot.locked .slot-name { color: #3a4046; }
   .slot.owned .slot-name { color: #9aa0a6; }
   .slot .slot-att {
-    font-size: 10px; font-weight: bold;
-    display: block; margin-top: 2px;
+    font-size: 9px; font-weight: bold;
+    display: block; margin-top: 1px;
     text-shadow: 0 0 4px currentColor;
   }
 
-  /* 操作提示：右下角武器槽上方，紧凑单行 */
+  /* 操作提示：底部中央，独立一行 */
   #controlsHint {
-    position: fixed; right: 16px; bottom: 64px;
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 9px; color: #5a6268;
     letter-spacing: 0.8px;
-    display: flex; gap: 8px; align-items: center;
+    display: flex; gap: 6px; align-items: center;
     background: rgba(13,16,19,0.7);
     border: 1px solid #1a1e22;
     padding: 4px 10px;
+    z-index: 10;
+    white-space: nowrap;
   }
   #controlsHint .key {
     background: #1a1e22; padding: 1px 4px;
@@ -1283,7 +1286,7 @@ function playZombieDeath() {
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
-const PIXEL_SCALE = 2;
+const PIXEL_SCALE = 1;
 
 // Blood stain offscreen buffer
 const bloodCanvas = document.createElement('canvas');
@@ -1307,15 +1310,15 @@ window.addEventListener('resize', resize);
 resize();
 
 // Pixel art helpers - snap to 2px grid for chunky pixel look
-function PX(x) { return Math.round(x / 2) * 2; }
-function pxRect(x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(PX(x), PX(y), Math.ceil(w), Math.ceil(h)); }
+function PX(x) { return Math.round(x); }
+function pxRect(x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(w)), Math.max(1, Math.round(h))); }
 function pxCircle(cx, cy, r, color) {
   ctx.fillStyle = color;
-  cx = PX(cx); cy = PX(cy); r = Math.ceil(r);
+  cx = PX(cx); cy = PX(cy); r = Math.max(1, Math.ceil(r));
   // Draw circle as pixel blocks
-  for (var dy = -r; dy <= r; dy += 2) {
+  for (var dy = -r; dy <= r; dy += 1) {
     var dx = Math.floor(Math.sqrt(r * r - dy * dy));
-    ctx.fillRect(cx - dx, cy + dy, dx * 2, 2);
+    ctx.fillRect(cx - dx, cy + dy, dx * 2, 1);
   }
 }
 
@@ -1451,16 +1454,39 @@ function addShake(amount) {
 
 // Ammo per weapon: pistol infinite, all other weapons limited
 const SECONDARY_AMMO = {
-  hmg: 60,
-  shotgun: 16,
-  flamethrower: 40,
-  rocket: 5,
-  laser: 30,
-  homing: 12,
-  grenade: 6,
-  micro_rocket: 15
+  hmg: 30,
+  shotgun: 8,
+  flamethrower: 20,
+  rocket: 3,
+  laser: 15,
+  homing: 6,
+  grenade: 3,
+  micro_rocket: 8
+};
+// 备弹总量（总子弹数，不含弹匣内）
+const TOTAL_SPARE_AMMO = {
+  hmg: 120,
+  shotgun: 32,
+  flamethrower: 80,
+  rocket: 9,
+  laser: 60,
+  homing: 24,
+  grenade: 9,
+  micro_rocket: 32
 };
 const ammo = {
+  pistol: Infinity,
+  hmg: 0,
+  shotgun: 0,
+  flamethrower: 0,
+  rocket: 0,
+  laser: 0,
+  homing: 0,
+  grenade: 0,
+  micro_rocket: 0
+};
+// 备弹（弹匣外的剩余子弹）
+const spareAmmo = {
   pistol: Infinity,
   hmg: 0,
   shotgun: 0,
@@ -1527,28 +1553,28 @@ const WEAPON_KEYS = ['pistol', 'hmg', 'shotgun', 'flamethrower', 'rocket', 'lase
 const ATTACHMENTS = {
   // 通用配件（所有非手枪武器可用）
   comp:       { nameZh: '枪口制退器', nameEn: 'COMP',
-                descZh: '后坐力 -60%', descEn: 'Recoil -60%',
+                descZh: '后坐力 -70% | 移速惩罚减半', descEn: 'Recoil -70% | Speed penalty halved',
                 icon: '◈', color: '#ffaa44',
-                apply: (w) => { w.recoilMult = 0.4; } },
+                apply: (w) => { w.recoilMult = 0.3; } },
   ap_rounds:  { nameZh: '穿甲弹', nameEn: 'AP ROUNDS',
-                descZh: '伤害 +25%', descEn: 'Damage +25%',
+                descZh: '伤害 +45% | 暴击率 +10%', descEn: 'Damage +45% | Crit +10%',
                 icon: '⤢', color: '#ff4466',
-                apply: (w) => { w.damage = Math.floor(w.damage * 1.25); } },
+                apply: (w) => { w.damage = Math.floor(w.damage * 1.45); w.critBonus = (w.critBonus || 0) + 0.10; } },
   // 武器专属配件
   laser_sight:{ nameZh: '激光瞄准', nameEn: 'LASER SIGHT',
-                descZh: '散布 -80%', descEn: 'Spread -80%',
+                descZh: '散布 -90% | 弹速 +30%', descEn: 'Spread -90% | Bullet speed +30%',
                 icon: '⊕', color: '#ff44ff',
-                apply: (w) => { w.spread = (w.spread || 0) * 0.2; w.jitter = (w.jitter || 0) * 0.2; },
+                apply: (w) => { w.spread = (w.spread || 0) * 0.1; w.jitter = (w.jitter || 0) * 0.1; w.bulletSpeed = Math.floor((w.bulletSpeed || 10) * 1.3); },
                 weaponOnly: ['hmg', 'shotgun', 'micro_rocket'] },
   overcharge: { nameZh: '过载充能', nameEn: 'OVERCHARGE',
-                descZh: '射速 +40%', descEn: 'Fire rate +40%',
+                descZh: '射速 +60% | 伤害 +15%', descEn: 'Fire rate +60% | Damage +15%',
                 icon: '⚡', color: '#ffff44',
-                apply: (w) => { w.fireRate = Math.floor(w.fireRate * 0.6); },
+                apply: (w) => { w.fireRate = Math.floor(w.fireRate * 0.4); w.damage = Math.floor(w.damage * 1.15); },
                 weaponOnly: ['laser', 'hmg', 'flamethrower'] },
   splinter:   { nameZh: '破片套件', nameEn: 'SPLINTER',
-                descZh: '爆炸范围 +40%', descEn: 'Blast +40%',
+                descZh: '爆炸范围 +60% | 爆炸伤害 +50%', descEn: 'Blast +60% | Blast damage +50%',
                 icon: '✺', color: '#ff8844',
-                apply: (w) => { w.explodeRadius = Math.floor((w.explodeRadius || 0) * 1.4); },
+                apply: (w) => { w.explodeRadius = Math.floor((w.explodeRadius || 0) * 1.6); w.explodeDamage = Math.floor((w.explodeDamage || 0) * 1.5); },
                 weaponOnly: ['rocket', 'grenade', 'micro_rocket'] }
 };
 
@@ -1845,9 +1871,11 @@ function tryReload() {
   const w = WEAPONS[player.weapon];
   const wAmmo = ammo[player.weapon];
   if (wAmmo === Infinity) return;
-  // 满弹检查：以 SECONDARY_AMMO 为实际上限（与游戏其它弹药补充逻辑一致）
+  // 满弹检查
   const ammoCap = SECONDARY_AMMO[player.weapon] || w.maxAmmo;
   if (wAmmo >= ammoCap) return;
+  // 备弹检查：没有备弹就不能装弹
+  if (spareAmmo[player.weapon] !== Infinity && spareAmmo[player.weapon] <= 0) return;
   player.reloading = true;
   // 装弹时长受职业 reloadMult + 升级 reloadBonus 影响
   const reloadMult = (player.class ? CLASSES[player.class].reloadMult : 1.0) * (1 - player.upgrades.reloadBonus);
@@ -2159,15 +2187,16 @@ function spawnZombie(type) {
   else if (side === 2) { x = Math.random() * WORLD_W; y = WORLD_H - 20; }
   else { x = 20; y = Math.random() * WORLD_H; }
 
-  // Scale HP with wave
-  const hpScale = 1 + (wave - 1) * 0.12;
+  // Scale HP and damage with wave
+  const hpScale = 1 + (wave - 1) * 0.15;
+  const dmgScale = 1 + (wave - 1) * 0.08;
   zombies.push({
     x, y, vx: 0, vy: 0,
     type,
     hp: def.hp * hpScale,
     maxHp: def.hp * hpScale,
     speed: def.speed,
-    damage: def.damage,
+    damage: Math.floor(def.damage * dmgScale),
     radius: def.radius,
     color: def.color,
     score: def.score,
@@ -2226,13 +2255,13 @@ function spawnBoss(typeKey) {
 
 function getWaveComposition(w) {
   const comp = { normal: 0, runner: 0, brute: 0, spitter: 0, tank: 0, screamer: 0 };
-  comp.normal = 4 + Math.floor(w * 1.5);
-  if (w >= 2) comp.runner = Math.floor(w * 0.8);
-  if (w >= 4) comp.brute = Math.floor((w - 3) * 0.6);
+  comp.normal = 5 + Math.floor(w * 2);
+  if (w >= 2) comp.runner = Math.floor(w * 1.0);
+  if (w >= 4) comp.brute = Math.floor((w - 3) * 0.8);
   // Elite zombies from wave 3
-  if (w >= 3) comp.spitter = Math.floor((w - 2) * 0.3);
-  if (w >= 5) comp.tank = Math.floor((w - 4) * 0.25);
-  if (w >= 4) comp.screamer = Math.floor((w - 3) * 0.2);
+  if (w >= 3) comp.spitter = Math.floor((w - 2) * 0.4);
+  if (w >= 5) comp.tank = Math.floor((w - 4) * 0.35);
+  if (w >= 4) comp.screamer = Math.floor((w - 3) * 0.25);
   return comp;
 }
 
@@ -2309,6 +2338,7 @@ function startWave(w) {
       player.secondWeaponUnlocked = true;
       player.ownedWeapons.push(cls.secondWeapon);
       ammo[cls.secondWeapon] = SECONDARY_AMMO[cls.secondWeapon] || 30;
+      spareAmmo[cls.secondWeapon] = TOTAL_SPARE_AMMO[cls.secondWeapon] || 0;
       // 显示解锁横幅
       waveBannerTime = 200;
       const swName = lang === 'zh' ? WEAPONS[cls.secondWeapon].nameZh : WEAPONS[cls.secondWeapon].name;
@@ -2492,7 +2522,8 @@ function updateSpawnTelegraphs(dt) {
 function spawnZombieAt(type, x, y) {
   if (zombies.length >= MAX_ZOMBIES) return;
   const def = ZOMBIE_TYPES[type];
-  const hpScale = 1 + (wave - 1) * 0.12;
+  const hpScale = 1 + (wave - 1) * 0.15; // 15% per wave (was 12%)
+  const dmgScale = 1 + (wave - 1) * 0.08; // damage also scales
   zombies.push({
     x, y, vx: 0, vy: 0,
     type,
@@ -2652,7 +2683,12 @@ function updatePlayer(dt) {
       player.reloadTimer = 0;
       const w = WEAPONS[player.weapon];
       if (ammo[player.weapon] !== Infinity) {
-        ammo[player.weapon] = SECONDARY_AMMO[player.weapon] || ammo[player.weapon];
+        // 从备弹中取子弹填入弹匣
+        const cap = SECONDARY_AMMO[player.weapon] || w.maxAmmo;
+        const needed = cap - ammo[player.weapon];
+        const taken = Math.min(needed, spareAmmo[player.weapon]);
+        ammo[player.weapon] += taken;
+        if (spareAmmo[player.weapon] !== Infinity) spareAmmo[player.weapon] -= taken;
       }
       updateHUD();
     }
@@ -2954,7 +2990,7 @@ function updateZombies(dt) {
         }
         else if (roll < 0.19) pickups.push({ x: z.x, y: z.y, type: 'food', radius: 12, life: 600, bob: 0 });
         else if (roll < 0.24) pickups.push({ x: z.x, y: z.y, type: 'water', radius: 12, life: 600, bob: 0 });
-        else if (roll < 0.30 && player.secondWeaponUnlocked) pickups.push({ x: z.x, y: z.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
+        else if (roll < 0.38) pickups.push({ x: z.x, y: z.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
         zombies.splice(i, 1);
         updateHUD();
         continue;
@@ -3182,7 +3218,7 @@ function updateFlameStream(dt) {
               pickups.push({ x: z.x, y: z.y, type: 'buff_' + buffs[Math.floor(Math.random() * 3)], radius: 12, life: 600, bob: 0 });
             } else if (roll < 0.19) pickups.push({ x: z.x, y: z.y, type: 'food', radius: 12, life: 600, bob: 0 });
             else if (roll < 0.24) pickups.push({ x: z.x, y: z.y, type: 'water', radius: 12, life: 600, bob: 0 });
-            else if (roll < 0.34 && player.secondWeaponUnlocked) pickups.push({ x: z.x, y: z.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
+            else if (roll < 0.42) pickups.push({ x: z.x, y: z.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
           }
           zombies.splice(j, 1);
           updateHUD();
@@ -3348,7 +3384,7 @@ function updateBoss(dt) {
     pickups.push({ x: boss.x + 30, y: boss.y, type: 'health', radius: 12, life: 600, bob: 0 });
     pickups.push({ x: boss.x - 30, y: boss.y, type: 'buff_rage', radius: 12, life: 600, bob: 0 });
     pickups.push({ x: boss.x, y: boss.y + 30, type: 'food', radius: 12, life: 600, bob: 0 });
-    if (player.secondWeaponUnlocked) pickups.push({ x: boss.x, y: boss.y - 30, type: 'ammo', radius: 12, life: 600, bob: 0 });
+    pickups.push({ x: boss.x, y: boss.y - 30, type: 'ammo', radius: 12, life: 600, bob: 0 });
     pickups.push({ x: boss.x, y: boss.y - 30, type: 'water', radius: 12, life: 600, bob: 0 });
     boss = null;
     updateHUD();
@@ -3596,9 +3632,10 @@ function updateBullets(dt) {
       const actualDmg = b.damage * (1 - (z.damageReduction || 0));
       z.hp -= actualDmg;
       z.hurtFlash = 8;
-      // 吸血：概率回复HP
-      if (b.lifesteal > 0 && Math.random() < b.lifesteal * 0.15) {
+      // 吸血：概率回复HP（每层8%概率，回1HP，有0.5秒内置CD）
+      if (b.lifesteal > 0 && Math.random() < b.lifesteal * 0.08 && (performance.now() - (player.lastLifesteal || 0) > 500)) {
         player.hp = Math.min(player.maxHp, player.hp + 1);
+        player.lastLifesteal = performance.now();
       }
       spawnBloodParticles(b.x, b.y, 5, (b.weaponType === 'flame' || b.weaponType === 'laser') ? (b.weaponType === 'flame' ? '#ff6622' : '#66ddff') : '#cc1122');
       addBloodStain(z.x, z.y, z.radius * 0.5);
@@ -4127,15 +4164,15 @@ function updatePickups(dt) {
         player.hp = Math.min(player.maxHp, player.hp + 25);
         playPickup();
       } else if (p.type === 'ammo') {
-        // 给所有已拥有的副武器补充弹药
-        if (player.ownedWeapons.includes('hmg')) ammo.hmg = Math.min(SECONDARY_AMMO.hmg, ammo.hmg + 15);
-        if (player.ownedWeapons.includes('shotgun')) ammo.shotgun = Math.min(SECONDARY_AMMO.shotgun, ammo.shotgun + 4);
-        if (player.ownedWeapons.includes('flamethrower')) ammo.flamethrower = Math.min(SECONDARY_AMMO.flamethrower, ammo.flamethrower + 10);
-        if (player.ownedWeapons.includes('rocket')) ammo.rocket = Math.min(SECONDARY_AMMO.rocket, ammo.rocket + 1);
-        if (player.ownedWeapons.includes('laser')) ammo.laser = Math.min(SECONDARY_AMMO.laser, ammo.laser + 10);
-        if (player.ownedWeapons.includes('homing')) ammo.homing = Math.min(SECONDARY_AMMO.homing, ammo.homing + 4);
-        if (player.ownedWeapons.includes('grenade')) ammo.grenade = Math.min(SECONDARY_AMMO.grenade, ammo.grenade + 2);
-        if (player.ownedWeapons.includes('micro_rocket')) ammo.micro_rocket = Math.min(SECONDARY_AMMO.micro_rocket, ammo.micro_rocket + 5);
+        // 给所有已拥有的副武器补充备弹
+        if (player.ownedWeapons.includes('hmg')) spareAmmo.hmg = Math.min(TOTAL_SPARE_AMMO.hmg, spareAmmo.hmg + 30);
+        if (player.ownedWeapons.includes('shotgun')) spareAmmo.shotgun = Math.min(TOTAL_SPARE_AMMO.shotgun, spareAmmo.shotgun + 8);
+        if (player.ownedWeapons.includes('flamethrower')) spareAmmo.flamethrower = Math.min(TOTAL_SPARE_AMMO.flamethrower, spareAmmo.flamethrower + 20);
+        if (player.ownedWeapons.includes('rocket')) spareAmmo.rocket = Math.min(TOTAL_SPARE_AMMO.rocket, spareAmmo.rocket + 2);
+        if (player.ownedWeapons.includes('laser')) spareAmmo.laser = Math.min(TOTAL_SPARE_AMMO.laser, spareAmmo.laser + 15);
+        if (player.ownedWeapons.includes('homing')) spareAmmo.homing = Math.min(TOTAL_SPARE_AMMO.homing, spareAmmo.homing + 6);
+        if (player.ownedWeapons.includes('grenade')) spareAmmo.grenade = Math.min(TOTAL_SPARE_AMMO.grenade, spareAmmo.grenade + 2);
+        if (player.ownedWeapons.includes('micro_rocket')) spareAmmo.micro_rocket = Math.min(TOTAL_SPARE_AMMO.micro_rocket, spareAmmo.micro_rocket + 8);
         playPickup();
       } else if (p.type.startsWith('buff_')) {
         const buffType = p.type.slice(5);
@@ -4154,16 +4191,17 @@ function updatePickups(dt) {
       } else if (p.type.startsWith('weapon_')) {
         const wId = p.type.slice(7);
         if (WEAPONS[wId] && !player.ownedWeapons.includes(wId)) {
-          // 拾取新武器：手枪无限弹药，副武器有限弹药
+          // 拾取新武器：填满弹匣+给满备弹
           player.ownedWeapons.push(wId);
           ammo[wId] = SECONDARY_AMMO[wId] || Infinity;
+          spareAmmo[wId] = TOTAL_SPARE_AMMO[wId] || 0;
           player.weapon = wId;
           player.reloading = false;
           player.reloadTimer = 0;
           playBuff();
         } else if (WEAPONS[wId] && player.ownedWeapons.includes(wId)) {
-          // 已拥有：副武器补充弹药
-          if (SECONDARY_AMMO[wId]) ammo[wId] = Math.min((SECONDARY_AMMO[wId] || 0), ammo[wId] + (SECONDARY_AMMO[wId] || 0) / 2 | 0);
+          // 已拥有：补充备弹
+          if (TOTAL_SPARE_AMMO[wId]) spareAmmo[wId] = Math.min(TOTAL_SPARE_AMMO[wId], spareAmmo[wId] + Math.ceil(TOTAL_SPARE_AMMO[wId] * 0.5));
           playPickup();
         }
       } else if (p.type.startsWith('attachment_')) {
@@ -4373,10 +4411,13 @@ function applyClass(classId) {
   player.ownedWeapons = ['pistol'];
   if (cls.startWeapon !== 'pistol') player.ownedWeapons.push(cls.startWeapon);
   player.weapon = cls.startWeapon;
-  // 副武器初始弹药（手枪无限，所有副武器有限）
-  if (cls.startWeapon && cls.startWeapon !== 'pistol') ammo[cls.startWeapon] = SECONDARY_AMMO[cls.startWeapon] || 30;
+  // 副武器初始弹药：填满弹匣+给满备弹
+  if (cls.startWeapon && cls.startWeapon !== 'pistol') {
+    ammo[cls.startWeapon] = SECONDARY_AMMO[cls.startWeapon] || 30;
+    spareAmmo[cls.startWeapon] = TOTAL_SPARE_AMMO[cls.startWeapon] || 0;
+  }
   // 解锁副武器初始无弹药，第5波解锁时补充
-  if (cls.secondWeapon) ammo[cls.secondWeapon] = 0;
+  if (cls.secondWeapon) { ammo[cls.secondWeapon] = 0; spareAmmo[cls.secondWeapon] = 0; }
   // 工程兵护盾
   if (classId === 'engineer') {
     player.classShield = cls.startShield;
@@ -4672,23 +4713,27 @@ function updateWaveSystem(dt) {
 // 升级池：属性类 + 技能类
 const UPGRADE_POOL = [
   // 属性类（可叠加）
-  { id: 'hp',       icon: '❤', nameZh: '生命强化', descZh: '生命上限 +25',           nameEn: 'VITALITY',  descEn: 'Max HP +25',
-    apply: (p) => { p.upgrades.hpBonus += 25; p.maxHp += 25; p.hp += 25; }, maxStacks: 8 },
-  { id: 'damage',   icon: '⚔', nameZh: '伤害精通', descZh: '伤害 +12%',              nameEn: 'FURY',      descEn: 'Damage +12%',
-    apply: (p) => { p.upgrades.damageBonus += 0.12; p.damageMult += 0.12; }, maxStacks: 8 },
-  { id: 'speed',    icon: '⚡', nameZh: '迅捷步伐', descZh: '移动速度 +8%',           nameEn: 'SWIFT',     descEn: 'Move speed +8%',
-    apply: (p) => { p.upgrades.speedBonus += 0.08; p.speedMult += 0.08; }, maxStacks: 6 },
-  { id: 'crit',     icon: '✦', nameZh: '暴击专注', descZh: '暴击率 +6%',             nameEn: 'FOCUS',     descEn: 'Crit chance +6%',
-    apply: (p) => { p.upgrades.critBonus += 0.06; p.critChance += 0.06; }, maxStacks: 6 },
+  { id: 'hp',       icon: '❤', nameZh: '生命强化', descZh: '生命上限 +30 & 回满血',  nameEn: 'VITALITY',  descEn: 'Max HP +30 & Full heal',
+    apply: (p) => { p.upgrades.hpBonus += 30; p.maxHp += 30; p.hp = p.maxHp; }, maxStacks: 8 },
+  { id: 'damage',   icon: '⚔', nameZh: '伤害精通', descZh: '伤害 +18%',              nameEn: 'FURY',      descEn: 'Damage +18%',
+    apply: (p) => { p.upgrades.damageBonus += 0.18; p.damageMult += 0.18; }, maxStacks: 8 },
+  { id: 'speed',    icon: '⚡', nameZh: '迅捷步伐', descZh: '移动速度 +12% & 冲刺CD -15%', nameEn: 'SWIFT', descEn: 'Move speed +12% & Dash CD -15%',
+    apply: (p) => { p.upgrades.speedBonus += 0.12; p.speedMult += 0.12; p.dashMaxCooldown = Math.floor(p.dashMaxCooldown * 0.85); }, maxStacks: 6 },
+  { id: 'crit',     icon: '✦', nameZh: '暴击专注', descZh: '暴击率 +10% & 暴击伤害 +25%', nameEn: 'FOCUS', descEn: 'Crit +10% & Crit dmg +25%',
+    apply: (p) => { p.upgrades.critBonus += 0.10; p.critChance += 0.10; p.critMult = (p.critMult || 2) + 0.25; }, maxStacks: 6 },
   // 技能类（独特效果）
-  { id: 'lifesteal',icon: '✚', nameZh: '吸血',     descZh: '15% 几率击中回复 1 HP',     nameEn: 'LIFESTEAL', descEn: '15% chance to heal 1 HP on hit',
+  { id: 'lifesteal',icon: '✚', nameZh: '吸血',     descZh: '8%几率击中回复1HP(0.5sCD)', nameEn: 'LIFESTEAL', descEn: '8% chance to heal 1 HP on hit (0.5s CD)',
     apply: (p) => { p.upgrades.lifesteal += 1; }, maxStacks: 4 },
   { id: 'pierce',   icon: '⟶', nameZh: '火焰穿透', descZh: '火焰枪穿透 +1',          nameEn: 'PIERCE',    descEn: 'Flame pierce +1',
     apply: (p) => { p.upgrades.pierceBonus += 1; }, maxStacks: 3, classOnly: 'medic' },
-  { id: 'shield',   icon: '◉', nameZh: '护盾再生', descZh: '每秒回复 2 护盾',        nameEn: 'SHIELD',    descEn: 'Regen 2 shield/sec',
-    apply: (p) => { p.upgrades.shieldRegen += 2; }, maxStacks: 3 },
-  { id: 'thorns',   icon: '※', nameZh: '反伤刺甲', descZh: '受击反弹 8 伤害',        nameEn: 'THORNS',    descEn: 'Reflect 8 damage when hit',
-    apply: (p) => { p.upgrades.thorns += 8; }, maxStacks: 4 }
+  { id: 'shield',   icon: '◉', nameZh: '护盾再生', descZh: '每秒回复 3 护盾',        nameEn: 'SHIELD',    descEn: 'Regen 3 shield/sec',
+    apply: (p) => { p.upgrades.shieldRegen += 3; }, maxStacks: 3 },
+  { id: 'thorns',   icon: '※', nameZh: '反伤刺甲', descZh: '受击反弹 15 伤害',       nameEn: 'THORNS',    descEn: 'Reflect 15 damage when hit',
+    apply: (p) => { p.upgrades.thorns += 15; }, maxStacks: 4 },
+  { id: 'reload',   icon: '↻', nameZh: '快速装填', descZh: '装弹速度 +25%',          nameEn: 'RAPID RELOAD', descEn: 'Reload speed +25%',
+    apply: (p) => { p.upgrades.reloadBonus += 0.25; }, maxStacks: 4 },
+  { id: 'ammo',     icon: '◆', nameZh: '弹药扩容', descZh: '弹匣+备弹 +30%',         nameEn: 'AMMO EXPAND', descEn: 'Magazine + spare ammo +30%',
+    apply: (p) => { p.upgrades.ammoBonus = (p.upgrades.ammoBonus || 0) + 0.30; for (const w in SECONDARY_AMMO) { ammo[w] = Math.min(Math.ceil(SECONDARY_AMMO[w] * (1 + (p.upgrades.ammoBonus || 0))), ammo[w] + Math.ceil(SECONDARY_AMMO[w] * 0.30)); spareAmmo[w] = Math.min(Math.ceil((TOTAL_SPARE_AMMO[w] || 0) * (1 + (p.upgrades.ammoBonus || 0))), spareAmmo[w] + Math.ceil((TOTAL_SPARE_AMMO[w] || 0) * 0.30)); } }, maxStacks: 3 }
 ];
 
 // 记录每个升级已选次数
@@ -6470,7 +6515,7 @@ function drawPlayer() {
     ctx.fillStyle = `rgba(255,170,68,${0.7 + pulse * 0.3})`;
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('[M] ' + player.mines + '/' + player.mineMax, player.x, player.y - player.radius - 12);
+    ctx.fillText('[SPACE] ' + player.mines + '/' + player.mineMax, player.x, player.y - player.radius - 12);
   }
 }
 
@@ -6960,7 +7005,7 @@ function drawComboIndicator() {
 
 function drawDashCooldown() {
   const x = 18;
-  const y = canvas.height - 92;
+  const y = canvas.height - 155;
   const w = 56;
   const h = 22;
 
@@ -7043,7 +7088,7 @@ function drawReloadBar() {
   if (!player.reloading) return;
   const x = 18;
   const w = 56;
-  const y = canvas.height - 120; // 位于冲刺栏上方
+  const y = canvas.height - 185; // 位于冲刺栏上方
   const h = 6;
   const total = player.reloadDuration > 0 ? player.reloadDuration : 1;
   const ratio = Math.max(0, Math.min(1, 1 - (player.reloadTimer / total)));
@@ -7108,7 +7153,8 @@ function updateHUD() {
   document.getElementById('weaponName').textContent = wName + classTag;
 
   const ammoVal = ammo[player.weapon];
-  const ammoStr = t('ammo') + (ammoVal === Infinity ? t('ammoInfinite') : ammoVal);
+  const spareVal = spareAmmo[player.weapon];
+  const ammoStr = ammoVal === Infinity ? t('ammo') + t('ammoInfinite') : t('ammo') + ammoVal + ' / ' + spareVal;
   document.getElementById('ammoText').textContent = ammoStr;
   // 装弹状态指示
   const reloadEl = document.getElementById('reloadIndicator');
@@ -7164,8 +7210,7 @@ function updateHUD() {
   const shootKey = lang === 'zh' ? '射击' : 'FIRE';
   const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
   const mineKey = lang === 'zh' ? '地雷' : 'MINE';
-  const dropKey = lang === 'zh' ? '丢弃' : 'DROP';
-  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">E</span>${mineKey}</span><span><span class="key">Q</span>${dropKey}</span><span><span class="key">1-9</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${mineKey}</span><span><span class="key">1-9</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
 
   // Countdown text
   const cdEl = document.getElementById('countdownText');
@@ -7208,14 +7253,14 @@ function showTutorial() {
     body.innerHTML =
       '<span class="k">WASD</span> 移动 &nbsp; <span class="k">鼠标</span> 瞄准 &nbsp; <span class="k">左键</span> 射击<br>' +
       '<span class="k">R</span> 装弹 &nbsp; <span class="k">Shift</span> 冲刺 &nbsp; <span class="k">空格</span> 地雷<br>' +
-      '<span class="k">1-9</span> 切换武器 &nbsp; <span class="k">Q</span> 丢弃武器';
+      '<span class="k">1-9</span> 切换武器';
     foot.textContent = '5 秒后消失，或按任意键继续';
   } else {
     title.textContent = 'CONTROLS';
     body.innerHTML =
       '<span class="k">WASD</span> Move &nbsp; <span class="k">Mouse</span> Aim &nbsp; <span class="k">LMB</span> Fire<br>' +
       '<span class="k">R</span> Reload &nbsp; <span class="k">Shift</span> Dash &nbsp; <span class="k">Space</span> Mine<br>' +
-      '<span class="k">1-9</span> Switch Weapon &nbsp; <span class="k">Q</span> Drop';
+      '<span class="k">1-9</span> Switch Weapon';
     foot.textContent = 'Disappears in 5s, or press any key to continue';
   }
   document.getElementById('tutorialOverlay').classList.remove('hidden');
@@ -7273,7 +7318,7 @@ function startGame() {
   player.lastY = player.y;
   // 重置升级系统
   player.upgrades = { hpBonus: 0, damageBonus: 0, speedBonus: 0, critBonus: 0, reloadBonus: 0,
-                      lifesteal: 0, pierceBonus: 0, shieldRegen: 0, thorns: 0 };
+                      lifesteal: 0, pierceBonus: 0, shieldRegen: 0, thorns: 0, ammoBonus: 0 };
   player.upgradeLevel = 0;
   for (const k in upgradeStacks) delete upgradeStacks[k];
 
@@ -7294,6 +7339,9 @@ function startGame() {
   ammo.homing = 0;
   ammo.grenade = 0;
   ammo.micro_rocket = 0;
+  // 重置备弹
+  spareAmmo.pistol = Infinity;
+  for (const wk of WEAPON_KEYS) { if (wk !== 'pistol') spareAmmo[wk] = 0; }
 
   zombies = [];
   bullets = [];
