@@ -963,6 +963,12 @@ const I18n = {
     engineerDesc: "Explosives +50% radius, +shield",
     scout: "SCOUT",
     scoutDesc: "+20% speed, longer dash",
+    heavy: "HEAVY",
+    heavyDesc: "-20% damage taken, high HP",
+    sniper: "SNIPER",
+    sniperDesc: "+25% crit, +50% crit dmg",
+    berserker: "BERSERKER",
+    berserkerDesc: "Lower HP = more damage",
     // Weapons
     pistol: "PISTOL",
     hmg: "HMG",
@@ -1039,7 +1045,13 @@ const I18n = {
     engineer: "工程兵",
     engineerDesc: "爆炸范围+50%，自带护盾",
     scout: "侦察兵",
-    scoutDesc: "速度+20%，冲刺更远",
+    scoutDesc: "速度+15%，冲刺更远",
+    heavy: "重装机兵",
+    heavyDesc: "受伤-20%，高血量+护盾",
+    sniper: "狙击手",
+    sniperDesc: "暴击+25%，暴伤+50%",
+    berserker: "狂战士",
+    berserkerDesc: "血量越低伤害越高",
     // Weapons
     pistol: "手枪",
     hmg: "重机枪",
@@ -1682,13 +1694,13 @@ const CLASSES = {
   assault: {
     name: 'assault', nameZh: '突击兵',
     icon: '\uD83D\uDCA5',
-    hp: 110,
+    hp: 100,
     speedMult: 1.0,
-    damageMult: 1.25,
-    reloadMult: 1.0,
+    damageMult: 1.20,
+    reloadMult: 0.85,
     mineMax: 3,
     startWeapon: 'hmg',
-    secondWeapon: 'laser',  // 第二副武器：激光枪（第5波解锁）
+    secondWeapon: 'laser',
     startAmmo: { hmg: 20 },
     dashCooldownMult: 1.0,
     passive: 'assault'
@@ -1696,13 +1708,13 @@ const CLASSES = {
   medic: {
     name: 'medic', nameZh: '医护兵',
     icon: '\u271A',
-    hp: 90,
+    hp: 85,
     speedMult: 1.0,
-    damageMult: 0.95,
+    damageMult: 0.90,
     reloadMult: 1.0,
     mineMax: 4,
     startWeapon: 'flamethrower',
-    secondWeapon: 'homing',  // 第二副武器：追踪弹（第5波解锁）
+    secondWeapon: 'homing',
     startAmmo: { flamethrower: 20 },
     dashCooldownMult: 1.0,
     passive: 'medic'
@@ -1710,33 +1722,78 @@ const CLASSES = {
   engineer: {
     name: 'engineer', nameZh: '工程兵',
     icon: '\uD83D\uDEE0',
-    hp: 100,
+    hp: 95,
     speedMult: 0.95,
     damageMult: 1.0,
     reloadMult: 1.0,
-    mineMax: 5,
+    mineMax: 4,
     startWeapon: 'shotgun',
-    secondWeapon: 'grenade', // 第二副武器：超级榴弹（第5波解锁）
+    secondWeapon: 'grenade',
     startAmmo: { shotgun: 6 },
     dashCooldownMult: 1.0,
     passive: 'engineer',
-    explosionMult: 1.5,
-    startShield: 30
+    explosionMult: 1.3,
+    startShield: 15
   },
   scout: {
     name: 'scout', nameZh: '侦察兵',
     icon: '\uD83C\uDFAF',
-    hp: 80,
-    speedMult: 1.20,
+    hp: 75,
+    speedMult: 1.15,
     damageMult: 1.0,
     reloadMult: 1.0,
     mineMax: 3,
     startWeapon: 'rocket',
-    secondWeapon: 'micro_rocket', // 第二副武器：微型火箭（第5波解锁）
+    secondWeapon: 'micro_rocket',
     startAmmo: { rocket: 2 },
-    dashCooldownMult: 0.6,
+    dashCooldownMult: 0.7,
     dashSpeedMult: 1.3,
     passive: 'scout'
+  },
+  heavy: {
+    name: 'heavy', nameZh: '重装机兵',
+    icon: '\uD83D\uDEE1',
+    hp: 140,
+    speedMult: 0.85,
+    damageMult: 1.05,
+    reloadMult: 1.0,
+    mineMax: 5,
+    startWeapon: 'shotgun',
+    secondWeapon: 'grenade',
+    startAmmo: { shotgun: 8 },
+    dashCooldownMult: 1.2,
+    dashSpeedMult: 0.7,
+    passive: 'heavy',
+    startShield: 10
+  },
+  sniper: {
+    name: 'sniper', nameZh: '狙击手',
+    icon: '\uD83C\uDFAF',
+    hp: 70,
+    speedMult: 1.0,
+    damageMult: 1.35,
+    reloadMult: 1.0,
+    mineMax: 2,
+    startWeapon: 'laser',
+    secondWeapon: 'railgun',
+    startAmmo: { laser: 25 },
+    dashCooldownMult: 0.9,
+    passive: 'sniper'
+  },
+  berserker: {
+    name: 'berserker', nameZh: '狂战士',
+    icon: '\uD83E\uDDDB',
+    hp: 95,
+    speedMult: 1.10,
+    damageMult: 1.0,
+    reloadMult: 1.0,
+    mineMax: 3,
+    startWeapon: 'shotgun',
+    secondWeapon: 'acid',
+    startAmmo: { shotgun: 8 },
+    dashCooldownMult: 0.8,
+    dashSpeedMult: 1.2,
+    passive: 'berserker'
   }
 };
 
@@ -4881,31 +4938,32 @@ function updateClassPassives(dt) {
   player.lastX = player.x;
   player.lastY = player.y;
 
-  // 医护兵：每秒回血
+  // 医护兵：每秒回血（低血量时回复更快）
   if (player.class === 'medic') {
     player.medicRegenTimer += dt;
     if (player.medicRegenTimer >= 60) { // ~1秒
       player.medicRegenTimer = 0;
-      const regen = player.hp < player.maxHp * 0.3 ? 1.2 : 0.4;
+      const regen = player.hp < player.maxHp * 0.3 ? 1.5 : 0.5;
       player.hp = Math.min(player.maxHp, player.hp + regen);
     }
   }
 
-  // 工程兵：护盾被动（非buff，是classShield，每60秒回复1点）
-  if (player.class === 'engineer' && player.classShield < CLASSES.engineer.startShield) {
+  // 职业护盾再生（工程兵和重装机兵，8秒/点）
+  const clsData = player.class ? CLASSES[player.class] : null;
+  if (clsData && clsData.startShield && player.classShield < clsData.startShield) {
     player.medicRegenTimer += dt;
-    if (player.medicRegenTimer >= 300) { // ~5秒
+    if (player.medicRegenTimer >= 480) { // ~8秒
       player.medicRegenTimer = 0;
-      player.classShield = Math.min(CLASSES.engineer.startShield, player.classShield + 1);
+      player.classShield = Math.min(clsData.startShield, player.classShield + 1);
     }
   }
 
-  // 升级：护盾再生（每秒回复护盾，工程兵或升级护盾再生均可）
+  // 升级：护盾再生（每秒回复护盾）
   if (player.upgrades.shieldRegen > 0) {
-    player.medicRegenTimer += dt;
-    if (player.medicRegenTimer >= 60) { // ~1秒
-      player.medicRegenTimer = 0;
-      const maxShield = (player.class === 'engineer' ? CLASSES.engineer.startShield : 0) + player.upgrades.shieldRegen * 10;
+    player.shieldUpTimer = (player.shieldUpTimer || 0) + dt;
+    if (player.shieldUpTimer >= 60) { // ~1秒
+      player.shieldUpTimer = 0;
+      const maxShield = (clsData && clsData.startShield ? clsData.startShield : 0) + player.upgrades.shieldRegen * 10;
       player.classShield = Math.min(maxShield, player.classShield + player.upgrades.shieldRegen);
     }
   }
@@ -4937,13 +4995,19 @@ function applyClass(classId) {
   }
   // 解锁副武器初始无弹药，第5波解锁时补充
   if (cls.secondWeapon) { ammo[cls.secondWeapon] = 0; spareAmmo[cls.secondWeapon] = 0; }
-  // 工程兵护盾
-  if (classId === 'engineer') {
+  // 职业护盾（工程兵和重装机兵）
+  if (cls.startShield) {
     player.classShield = cls.startShield;
   } else {
     player.classShield = 0;
   }
+  // 狙击手：暴击属性
+  if (classId === 'sniper') {
+    player.critChance = (player.critChance || 0) + 0.25;
+    player.critMult = 2.5;
+  }
   player.medicRegenTimer = 0;
+  player.shieldUpTimer = 0;
 }
 
 // =====================================================================
@@ -4961,6 +5025,16 @@ function getClassDamageMod() {
     // 静止时 +10% 伤害，移动时 -10% 伤害
     if (player.stillTime > 30) mod += 0.1;
     else if (player.movingTime > 30) mod -= 0.1;
+  } else if (player.class === 'sniper') {
+    // 静止时 +15% 伤害
+    if (player.stillTime > 30) mod += 0.15;
+  } else if (player.class === 'berserker') {
+    // 狂战士：血量越低伤害越高，最高+60%
+    const hpPct = player.hp / player.maxHp;
+    if (hpPct < 0.8) {
+      const bonus = (0.8 - hpPct) / 0.8 * 0.60;
+      mod += bonus;
+    }
   }
   // 生存状态影响
   if (survival.hunger < 30) mod *= 0.9;
@@ -5108,11 +5182,14 @@ function damagePlayer(dmg, attacker) {
     return;
   }
   if (player.invuln > 0) return;
-  // 工程兵职业护盾：优先吸收伤害
+  // 重装机兵：减伤20%
+  if (player.class === 'heavy') dmg *= 0.8;
+  // 职业护盾：吸收50%伤害（工程兵和重装机兵）
   if (player.classShield > 0) {
-    if (player.classShield >= dmg) {
-      player.classShield -= dmg;
-      dmg = 0;
+    const absorbed = Math.ceil(dmg * 0.5);
+    if (player.classShield >= absorbed) {
+      player.classShield -= absorbed;
+      dmg -= absorbed;
     } else {
       dmg -= player.classShield;
       player.classShield = 0;
@@ -5627,13 +5704,16 @@ function showClassSelect() {
     { id: 'assault', icon: '\uD83D\uDCA5', name: t('assault'), desc: t('assaultDesc') },
     { id: 'medic',   icon: '\u271A',       name: t('medic'),   desc: t('medicDesc') },
     { id: 'engineer',icon: '\uD83D\uDEE0', name: t('engineer'),desc: t('engineerDesc') },
-    { id: 'scout',   icon: '\uD83C\uDFAF', name: t('scout'),   desc: t('scoutDesc') }
+    { id: 'scout',   icon: '\uD83C\uDFAF', name: t('scout'),   desc: t('scoutDesc') },
+    { id: 'heavy',   icon: '\uD83D\uDEE1', name: t('heavy'),   desc: t('heavyDesc') },
+    { id: 'sniper',  icon: '\uD83C\uDFAF', name: t('sniper'),  desc: t('sniperDesc') },
+    { id: 'berserker',icon:'\uD83E\uDDDB', name: t('berserker'),desc: t('berserkerDesc') }
   ];
 
   // 属性条计算（基于 CLASSES 数据，归一化到 0-100%）
-  const hpMax = 120, hpMin = 70;
-  const dmgMax = 1.3, dmgMin = 0.9;
-  const spdMax = 1.25, spdMin = 0.9;
+  const hpMax = 150, hpMin = 60;
+  const dmgMax = 1.5, dmgMin = 0.85;
+  const spdMax = 1.25, spdMin = 0.8;
 
   classes.forEach((c, i) => {
     const cd = CLASSES[c.id];
@@ -7906,7 +7986,7 @@ function updateHUD() {
     const cls = CLASSES[player.class];
     document.getElementById('classBadgeText').textContent = cls.icon + ' ' + (lang === 'zh' ? cls.nameZh : cls.name.toUpperCase());
     const shieldEl = document.getElementById('shieldVal');
-    if (player.class === 'engineer' && player.classShield > 0) {
+    if (player.classShield > 0) {
       shieldEl.textContent = '+' + Math.floor(player.classShield);
     } else {
       shieldEl.textContent = '';
@@ -8078,6 +8158,10 @@ function startGame() {
   player.dashTrail = [];
   player.classShield = 0;
   player.medicRegenTimer = 0;
+  player.shieldUpTimer = 0;
+  player.critChance = 0.15;
+  player.critMult = 2;
+  player.lastLifesteal = 0;
   player.movingTime = 0;
   player.stillTime = 0;
   player.lastX = player.x;
