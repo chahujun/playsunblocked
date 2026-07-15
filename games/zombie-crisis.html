@@ -1342,6 +1342,7 @@ let score = 0;
 let zombiesKilled = 0;
 let wave = 0;
 let waveActive = false;
+let waveActiveTimer = 0; // 波次激活计时器（用于安全兜底）
 let waveCountdown = 0; // seconds until next wave
 let zombiesToSpawn = 0;
 let spawnTimer = 0;
@@ -2563,6 +2564,7 @@ function getWaveComposition(w) {
 function startWave(w) {
   wave = w;
   waveActive = true;
+  waveActiveTimer = 0;
 
   // 清理上一波可能残留的所有实体
   spawnTelegraphs = [];
@@ -8208,8 +8210,9 @@ function startGame() {
   lightningEffects = [];
   turrets = [];
   spawnQueue = [];
-  damageNumbers = [];
   spawnTelegraphs = [];
+  waveActiveTimer = 0;
+  damageNumbers = [];
   barrels = [];
   terrainFeatures = [];
   dayNightTime = 0;
