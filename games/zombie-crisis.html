@@ -2015,7 +2015,7 @@ function tryShoot() {
              (w.type === 'tesla' ? (Math.random() < 0.5 ? '#aa66ff' : '#cc99ff') :
              (w.type === 'acid' ? (Math.random() < 0.5 ? '#66ff44' : '#aaff88') :
              (w.type === 'railgun' ? '#ffffaa' :
-             (player.buffs.rage > 0 ? '#ff4422' : '#ffdd66')))))))
+             (player.buffs.rage > 0 ? '#ff4422' : '#ffdd66'))))))))
     });
   }
 
@@ -2036,9 +2036,9 @@ function tryShoot() {
     const isRailgun = w.type === 'railgun';
     const isChain = isTesla || isLaser; // 穿透型武器共用 hitTargets 机制
     // 子弹大小
-    const bulletSize = w.type === 'rocket' ? 6 : (isFlame ? 16 : (isLaser ? 5 : (isHoming ? 7 : (isGrenade ? 8 : (isMicroRocket ? 4 : (isTesla ? 4 : (isAcid ? 6 : (isRailgun ? 8 : 3))))))))); 
+    const bulletSize = w.type === 'rocket' ? 6 : (isFlame ? 16 : (isLaser ? 5 : (isHoming ? 7 : (isGrenade ? 8 : (isMicroRocket ? 4 : (isTesla ? 4 : (isAcid ? 6 : (isRailgun ? 8 : 3))))))));
     // 子弹生命
-    const bulletLife = w.type === 'rocket' ? 120 : (isFlame ? 40 : (isLaser ? 50 : (isHoming ? 200 : (isGrenade ? 100 : (isTesla ? 60 : (isAcid ? 100 : (isRailgun ? 30 : 80))))))));
+    const bulletLife = w.type === 'rocket' ? 120 : (isFlame ? 40 : (isLaser ? 50 : (isHoming ? 200 : (isGrenade ? 100 : (isTesla ? 60 : (isAcid ? 100 : (isRailgun ? 30 : 80)))))));
     bullets.push({
       x: muzzleX,
       y: muzzleY,
