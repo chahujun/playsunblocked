@@ -135,6 +135,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Pawn Protocol - tactical possession game free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>Pawn Protocol / 借尸协议</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -176,6 +177,41 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
 <canvas id="game"></canvas>
 <div id="langPanel">
   <span class="lbl">LANG</span>
@@ -378,6 +414,33 @@ let spacePressed = false, ejectPressed = false, clickFlag = false, resetRequeste
 /* ---------- 5. 游戏状态 ---------- */
 const STATE = { IDLE: 0, PLAYING: 1, GAMEOVER: 2, WIN: 3 };
 let state = STATE.IDLE;
+
+/* ---------- 5b. 教程系统 ---------- */
+let tutorialDone = false;                                    // 全局标记：完成过一次教程后不再触发
+let tutorial = {
+  active: false,                                             // 教程是否进行中
+  step: 0,                                                   // 当前步骤 0-5
+  showing: true,                                             // true=显示叠加层等空格确认；false=等待玩家执行动作
+  startGx: 1, startGy: 1,                                    // 记录起始房间坐标，用于检测房间切换
+  _hadHost: false,                                           // 进入"脱离"步骤时是否拥有宿主
+  _tick: 0                                                   // 动画计数
+};
+let hostCard = null;                                         // {kind, life, maxLife} 寄生成功后的能力说明浮动卡片
+
+const TUTORIAL_STEPS = [
+  { act: "move",    zh: ["第一步 · 移动", "使用 W A S D 移动你的能量球"],
+                   en: ["Step 1 · Move", "Use W A S D to move your energy orb"] },
+  { act: "possess", zh: ["第二步 · 寄生", "按 空格 发射寄生线，命中敌人即可寄生控制它"],
+                   en: ["Step 2 · Possess", "Press SPACE to fire a possess line; hit an enemy to control it"] },
+  { act: "shoot",   zh: ["第三步 · 宿主能力", "左键射击 · E 脱离宿主。试着按住左键射击"],
+                   en: ["Step 3 · Host Power", "LMB shoot · E eject. Hold LMB to fire"] },
+  { act: "eject",   zh: ["第四步 · 脱离宿主", "按 E 脱离宿主，宿主会重新变回敌人"],
+                   en: ["Step 4 · Eject", "Press E to eject; the host turns back into an enemy"] },
+  { act: "room",    zh: ["第五步 · 切换房间", "查看右下角小地图，走到门边即可切换房间"],
+                   en: ["Step 5 · Switch Room", "Check the minimap (bottom-right); walk to a door to switch rooms"] },
+  { act: "end",     zh: ["最后一步 · 通关", "找到核心房间并摧毁它即可通关！"],
+                   en: ["Final Step · Win", "Find the core room and destroy it to win!"] }
+];
 
 /* ---------- 6. 矩阵代码背景（纯视觉）---------- */
 const MATRIX = {
@@ -706,6 +769,21 @@ function startGame() {
   player.battery = player.maxBattery;
   possessLine = null;
   bullets = []; enemyBullets = []; particles = []; floatTexts = [];
+  hostCard = null;
+  // 教程：仅在首次（未完成过）触发
+  if (!tutorialDone) {
+    tutorial.active = true;
+    tutorial.step = 0;
+    tutorial.showing = true;
+    tutorial.startGx = map.sx;
+    tutorial.startGy = map.sy;
+    tutorial._hadHost = false;
+    tutorial._tick = 0;
+    // 起始房间默认无敌人，教程需一只警卫供寄生练习（无宿主时敌人不会开火，安全）
+    currentRoom.enemies.push(makeEnemy(CFG.ROOM_W / 2 + 150, CFG.ROOM_H / 2, "guard"));
+  } else {
+    tutorial.active = false;
+  }
   state = STATE.PLAYING;
 }
 
@@ -932,6 +1010,8 @@ function doPossess(enemy) {
   player.r = enemy.r;
   player.x = enemy.x; player.y = enemy.y;
   player.decay = 0;
+  // 显示宿主能力说明浮动卡片（约2秒）
+  hostCard = { kind: enemy.kind, life: 120, maxLife: 120 };
 }
 
 /* ---------- 16. 更新：敌人 AI ---------- */
@@ -1300,6 +1380,12 @@ function draw() {
   // 状态界面
   if (state === STATE.GAMEOVER) drawGameOver();
   else if (state === STATE.WIN) drawWin();
+
+  // 教程叠加层 + 宿主能力卡片（仅 PLAYING 时）
+  if (state === STATE.PLAYING) {
+    drawHostCard();
+    drawTutorialOverlay();
+  }
 }
 
 function drawWalls(arr, color) {
@@ -1538,8 +1624,8 @@ function drawHUD() {
   }
   ctx.restore();
 
-  // 提示文字
-  document.getElementById("hint").textContent = t("hint");
+  // 提示文字（动态：教程步骤 / 宿主能力 / 默认操作）
+  updateHint();
 }
 
 function drawIdle() {
@@ -1596,6 +1682,211 @@ function drawWin() {
   ctx.fillText((LANG === "en" ? "press R to prestige (battery +6%, decay -6%)" : "按 R 重构节点（电池 +6%，磨损 -6%）"), VW/2, VH/2 + 76);
 }
 
+/* ---------- 19b. 教程系统函数 ---------- */
+// 圆角矩形路径（仅构建路径，由调用方 fill/stroke）
+function roundRect(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+// 简单自动换行（按空格分词，超长 CJK 串按字符断行）
+function wrapText(text, x, y, maxWidth, lineHeight) {
+  const words = text.split(" ");
+  const lines = [];
+  let line = "";
+  for (let w of words) {
+    while (ctx.measureText(w).width > maxWidth) {
+      let cut = 1;
+      while (cut < w.length && ctx.measureText(w.substring(0, cut + 1)).width <= maxWidth) cut++;
+      lines.push((line + w.substring(0, cut)).trim());
+      line = "";
+      w = w.substring(cut);
+    }
+    const test = line ? line + " " + w : w;
+    if (ctx.measureText(test).width > maxWidth && line) { lines.push(line); line = w; }
+    else { line = test; }
+  }
+  if (line.trim()) lines.push(line);
+  const startY = y + (lines.length > 1 ? 0 : lineHeight / 2);
+  for (let i = 0; i < lines.length; i++) ctx.fillText(lines[i], x, startY + i * lineHeight);
+}
+
+function tutorialStepText() {
+  const s = TUTORIAL_STEPS[tutorial.step];
+  if (!s) return ["", ""];
+  return (LANG === "en") ? s.en : s.zh;
+}
+
+function getHostAbilityText(kind) {
+  if (kind === "guard")  return LANG === "en" ? "GUARD — LMB shoot · 60 ammo · combat"          : "警卫 — 左键射击 · 60发弹药 · 适合战斗";
+  if (kind === "drone")  return LANG === "en" ? "DRONE — fly over hazards · auto-hack · explore" : "无人机 — 飞越危险带 · 自动黑入控制台 · 适合探索";
+  if (kind === "turret") return LANG === "en" ? "TURRET — fan AoE · infinite ammo · defense"     : "重甲炮塔 — 扇形AoE · 无限弹药 · 适合防守";
+  return "";
+}
+
+function advanceTutorial() {
+  tutorial.step += 1;
+  tutorial.showing = true;
+  if (tutorial.step >= TUTORIAL_STEPS.length) {
+    tutorial.active = false;
+    tutorialDone = true;
+  }
+}
+
+// 教程更新：需在 updatePlayer 之前调用，以便在叠加层显示时消费 spacePressed
+function updateTutorial() {
+  if (!tutorial.active) return;
+  const s = TUTORIAL_STEPS[tutorial.step];
+  if (!s) return;
+  tutorial._tick += 1;
+  // 叠加层显示中：等待空格确认
+  if (tutorial.showing) {
+    if (spacePressed) {
+      spacePressed = false;                 // 消费，避免确认键立即触发寄生
+      if (s.act === "end") { tutorial.active = false; tutorialDone = true; return; }
+      tutorial.showing = false;             // 进入动作等待阶段
+      if (s.act === "eject") tutorial._hadHost = !!player.host;
+    }
+    return;
+  }
+  // 等待玩家执行对应动作
+  switch (s.act) {
+    case "move":    if (keys["w"] || keys["a"] || keys["s"] || keys["d"]) advanceTutorial(); break;
+    case "possess": if (player.host) advanceTutorial(); break;
+    case "shoot":   if (mouse.down && player.host) advanceTutorial(); break;
+    case "eject":   if (tutorial._hadHost && !player.host) advanceTutorial(); break;
+    case "room":    if (currentRoom.gx !== tutorial.startGx || currentRoom.gy !== tutorial.startGy) advanceTutorial(); break;
+  }
+}
+
+// 教程叠加层（半透明黑色 + 中央文字框 + 底部"按空格继续"）
+function drawTutorialOverlay() {
+  if (!tutorial.active) return;
+  const s = TUTORIAL_STEPS[tutorial.step];
+  if (!s) return;
+  const [title, desc] = tutorialStepText();
+  ctx.save();
+  if (tutorial.showing) {
+    // ---- 完整叠加层 ----
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(0, 0, VW, VH);
+    const bw = Math.min(480, VW - 40), bh = 168;
+    const bx = (VW - bw) / 2, by = (VH - bh) / 2;
+    ctx.fillStyle = "rgba(0,18,8,0.95)";
+    ctx.strokeStyle = "#00ff66"; ctx.lineWidth = 2;
+    roundRect(bx, by, bw, bh, 10); ctx.fill(); ctx.stroke();
+
+    // 步骤序号圆点
+    ctx.fillStyle = "#00ff66";
+    ctx.beginPath(); ctx.arc(bx + 30, by + 32, 13, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#001a08";
+    ctx.font = "bold 14px Courier New";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(String(tutorial.step + 1), bx + 30, by + 33);
+
+    // 标题
+    ctx.fillStyle = "#aaffaa";
+    ctx.font = "bold 20px Courier New";
+    ctx.textAlign = "left";
+    ctx.fillText(title, bx + 56, by + 38);
+
+    // 描述（自动换行）
+    ctx.fillStyle = "#e8ffe8";
+    ctx.font = "14px Courier New";
+    ctx.textAlign = "center"; ctx.textBaseline = "top";
+    wrapText(desc, bx + bw / 2, by + 72, bw - 48, 20);
+
+    // 进度点
+    const dots = TUTORIAL_STEPS.length;
+    const dpy = by + bh - 22;
+    for (let i = 0; i < dots; i++) {
+      const dpx = VW / 2 - (dots - 1) * 9 + i * 18;
+      ctx.beginPath(); ctx.arc(dpx, dpy, 4, 0, Math.PI * 2);
+      ctx.fillStyle = (i === tutorial.step) ? "#00ff66" : (i < tutorial.step ? "#226633" : "#114422");
+      ctx.fill();
+    }
+
+    // 底部"按空格继续"（闪烁）
+    const blink = (Math.sin(tutorial._tick / 8) + 1) / 2;
+    ctx.globalAlpha = 0.45 + 0.55 * blink;
+    ctx.fillStyle = "#ffcc66";
+    ctx.font = "bold 12px Courier New";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(LANG === "en" ? "[ press SPACE to continue ]" : "[ 按空格继续 ]", VW / 2, dpy - 16);
+    ctx.globalAlpha = 1;
+
+    // 顶部标签
+    ctx.fillStyle = "#558855";
+    ctx.font = "10px Courier New";
+    ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    ctx.fillText(LANG === "en" ? "TUTORIAL" : "教程引导", VW / 2, by - 6);
+  } else {
+    // ---- 动作阶段：顶部紧凑提示横幅 ----
+    const bw = Math.min(540, VW - 40), bh = 34;
+    const bx = (VW - bw) / 2, by = 10;
+    ctx.fillStyle = "rgba(0,18,8,0.82)";
+    ctx.strokeStyle = "rgba(0,255,102,0.55)"; ctx.lineWidth = 1;
+    roundRect(bx, by, bw, bh, 8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#aaffaa";
+    ctx.font = "bold 12px Courier New";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    const tag = LANG === "en" ? "TUTORIAL" : "教程";
+    ctx.fillText(tag + " " + (tutorial.step + 1) + "/" + TUTORIAL_STEPS.length + " · " + title, VW / 2, by + bh / 2 + 1);
+  }
+  ctx.restore();
+}
+
+// 宿主能力浮动卡片（寄生成功后显示约2秒）
+function drawHostCard() {
+  if (!hostCard) return;
+  const txt = getHostAbilityText(hostCard.kind);
+  const lifeRatio = hostCard.life / hostCard.maxLife;
+  const cw = Math.min(440, VW - 40), ch = 50;
+  const cx = (VW - cw) / 2, cy = 56;
+  ctx.save();
+  ctx.globalAlpha = Math.min(1, lifeRatio * 1.8);
+  ctx.fillStyle = "rgba(0,20,10,0.93)";
+  ctx.strokeStyle = "#00ffaa"; ctx.lineWidth = 2;
+  roundRect(cx, cy, cw, ch, 8); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = "#00ffaa";
+  ctx.beginPath(); ctx.arc(cx + 24, cy + ch / 2, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#001a08";
+  ctx.font = "bold 13px Courier New";
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  const icon = hostCard.kind === "guard" ? "G" : hostCard.kind === "drone" ? "D" : "T";
+  ctx.fillText(icon, cx + 24, cy + ch / 2 + 1);
+  ctx.fillStyle = "#eafff0";
+  ctx.font = "13px Courier New";
+  ctx.textAlign = "left";
+  ctx.fillText(txt, cx + 46, cy + ch / 2 + 1);
+  ctx.restore();
+  // 暂停（叠加层显示）时不计时，避免卡片在阅读期间消失
+  if (!(tutorial.active && tutorial.showing)) {
+    hostCard.life -= 1;
+    if (hostCard.life <= 0) hostCard = null;
+  }
+}
+
+// 动态底部提示：根据教程步骤 / 宿主状态变化
+function updateHint() {
+  let txt;
+  if (tutorial.active) {
+    const s = TUTORIAL_STEPS[tutorial.step];
+    txt = s ? ((LANG === "en" ? s.en : s.zh).join(" — ")) : t("hint");
+  } else if (player && player.host) {
+    txt = getHostAbilityText(player.hostKind);
+  } else if (player) {
+    txt = LANG === "en" ? "Space possess · E eject" : "空格寄生 · E脱离";
+  } else {
+    txt = t("hint");
+  }
+  document.getElementById("hint").textContent = txt;
+}
+
 /* ---------- 20. 状态切换 ---------- */
 function gameOver() {
   if (state !== STATE.PLAYING) return;
@@ -1619,12 +1910,21 @@ function loop(now) {
   MATRIX.update();
 
   if (state === STATE.PLAYING) {
-    updatePlayer(dt);
-    updatePossessLine(dt);
-    updateEnemies(dt);
-    updateBullets();
+    // 教程叠加层显示时暂停游戏模拟（防止宿主磨损/电量耗尽），仅处理空格确认
+    const tutorialPaused = tutorial.active && tutorial.showing;
+    updateTutorial();
+    if (tutorialPaused) {
+      // 丢弃暂停期间的杂散输入，避免解除暂停时误触发
+      ejectPressed = false;
+      mouse.pressed = false;
+    } else {
+      updatePlayer(dt);
+      updatePossessLine(dt);
+      updateEnemies(dt);
+      updateBullets();
+      tryTransition();
+    }
     updateParticles();
-    tryTransition();
   } else {
     updateParticles();
   }

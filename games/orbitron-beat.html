@@ -134,6 +134,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="description" content="Play Orbitron Beat - rhythm orbit game free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>Loop Beat · 转圈踩点</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
@@ -249,6 +250,32 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     box-shadow: 0 0 36px rgba(127,255,212,0.9), inset 0 0 18px rgba(127,255,212,0.4);
     color: #fff;
   }
+  .diffBtn {
+    background: transparent;
+    border: 1.5px solid #4a6a7a;
+    color: #6fa3b8;
+    padding: 8px 20px;
+    font-family: inherit; font-weight: bold;
+    font-size: 13px; letter-spacing: 2px;
+    cursor: pointer; border-radius: 2px;
+    transition: all 0.2s;
+    pointer-events: auto;
+  }
+  .diffBtn:hover { border-color: #7fffd4; color: #7fffd4; }
+  .diffBtn.selected {
+    border-color: #7fffd4; color: #7fffd4;
+    box-shadow: 0 0 14px rgba(127,255,212,0.4);
+    background: rgba(127,255,212,0.1);
+  }
+  #practiceTag {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 28px; font-weight: 900; letter-spacing: 8px;
+    color: #7fffd4; text-shadow: 0 0 20px #7fffd4;
+    pointer-events: none; z-index: 4; opacity: 0;
+    transition: opacity 0.3s;
+  }
+  #practiceTag.show { opacity: 0.8; animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:0.9} }
   #finalScore { font-size: 26px; color: #ffd700; text-shadow: 0 0 14px #ffd700; letter-spacing: 3px; }
 
   /* Perfect 浮字 */
@@ -271,6 +298,41 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
 <canvas id="game"></canvas>
 
 <div id="hud">
@@ -286,12 +348,18 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <div id="helpBar">Space / Click to alternate orbits on the BEAT.</div>
 
+<div id="practiceTag"></div>
 <div id="judgePop"></div>
 
 <!-- Start screen -->
 <div class="overlay" id="startScreen">
   <div class="title" id="titleText">Loop Beat</div>
-  <div class="sub" id="startSub">Tap Space or click to switch orbits on the beat.</div>
+  <div class="sub" id="startSub">按空格或点击在节拍上切换轨道。</div>
+  <div id="diffSelect" style="display:flex;gap:12px;margin-bottom:6px;">
+    <button class="diffBtn" data-diff="easy" id="diffEasy">EASY</button>
+    <button class="diffBtn selected" data-diff="normal" id="diffNormal">NORMAL</button>
+    <button class="diffBtn" data-diff="hard" id="diffHard">HARD</button>
+  </div>
   <button class="bigBtn" id="startBtn">START</button>
 </div>
 
@@ -319,7 +387,9 @@ const I18N = {
     score: 'SCORE: ',
     combo: 'COMBO: ',
     diff: 'BPM: ',
-    help: 'Tap Space or click to switch orbits on the beat.',
+    help: 'Tap Space or click to switch orbits on the beat. Practice first — obstacles come later!',
+    startSub: 'Tap Space or click to switch orbits on the beat.',
+    diffEasy: 'EASY', diffNormal: 'NORMAL', diffHard: 'HARD',
     perfect: 'PERFECT',
     miss: 'MISS',
     best: 'MAX COMBO: '
@@ -331,7 +401,9 @@ const I18N = {
     score: '得分: ',
     combo: '连击: ',
     diff: 'BPM: ',
-    help: '空格或点击，踩着鼓点切轨道。',
+    help: '空格或点击，踩着鼓点切轨道。先练习，障碍稍后出现！',
+    startSub: '按空格或点击在节拍上切换轨道。',
+    diffEasy: '简单', diffNormal: '普通', diffHard: '困难',
     perfect: '完美',
     miss: '踩空',
     best: '最高连击: '
@@ -349,6 +421,10 @@ function applyI18n() {
   document.getElementById('comboLine').innerHTML = t.combo + '<span class="v" id="comboV">0</span>';
   document.getElementById('bpmTag').textContent = t.diff + '120';
   document.getElementById('helpBar').textContent = t.help;
+  document.getElementById('startSub').textContent = t.startSub;
+  document.getElementById('diffEasy').textContent = t.diffEasy;
+  document.getElementById('diffNormal').textContent = t.diffNormal;
+  document.getElementById('diffHard').textContent = t.diffHard;
   document.getElementById('langBtn').textContent = (lang === 'en') ? 'EN / 中' : '中 / EN';
 }
 
@@ -377,6 +453,16 @@ const ORBIT_COLORS = ['#7fffd4', '#1e90ff', '#ff61c7'];
 const BPM = 120;
 const SEC_PER_BEAT = 60 / BPM;          // 0.5s
 const SEC_PER_BAR = SEC_PER_BEAT * 4;   // 2.0s
+
+/* ---------- 难度与练习段 ---------- */
+let difficulty = 'normal'; // easy / normal / hard
+const DIFF_CONFIG = {
+  easy:   { practiceBars: 4, obsSpeedMul: 0.7, obsFreq: 1, timingWindow: 0.14, label: 'EASY' },
+  normal: { practiceBars: 2, obsSpeedMul: 1.0, obsFreq: 1, timingWindow: 0.10, label: 'NORMAL' },
+  hard:   { practiceBars: 0, obsSpeedMul: 1.3, obsFreq: 2, timingWindow: 0.08, label: 'HARD' }
+};
+let totalBeats = 0;       // 累计节拍数（用于练习段判定和渐进难度）
+let practiceBeats = 8;    // 练习段节拍数（2小节=8拍），根据难度调整
 
 let audioCtx = null;
 let masterGain = null;
@@ -462,7 +548,11 @@ function scheduleBeat(idx, time) {
   else playSnare(time);
   playArp(time); // 琶音仅在 arpEnabled 时实际发声
   beatQueue.push({ time, idx });
-  pendingSpawns.push({ time, beatIdx: idx });
+  // 练习段不生成障碍
+  if (totalBeats >= practiceBeats) {
+    pendingSpawns.push({ time, beatIdx: idx });
+  }
+  totalBeats++;
 }
 
 function audioScheduler() {
@@ -532,6 +622,8 @@ function resetGame() {
   player = newPlayer();
   beatQueue = [];
   beatIndex = 0;
+  totalBeats = 0;
+  practiceBeats = DIFF_CONFIG[difficulty].practiceBars * 4;
   nextBeatTime = audioCtx ? audioCtx.currentTime + 0.08 : 0;
 }
 
@@ -558,7 +650,8 @@ function jump() {
   const info = nearestBeatInfo();
   if (!info) return;
   const d = info.diff;
-  if (d <= 0.10) {
+  const window = DIFF_CONFIG[difficulty].timingWindow;
+  if (d <= window) {
     // Perfect
     score += 100 + combo * 5;
     combo++;
@@ -618,17 +711,21 @@ function showJudge(kind) {
 function spawnObstacle(beatIdx) {
   // 仅在 Kick 拍（0 或 2）生成
   if (beatIdx !== 0 && beatIdx !== 2) return;
+  const cfg = DIFF_CONFIG[difficulty];
+  // 渐进难度：每32拍（8小节）障碍旋转加速10%，上限+80%
+  const progMul = Math.min(1.8, 1 + Math.floor((totalBeats - practiceBeats) / 32) * 0.1);
+  const speedMul = cfg.obsSpeedMul * progMul;
+  // Hard模式每拍都生成，其他模式仅Kick拍
+  if (difficulty !== 'hard' && beatIdx !== 0 && beatIdx !== 2) return;
   const orbit = Math.floor(Math.random() * 3);
-  // 避免初始就在玩家轨道上重叠（保留一些容错）
   const radii = orbitRadii();
-  const arcWidth = 0.32 + Math.random() * 0.12; // 弧度宽度
-  // 起始角度：取玩家对面方向附近，让玩家有时间反应
+  const arcWidth = 0.32 + Math.random() * 0.12;
   const baseAng = player.angle + Math.PI + (Math.random() - 0.5) * 0.6;
   obstacles.push({
     orbit,
     angle: baseAng,
     arc: arcWidth,
-    rot: (Math.random() < 0.5 ? 1 : -1) * (0.35 + Math.random() * 0.35), // rad/s，与玩家相向
+    rot: (Math.random() < 0.5 ? 1 : -1) * (0.35 + Math.random() * 0.35) * speedMul,
     r: radii[orbit],
     life: 0,
     born: true
@@ -766,6 +863,15 @@ function update(dt) {
   }
 
   updateParticles(dt);
+
+  // 练习段提示
+  const practiceTag = document.getElementById('practiceTag');
+  if (totalBeats < practiceBeats) {
+    practiceTag.textContent = (lang === 'en') ? 'PRACTICE — NO OBSTACLES' : '练习中 — 无障碍';
+    practiceTag.classList.add('show');
+  } else {
+    practiceTag.classList.remove('show');
+  }
 
   // HUD 更新
   document.getElementById('scoreV').textContent = score;
@@ -978,6 +1084,15 @@ canvas.addEventListener('pointerdown', (e) => {
 
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('retryBtn').addEventListener('click', startGame);
+
+// 难度选择按钮
+document.querySelectorAll('.diffBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diffBtn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    difficulty = btn.dataset.diff;
+  });
+});
 
 document.getElementById('langBtn').addEventListener('click', () => {
   lang = (lang === 'en') ? 'zh' : 'en';

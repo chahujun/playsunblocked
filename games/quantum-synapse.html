@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- i18n-script DISABLED: redundant, the game already has its own I18N system (t() function) below.
 <script id="i18n-script">
 (function(){
   var lang = new URLSearchParams(window.location.search).get('lang') || 'cn';
@@ -131,6 +132,7 @@
   setTimeout(init, 2000);
 })();
 </script>
+-->
 
 <style id="auto-fit">
 html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
@@ -161,6 +163,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Quantum Synapse - neural idle game free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>Mindloop | 念回路</title>
 <style>
 /* ============================================================
@@ -625,9 +628,203 @@ body{
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--c-border-hi);border-radius:0}
+
+/* ===== TOP-RIGHT CONTROL CLUSTER (help + mute + lang) ===== */
+#top-right-controls{
+    justify-self:end;
+    display:flex;align-items:stretch;gap:8px;
+    /* clear the fixed playsunblocked menu button (top-right) */
+    margin-right:54px;
+}
+.icon-btn{
+    background:var(--bg-panel);
+    border:1px solid var(--c-border-hi);
+    color:var(--c-cyan);
+    padding:0 12px;
+    font-family:inherit;font-size:14px;font-weight:bold;
+    cursor:pointer;letter-spacing:1px;
+    transition:all 0.25s cubic-bezier(.4,0,.2,1);
+    backdrop-filter:blur(14px);
+    display:flex;align-items:center;justify-content:center;
+    min-width:40px;
+}
+.icon-btn:hover{
+    border-color:var(--c-cyan);
+    box-shadow:0 0 18px rgba(125,249,255,0.35);
+    color:#fff;
+}
+#btn-help{font-size:16px}
+
+/* ===== TUTORIAL BOX ===== */
+#tutorial-box{
+    position:absolute;left:50%;bottom:24px;transform:translateX(-50%);
+    max-width:560px;width:calc(100% - 540px);min-width:280px;
+    background:rgba(8,16,38,0.82);
+    border:1px solid var(--c-border-magenta);
+    backdrop-filter:blur(14px);
+    padding:12px 18px;
+    display:flex;align-items:center;gap:14px;
+    box-shadow:0 6px 28px rgba(0,0,0,0.55),0 0 24px rgba(255,77,255,0.12);
+    z-index:15;
+    animation:tutPulse 3s ease-in-out infinite;
+}
+@keyframes tutPulse{0%,100%{border-color:var(--c-border-magenta)}50%{border-color:var(--c-magenta)}}
+#tutorial-box.hidden{display:none}
+.tut-icon{
+    width:26px;height:26px;border-radius:50%;
+    background:linear-gradient(135deg,var(--c-magenta),var(--c-cyan));
+    display:flex;align-items:center;justify-content:center;
+    font-size:14px;font-weight:900;color:#fff;flex-shrink:0;
+    box-shadow:0 0 12px rgba(255,77,255,0.5);
+}
+.tut-text{
+    flex:1;font-size:11px;line-height:1.5;letter-spacing:0.5px;
+    color:var(--c-cyan);
+}
+.tut-close{
+    background:transparent;border:1px solid var(--c-border-hi);
+    color:var(--c-cyan-dim);font-family:inherit;font-size:9px;font-weight:bold;
+    letter-spacing:1px;padding:5px 10px;cursor:pointer;flex-shrink:0;
+    transition:all 0.2s;
+}
+.tut-close:hover{border-color:var(--c-cyan);color:#fff;background:rgba(125,249,255,0.1)}
+
+/* ===== SAVE INDICATOR ===== */
+#save-indicator{
+    position:fixed;top:62px;right:16px;z-index:20;
+    background:rgba(20,40,30,0.85);
+    border:1px solid rgba(125,255,157,0.5);
+    color:var(--c-green);
+    font-size:9px;letter-spacing:3px;font-weight:bold;
+    padding:5px 12px;
+    opacity:0;transform:translateY(-6px);
+    transition:opacity 0.3s,transform 0.3s;
+    pointer-events:none;
+}
+#save-indicator.show{opacity:1;transform:translateY(0)}
+#save-indicator::before{content:"●";color:var(--c-green);margin-right:6px;animation:dotPulse 1.2s ease-in-out infinite}
+
+/* ===== PRESTIGE PROGRESS BAR ===== */
+.prestige-progress{
+    margin-top:8px;
+}
+.prestige-progress-track{
+    height:6px;background:rgba(125,249,255,0.08);
+    border:1px solid var(--c-border);position:relative;overflow:hidden;
+}
+.prestige-progress-fill{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,var(--c-cyan-dim),var(--c-magenta));
+    box-shadow:0 0 10px rgba(255,77,255,0.5);
+    transition:width 0.4s ease;
+}
+.prestige-progress-text{
+    font-size:9px;letter-spacing:1px;color:var(--c-text-dim);
+    margin-top:4px;display:flex;justify-content:space-between;
+    font-variant-numeric:tabular-nums;
+}
+
+/* ===== MODAL OVERLAY (help / confirm / offline) ===== */
+.modal-overlay{
+    position:fixed;inset:0;z-index:100;
+    background:rgba(3,5,15,0.78);
+    backdrop-filter:blur(8px);
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;
+    transition:opacity 0.25s;
+}
+.modal-overlay.show{opacity:1;pointer-events:auto}
+.modal-card{
+    background:linear-gradient(160deg,rgba(12,22,48,0.96),rgba(8,16,38,0.96));
+    border:1px solid var(--c-border-hi);
+    box-shadow:0 0 60px rgba(125,249,255,0.15),0 12px 48px rgba(0,0,0,0.6);
+    max-width:440px;width:calc(100% - 48px);
+    padding:24px 26px 22px;
+    position:relative;
+    transform:scale(0.94);transition:transform 0.25s;
+}
+.modal-overlay.show .modal-card{transform:scale(1)}
+.modal-card::before,.modal-card::after{
+    content:"";position:absolute;width:16px;height:16px;
+    border:1.5px solid var(--c-cyan-dim);pointer-events:none;
+}
+.modal-card::before{top:-1px;left:-1px;border-right:none;border-bottom:none}
+.modal-card::after{bottom:-1px;right:-1px;border-left:none;border-top:none}
+.modal-title{
+    font-size:15px;font-weight:900;letter-spacing:4px;text-transform:uppercase;
+    color:var(--c-cyan);text-shadow:0 0 12px rgba(125,249,255,0.4);
+    margin-bottom:14px;display:flex;align-items:center;gap:10px;
+}
+.modal-title::before{
+    content:"";width:4px;height:18px;
+    background:linear-gradient(180deg,var(--c-cyan),var(--c-magenta));
+    box-shadow:0 0 8px var(--c-cyan);
+}
+.modal-body{font-size:11px;line-height:1.8;letter-spacing:0.4px;color:var(--c-cyan-dim)}
+.modal-body p{margin:0 0 4px}
+.modal-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+.modal-btn{
+    background:var(--bg-panel);border:1px solid var(--c-border-hi);
+    color:var(--c-cyan);font-family:inherit;font-size:10px;font-weight:bold;
+    letter-spacing:2px;padding:9px 18px;cursor:pointer;
+    transition:all 0.2s;text-transform:uppercase;
+}
+.modal-btn:hover{border-color:var(--c-cyan);color:#fff;box-shadow:0 0 14px rgba(125,249,255,0.3)}
+.modal-btn.primary{
+    border-color:var(--c-border-magenta);color:var(--c-magenta-dim);
+    background:linear-gradient(135deg,rgba(60,15,70,0.6),rgba(30,20,50,0.8));
+}
+.modal-btn.primary:hover{border-color:var(--c-magenta);color:#fff;box-shadow:0 0 18px rgba(255,77,255,0.4)}
+.modal-btn.danger{border-color:rgba(255,120,120,0.5);color:#ff9d9d}
+.modal-btn.danger:hover{border-color:#ff7d7d;color:#fff;box-shadow:0 0 18px rgba(255,120,120,0.4)}
+
+/* Offline notice specific accent */
+#offline-notice .modal-title{color:var(--c-gold)}
+#offline-notice .modal-title::before{background:linear-gradient(180deg,var(--c-gold),var(--c-magenta))}
+#offline-gain{
+    font-size:24px;font-weight:900;color:var(--c-green);
+    text-shadow:0 0 14px rgba(125,255,157,0.5);
+    margin:6px 0 2px;font-variant-numeric:tabular-nums;
+}
+#offline-time{font-size:10px;color:var(--c-text-dim);letter-spacing:1px;margin-bottom:6px}
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
 <canvas id="game"></canvas>
 <div id="scan-overlay"></div>
 <div id="vignette"></div>
@@ -647,10 +844,14 @@ body{
             <div id="energy-value">0</div>
             <div id="eps-value"></div>
         </div>
-        <button id="lang-toggle">
-            <span class="lang-dot"></span>
-            <span id="lang-text">EN / 简中</span>
-        </button>
+        <div id="top-right-controls">
+            <button id="btn-help" class="icon-btn" title="?">?</button>
+            <button id="btn-mute" class="icon-btn" title="Mute">🔊</button>
+            <button id="lang-toggle">
+                <span class="lang-dot"></span>
+                <span id="lang-text">EN / 简中</span>
+            </button>
+        </div>
     </div>
 
     <div id="upgrade-panel">
@@ -696,6 +897,10 @@ body{
             <div class="prestige-name" id="prestige-name"></div>
             <div class="prestige-desc" id="prestige-desc"></div>
             <div class="prestige-gain" id="prestige-gain"></div>
+            <div class="prestige-progress">
+                <div class="prestige-progress-track"><div class="prestige-progress-fill" id="prestige-progress-fill"></div></div>
+                <div class="prestige-progress-text"><span id="prestige-progress-cur"></span><span id="prestige-progress-pct"></span></div>
+            </div>
         </button>
         <div id="gene-shop">
             <div id="gene-shop-title"></div>
@@ -708,6 +913,50 @@ body{
     </div>
 
     <div id="click-hint"></div>
+
+    <div id="tutorial-box" class="hidden">
+        <div class="tut-icon">!</div>
+        <div class="tut-text" id="tutorial-text"></div>
+        <button class="tut-close" id="tutorial-close">GOT IT</button>
+    </div>
+</div>
+
+<div id="save-indicator">SAVED</div>
+
+<!-- Help modal -->
+<div id="help-modal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-title" id="help-title"></div>
+        <div class="modal-body" id="help-body"></div>
+        <div class="modal-actions">
+            <button class="modal-btn primary" id="help-close-btn"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Prestige confirm modal -->
+<div id="confirm-modal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-title" id="confirm-title"></div>
+        <div class="modal-body" id="confirm-body"></div>
+        <div class="modal-actions">
+            <button class="modal-btn" id="confirm-no"></button>
+            <button class="modal-btn primary" id="confirm-yes"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Offline progress notice -->
+<div id="offline-notice" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-title" id="offline-title"></div>
+        <div class="modal-body" id="offline-body"></div>
+        <div id="offline-gain"></div>
+        <div id="offline-time"></div>
+        <div class="modal-actions">
+            <button class="modal-btn primary" id="offline-collect"></button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -778,6 +1027,37 @@ const I18N = {
         sectUpgrades: 'UPGRADES',
         sectSingularity: 'PRESTIGE // GENES',
         statsHeader: 'STATS',
+        // Tutorial
+        tutorial0: 'Click the glowing core to fire a pulse',
+        tutorial1: 'Pulses travel through ×N and +N nodes to multiply energy',
+        tutorial2: 'Buy an Axon upgrade to add multiplier nodes to the network',
+        tutorial3: 'Watch pulses split and multiply through the network!',
+        tutorial4: 'Buy Myelin to increase pulse speed, or Split for more pathways',
+        tutorial5: 'Keep accumulating! At 1M total energy you can Rebirth for permanent bonuses',
+        tutorialGotIt: 'GOT IT',
+        // Help
+        helpTitle: 'How to Play',
+        helpClose: 'Close',
+        help1: '• Click the glowing core to fire pulses',
+        help2: '• ×N nodes multiply pulse energy, +N nodes add to it',
+        help3: '• Pulses decay 10% per hop (0.9x)',
+        help4: '• Buy upgrades: Axon (multiplier nodes), Myelin (speed), Split (pathways)',
+        help5: '• Accumulate 1M total energy to Rebirth for singularity points',
+        help6: '• Spend singularity points on permanent genes',
+        // Save / Offline
+        savedLabel: 'SAVED',
+        offlineTitle: 'WELCOME BACK',
+        offlineBody: 'While you were away you gained',
+        offlineTime: 'over',
+        offlineCollect: 'COLLECT',
+        // Prestige confirm
+        prestigeConfirm: 'Are you sure? You will reset current progress but keep singularity points and genes.',
+        confirmYes: 'CONFIRM',
+        confirmNo: 'CANCEL',
+        // Mute
+        muteOn: 'Mute',
+        muteOff: 'Unmute',
+        helpBtn: 'Help',
     },
     zh: {
         title: '念回路',
@@ -820,6 +1100,37 @@ const I18N = {
         sectUpgrades: '升级',
         sectSingularity: '转生 // 基因',
         statsHeader: '数据面板',
+        // 教程
+        tutorial0: '点击发光的核心，发射一道脉冲',
+        tutorial1: '脉冲穿过 ×N 和 +N 节点来倍增脑力',
+        tutorial2: '购买 Axon 升级，为网络添加更多乘法节点',
+        tutorial3: '看脉冲在网络中分裂、倍增！',
+        tutorial4: '购买 Myelin 提升脉冲速度，或购买 Split 增加通路',
+        tutorial5: '继续累积！累计脑力达 1M 时可转生获得永久加成',
+        tutorialGotIt: '知道了',
+        // 帮助
+        helpTitle: '游戏说明',
+        helpClose: '关闭',
+        help1: '• 点击发光核心发射脉冲',
+        help2: '• ×N 节点倍增脉冲能量，+N 节点增加能量',
+        help3: '• 脉冲每跳衰减 10%（×0.9）',
+        help4: '• 购买升级：Axon（乘法节点）、Myelin（速度）、Split（通路）',
+        help5: '• 累计脑力达 1M 可转生获得奇点',
+        help6: '• 用奇点购买永久基因',
+        // 存档 / 离线
+        savedLabel: '已保存',
+        offlineTitle: '欢迎回来',
+        offlineBody: '你离开期间获得了',
+        offlineTime: '时长',
+        offlineCollect: '领取',
+        // 转生确认
+        prestigeConfirm: '确定转生？当前进度将重置，但保留奇点和基因。',
+        confirmYes: '确认',
+        confirmNo: '取消',
+        // 静音
+        muteOn: '静音',
+        muteOff: '取消静音',
+        helpBtn: '帮助',
     }
 };
 let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
@@ -832,11 +1143,12 @@ let lastImpulseSound = 0;
 function initAudio() {
     if (audioCtx) return;
     try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    if (audioCtx && game.muted) { try { audioCtx.suspend(); } catch(e) {} }
 }
 
 // Bandpass white-noise burst (0.05s) — electric crackle
 function playImpulseSound() {
-    if (!audioCtx) return;
+    if (!audioCtx || game.muted) return;
     const now = audioCtx.currentTime;
     if (now - lastImpulseSound < 0.04) return; // throttle
     lastImpulseSound = now;
@@ -856,7 +1168,7 @@ function playImpulseSound() {
 // Sine sweep 800→1600Hz — node activation chime
 let lastNodeSound = 0;
 function playNodeSound() {
-    if (!audioCtx) return;
+    if (!audioCtx || game.muted) return;
     const now = audioCtx.currentTime;
     if (now - lastNodeSound < 0.06) return;
     lastNodeSound = now;
@@ -873,7 +1185,7 @@ function playNodeSound() {
 
 // Upgrade sound — double tone
 function playUpgradeSound() {
-    if (!audioCtx) return;
+    if (!audioCtx || game.muted) return;
     const now = audioCtx.currentTime;
     [880, 1320].forEach((f, i) => {
         const osc = audioCtx.createOscillator();
@@ -891,7 +1203,7 @@ function playUpgradeSound() {
 
 // Prestige sound — ascending arpeggio
 function playPrestigeSound() {
-    if (!audioCtx) return;
+    if (!audioCtx || game.muted) return;
     const now = audioCtx.currentTime;
     [523, 659, 784, 1047, 1319].forEach((f, i) => {
         const osc = audioCtx.createOscillator();
@@ -905,6 +1217,28 @@ function playPrestigeSound() {
         osc.connect(g); g.connect(audioCtx.destination);
         osc.start(t0); osc.stop(t0 + 0.45);
     });
+}
+
+// ===== MUTE CONTROL =====
+function applyMuteState() {
+    const btn = document.getElementById('btn-mute');
+    if (!btn) return;
+    btn.textContent = game.muted ? '🔇' : '🔊';
+    btn.title = t(game.muted ? 'muteOff' : 'muteOn');
+    if (audioCtx) {
+        if (game.muted) {
+            if (audioCtx.state === 'running') audioCtx.suspend();
+        } else {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+    }
+    try { localStorage.setItem(MUTE_KEY, game.muted ? '1' : '0'); } catch(e) {}
+}
+
+function toggleMute() {
+    if (!audioCtx) initAudio();
+    game.muted = !game.muted;
+    applyMuteState();
 }
 
 // ===== NUMBER FORMATTING =====
@@ -938,6 +1272,8 @@ const game = {
     lastSecTime: 0,
     lastAutoImpulse: 0,
     firstClick: false,
+    tutorial: { step: 0, done: false },
+    muted: false,
 };
 
 const GENE_COSTS = { noDecay: 3, doubleEnergy: 5, autoImpulse: 4, overclock: 3, boost: 8 };
@@ -1109,7 +1445,7 @@ class Impulse {
 
 function triggerImpulse() {
     if (!audioCtx) initAudio();
-    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if (audioCtx && audioCtx.state === 'suspended' && !game.muted) audioCtx.resume();
     if (!game.firstClick) {
         game.firstClick = true;
         document.getElementById('click-hint').classList.add('hidden');
@@ -1250,6 +1586,126 @@ function buyGene(name) {
         });
     }
     playUpgradeSound();
+}
+
+// ===== SAVE / LOAD =====
+const SAVE_KEY = 'qs_save';
+const MUTE_KEY = 'qs_muted';
+const MAX_OFFLINE_MS = 8 * 3600 * 1000; // 8 hours cap
+
+// Current energy-per-second estimate (used for offline progress)
+function calculateEPS() {
+    return game.displayEPS || 0;
+}
+
+function flashSaveIndicator() {
+    const el = document.getElementById('save-indicator');
+    if (!el) return;
+    el.textContent = t('savedLabel');
+    el.classList.add('show');
+    clearTimeout(flashSaveIndicator._t);
+    flashSaveIndicator._t = setTimeout(() => el.classList.remove('show'), 1100);
+}
+
+function saveGame() {
+    try {
+        localStorage.setItem(SAVE_KEY, JSON.stringify({
+            energy: game.energy,
+            totalEnergy: game.totalEnergy,
+            axonDensity: game.axonDensity,
+            myelinSpeed: game.myelinSpeed,
+            transmitter: game.transmitter,
+            singularityPoints: game.singularityPoints,
+            totalPrestiges: game.totalPrestiges,
+            genes: game.genes,
+            firstClick: game.firstClick,
+            tutorial: game.tutorial,
+            muted: game.muted,
+            displayEPS: game.displayEPS,
+            saveTime: Date.now()
+        }));
+        flashSaveIndicator();
+    } catch(e) {}
+}
+
+function loadGame() {
+    try {
+        const raw = localStorage.getItem(SAVE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        if (!data) return false;
+        // Restore scalar/runtime state only (not nodes/edges — rebuilt below)
+        game.energy = data.energy || 0;
+        game.totalEnergy = data.totalEnergy || 0;
+        game.axonDensity = data.axonDensity || 0;
+        game.myelinSpeed = data.myelinSpeed || 0;
+        game.transmitter = data.transmitter || 0;
+        game.singularityPoints = data.singularityPoints || 0;
+        game.totalPrestiges = data.totalPrestiges || 0;
+        if (data.genes) game.genes = Object.assign(game.genes, data.genes);
+        game.firstClick = !!data.firstClick;
+        if (data.tutorial) game.tutorial = Object.assign({ step: 0, done: false }, data.tutorial);
+        game.muted = !!data.muted;
+        game.displayEPS = data.displayEPS || 0;
+
+        // Rebuild the network to match saved upgrade levels
+        rebuildNetworkFromState();
+
+        // Hide initial click hint if already clicked before
+        if (game.firstClick) document.getElementById('click-hint').classList.add('hidden');
+
+        // Offline progress: award 50% of current EPS for elapsed time (capped)
+        if (data.saveTime) {
+            const offlineMs = Math.min(Date.now() - data.saveTime, MAX_OFFLINE_MS);
+            const offlineSec = Math.max(0, offlineMs / 1000);
+            if (offlineSec > 30) { // only show notice if away for more than 30s
+                const eps = calculateEPS();
+                const offlineGain = Math.floor(eps * offlineSec * 0.5);
+                if (offlineGain > 0) {
+                    game.energy += offlineGain;
+                    game.totalEnergy += offlineGain;
+                    showOfflineNotice(offlineGain, offlineSec);
+                }
+            }
+        }
+
+        applyMuteState();
+        return true;
+    } catch(e) { return false; }
+}
+
+// Reconstruct the neural network so it reflects saved axon density
+function rebuildNetworkFromState() {
+    buildInitialGraph();
+    const savedAxon = game.axonDensity;
+    game.axonDensity = 0;
+    for (let i = 0; i < savedAxon; i++) {
+        if (game.nodes.length >= MAX_NODES) break;
+        // buyAxon() reads cost from game.energy, but we don't want to spend energy on rebuild.
+        // Temporarily grant enough energy, then restore it.
+        const realEnergy = game.energy;
+        game.energy = Infinity;
+        buyAxon();
+        game.energy = realEnergy;
+    }
+    game.axonDensity = savedAxon;
+}
+
+function showOfflineNotice(gain, seconds) {
+    const modal = document.getElementById('offline-notice');
+    document.getElementById('offline-title').textContent = t('offlineTitle');
+    document.getElementById('offline-body').textContent = t('offlineBody');
+    document.getElementById('offline-gain').textContent = '◈ ' + fmt(gain);
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    let timeStr = '';
+    if (h > 0) timeStr += h + 'h ';
+    if (m > 0 || h > 0) timeStr += m + 'm ';
+    timeStr += s + 's';
+    document.getElementById('offline-time').textContent = t('offlineTime') + ': ' + timeStr;
+    document.getElementById('offline-collect').textContent = t('offlineCollect');
+    modal.classList.add('show');
 }
 
 // ===== RENDERING =====
@@ -1422,6 +1878,77 @@ function drawImpulses(dt) {
     }
 }
 
+// ===== TUTORIAL =====
+function updateTutorial() {
+    if (game.tutorial.done) return;
+    // Veterans who have already rebirthed never need the tutorial
+    if (game.totalPrestiges > 0) { game.tutorial.step = 6; game.tutorial.done = true; }
+    const box = document.getElementById('tutorial-box');
+    const txt = document.getElementById('tutorial-text');
+    const step = game.tutorial.step;
+    // Advance conditions for each step
+    if (step === 0 && game.firstClick) game.tutorial.step = 1;
+    else if (step === 1 && game.totalEnergy >= 80) game.tutorial.step = 2;
+    else if (step === 2 && game.axonDensity > 0) game.tutorial.step = 3;
+    else if (step === 3 && game.totalEnergy >= 500) game.tutorial.step = 4;
+    else if (step === 4 && game.totalEnergy >= 10000) game.tutorial.step = 5;
+    else if (step === 5 && game.totalPrestiges > 0) { game.tutorial.step = 6; game.tutorial.done = true; }
+
+    if (game.tutorial.done) {
+        box.classList.add('hidden');
+        return;
+    }
+    // Step 0 is handled by the existing center click-hint; show the tutorial box from step 1 onward
+    if (game.tutorial.step === 0) {
+        box.classList.add('hidden');
+        return;
+    }
+    txt.textContent = t('tutorial' + game.tutorial.step);
+    document.getElementById('tutorial-close').textContent = t('tutorialGotIt');
+    box.classList.remove('hidden');
+}
+
+function dismissTutorial() {
+    game.tutorial.done = true;
+    document.getElementById('tutorial-box').classList.add('hidden');
+}
+
+// ===== HELP PANEL =====
+function openHelp() {
+    document.getElementById('help-title').textContent = t('helpTitle');
+    const body = document.getElementById('help-body');
+    body.innerHTML =
+        '<p>' + t('help1') + '</p>' +
+        '<p>' + t('help2') + '</p>' +
+        '<p>' + t('help3') + '</p>' +
+        '<p>' + t('help4') + '</p>' +
+        '<p>' + t('help5') + '</p>' +
+        '<p>' + t('help6') + '</p>';
+    document.getElementById('help-close-btn').textContent = t('helpClose');
+    document.getElementById('help-modal').classList.add('show');
+}
+
+function closeHelp() {
+    document.getElementById('help-modal').classList.remove('show');
+}
+
+// ===== PRESTIGE CONFIRM =====
+let pendingPrestige = false;
+function openPrestigeConfirm() {
+    if (!canPrestige()) return;
+    document.getElementById('confirm-title').textContent = t('rebirth');
+    document.getElementById('confirm-body').textContent = t('prestigeConfirm');
+    document.getElementById('confirm-yes').textContent = t('confirmYes');
+    document.getElementById('confirm-no').textContent = t('confirmNo');
+    document.getElementById('confirm-modal').classList.add('show');
+    pendingPrestige = true;
+}
+function closePrestigeConfirm(confirmed) {
+    document.getElementById('confirm-modal').classList.remove('show');
+    pendingPrestige = false;
+    if (confirmed) doPrestige();
+}
+
 // ===== UI UPDATE =====
 function updateUI() {
     // Energy
@@ -1486,7 +2013,7 @@ function updateUI() {
     // Prestige
     document.getElementById('sp-label').textContent = t('singularity');
     document.getElementById('sp-value').textContent = game.singularityPoints;
-    document.getElementById('prestige-name').textContent = t('consciousness');
+    document.getElementById('prestige-name').textContent = t('rebirth');
     document.getElementById('prestige-desc').textContent = t('prestigeDesc');
     const gain = prestigeGain();
     const pGainEl = document.getElementById('prestige-gain');
@@ -1498,6 +2025,11 @@ function updateUI() {
         pGainEl.textContent = t('prestigeReq');
         pBtn.className = 'disabled';
     }
+    // Prestige progress bar (totalEnergy / 1M)
+    const progPct = Math.min(100, (game.totalEnergy / PRESTIGE_REQ) * 100);
+    document.getElementById('prestige-progress-fill').style.width = progPct + '%';
+    document.getElementById('prestige-progress-cur').textContent = fmt(game.totalEnergy) + ' / ' + fmt(PRESTIGE_REQ);
+    document.getElementById('prestige-progress-pct').textContent = progPct.toFixed(1) + '%';
 
     // Genes
     document.getElementById('gene-shop-title').textContent = t('genes');
@@ -1546,7 +2078,7 @@ document.getElementById('btn-transmitter').addEventListener('click', () => {
     if (game.energy >= getTransCost()) buyTransmitter();
 });
 document.getElementById('btn-prestige').addEventListener('click', () => {
-    if (canPrestige()) doPrestige();
+    if (canPrestige()) openPrestigeConfirm();
 });
 
 document.querySelectorAll('.gene-btn').forEach(btn => {
@@ -1559,7 +2091,37 @@ document.querySelectorAll('.gene-btn').forEach(btn => {
 document.getElementById('lang-toggle').addEventListener('click', () => {
     lang = lang === 'en' ? 'zh' : 'en';
     updateUI();
+    applyMuteState(); // refresh mute button title language
+    updateHelpIfOpen();
 });
+
+// New UI event listeners
+document.getElementById('btn-help').addEventListener('click', openHelp);
+document.getElementById('help-close-btn').addEventListener('click', closeHelp);
+document.getElementById('help-modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closeHelp();
+});
+document.getElementById('btn-mute').addEventListener('click', toggleMute);
+document.getElementById('tutorial-close').addEventListener('click', dismissTutorial);
+
+document.getElementById('confirm-yes').addEventListener('click', () => closePrestigeConfirm(true));
+document.getElementById('confirm-no').addEventListener('click', () => closePrestigeConfirm(false));
+document.getElementById('confirm-modal').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) closePrestigeConfirm(false);
+});
+
+document.getElementById('offline-collect').addEventListener('click', () => {
+    document.getElementById('offline-notice').classList.remove('show');
+});
+document.getElementById('offline-notice').addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) document.getElementById('offline-notice').classList.remove('show');
+});
+
+// Update help modal text live if it's currently open (e.g. on language switch)
+function updateHelpIfOpen() {
+    const modal = document.getElementById('help-modal');
+    if (modal.classList.contains('show')) openHelp();
+}
 
 // ===== GAME LOOP =====
 let lastTime = performance.now();
@@ -1600,6 +2162,7 @@ function loop(now) {
 
     // UI
     updateUI();
+    updateTutorial();
 
     requestAnimationFrame(loop);
 }
@@ -1607,7 +2170,22 @@ function loop(now) {
 // ===== INIT =====
 resize();
 buildInitialGraph();
+// Load saved progress (also rebuilds network + awards offline gains)
+const _loaded = loadGame();
+if (!_loaded) {
+    // No save: still honour any persisted mute preference
+    try { game.muted = localStorage.getItem(MUTE_KEY) === '1'; } catch(e) {}
+}
+applyMuteState();
 updateUI();
+// Auto-save every 10 seconds
+setInterval(saveGame, 10000);
+// Save when the page becomes hidden (tab switch / minimise)
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) saveGame();
+});
+// Save before unload as a safety net
+window.addEventListener('beforeunload', saveGame);
 requestAnimationFrame(loop);
 </script>
 </body>

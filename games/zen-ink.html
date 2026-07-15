@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <script id="i18n-script">
 (function(){
@@ -129,14 +129,19 @@
 html,body{margin:0!important;padding:0!important;overflow:hidden!important;width:100vw!important;height:100vh!important;}
 </style>
 <script id="auto-fit-script">
+/* zen-ink uses #stage canvas with position:fixed;inset:0 and its own resize() — no transform needed */
 (function(){
   function fitGame(){
-    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.body;
-    if(!stage)return;
+    var stage=document.querySelector('.stage')||document.querySelector('.game-wrap')||document.querySelector('#stage');
+    if(!stage||stage===document.body)return;
+    /* If the element is position:fixed and fills viewport, skip transform */
+    var cs=window.getComputedStyle(stage);
+    if(cs.position==='fixed'){return}
     var sw=stage.scrollWidth,sh=stage.scrollHeight;
     if(!sw||!sh)return;
     var vw=window.innerWidth,vh=window.innerHeight;
     var scale=Math.min(vw/sw,vh/sh);
+    if(scale>0.99&&scale<1.01)return;
     stage.style.transformOrigin='top left';
     stage.style.transform='scale('+scale+')';
     stage.style.position='absolute';
@@ -154,6 +159,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="Play Zen Ink - meditative ink painting idle game free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>半卷山水 · Half a Scroll</title>
 <style>
   :root{
@@ -241,6 +247,41 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
   <canvas id="stage"></canvas>
   <div id="intro">
     <h1>半卷山水</h1>
@@ -686,6 +727,8 @@ let state = {
   zen:0, totalZen:0, insp:0, shad:0, asc:0,
   upg:{permeate:0,flow:0,color:0,brush:0},
   autoBrush:false, muted:false,
+  seenShadeGuide:false, seenAscGuide:false,
+  achievements:{},
 };
 let lastSave = 0;
 function effect(){
@@ -730,8 +773,36 @@ function shadeReq(){ return 800; }
 function shadeGain(){ return Math.floor(Math.sqrt(state.totalZen/800)); }
 function ascReq(){ return 40000; }
 function ascGain(){ return Math.floor(Math.sqrt(state.totalZen/40000)); }
+
+/* prestige guide popup */
+function showGuide(type){
+  const isZh = LANG==='zh';
+  let title, body;
+  if(type==='shade'){
+    title = isZh? '积墨重叠' : 'Layered Wash';
+    body = isZh? 
+      '你已积累足够的禅意，可以"重画一张"。\n\n积墨重叠会重置当前禅意和画面，但获得永久的积墨层加成（每层+50%收益）。\n\n这是水墨修行的一部分——放下当前画卷，换取更深远的境界。' :
+      'You have enough Zen to "repaint".\n\nLayered Wash resets your current Zen and canvas, but grants permanent shading layers (+50% income each).\n\nThis is part of ink practice — let go of the current scroll to reach deeper realms.';
+  } else {
+    title = isZh? '灵感飞升' : 'Inspiration Ascension';
+    body = isZh?
+      '你的修为已至化境，可以飞升。\n\n灵感飞升重置一切（含积墨层），但获得灵感和自动画笔。\n\n灵感每点+12%扩散速度，自动画笔将自动滴墨，解放双手。' :
+      'Your practice has reached transcendence.\n\nAscension resets everything (including shading layers), but grants Inspiration and auto-brush.\n\nEach Inspiration +12% spread speed. Auto-brush drips ink automatically.';
+  }
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(20,18,14,0.7);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+  overlay.innerHTML = '<div style="background:#fcfaf2;border:1px solid #a88c5a;border-radius:4px;padding:32px 40px;max-width:440px;text-align:center;font-family:serif;">'
+    + '<div style="font-size:22px;color:#a8362c;letter-spacing:3px;margin-bottom:16px;">'+title+'</div>'
+    + '<div style="font-size:14px;color:#3a3228;line-height:1.8;white-space:pre-wrap;">'+body+'</div>'
+    + '<button id="guideClose" style="margin-top:20px;padding:8px 28px;border:1px solid #a88c5a;background:transparent;color:#3a3228;cursor:pointer;font-family:serif;font-size:14px;letter-spacing:2px;">'
+    + (isZh?'明白了':'Got it') + '</button></div>';
+  document.body.appendChild(overlay);
+  overlay.querySelector('#guideClose').onclick = function(){ overlay.remove(); };
+}
+
 function doShade(){
   if(state.totalZen < shadeReq()) return;
+  if(!state.seenShadeGuide){ state.seenShadeGuide = true; showGuide('shade'); save(); return; }
   const g = shadeGain(); if(g<=0) return;
   state.shad += g; resetRun();
   toast(LANG==='zh'?('+'+g+' 积墨层'):('+'+g+' layers'));
@@ -739,6 +810,7 @@ function doShade(){
 }
 function doAscend(){
   if(state.totalZen < ascReq()) return;
+  if(!state.seenAscGuide){ state.seenAscGuide = true; showGuide('asc'); save(); return; }
   const g = ascGain(); if(g<=0) return;
   state.insp += g; state.asc++; state.autoBrush = true; resetRun();
   toast(LANG==='zh'?('+'+g+' 灵感'):('+'+g+' inspiration'));
@@ -748,6 +820,26 @@ function resetRun(){
   state.zen=0; state.totalZen=0;
   activeDrops=[]; bakedDrops=[];
   generatePaper(); sceneryDirty=true; initScenery();
+}
+
+/* ---------- achievements ---------- */
+const ZEN_ACHIEVEMENTS = [
+  { id:'firstAwaken', name:{zh:'山水初醒',en:'First Awakening'}, desc:{zh:'唤醒第一处景物',en:'Awaken first scenery'}, check:()=>scenery.some(s=>s.awakened) },
+  { id:'allAwaken', name:{zh:'万象皆醒',en:'All Awakened'}, desc:{zh:'唤醒所有景物',en:'Awaken all scenery'}, check:()=>scenery.length>0 && scenery.every(s=>s.awakened) },
+  { id:'shade1', name:{zh:'初积墨',en:'First Wash'}, desc:{zh:'首次积墨重叠',en:'First Layered Wash'}, check:()=>state.shad>0 },
+  { id:'asc1', name:{zh:'飞升',en:'Ascended'}, desc:{zh:'首次灵感飞升',en:'First Ascension'}, check:()=>state.asc>0 },
+  { id:'zen10k', name:{zh:'万禅',en:'Ten Thousand Zen'}, desc:{zh:'累计10,000禅意',en:'10,000 total Zen'}, check:()=>state.totalZen>=10000 },
+  { id:'shade5', name:{zh:'五层积墨',en:'Five Layers'}, desc:{zh:'5层积墨',en:'5 shading layers'}, check:()=>state.shad>=5 },
+];
+function checkZenAchievements(){
+  ZEN_ACHIEVEMENTS.forEach(ach=>{
+    if(state.achievements[ach.id]) return;
+    if(ach.check()){
+      state.achievements[ach.id] = true;
+      toast('★ ' + ach.name[LANG==='zh'?'zh':'en']);
+      Audio.chime();
+    }
+  });
 }
 
 /* ---------- input ---------- */
@@ -885,6 +977,7 @@ function loop(now){
   updateAuto(dt);
   state.zen += zenPerSec()*dt;
   state.totalZen += zenPerSec()*dt;
+  checkZenAchievements();
   render();
   updateHUD();
   if(now-lastSave>4000){ save(); lastSave=now; }
@@ -1018,6 +1111,8 @@ function load(){
     state.zen=d.zen||0; state.totalZen=d.totalZen||0; state.insp=d.insp||0;
     state.shad=d.shad||0; state.asc=d.asc||0;
     state.autoBrush=!!d.autoBrush; state.muted=!!d.muted;
+    state.seenShadeGuide=!!d.seenShadeGuide; state.seenAscGuide=!!d.seenAscGuide;
+    state.achievements=d.achievements||{};
     state.upg=Object.assign({permeate:0,flow:0,color:0,brush:0}, d.upg||{});
     if(d.baked) bakedDrops=d.baked;
     if(d.sc && d.sc.length===scenery.length){

@@ -150,6 +150,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Event Horizon - bite-sized cosmic idle game free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>Bite-sized Cosmos · 一口一个宇宙</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -512,6 +513,41 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
 <canvas id="game"></canvas>
 
 <div id="coords">
@@ -644,7 +680,8 @@ const game = {
   upgrades: { wave: 0, grav: 0, dark: 0, accretion: 0 },
   rippleCooldown: 0,
   autoEmit: false,
-  prestigeThreshold: 3000
+  prestigeThreshold: 3000,
+  achievements: {}
 };
 
 // ==================== Canvas ====================
@@ -702,6 +739,9 @@ function spawnParticle() {
   else if (r < 0.88) type = 'dust';
   else type = 'meteor';
 
+  // 10% chance of "rogue" particle that tries to escape
+  const isRogue = Math.random() < 0.10;
+
   const def = PARTICLE_TYPES[type];
   // Aim somewhere near center (with offset so they don't all hit dead-center)
   const tx = CX + (Math.random() - 0.5) * 250;
@@ -716,7 +756,9 @@ function spawnParticle() {
     vy: (dy / d) * sp,
     type, mass: def.mass, size: def.size, color: def.color,
     captured: false,
-    angle: 0, stretch: 1, age: 0
+    angle: 0, stretch: 1, age: 0,
+    rogue: isRogue,
+    escapeBoost: 0
   });
 }
 
@@ -989,6 +1031,7 @@ function saveGame() {
       totalCollected: game.totalCollected,
       upgrades: game.upgrades,
       autoEmit: game.autoEmit,
+      achievements: game.achievements,
       lang: lang
     }));
   } catch(e) {}
@@ -1003,6 +1046,7 @@ function loadGame() {
     if (typeof d.totalCollected === 'number') game.totalCollected = d.totalCollected;
     if (d.upgrades) game.upgrades = Object.assign(game.upgrades, d.upgrades);
     if (typeof d.autoEmit === 'boolean') game.autoEmit = d.autoEmit;
+    if (d.achievements) game.achievements = Object.assign({}, d.achievements);
     if (d.lang) lang = d.lang;
   } catch(e) {}
 }
@@ -1044,6 +1088,79 @@ document.addEventListener('keydown', (e) => {
 let lastTime = performance.now();
 let spawnTimer = 0;
 
+// ==================== Celestial Events ====================
+let eventTimer = 25000; // first event at 25s
+let activeEvent = null;
+const EVENT_TYPES = [
+  {
+    id: 'flyby', name: { en: 'STELLAR FLYBY', zh: '恒星掠过' },
+    desc: { en: 'A passing star boosts gravity!', zh: '路过的恒星增强了引力！' },
+    duration: 8000, effect: 'gravityBoost'
+  },
+  {
+    id: 'supernova', name: { en: 'SUPERNOVA', zh: '超新星爆发' },
+    desc: { en: 'Massive particle burst incoming!', zh: '大量粒子涌入！' },
+    duration: 3000, effect: 'particleBurst'
+  },
+  {
+    id: 'anomaly', name: { en: 'GRAVITY ANOMALY', zh: '引力异常' },
+    desc: { en: 'Gravity weakened temporarily', zh: '引力暂时减弱' },
+    duration: 6000, effect: 'gravityWeak'
+  }
+];
+
+function triggerEvent() {
+  const evt = EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)];
+  activeEvent = { ...evt, elapsed: 0 };
+  showToast(evt.name[lang] + ' — ' + evt.desc[lang], 3000);
+  if (evt.effect === 'particleBurst') {
+    for (let i = 0; i < 25; i++) setTimeout(() => spawnParticle(), i * 80);
+  }
+}
+
+function updateEvent(dt) {
+  if (!activeEvent) {
+    eventTimer -= dt;
+    if (eventTimer <= 0) {
+      triggerEvent();
+      eventTimer = 30000 + Math.random() * 20000;
+    }
+    return;
+  }
+  activeEvent.elapsed += dt;
+  if (activeEvent.elapsed >= activeEvent.duration) {
+    activeEvent = null;
+  }
+}
+
+function getEventGravityMul() {
+  if (!activeEvent) return 1;
+  if (activeEvent.effect === 'gravityBoost') return 2.0;
+  if (activeEvent.effect === 'gravityWeak') return 0.4;
+  return 1;
+}
+
+// ==================== Achievements ====================
+const ACHIEVEMENTS = [
+  { id: 'first', threshold: 100, name: { en: 'First Light', zh: '初光' }, desc: { en: 'Reach 100 mass', zh: '质量达到100' } },
+  { id: 'centurion', threshold: 1000, name: { en: 'Centurion', zh: '百倍' }, desc: { en: 'Reach 1,000 mass', zh: '质量达到1,000' } },
+  { id: 'massive', threshold: 10000, name: { en: 'Massive', zh: '巨质' }, desc: { en: 'Reach 10,000 mass', zh: '质量达到10,000' } },
+  { id: 'void', threshold: 100000, name: { en: 'Void Lord', zh: '虚空之主' }, desc: { en: 'Reach 100,000 mass', zh: '质量达到100,000' } },
+  { id: 'prestige1', threshold: 1, name: { en: 'Warp Pioneer', zh: '跃迁先驱' }, desc: { en: 'First collapse', zh: '首次塌缩' }, check: () => game.voidCrystals >= 1 },
+  { id: 'prestige5', threshold: 5, name: { en: 'Singularity', zh: '奇点' }, desc: { en: '5 void crystals', zh: '5颗虚空晶体' }, check: () => game.voidCrystals >= 5 }
+];
+
+function checkAchievements() {
+  ACHIEVEMENTS.forEach(ach => {
+    if (game.achievements[ach.id]) return;
+    const met = ach.check ? ach.check() : game.mass >= ach.threshold;
+    if (met) {
+      game.achievements[ach.id] = true;
+      showToast('★ ' + ach.name[lang] + ' — ' + ach.desc[lang], 3000);
+    }
+  });
+}
+
 function update(dt) {
   // Spawn
   spawnTimer -= dt;
@@ -1051,6 +1168,12 @@ function update(dt) {
     spawnParticle();
     spawnTimer = 350 + Math.random() * 250;
   }
+
+  // Celestial events
+  updateEvent(dt);
+
+  // Check achievements
+  checkAchievements();
 
   // Cooldown
   if (game.rippleCooldown > 0) {
@@ -1067,7 +1190,7 @@ function update(dt) {
     game.mass += getDarkMatterRate() * (dt / 1000);
   }
 
-  const G = getG();
+  const G = getG() * getEventGravityMul();
   const range = getRange();
   const ehr = getEventHorizonRadius();
   const timeScale = dt / 16.67;
@@ -1088,6 +1211,16 @@ function update(dt) {
       a = Math.min(a, 4); // clamp to prevent insane slingshot
       p.vx += (dx / r) * a * timeScale;
       p.vy += (dy / r) * a * timeScale;
+    }
+
+    // Rogue particle escape: at 60%+ of range, boost outward velocity
+    if (p.rogue && r > range * 0.6 && r < range) {
+      const escapeForce = 0.08 * timeScale;
+      p.vx -= (dx / r) * escapeForce;
+      p.vy -= (dy / r) * escapeForce;
+      p.escapeBoost = 1; // visual flag
+    } else {
+      p.escapeBoost = Math.max(0, p.escapeBoost - 0.02);
     }
 
     // Cosmic drag (very subtle)

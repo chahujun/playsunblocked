@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <script id="i18n-script">
 (function(){
@@ -188,6 +188,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Alchemical Leak - fluid sandbox rogue-lite free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>BREACH / 罐区失守</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
@@ -393,6 +394,12 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     0%,100%{box-shadow:inset 0 0 60px 10px rgba(239,68,68,0.25);}
     50%{box-shadow:inset 0 0 120px 30px rgba(239,68,68,0.5);}
   }
+  /* 低血量生命条闪烁 */
+  .bar.hp .inner.urgent{ animation:hpBarFlash 0.55s ease-in-out infinite; }
+  @keyframes hpBarFlash{
+    0%,100%{ filter:brightness(1); box-shadow:0 0 0 rgba(239,68,68,0); }
+    50%{ filter:brightness(1.9); box-shadow:0 0 10px rgba(239,68,68,1); }
+  }
   /* Boss 血条 */
   #bossBar{
     position:absolute;left:50%;top:54px;transform:translateX(-50%);
@@ -409,6 +416,41 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
 <div id="device">
   <div id="bezel">
     <div id="nameplate">
@@ -458,7 +500,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
       <div id="banner"></div>
       <div id="lowHpVignette"></div>
-      <div id="bossBar"><div class="lbl" id="bossLbl">☣ HEAVY UNIT</div><div class="bar"><div class="inner" id="bossInner" style="width:100%"></div></div></div>
+      <div id="bossBar"><div class="lbl" id="bossLbl">☣ 重型单位</div><div class="bar"><div class="inner" id="bossInner" style="width:100%"></div></div></div>
 
       <div id="overlay">
         <h1 id="ovTitle">罐区失守</h1>
@@ -510,7 +552,17 @@ const I18N = {
     buy:"BUY", owned:"OWNED", cant:"NOT ENOUGH",
     cur:"Cur:", dustUnit:"dust", leave:"LEAVE", descend:"DESCEND",
     bossWarn:"!! HEAVY UNIT DETECTED !!",
-    burning:"BURNING", shocked:"SHOCKED", melted:"MELTING"
+    bossLabel:"☣ HEAVY UNIT",
+    burning:"BURNING", shocked:"SHOCKED", melted:"MELTING",
+    hintMove:"Click to splash reagent · 1/2/3 to switch",
+    hintSplash:"Water conducts electricity · Oil burns in fire · Acid corrodes metal",
+    hintKill:"Collect organic dust",
+    hintPass:"Permit found! Head to the bulkhead door",
+    reactOilFire:"Oil ignited!",
+    reactWaterConduct:"Water conducts!",
+    reactAcid:"Acid corrosion!",
+    paused:"PAUSED",
+    pauseHint:"Press P / ESC to resume"
   },
   zh:{
     title:"罐区失守", sub:"罐区失守",
@@ -536,7 +588,17 @@ const I18N = {
     buy:"购买", owned:"已购", cant:"尘埃不足",
     cur:"现：", dustUnit:"尘埃", leave:"离开", descend:"进入下一层",
     bossWarn:"！！检测到重型单位！！",
-    burning:"燃烧中", shocked:"触电中", melted:"腐蚀中"
+    bossLabel:"☣ 重型单位",
+    burning:"燃烧中", shocked:"触电中", melted:"腐蚀中",
+    hintMove:"拖拽鼠标泼洒试剂 · 1/2/3 切换",
+    hintSplash:"水导电灭火 · 原油遇火燃烧 · 强酸腐蚀铁门",
+    hintKill:"收集有机尘埃",
+    hintPass:"找到通行证！前往隔断门",
+    reactOilFire:"原油燃烧！",
+    reactWaterConduct:"水导电！",
+    reactAcid:"酸腐蚀！",
+    paused:"已暂停",
+    pauseHint:"按 P / ESC 继续"
   }
 };
 let LANG = new URLSearchParams(window.location.search).get('lang') || 'zh';
@@ -568,6 +630,7 @@ let grid = [];        // grid[y][x] = {type, liquid, lqAmt, fire, elec, gas, hp}
 let gens = [];        // 发电机 {x,y}
 let passPos=null, doorPos=null, vendPos=null;
 let passPicked=false;
+let exploredMap = []; // exploredMap[y][x] = 是否已探索（小地图迷雾用）
 
 function makeCell(type){
   return {type, liquid:L_NONE, lqAmt:0, fire:0, elec:0, gas:0, hp: wallHP(type)};
@@ -591,10 +654,13 @@ function isWalkable(x,y){
 const rooms = [];
 function genLevel(levelNum){
   grid = []; rooms.length=0; gens=[]; passPicked=false;
+  exploredMap=[];
   for(let y=0;y<MAP_H;y++){
     const row=[];
-    for(let x=0;x<MAP_W;x++) row.push(makeCell(T_WALL));
+    const erow=[];
+    for(let x=0;x<MAP_W;x++){ row.push(makeCell(T_WALL)); erow.push(false); }
     grid.push(row);
+    exploredMap.push(erow);
   }
   // 随机房间
   const rc = 6 + Math.min(levelNum, 4);
@@ -785,6 +851,7 @@ function updateFluids(){
         if(c.liquid===L_OIL){
           c.fire = Math.min(100, c.fire+18);
           c.lqAmt -= 6; if(c.lqAmt<=0){c.lqAmt=0;c.liquid=L_NONE;}
+          if(!seenOilFire){ seenOilFire=true; showHint(t('reactOilFire'),180); }
           // 火粒子
           if(Math.random()<0.6) spawnParticle(x*TILE+TILE/2, y*TILE+TILE/2, 'fire');
         }
@@ -815,11 +882,13 @@ function updateFluids(){
             const n=idx(x+dx,y+dy);
             if(n && n.liquid===L_WATER && n.elec<5){ n.elec = 6; }
           }
+          if(!seenWaterConduct){ seenWaterConduct=true; showHint(t('reactWaterConduct'),180); }
         }
         if(c.elec<=0) c.elec=0;
       }
       // 酸腐蚀
       if(c.liquid===L_ACID && c.lqAmt>3){
+        if((c.type===T_WOOD||c.type===T_IRON) && !seenAcidCorrode){ seenAcidCorrode=true; showHint(t('reactAcid'),180); }
         if(c.type===T_WOOD){ c.hp-=0.8; if(Math.random()<0.3) spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'bubble'); }
         else if(c.type===T_IRON){ c.hp-=0.4; if(Math.random()<0.3) spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'bubble'); }
         if(c.hp<=0 && (c.type===T_WOOD||c.type===T_IRON)){ c.type=T_FLOOR; spawnParticle(x*TILE+TILE/2,y*TILE+TILE/2,'smoke'); }
@@ -894,7 +963,7 @@ function updatePlayer(){
   movePlayerAxis(player.vx,0);
   movePlayerAxis(0,player.vy);
   // 移动残影
-  if((mx||my) && (performance.now()-(player._lastTrail||0)>60){
+  if((mx||my) && (performance.now()-(player._lastTrail||0)>60)){
     player.trail.push({x:player.x,y:player.y,life:14});
     player._lastTrail=performance.now();
     if(player.trail.length>6) player.trail.shift();
@@ -911,6 +980,14 @@ function updatePlayer(){
   // 站在火/电/酸/毒格上受伤
   const gx = Math.floor(player.x/TILE), gy=Math.floor(player.y/TILE);
   const c=idx(gx,gy);
+  // 标记探索过的格子（视野半径，用于小地图迷雾）
+  for(let dy=-4;dy<=4;dy++){
+    for(let dx=-4;dx<=4;dx++){
+      if(dx*dx+dy*dy>18) continue;
+      const ex=gx+dx, ey=gy+dy;
+      if(ex>=0&&ex<MAP_W&&ey>=0&&ey<MAP_H) exploredMap[ey][ex]=true;
+    }
+  }
   if(c){
     if(c.fire>5 && player.hurtCd<=0){ damagePlayer(6,'fire'); }
     if(c.elec>0 && c.liquid===L_WATER && player.hurtCd<=0){ damagePlayer(4,'shock'); player.shocked=20; }
@@ -927,6 +1004,7 @@ function updatePlayer(){
       passPicked=true;
       showBanner(t('foundPass'),1800);
       sfx('pickup');
+      if(!tutFlags.gotPass){ tutFlags.gotPass=true; showHint(t('hintPass'),240); }
     }
   }
   // 接触门
@@ -1026,6 +1104,7 @@ function spray(){
       if(n&&n.elec>0){ c.elec=6; break; }
     }
   }
+  if(!tutFlags.splashed){ tutFlags.splashed=true; showHint(t('hintSplash'),240); }
   sfx('spray');
 }
 
@@ -1036,9 +1115,10 @@ function updateEnemies(){
     if(e.hp<=0){
       // 死亡
       player.dust += (e.type==='boss'?50:(e.type==='sentry'?8:12));
-      spawnFloat(e.x,e.y,'+'+(e.type==='boss'?50:(e.type==='sentry'?8:12))+' dust','#fbbf24');
+      spawnFloat(e.x,e.y,'+'+(e.type==='boss'?50:(e.type==='sentry'?8:12))+' '+t('dustUnit'),'#fbbf24');
       for(let k=0;k<14;k++) spawnParticle(e.x,e.y,'blood');
       sfx('kill');
+      if(!tutFlags.killed){ tutFlags.killed=true; showHint(t('hintKill'),210); }
       enemies.splice(i,1);
       continue;
     }
@@ -1356,6 +1436,10 @@ function render(){
   drawLighting(x0,x1,y0,y1);
   // 小地图
   drawMinimap();
+  // 教程/反应提示
+  drawHint();
+  // 暂停遮罩
+  if(paused) drawPauseOverlay();
 }
 function drawLighting(x0,x1,y0,y1){
   // 全屏暗色覆盖，再用 destination-out 挖出光圈
@@ -1398,6 +1482,7 @@ function drawLighting(x0,x1,y0,y1){
   ctx.restore();
 }
 function drawMinimap(){
+  if(!exploredMap||!exploredMap.length) return;
   const mw=120, mh=Math.floor(mw*MAP_H/MAP_W);
   const mx=W-mw-12, my=H-mh-28;
   ctx.save();
@@ -1406,30 +1491,44 @@ function drawMinimap(){
   ctx.strokeStyle='rgba(126,224,138,0.4)'; ctx.lineWidth=1;
   ctx.strokeRect(mx-3,my-3,mw+6,mh+6);
   const sx=mw/MAP_W, sy=mh/MAP_H;
-  // 地图格子
+  // 当前所在房间（用于高亮）
+  const pgx=Math.floor(player.x/TILE), pgy=Math.floor(player.y/TILE);
+  let curRoom=null;
+  for(const r of rooms){
+    if(pgx>=r.x&&pgx<r.x+r.w&&pgy>=r.y&&pgy<r.y+r.h){ curRoom=r; break; }
+  }
+  // 仅绘制已探索的格子（迷雾）
   for(let y=0;y<MAP_H;y++){
     for(let x=0;x<MAP_W;x++){
+      if(!exploredMap[y][x]) continue;
       const c=grid[y][x];
       if(c.type===T_FLOOR||c.type===T_WOOD||c.type===T_IRON||c.type===T_DOOR){
-        ctx.fillStyle = c.type===T_DOOR?'#fbbf24':'#1e3a28';
+        const inCur = curRoom && x>=curRoom.x && x<curRoom.x+curRoom.w && y>=curRoom.y && y<curRoom.y+curRoom.h;
+        ctx.fillStyle = inCur ? 'rgba(126,224,138,0.95)' : 'rgba(150,160,150,0.4)';
         ctx.fillRect(mx+x*sx, my+y*sy, Math.ceil(sx), Math.ceil(sy));
       }
       if(c.fire>5){ ctx.fillStyle='#fb923c'; ctx.fillRect(mx+x*sx, my+y*sy, Math.ceil(sx), Math.ceil(sy)); }
     }
   }
-  // 通行证
-  if(!passPicked && passPos){
+  // 出口门：绿点（探索后显示）
+  if(doorPos && exploredMap[doorPos.y] && exploredMap[doorPos.y][doorPos.x]){
+    ctx.fillStyle='#4ade80';
+    ctx.fillRect(mx+doorPos.x*sx-1, my+doorPos.y*sy-1, 4, 4);
+  }
+  // 通行证：黄点（发现后显示，未拾取时）
+  if(!passPicked && passPos && exploredMap[passPos.y] && exploredMap[passPos.y][passPos.x]){
     ctx.fillStyle='#fbbf24';
-    ctx.fillRect(mx+passPos.x*sx-1, my+passPos.y*sy-1, 3, 3);
+    ctx.fillRect(mx+passPos.x*sx-1, my+passPos.y*sy-1, 4, 4);
   }
-  // 玩家
-  ctx.fillStyle='#7ee08a';
+  // Boss：红点（Boss 层且 Boss 存在时）
+  const boss = enemies.find(e=>e.type==='boss');
+  if(boss){
+    ctx.fillStyle='#ef4444';
+    ctx.fillRect(mx+(boss.x/TILE)*sx-1, my+(boss.y/TILE)*sy-1, 4, 4);
+  }
+  // 玩家：白点
+  ctx.fillStyle='#ffffff';
   ctx.fillRect(mx+(player.x/TILE)*sx-1, my+(player.y/TILE)*sy-1, 3, 3);
-  // 敌人
-  ctx.fillStyle='#ef4444';
-  for(const e of enemies){
-    ctx.fillRect(mx+(e.x/TILE)*sx-0.5, my+(e.y/TILE)*sy-0.5, 2, 2);
-  }
   ctx.restore();
 }
 function drawCell(c,gx,gy){
@@ -1718,6 +1817,7 @@ function updateHUD(){
   // 低血量红边
   const lowHp = player.alive && player.hp>0 && player.hp/player.maxHp < 0.3;
   document.getElementById('lowHpVignette').classList.toggle('warn', lowHp);
+  document.getElementById('hpBar').classList.toggle('urgent', lowHp);
   // Boss 血条
   const boss = enemies.find(e=>e.type==='boss');
   const bb = document.getElementById('bossBar');
@@ -1740,6 +1840,44 @@ function updateBanner(){
   if(bannerTimer>0){ bannerTimer--; if(bannerTimer<=0){ document.getElementById('banner').style.opacity='0'; } }
 }
 
+/* ---------- 15b. 教程提示 / 反应提示 / 暂停 ---------- */
+let hintTimer=0, hintTxt='';
+let tutFlags={ splashed:false, killed:false, gotPass:false };
+let seenOilFire=false, seenWaterConduct=false, seenAcidCorrode=false;
+let paused=false;
+function showHint(txt,dur){ hintTxt=txt; hintTimer=dur; }
+function updateHint(){ if(hintTimer>0) hintTimer--; }
+function drawHint(){
+  if(hintTimer<=0||!hintTxt) return;
+  let a=1; if(hintTimer<30) a=hintTimer/30;       // 末尾 0.5 秒淡出
+  ctx.save();
+  ctx.globalAlpha=a;
+  ctx.textAlign='center';
+  ctx.font='13px Share Tech Mono';
+  const tw=ctx.measureText(hintTxt).width;
+  const bx=W/2, by=H-50;
+  ctx.fillStyle='rgba(5,12,8,0.88)';
+  ctx.fillRect(bx-tw/2-14, by-15, tw+28, 24);
+  ctx.strokeStyle='rgba(126,224,138,0.5)'; ctx.lineWidth=1;
+  ctx.strokeRect(bx-tw/2-14, by-15, tw+28, 24);
+  ctx.fillStyle='#7ee08a';
+  ctx.fillText(hintTxt, bx, by+1);
+  ctx.restore();
+}
+function drawPauseOverlay(){
+  ctx.save();
+  ctx.fillStyle='rgba(5,12,8,0.6)';
+  ctx.fillRect(0,0,W,H);
+  ctx.textAlign='center';
+  ctx.fillStyle='rgba(251,191,36,0.92)';
+  ctx.font='46px VT323';
+  ctx.fillText(t('paused'), W/2, H/2-6);
+  ctx.fillStyle='rgba(126,224,138,0.7)';
+  ctx.font='13px Share Tech Mono';
+  ctx.fillText(t('pauseHint'), W/2, H/2+24);
+  ctx.restore();
+}
+
 /* ---------- 16. 游戏状态机 ---------- */
 const ST_TITLE=0, ST_PLAY=1, ST_SHOP=2, ST_DEAD=3, ST_WIN=4;
 let state=ST_TITLE;
@@ -1758,6 +1896,9 @@ function startGame(){
   player.selected=0;
   player.knockX=0; player.knockY=0; player.trail.length=0; player._lastTrail=0;
   shakeMag=0; shakeX=0; shakeY=0;
+  tutFlags={ splashed:false, killed:false, gotPass:false };
+  seenOilFire=false; seenWaterConduct=false; seenAcidCorrode=false;
+  paused=false; hintTimer=0; hintTxt='';
   try{
     enterLevel();
     state=ST_PLAY;
@@ -1782,6 +1923,8 @@ function enterLevel(){
   if(player.maxShield>0) player.shield=player.maxShield;
   spawnEnemies(r.startR);
   showBanner((LANG==='zh'?'第 ':'LEVEL ')+levelNum+(LANG==='zh'?' 层':''),1500);
+  // 第 1 层新手提示
+  if(levelNum===1) showHint(t('hintMove'),240);
 }
 function enterLevelNext(){
   levelNum++;
@@ -1900,7 +2043,7 @@ function showOverlay(o){
 /* ---------- 17. 主循环 ---------- */
 function tick(){
   try{
-    if(state===ST_PLAY){
+    if(state===ST_PLAY && !paused){
       updatePlayer();
       updateEnemies();
       updateProjectiles();
@@ -1908,11 +2051,12 @@ function tick(){
       updateParticles();
       updateFloats();
       ambientTick();
-    } else {
+      updateHint();
+    } else if(state!==ST_PLAY){
       updateParticles();
       updateFloats();
     }
-    updateBanner();
+    if(!paused) updateBanner();
     updateHUD();
     render();
   }catch(err){
@@ -1939,6 +2083,11 @@ window.addEventListener('keydown',e=>{
     const n=parseInt(k)-1;
     if(player.selected!==n){ player.selected=n; ensureAudio(); sfx('pickup'); }
   }
+  if((k==='p'||k==='escape') && state===ST_PLAY && !e.repeat){
+    paused=!paused;
+    ensureAudio(); sfx('pickup');
+    e.preventDefault();
+  }
   if(k==='escape' && state===ST_SHOP){ /* 不允许 ESC 退出 */ }
 });
 window.addEventListener('keyup',e=>{ keys[e.key.toLowerCase()]=false; });
@@ -1963,6 +2112,7 @@ function applyLang(){
   document.getElementById('lblDrip').textContent=t('dripSpeed');
   document.getElementById('lblHp').textContent=t('hp');
   document.getElementById('lblShield').textContent=t('shield');
+  document.getElementById('bossLbl').textContent=t('bossLabel');
   document.getElementById('hintL').innerHTML=t('hintL');
   document.getElementById('langToggle').textContent = LANG==='zh'?'EN':'中文';
   // 标题界面（纯单语，不再混杂另一语言）

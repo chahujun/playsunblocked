@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 
 <script id="i18n-script">
@@ -495,6 +495,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Void Shadow - stealth survival game free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>诡秘调查：虚空之影</title>
 <style>
 :root{
@@ -1212,7 +1213,7 @@ body::after{
   border-color:#5a3a3a;
 }
 .hand-card.slot-full::after{
-  content:"槽位满";position:absolute;top:50%;left:50%;
+  content:attr(data-label);position:absolute;top:50%;left:50%;
   transform:translate(-50%,-50%) rotate(-15deg);
   color:#8b0000;font-size:14px;font-weight:bold;
   text-shadow:0 0 4px #000;
@@ -1357,6 +1358,41 @@ body::after{
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
 <canvas id="fog-canvas"></canvas>
 <div id="app">
   <!-- 顶部工具栏 -->
@@ -3735,7 +3771,7 @@ function renderHand(){
     c.draggable=true;
     // 检查装备槽是否已满(同槽位装备最多2件)
     const slotFull = card.type==='asset'&&card.slot&&game.investigator.equipped.filter(e=>e.slot===card.slot).length>=2;
-    if(slotFull) c.classList.add('slot-full');
+    if(slotFull){c.classList.add('slot-full');c.setAttribute('data-label',currentLang==='en'?'Slots Full':'槽位满');}
     // 可用牌高亮:资源足够 + 阶段正确 + (装备无槽位满)
     const canPlay = game.phase==='investigation'&&game.investigator.actions>0&&
       card.cost<=game.investigator.resources&&!slotFull&&card.type!=='skill';
@@ -4087,7 +4123,7 @@ document.getElementById('btn-shortcuts').onclick=showShortcuts;
 document.getElementById('btn-lang').onclick=toggleLanguage;
 // 重开按钮
 document.getElementById('btn-restart').onclick=()=>{
-  if(confirm('确定重新开始游戏?当前进度将丢失。')){
+  if(confirm(t('restart_confirm'))){
     document.getElementById('ending-overlay').classList.add('hidden');
     document.getElementById('ending-grade').classList.add('hidden');
     document.getElementById('score-breakdown').classList.add('hidden');
@@ -4154,7 +4190,7 @@ window.addEventListener('keydown',(e)=>{
   }
   // R 键重开
   if(e.key==='r'||e.key==='R'){
-    if(confirm('确定重新开始?')){initGame();startMythosPhase();}
+    if(confirm(t('restart_confirm'))){initGame();startMythosPhase();}
   }
   // H 键查看规则
   if(e.key==='h'||e.key==='H'){showRules();}
