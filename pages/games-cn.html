@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" class="light" data-lang="cn">
 <head>
     <meta charset="UTF-8">
@@ -965,10 +965,10 @@
     var url = window.location.pathname;
     var query = window.location.search;
     var hash = window.location.hash;
-    if (url.indexOf('-en.html') !== -1) {
-      url = url.replace('-en.html', '-cn.html');
-    } else if (url.indexOf('-cn.html') !== -1) {
-      url = url.replace('-cn.html', '-en.html');
+    if (url.indexOf('-en') !== -1) {
+      url = url.replace(/-en(\.html)?$/, function(m, ext) { return '-cn' + (ext || ''); });
+    } else if (url.indexOf('-cn') !== -1) {
+      url = url.replace(/-cn(\.html)?$/, function(m, ext) { return '-en' + (ext || ''); });
     }
     window.location.href = url + query + hash;
   });
