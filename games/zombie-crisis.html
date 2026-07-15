@@ -114,6 +114,8 @@
     '狂暴': 'RAGE',
     '护盾': 'SHIELD',
     '急速': 'HASTE',
+    '隐身': 'CLOAK',
+    '狂热': 'FRENZY',
     '白天': 'DAY',
     '夜晚': 'NIGHT',
     '黄昏': 'DUSK',
@@ -943,6 +945,8 @@ const I18n = {
     rage: "RAGE",
     shield: "SHIELD",
     haste: "HASTE",
+    cloak: "CLOAK",
+    frenzy: "FRENZY",
     bestScore: "BEST: ",
     day: "DAY",
     night: "NIGHT",
@@ -956,19 +960,19 @@ const I18n = {
     silentDesc: "No warnings. Stay alert.",
     // Classes
     assault: "ASSAULT",
-    assaultDesc: "+25% damage, faster reload",
+    assaultDesc: "+20% dmg, fast reload | SPACE: Grenade",
     medic: "MEDIC",
-    medicDesc: "Regen HP, +1 mine slot",
+    medicDesc: "HP regen | SPACE: Med Kit (heal 35)",
     engineer: "ENGINEER",
-    engineerDesc: "Explosives +50% radius, +shield",
+    engineerDesc: "Explosives +30% | SPACE: Auto-Turret",
     scout: "SCOUT",
-    scoutDesc: "+20% speed, longer dash",
+    scoutDesc: "+15% speed, long dash | SPACE: Cloak",
     heavy: "HEAVY",
-    heavyDesc: "-20% damage taken, high HP",
+    heavyDesc: "-20% dmg taken, high HP | SPACE: Barricade",
     sniper: "SNIPER",
-    sniperDesc: "+25% crit, +50% crit dmg",
+    sniperDesc: "+25% crit, +50% crit dmg | SPACE: Pulse Strike",
     berserker: "BERSERKER",
-    berserkerDesc: "Lower HP = more damage",
+    berserkerDesc: "Low HP = more dmg | SPACE: Frenzy",
     // Weapons
     pistol: "PISTOL",
     hmg: "HMG",
@@ -1026,6 +1030,8 @@ const I18n = {
     rage: "狂暴",
     shield: "护盾",
     haste: "急速",
+    cloak: "隐身",
+    frenzy: "狂热",
     bestScore: "最佳: ",
     day: "白天",
     night: "夜晚",
@@ -1039,19 +1045,19 @@ const I18n = {
     silentDesc: "无预警。保持警惕。",
     // Classes
     assault: "突击兵",
-    assaultDesc: "伤害+25%，装弹更快",
+    assaultDesc: "伤害+20%，快速装弹 | 空格: 手雷",
     medic: "医护兵",
-    medicDesc: "生命回复，地雷上限+1",
+    medicDesc: "生命回复 | 空格: 医疗包(回血35)",
     engineer: "工程兵",
-    engineerDesc: "爆炸范围+50%，自带护盾",
+    engineerDesc: "爆炸+30% | 空格: 自动炮台",
     scout: "侦察兵",
-    scoutDesc: "速度+15%，冲刺更远",
+    scoutDesc: "速度+15%，冲刺远 | 空格: 隐身",
     heavy: "重装机兵",
-    heavyDesc: "受伤-20%，高血量+护盾",
+    heavyDesc: "受伤-20%，高血量 | 空格: 路障",
     sniper: "狙击手",
-    sniperDesc: "暴击+25%，暴伤+50%",
+    sniperDesc: "暴击+25%，暴伤+50% | 空格: 脉冲波",
     berserker: "狂战士",
-    berserkerDesc: "血量越低伤害越高",
+    berserkerDesc: "血越低伤害越高 | 空格: 狂热",
     // Weapons
     pistol: "手枪",
     hmg: "重机枪",
@@ -1390,7 +1396,7 @@ const player = {
   critChance: 0.15,
   critMult: 2,
   // Buffs
-  buffs: { rage: 0, shield: 0, haste: 0 },
+  buffs: { rage: 0, shield: 0, haste: 0, cloak: 0, frenzy: 0 },
   // Terrain
   inGrass: false,
   inWater: false,
@@ -1704,7 +1710,8 @@ const CLASSES = {
     secondWeapon: 'laser',
     startAmmo: { hmg: 20 },
     dashCooldownMult: 1.0,
-    passive: 'assault'
+    passive: 'assault',
+    spaceAbility: 'grenade'
   },
   medic: {
     name: 'medic', nameZh: '医护兵',
@@ -1718,7 +1725,8 @@ const CLASSES = {
     secondWeapon: 'homing',
     startAmmo: { flamethrower: 20 },
     dashCooldownMult: 1.0,
-    passive: 'medic'
+    passive: 'medic',
+    spaceAbility: 'medkit'
   },
   engineer: {
     name: 'engineer', nameZh: '工程兵',
@@ -1734,7 +1742,8 @@ const CLASSES = {
     dashCooldownMult: 1.0,
     passive: 'engineer',
     explosionMult: 1.3,
-    startShield: 15
+    startShield: 15,
+    spaceAbility: 'turret'
   },
   scout: {
     name: 'scout', nameZh: '侦察兵',
@@ -1749,7 +1758,8 @@ const CLASSES = {
     startAmmo: { rocket: 2 },
     dashCooldownMult: 0.7,
     dashSpeedMult: 1.3,
-    passive: 'scout'
+    passive: 'scout',
+    spaceAbility: 'cloak'
   },
   heavy: {
     name: 'heavy', nameZh: '重装机兵',
@@ -1765,7 +1775,8 @@ const CLASSES = {
     dashCooldownMult: 1.2,
     dashSpeedMult: 0.7,
     passive: 'heavy',
-    startShield: 10
+    startShield: 10,
+    spaceAbility: 'barricade'
   },
   sniper: {
     name: 'sniper', nameZh: '狙击手',
@@ -1779,7 +1790,8 @@ const CLASSES = {
     secondWeapon: 'railgun',
     startAmmo: { laser: 25 },
     dashCooldownMult: 0.9,
-    passive: 'sniper'
+    passive: 'sniper',
+    spaceAbility: 'pulse'
   },
   berserker: {
     name: 'berserker', nameZh: '狂战士',
@@ -1794,7 +1806,8 @@ const CLASSES = {
     startAmmo: { shotgun: 8 },
     dashCooldownMult: 0.8,
     dashSpeedMult: 1.2,
-    passive: 'berserker'
+    passive: 'berserker',
+    spaceAbility: 'frenzy'
   }
 };
 
@@ -1842,6 +1855,9 @@ const survivalHints = { hunger: false, thirst: false, stamina: false };
 let zombies = [];
 let bullets = [];
 let mines = [];
+let grenades = [];
+let barricades = [];
+let pulseWaves = [];
 let crates = [];
 let particles = [];
 let pickups = [];
@@ -2028,7 +2044,7 @@ function tryShoot() {
   if (state !== GameState.PLAYING) return;
   const now = performance.now();
   const w = WEAPONS[player.weapon];
-  if (now - player.lastShot < w.fireRate) return;
+  if (now - player.lastShot < w.fireRate * (player.buffs.frenzy > 0 ? 0.5 : 1)) return;
 
   // 副武器弹药检查
   const wAmmo = ammo[player.weapon];
@@ -2078,8 +2094,9 @@ function tryShoot() {
   // Visual FX: recoil + shake
   triggerShootFX();
 
-  // Apply rage buff (damage * 2)
-  const rageMult = player.buffs.rage > 0 ? 2 : 1;
+  // Apply rage buff (damage * 1.8) and frenzy buff (+50% damage)
+  const rageMult = player.buffs.rage > 0 ? 1.8 : 1;
+  const frenzyDmgMult = player.buffs.frenzy > 0 ? 1.5 : 1;
 
   // Muzzle flash particle
   const muzzleX = player.x + Math.cos(baseAngle) * (player.radius + 14);
@@ -2112,7 +2129,7 @@ function tryShoot() {
   for (const spread of spreads) {
     const isCrit = Math.random() < player.critChance;
     const classDmgMod = getClassDamageMod();
-    const dmg = w.damage * player.damageMult * rageMult * classDmgMod * (isCrit ? player.critMult : 1);
+    const dmg = w.damage * player.damageMult * rageMult * frenzyDmgMult * classDmgMod * (isCrit ? player.critMult : 1);
 
     // 根据武器类型设置子弹属性
     const isFlame = w.type === 'flame';
@@ -2142,9 +2159,9 @@ function tryShoot() {
       weaponType: w.type || 'normal',
       // 爆炸参数（火箭筒/榴弹/微型火箭）
       explodeRadius: (w.explodeRadius || 0) * (player.class === 'engineer' ? (CLASSES.engineer.explosionMult || 1) : 1),
-      explodeDamage: (w.explodeDamage || 0) * player.damageMult * rageMult * classDmgMod,
+      explodeDamage: (w.explodeDamage || 0) * player.damageMult * rageMult * frenzyDmgMult * classDmgMod,
       fragments: w.fragments || 0,
-      fragmentDamage: (w.fragmentDamage || 0) * player.damageMult * rageMult * classDmgMod,
+      fragmentDamage: (w.fragmentDamage || 0) * player.damageMult * rageMult * frenzyDmgMult * classDmgMod,
       // 火焰枪/激光枪/电磁枪：穿透型参数
       pierce: (isFlame || isLaser || isTesla || isRailgun) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
       hitTargets: (isFlame || isLaser || isTesla || isRailgun) ? [] : null,
@@ -2190,21 +2207,86 @@ function tryShoot() {
 function placeMine() {
   if (state !== GameState.PLAYING) return;
   if (player.mines <= 0) return;
-  player.mines--;
-  // 工程兵：爆炸范围 +50%
   const cls = player.class ? CLASSES[player.class] : null;
-  const explosionMult = cls && cls.explosionMult ? cls.explosionMult : 1.0;
-  mines.push({
-    x: player.x,
-    y: player.y,
-    radius: 14,
-    triggerRadius: 28,
-    explodeRadius: 110 * explosionMult,
-    armed: true,
-    triggered: false,
-    triggerTimer: 0,
-    explodeDamage: 120 * player.damageMult
-  });
+  const abilityType = cls ? (cls.spaceAbility || 'mine') : 'mine';
+
+  if (abilityType === 'grenade') {
+    // 突击兵：投掷手雷（向前方投掷，落点爆炸）
+    player.mines--;
+    const ang = player.angle;
+    grenades.push({
+      x: player.x, y: player.y,
+      vx: Math.cos(ang) * 12, vy: Math.sin(ang) * 12,
+      life: 60, explodeRadius: 130, damage: 150 * player.damageMult
+    });
+  } else if (abilityType === 'medkit') {
+    // 医护兵：医疗包（瞬间回血35HP）
+    player.mines--;
+    player.hp = Math.min(player.maxHp, player.hp + 35);
+    spawnBloodParticles(player.x, player.y, 12, '#44ff44');
+  } else if (abilityType === 'turret') {
+    // 工程兵：放置临时炮台（15秒后消失）
+    player.mines--;
+    placeTurret('mg', player.x + Math.cos(player.angle) * 30, player.y + Math.sin(player.angle) * 30);
+    const t = turrets[turrets.length - 1];
+    t.lifetime = 900; // 15秒
+  } else if (abilityType === 'cloak') {
+    // 侦察兵：隐身3秒（僵尸丢失目标）
+    player.mines--;
+    player.buffs.cloak = 180; // 3秒
+  } else if (abilityType === 'barricade') {
+    // 重装机兵：放置路障（阻挡僵尸，有HP）
+    player.mines--;
+    barricades.push({ x: player.x + Math.cos(player.angle) * 35, y: player.y + Math.sin(player.angle) * 35, hp: 200, maxHp: 200, angle: player.angle });
+  } else if (abilityType === 'pulse') {
+    // 狙击手：脉冲波（前方直线秒杀普通僵尸，对精英和BOSS造成大量伤害）
+    player.mines--;
+    const ang = player.angle;
+    pulseWaves.push({ x: player.x, y: player.y, angle: ang, range: 500, width: 40, life: 20 });
+    // 立即判定伤害
+    for (let i = zombies.length - 1; i >= 0; i--) {
+      const z = zombies[i];
+      const dx = z.x - player.x, dy = z.y - player.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist > 500) continue;
+      const angleToZ = Math.atan2(dy, dx);
+      let angleDiff = Math.abs(angleToZ - ang);
+      while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - Math.PI * 2);
+      if (angleDiff < 0.3) {
+        if (z.isElite || z.type === 'brute' || z.type === 'tank') {
+          z.hp -= 300 * player.damageMult;
+          addDamageNumber(z.x, z.y - z.radius, 300, '#44ddff', false);
+        } else {
+          z.hp = 0;
+          addDamageNumber(z.x, z.y - z.radius, 'KILL', '#44ddff', true);
+        }
+      }
+    }
+    if (boss) {
+      const dx = boss.x - player.x, dy = boss.y - player.y;
+      const angleToB = Math.atan2(dy, dx);
+      let angleDiff = Math.abs(angleToB - ang);
+      while (angleDiff > Math.PI) angleDiff = Math.abs(angleDiff - Math.PI * 2);
+      if (Math.hypot(dx, dy) < 500 && angleDiff < 0.3) {
+        boss.hp -= 500 * player.damageMult;
+        addDamageNumber(boss.x, boss.y - boss.radius, 500, '#44ddff', true);
+      }
+    }
+    addShake(6);
+  } else if (abilityType === 'frenzy') {
+    // 狂战士：狂暴模式（8秒，攻速+100%，移速+30%，吸血+15%）
+    player.mines--;
+    player.buffs.frenzy = 480; // 8秒
+  } else {
+    // 默认：地雷
+    player.mines--;
+    const explosionMult = cls && cls.explosionMult ? cls.explosionMult : 1.0;
+    mines.push({
+      x: player.x, y: player.y, radius: 14, triggerRadius: 28,
+      explodeRadius: 110 * explosionMult, armed: true, triggered: false,
+      triggerTimer: 0, explodeDamage: 120 * player.damageMult
+    });
+  }
   updateHUD();
 }
 
@@ -2275,6 +2357,16 @@ function updateTurrets(dt) {
       spawnBloodParticles(t.x, t.y, 15, t.def.color);
       addShake(4);
       turrets.splice(i, 1);
+      continue;
+    }
+    // 临时炮台生命周期（工程兵技能）
+    if (t.lifetime !== undefined) {
+      t.lifetime -= dt;
+      if (t.lifetime <= 0) {
+        spawnBloodParticles(t.x, t.y, 8, t.def.color);
+        turrets.splice(i, 1);
+        continue;
+      }
     }
   }
 }
@@ -2800,6 +2892,9 @@ function update(dt) {
   updateBullets(dt);
   updateBoss(dt);
   updateMines(dt);
+  updateGrenades(dt);
+  updateBarricades(dt);
+  updatePulseWaves(dt);
   updatePoisonProjectiles(dt);
   updatePoisonPools(dt);
   updateFirePools(dt);
@@ -3002,6 +3097,12 @@ function getComboMult() {
 }
 
 function updatePlayer(dt) {
+  // Buff decay
+  if (player.buffs.rage > 0) player.buffs.rage -= dt;
+  if (player.buffs.haste > 0) player.buffs.haste -= dt;
+  if (player.buffs.cloak > 0) player.buffs.cloak -= dt;
+  if (player.buffs.frenzy > 0) player.buffs.frenzy -= dt;
+
   // Dash timer
   if (player.dashTime > 0) {
     player.dashTime -= dt;
@@ -3043,7 +3144,8 @@ function updatePlayer(dt) {
 
     // Clamp max speed
     const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
-    const hasteMult = player.buffs.haste > 0 ? 1.4 : 1;
+    const hasteMult = player.buffs.haste > 0 ? 1.5 : 1;
+    const frenzyMult = player.buffs.frenzy > 0 ? 1.3 : 1;
     // 重武器移速惩罚
     const wDef = WEAPONS[player.weapon];
     const heavyMult = wDef.weaponClass === 'heavy' ? HEAVY_SPEED_PENALTY : 1.0;
@@ -3055,7 +3157,7 @@ function updatePlayer(dt) {
     if (survival.thirst < 30) survivalMult *= 0.85;
     if (survival.stamina < 20) survivalMult *= 0.8;
     // 雨天减速叠加
-    const maxSpd = player.maxSpeed * player.speedMult * hasteMult * heavyMult * weatherMult * survivalMult;
+    const maxSpd = player.maxSpeed * player.speedMult * hasteMult * frenzyMult * heavyMult * weatherMult * survivalMult;
     if (speed > maxSpd) {
       player.vx = (player.vx / speed) * maxSpd;
       player.vy = (player.vy / speed) * maxSpd;
@@ -3254,6 +3356,10 @@ function updateZombies(dt) {
     if (player.inGrass && dist > 120) {
       speedMod = 0.3; // Reduced detection
     }
+    // 隐身效果：僵尸大幅降低追踪能力
+    if (player.buffs.cloak > 0) {
+      speedMod *= 0.15;
+    }
     // 酸液减速效果
     if (z.slowTimer > 0) {
       z.slowTimer -= dt;
@@ -3427,6 +3533,15 @@ function updateZombies(dt) {
           t.hurtFlash = 8;
           z.attackCooldown = 40;
           spawnBloodParticles(t.x, t.y, 3, t.def.color);
+          break;
+        }
+      }
+      // 攻击路障
+      for (const b of barricades) {
+        if (circleCollide(z, { x: b.x, y: b.y, radius: 18 })) {
+          b.hp -= z.damage;
+          z.attackCooldown = 40;
+          spawnBloodParticles(b.x, b.y, 3, '#888888');
           break;
         }
       }
@@ -4419,6 +4534,58 @@ function updateMines(dt) {
     }
   }
 }
+
+// =====================================================================
+// GRENADES - 手雷系统（突击兵专属）
+// =====================================================================
+function updateGrenades(dt) {
+  for (let i = grenades.length - 1; i >= 0; i--) {
+    const g = grenades[i];
+    g.x += g.vx * dt;
+    g.y += g.vy * dt;
+    g.vx *= 0.96;
+    g.vy *= 0.96;
+    g.life -= dt;
+    if (g.life <= 0) {
+      explodeAt(g.x, g.y, g.explodeRadius, g.damage, true);
+      grenades.splice(i, 1);
+    }
+  }
+}
+
+// =====================================================================
+// BARRICADES - 路障系统（重装机兵专属）
+// =====================================================================
+function updateBarricades(dt) {
+  for (let i = barricades.length - 1; i >= 0; i--) {
+    const b = barricades[i];
+    if (b.hp <= 0) {
+      spawnBloodParticles(b.x, b.y, 8, '#888888');
+      barricades.splice(i, 1);
+      continue;
+    }
+    // 僵尸碰撞减速
+    for (const z of zombies) {
+      if (Math.sqrt(distSq(b, z)) < 20 + z.radius) {
+        const ang = Math.atan2(z.y - b.y, z.x - b.x);
+        z.x = b.x + Math.cos(ang) * (22 + z.radius);
+        z.y = b.y + Math.sin(ang) * (22 + z.radius);
+      }
+    }
+  }
+}
+
+// =====================================================================
+// PULSE WAVES - 脉冲波系统（狙击手专属）
+// =====================================================================
+function updatePulseWaves(dt) {
+  for (let i = pulseWaves.length - 1; i >= 0; i--) {
+    const p = pulseWaves[i];
+    p.life -= dt;
+    if (p.life <= 0) pulseWaves.splice(i, 1);
+  }
+}
+
 // =====================================================================
 // EXPLODE AT - 通用爆炸函数（火箭筒/地雷共用）
 // =====================================================================
@@ -5841,6 +6008,59 @@ function render() {
 
   // Turrets
   drawTurrets();
+
+  // Barricades
+  for (const b of barricades) {
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(b.angle);
+    ctx.fillStyle = '#556b2f';
+    ctx.fillRect(-18, -5, 36, 10);
+    ctx.fillStyle = '#3a4a1f';
+    ctx.fillRect(-18, -5, 36, 2);
+    ctx.fillStyle = '#6b8e23';
+    ctx.fillRect(-16, -3, 4, 6);
+    ctx.fillRect(-8, -3, 4, 6);
+    ctx.fillRect(0, -3, 4, 6);
+    ctx.fillRect(8, -3, 4, 6);
+    ctx.restore();
+    // HP bar
+    if (b.hp < b.maxHp) {
+      ctx.fillStyle = '#333';
+      ctx.fillRect(b.x - 15, b.y - 12, 30, 3);
+      ctx.fillStyle = '#6b8e23';
+      ctx.fillRect(b.x - 15, b.y - 12, 30 * (b.hp / b.maxHp), 3);
+    }
+  }
+
+  // Grenades
+  for (const g of grenades) {
+    ctx.fillStyle = '#ff8833';
+    ctx.beginPath();
+    ctx.arc(g.x, g.y, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ffdd44';
+    ctx.beginPath();
+    ctx.arc(g.x, g.y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Pulse waves
+  for (const p of pulseWaves) {
+    const alpha = p.life / 20;
+    ctx.strokeStyle = `rgba(68, 221, 255, ${alpha})`;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(p.x + Math.cos(p.angle) * p.range, p.y + Math.sin(p.angle) * p.range);
+    ctx.stroke();
+    ctx.strokeStyle = `rgba(68, 221, 255, ${alpha * 0.3})`;
+    ctx.lineWidth = p.width;
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+    ctx.lineTo(p.x + Math.cos(p.angle) * p.range, p.y + Math.sin(p.angle) * p.range);
+    ctx.stroke();
+  }
 
   // Shockwaves
   for (const s of shockwaves) {
@@ -7359,6 +7579,62 @@ function drawPlayer() {
   // Pixel body - flat color, no gradient (context already translated by walkBob)
   var pr = player.radius;
   var bodyColor = (player.hurtFlash > 0 && Math.floor(player.hurtFlash / 3) % 2 === 0) ? '#ff4444' : '#00cc88';
+
+  // 隐身效果（侦察兵）
+  if (player.buffs.cloak > 0) {
+    ctx.globalAlpha = 0.35;
+  }
+
+  // 狂暴光环（红色脉冲）
+  if (player.buffs.rage > 0) {
+    const pulse = (Math.sin(performance.now() * 0.01) + 1) * 0.5;
+    ctx.fillStyle = `rgba(255, 68, 34, ${0.15 + pulse * 0.15})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, pr + 8 + pulse * 4, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 狂战士狂暴模式（紫色光环）
+  if (player.buffs.frenzy > 0) {
+    const pulse = (Math.sin(performance.now() * 0.015) + 1) * 0.5;
+    ctx.fillStyle = `rgba(255, 50, 50, ${0.12 + pulse * 0.18})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, pr + 6 + pulse * 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 护盾光环（蓝色环）
+  if (player.buffs.shield > 0) {
+    ctx.strokeStyle = `rgba(68, 170, 255, 0.8)`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, pr + 5, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = `rgba(68, 170, 255, 0.1)`;
+    ctx.beginPath();
+    ctx.arc(0, 0, pr + 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // 急速效果（黄色速度线）
+  if (player.buffs.haste > 0) {
+    const pSpeed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+    if (pSpeed > 0.3) {
+      ctx.strokeStyle = `rgba(255, 221, 68, 0.5)`;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 4; i++) {
+        const ang = Math.atan2(-player.vy, -player.vx) + (Math.random() - 0.5) * 0.4;
+        const len = 6 + Math.random() * 8;
+        const offX = Math.cos(ang) * len;
+        const offY = Math.sin(ang) * len;
+        ctx.beginPath();
+        ctx.moveTo(offX, offY);
+        ctx.lineTo(offX * 1.5, offY * 1.5);
+        ctx.stroke();
+      }
+    }
+  }
+
   pxCircle(0, 0, pr, bodyColor);
 
   // Armor plates - pixel rect blocks
@@ -7387,14 +7663,27 @@ function drawPlayer() {
   drawWeapon();
 
   ctx.restore();
+  ctx.globalAlpha = 1;
 
-  // Mine count indicator (above player)
+  // Space ability indicator (above player)
   if (player.mines > 0) {
-    const pulse = (Math.sin(performance.now() * 0.005) + 1) * 0.5;
-    ctx.fillStyle = `rgba(255,170,68,${0.7 + pulse * 0.3})`;
+    const cls = player.class ? CLASSES[player.class] : null;
+    const abilityNames = {
+      grenade: lang === 'zh' ? '手雷' : 'NADE',
+      medkit: lang === 'zh' ? '医疗包' : 'MED',
+      turret: lang === 'zh' ? '炮台' : 'TURR',
+      cloak: lang === 'zh' ? '隐身' : 'CLOAK',
+      barricade: lang === 'zh' ? '路障' : 'WALL',
+      pulse: lang === 'zh' ? '脉冲' : 'PULSE',
+      frenzy: lang === 'zh' ? '狂热' : 'FREN',
+      mine: lang === 'zh' ? '地雷' : 'MINE'
+    };
+    const abilName = abilityNames[cls && cls.spaceAbility ? cls.spaceAbility : 'mine'] || (lang === 'zh' ? '地雷' : 'MINE');
+    const pulse2 = (Math.sin(performance.now() * 0.005) + 1) * 0.5;
+    ctx.fillStyle = `rgba(255,170,68,${0.7 + pulse2 * 0.3})`;
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('[SPACE] ' + player.mines + '/' + player.mineMax, player.x, player.y - player.radius - 12);
+    ctx.fillText('[SPACE] ' + abilName + ' ' + player.mines + '/' + player.mineMax, player.x, player.y - player.radius - 12);
   }
 }
 
@@ -7925,7 +8214,9 @@ function drawBuffs(x, y) {
   const buffs = [
     { key: 'rage', color: '#ff4422', icon: '\uD83D\uDD25' },
     { key: 'shield', color: '#44aaff', icon: '\uD83D\uDEE1' },
-    { key: 'haste', color: '#ffdd44', icon: '\u26A1' }
+    { key: 'haste', color: '#ffdd44', icon: '\u26A1' },
+    { key: 'cloak', color: '#88ddaa', icon: '\uD83D\uDC73' },
+    { key: 'frenzy', color: '#ff3366', icon: '\uD83E\uDDDB' }
   ];
   let offsetX = 0;
   for (const b of buffs) {
@@ -8090,7 +8381,7 @@ function updateHUD() {
   const shootKey = lang === 'zh' ? '射击' : 'FIRE';
   const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
   const mineKey = lang === 'zh' ? '地雷' : 'MINE';
-  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${mineKey}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${lang === 'zh' ? '职业技能' : 'ABILITY'}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
 
   // Countdown text
   const cdEl = document.getElementById('countdownText');
@@ -8244,6 +8535,9 @@ function startGame() {
   spawnQueue = [];
   spawnTelegraphs = [];
   waveActiveTimer = 0;
+  grenades = [];
+  barricades = [];
+  pulseWaves = [];
   damageNumbers = [];
   barrels = [];
   terrainFeatures = [];
