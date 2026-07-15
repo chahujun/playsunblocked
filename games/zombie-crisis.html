@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <script id="i18n-script">
 (function(){
@@ -259,6 +259,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Zombie Crisis - top-down wave survival shooter free online - no downloads, no sign-up. Works on school Chromebooks.">
 <title>僵尸危机：末日突围 — Zombie Crisis: Outbreak</title>
 <style>
   /* ---------- 字体与基础 ---------- */
@@ -271,7 +272,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     user-select: none;
     -webkit-font-smoothing: antialiased;
   }
-  canvas { display: block; cursor: crosshair; }
+  canvas { display: block; cursor: crosshair; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
 
   .mono { font-family: 'JetBrains Mono', 'Consolas', monospace; }
   .display { font-family: 'Oswald', 'Microsoft YaHei', sans-serif; }
@@ -293,6 +294,41 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     mix-blend-mode: overlay;
   }
   .overlay.hidden { opacity: 0; pointer-events: none; }
+
+  /* 首次游戏教程 */
+  #tutorialOverlay { z-index: 200; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(15,20,18,0.78), rgba(5,6,8,0.88)); }
+  .tutorial-card {
+    position: relative;
+    padding: 28px 40px;
+    background: #111417;
+    border: 1px solid #2a3036;
+    border-top: 2px solid #e8b04a;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.8);
+    min-width: 420px;
+    text-align: center;
+  }
+  .tutorial-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 24px; font-weight: 700;
+    color: #e8e4d8; letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .tutorial-body {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px; line-height: 1.9;
+    color: #c8c8c0; letter-spacing: 0.5px;
+  }
+  .tutorial-body .k {
+    display: inline-block;
+    background: #1a1e22; border: 1px solid #2a3036;
+    color: #e8b04a; padding: 1px 8px; margin: 0 2px;
+    font-weight: 700; border-radius: 2px;
+  }
+  .tutorial-foot {
+    margin-top: 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: #5a6268; letter-spacing: 1px;
+  }
 
   /* ---------- 卡片：去掉光晕，加做旧边框 ---------- */
   .card {
@@ -572,6 +608,12 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
   }
   #weaponInfo .ammo { color: #88a8c8; }
   #weaponInfo .mines { color: #c8a888; margin-left: auto; }
+  #weaponInfo .reload-indicator {
+    color: #e8b04a; font-weight: 700; letter-spacing: 1px;
+    text-shadow: 0 0 6px rgba(232,176,74,0.6);
+    animation: zcBlink 0.7s steps(2) infinite;
+  }
+  @keyframes zcBlink { 50% { opacity: 0.35; } }
 
   /* 武器槽位：右下角9个卡片 */
   #weaponSlots {
@@ -645,15 +687,19 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
   #waveText {
     display: block;
     font-family: 'Oswald', sans-serif;
-    font-size: 20px; font-weight: 700;
+    font-size: 24px; font-weight: 700;
     letter-spacing: 4px;
     color: #e8e4d8;
   }
   #countdownText {
     display: block; margin-top: 3px;
-    font-size: 10px; letter-spacing: 2px;
+    font-size: 13px; letter-spacing: 2px; font-weight: 700;
     color: #e8b04a;
     text-transform: uppercase;
+  }
+  @keyframes flash-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
   }
 
   /* 红闪：更猛烈、更短 */
@@ -711,6 +757,41 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 </style>
 </head>
 <body>
+<!-- playsunblocked in-game menu -->
+<style id="ps-menu-style">
+#ps-menu-btn{position:fixed;top:12px;right:12px;z-index:999999;width:40px;height:40px;border:2px solid #1A1A1A;border-radius:8px;background:#FF5C28;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:3px 3px 0 0 #1A1A1A;transition:transform .1s ease;font-family:sans-serif;opacity:.85}
+#ps-menu-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 0 #1A1A1A;opacity:1}
+#ps-menu-panel{position:fixed;top:60px;right:12px;z-index:999999;min-width:180px;border:2px solid #1A1A1A;border-radius:8px;background:#fff;box-shadow:4px 4px 0 0 #1A1A1A;display:none;overflow:hidden;font-family:'Space Grotesk',sans-serif}
+#ps-menu-panel.show{display:block}
+.ps-menu-item{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #e0e0e0;color:#1A1A1A;text-decoration:none;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.ps-menu-item:last-child{border-bottom:none}
+.ps-menu-item:hover{background:#FFF0EB;color:#FF5C28}
+.ps-menu-item svg{width:16px;height:16px;flex-shrink:0}
+</style>
+<div id="ps-menu-btn" onclick="document.getElementById('ps-menu-panel').classList.toggle('show')">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</div>
+<div id="ps-menu-panel">
+<a class="ps-menu-item" onclick="psGoHome()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+<span id="ps-label-home">Home</span></a>
+<a class="ps-menu-item" onclick="psGoGames()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="11" x2="10" y2="11"/><line x1="8" y1="9" x2="8" y2="13"/><line x1="15" y1="12" x2="15.01" y2="12"/><line x1="18" y1="10" x2="18.01" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.544-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.152A4 4 0 0 0 17.32 5z"/></svg>
+<span id="ps-label-games">More Games</span></a>
+<a class="ps-menu-item" onclick="psReload()">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+<span id="ps-label-restart">Restart</span></a>
+</div>
+<script id="ps-menu-script">
+function psGetLang(){try{return new URLSearchParams(window.location.search).get('lang')||'en'}catch(e){return'en'}}
+function psGoHome(){var l=psGetLang();try{window.parent.location.href='../pages/index-'+l+'.html'}catch(e){window.location.href='../pages/index-'+l+'.html'}}
+function psGoGames(){var l=psGetLang();try{window.parent.location.href='../pages/games-'+l+'.html'}catch(e){window.location.href='../pages/games-'+l+'.html'}}
+function psReload(){try{window.parent.location.reload()}catch(e){window.location.reload()}}
+(function(){var l=psGetLang();if(l==='cn'){var m={'Home':'首页','More Games':'更多游戏','Restart':'重新开始'};['ps-label-home','ps-label-games','ps-label-restart'].forEach(function(id){var el=document.getElementById(id);if(el&&m[el.textContent])el.textContent=m[el.textContent]})}})();
+document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn')&&!e.target.closest('#ps-menu-panel')){document.getElementById('ps-menu-panel').classList.remove('show')}});
+</script>
+<!-- /playsunblocked in-game menu -->
+
 
 <canvas id="game"></canvas>
 
@@ -765,6 +846,15 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 <div id="screenVignette"></div>
 <div id="lowHpWarning"></div>
 
+<!-- 首次游戏教程覆盖层 -->
+<div id="tutorialOverlay" class="overlay hidden">
+  <div class="tutorial-card">
+    <div class="tutorial-title" id="tutorialTitle">操作指南</div>
+    <div class="tutorial-body" id="tutorialBody"></div>
+    <div class="tutorial-foot" id="tutorialFoot"></div>
+  </div>
+</div>
+
 <!-- HUD -->
 <div id="hud" class="hidden">
   <!-- 左下：统一状态面板（整合所有玩家信息） -->
@@ -778,6 +868,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     <div id="weaponInfo">
       <span class="wname" id="weaponName">PISTOL</span>
       <span class="ammo" id="ammoText">弹药: ∞</span>
+      <span id="reloadIndicator" class="reload-indicator"></span>
       <span class="mines" id="minesText">MINES: 3</span>
     </div>
   </div>
@@ -852,8 +943,8 @@ const I18n = {
     bestScore: "BEST: ",
     day: "DAY",
     night: "NIGHT",
-    dawn: "DUSK",
-    dusk: "DAWN",
+    dawn: "DAWN",
+    dusk: "DUSK",
     hordeWave: "HORDE WAVE",
     bossWave: "BOSS WAVE",
     silentWave: "SILENT WAVE",
@@ -929,8 +1020,8 @@ const I18n = {
     bestScore: "最佳: ",
     day: "白天",
     night: "夜晚",
-    dawn: "黄昏",
-    dusk: "黎明",
+    dawn: "黎明",
+    dusk: "黄昏",
     hordeWave: "尸潮波次",
     bossWave: "精英波次",
     silentWave: "无声波次",
@@ -1191,20 +1282,42 @@ function playZombieDeath() {
 // =====================================================================
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+const PIXEL_SCALE = 2;
 
 // Blood stain offscreen buffer
 const bloodCanvas = document.createElement('canvas');
 bloodCanvas.width = WORLD_W;
 bloodCanvas.height = WORLD_H;
 const bloodCtx = bloodCanvas.getContext('2d');
+bloodCtx.imageSmoothingEnabled = false;
 let bloodStainCount = 0;
 
+let VIEW_W, VIEW_H;
 function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = Math.ceil(window.innerWidth / PIXEL_SCALE);
+  canvas.height = Math.ceil(window.innerHeight / PIXEL_SCALE);
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  ctx.imageSmoothingEnabled = false;
+  VIEW_W = canvas.width * PIXEL_SCALE;
+  VIEW_H = canvas.height * PIXEL_SCALE;
 }
 window.addEventListener('resize', resize);
 resize();
+
+// Pixel art helpers - snap to 2px grid for chunky pixel look
+function PX(x) { return Math.round(x / 2) * 2; }
+function pxRect(x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(PX(x), PX(y), Math.ceil(w), Math.ceil(h)); }
+function pxCircle(cx, cy, r, color) {
+  ctx.fillStyle = color;
+  cx = PX(cx); cy = PX(cy); r = Math.ceil(r);
+  // Draw circle as pixel blocks
+  for (var dy = -r; dy <= r; dy += 2) {
+    var dx = Math.floor(Math.sqrt(r * r - dy * dy));
+    ctx.fillRect(cx - dx, cy + dy, dx * 2, 2);
+  }
+}
 
 // =====================================================================
 // GAME STATE
@@ -1591,6 +1704,8 @@ let survival = {
   stamina: 100,    // 体力（冲刺消耗）
   warning: ''      // 当前警告文字
 };
+// 生存系统首次提示追踪（避免重复刷屏）
+const survivalHints = { hunger: false, thirst: false, stamina: false };
 
 // =====================================================================
 // ENTITY ARRAYS
@@ -1605,6 +1720,7 @@ let poisonPools = [];
 let shockwaves = [];
 let poisonProjectiles = [];
 let firePools = []; // 火焰枪地面残留火焰
+let floatingHints = []; // 浮动提示文字（生存系统引导）
 
 // =====================================================================
 // CAMERA
@@ -1612,12 +1728,12 @@ let firePools = []; // 火焰枪地面残留火焰
 const camera = { x: 0, y: 0 };
 
 function updateCamera() {
-  const targetX = player.x - canvas.width / 2;
-  const targetY = player.y - canvas.height / 2;
+  const targetX = player.x - VIEW_W / 2;
+  const targetY = player.y - VIEW_H / 2;
   camera.x += (targetX - camera.x) * 0.12;
   camera.y += (targetY - camera.y) * 0.12;
-  camera.x = Math.max(0, Math.min(WORLD_W - canvas.width, camera.x));
-  camera.y = Math.max(0, Math.min(WORLD_H - canvas.height, camera.y));
+  camera.x = Math.max(0, Math.min(WORLD_W - VIEW_W, camera.x));
+  camera.y = Math.max(0, Math.min(WORLD_H - VIEW_H, camera.y));
 }
 
 // =====================================================================
@@ -1637,12 +1753,14 @@ document.addEventListener('keydown', (e) => {
     if (w) switchWeapon(w);
   }
   if (e.key === 'Shift' || e.key.toLowerCase() === 'shift') tryDash();
+  if (e.key.toLowerCase() === 'r') tryReload();
 });
 document.addEventListener('keyup', (e) => { keys[e.key.toLowerCase()] = false; });
 
 canvas.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
+  const rect = canvas.getBoundingClientRect();
+  mouseX = Math.round((e.clientX - rect.left) / PIXEL_SCALE);
+  mouseY = Math.round((e.clientY - rect.top) / PIXEL_SCALE);
 });
 canvas.addEventListener('mousedown', (e) => {
   if (e.button === 0) { mouseDown = true; tryShoot(); }
@@ -1727,11 +1845,14 @@ function tryReload() {
   const w = WEAPONS[player.weapon];
   const wAmmo = ammo[player.weapon];
   if (wAmmo === Infinity) return;
-  if (wAmmo >= w.maxAmmo) return;
+  // 满弹检查：以 SECONDARY_AMMO 为实际上限（与游戏其它弹药补充逻辑一致）
+  const ammoCap = SECONDARY_AMMO[player.weapon] || w.maxAmmo;
+  if (wAmmo >= ammoCap) return;
   player.reloading = true;
   // 装弹时长受职业 reloadMult + 升级 reloadBonus 影响
   const reloadMult = (player.class ? CLASSES[player.class].reloadMult : 1.0) * (1 - player.upgrades.reloadBonus);
   player.reloadTimer = Math.max(15, w.reload * reloadMult);
+  player.reloadDuration = player.reloadTimer; // 记录总时长，用于进度条
   playReload();
 }
 
@@ -1748,7 +1869,7 @@ function tryShoot() {
 
   // 副武器弹药检查
   const wAmmo = ammo[player.weapon];
-  if (wAmmo !== Infinity && wAmmo <= 0) return;
+  if (wAmmo !== Infinity && wAmmo <= 0) { tryReload(); return; }
 
   player.lastShot = now;
 
@@ -1757,8 +1878,8 @@ function tryShoot() {
     ammo[player.weapon]--;
   }
 
-  const worldMX = mouseX + camera.x;
-  const worldMY = mouseY + camera.y;
+  const worldMX = mouseX * PIXEL_SCALE + camera.x;
+  const worldMY = mouseY * PIXEL_SCALE + camera.y;
   const baseAngle = Math.atan2(worldMY - player.y, worldMX - player.x);
   player.angle = baseAngle;
 
@@ -2288,6 +2409,7 @@ function update(dt) {
   updatePickups(dt);
   updateBarrels(dt);
   updateDamageNumbers(dt);
+  updateFloatingHints(dt);
   updateSpawnTelegraphs(dt);
   updateCamera();
   updateWaveSystem(dt);
@@ -2407,6 +2529,39 @@ function addDamageNumber(x, y, value, color, isCrit) {
   });
 }
 
+// 浮动提示文字（用于生存系统引导）
+function spawnHint(x, y, text, color) {
+  floatingHints.push({
+    x: x, y: y,
+    text: text,
+    life: 150, maxLife: 150,
+    color: color || '#e8b04a'
+  });
+}
+
+function updateFloatingHints(dt) {
+  for (let i = floatingHints.length - 1; i >= 0; i--) {
+    const h = floatingHints[i];
+    h.y -= 0.35 * dt;
+    h.life -= dt;
+    if (h.life <= 0) floatingHints.splice(i, 1);
+  }
+}
+
+function drawFloatingHint(h) {
+  const alpha = Math.min(1, h.life / 40);
+  ctx.globalAlpha = alpha;
+  ctx.font = '700 13px "Oswald", "Microsoft YaHei", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.strokeStyle = 'rgba(0,0,0,0.95)';
+  ctx.lineWidth = 3;
+  ctx.strokeText(h.text, h.x, h.y);
+  ctx.fillStyle = h.color;
+  ctx.fillText(h.text, h.x, h.y);
+  ctx.globalAlpha = 1;
+}
+
 function addCombo() {
   combo++;
   comboTimer = COMBO_TIMEOUT;
@@ -2489,6 +2644,40 @@ function updatePlayer(dt) {
     player.vy *= Math.pow(FRICTION, dt);
   }
 
+  // Reload timer
+  if (player.reloading) {
+    player.reloadTimer -= dt;
+    if (player.reloadTimer <= 0) {
+      player.reloading = false;
+      player.reloadTimer = 0;
+      const w = WEAPONS[player.weapon];
+      if (ammo[player.weapon] !== Infinity) {
+        ammo[player.weapon] = SECONDARY_AMMO[player.weapon] || ammo[player.weapon];
+      }
+      updateHUD();
+    }
+  }
+
+  // Survival low-stat hints (首次提示，恢复后重置以便再次提示)
+  if (survival.hunger < 30 && !survivalHints.hunger) {
+    survivalHints.hunger = true;
+    spawnHint(player.x, player.y - 34, lang === 'zh' ? '饥饿影响移速！寻找食物' : 'Starving! Find food', '#d4a04a');
+  } else if (survival.hunger > 60) {
+    survivalHints.hunger = false;
+  }
+  if (survival.thirst < 30 && !survivalHints.thirst) {
+    survivalHints.thirst = true;
+    spawnHint(player.x, player.y - 34, lang === 'zh' ? '口渴影响移速！寻找水' : 'Dehydrated! Find water', '#4a8ad4');
+  } else if (survival.thirst > 60) {
+    survivalHints.thirst = false;
+  }
+  if (survival.stamina < 20 && !survivalHints.stamina) {
+    survivalHints.stamina = true;
+    spawnHint(player.x, player.y - 34, lang === 'zh' ? '体力不足！减少冲刺' : 'Exhausted! Stop dashing', '#88d48a');
+  } else if (survival.stamina > 50) {
+    survivalHints.stamina = false;
+  }
+
   // Dash cooldown
   if (player.dashCooldown > 0) player.dashCooldown -= dt;
 
@@ -2526,8 +2715,8 @@ function updatePlayer(dt) {
   }
 
   // Aim angle
-  const worldMX = mouseX + camera.x;
-  const worldMY = mouseY + camera.y;
+  const worldMX = mouseX * PIXEL_SCALE + camera.x;
+  const worldMY = mouseY * PIXEL_SCALE + camera.y;
   player.angle = Math.atan2(worldMY - player.y, worldMX - player.x);
 
   // Auto-fire for SMG
@@ -2945,8 +3134,8 @@ function updateFlameStream(dt) {
   const fs = player.flameStream;
 
   // 更新火柱角度（跟随鼠标）
-  const worldMX = mouseX + camera.x;
-  const worldMY = mouseY + camera.y;
+  const worldMX = mouseX * PIXEL_SCALE + camera.x;
+  const worldMY = mouseY * PIXEL_SCALE + camera.y;
   fs.angle = Math.atan2(worldMY - player.y, worldMX - player.x);
 
   // 持续伤害tick（每5帧一次，约12次/秒）
@@ -3228,7 +3417,7 @@ function bossSkill(b) {
 // BOSS渲染
 function drawBoss() {
   if (!boss) return;
-  const sx = boss.x - camera.x, sy = boss.y - camera.y;
+  const sx = boss.x, sy = boss.y;
   ctx.save();
 
   // 护盾光环
@@ -3244,10 +3433,7 @@ function drawBoss() {
   ctx.globalAlpha = boss.teleporting > 0 ? 0.3 : 1;
 
   // 主体
-  const grad = ctx.createRadialGradient(sx, sy, 0, sx, sy, boss.radius);
-  grad.addColorStop(0, boss.hurtFlash > 0 ? '#ffffff' : boss.color);
-  grad.addColorStop(1, '#1a0a0a');
-  ctx.fillStyle = grad;
+  ctx.fillStyle = boss.hurtFlash > 0 ? '#ffffff' : boss.color;
   ctx.beginPath();
   ctx.arc(sx, sy, boss.radius, 0, Math.PI * 2);
   ctx.fill();
@@ -3269,17 +3455,14 @@ function drawBoss() {
 
   // BOSS血条（屏幕顶部）
   const barW = 400, barH = 16;
-  const barX = (canvas.width - barW) / 2;
+  const barX = (VIEW_W - barW) / 2;
   const barY = 20;
   ctx.fillStyle = 'rgba(0,0,0,0.7)';
   ctx.fillRect(barX - 2, barY - 2, barW + 4, barH + 4);
   ctx.fillStyle = '#2a0a0a';
   ctx.fillRect(barX, barY, barW, barH);
   const hpPct = Math.max(0, boss.hp / boss.maxHp);
-  const hpGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
-  hpGrad.addColorStop(0, '#8e1e1e');
-  hpGrad.addColorStop(1, '#ff4422');
-  ctx.fillStyle = hpGrad;
+  ctx.fillStyle = '#8e1e1e';
   ctx.fillRect(barX, barY, barW * hpPct, barH);
   // 阶段2标记线
   ctx.strokeStyle = '#ffdd44';
@@ -3893,18 +4076,12 @@ function drawBarrel(b) {
   ctx.ellipse(3, 5, b.radius * 1.1, b.radius * 0.55, 0, 0, Math.PI * 2);
   ctx.fill();
   // Body (red barrel)
-  const grad = ctx.createLinearGradient(-b.radius, 0, b.radius, 0);
   if (b.triggered) {
     const blink = Math.sin(performance.now() * 0.04) > 0;
-    grad.addColorStop(0, blink ? '#ff6644' : '#aa2211');
-    grad.addColorStop(0.5, blink ? '#ff8866' : '#cc3311');
-    grad.addColorStop(1, blink ? '#ff6644' : '#aa2211');
+    ctx.fillStyle = blink ? '#ff6644' : '#aa2211';
   } else {
-    grad.addColorStop(0, '#882211');
-    grad.addColorStop(0.5, '#cc3311');
-    grad.addColorStop(1, '#882211');
+    ctx.fillStyle = '#882211';
   }
-  ctx.fillStyle = grad;
   ctx.beginPath();
   ctx.arc(0, 0, b.radius, 0, Math.PI * 2);
   ctx.fill();
@@ -4255,17 +4432,14 @@ function drawWeather() {
     if (opacity > 0.01) {
       const cx = player.x, cy = player.y;
       const radius = w.type === 'fog' ? 280 : 380;
-      const grad = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius);
-      grad.addColorStop(0, 'transparent');
-      grad.addColorStop(1, `rgba(180,190,200,${opacity})`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(camera.x - 100, camera.y - 100, canvas.width + 200, canvas.height + 200);
+      ctx.fillStyle = `rgba(180,190,200,${opacity})`;
+      ctx.fillRect(camera.x - 100, camera.y - 100, VIEW_W + 200, VIEW_H + 200);
     }
   }
   // 雷暴闪电全屏白闪
   if (w.lightningFlash > 0) {
     ctx.fillStyle = `rgba(255,255,240,${(w.lightningFlash / 8) * 0.5})`;
-    ctx.fillRect(camera.x - 100, camera.y - 100, canvas.width + 200, canvas.height + 200);
+    ctx.fillRect(camera.x - 100, camera.y - 100, VIEW_W + 200, VIEW_H + 200);
   }
 }
 
@@ -4693,7 +4867,7 @@ function drawMission() {
   const m = currentMission;
   // 任务进度条（屏幕右侧）
   const barW = 200, barH = 8;
-  const barX = canvas.width - barW - 20;
+  const barX = VIEW_W - barW - 20;
   const barY = 80;
   ctx.fillStyle = 'rgba(0,0,0,0.6)';
   ctx.fillRect(barX - 2, barY - 2, barW + 4, barH + 4);
@@ -4706,7 +4880,7 @@ function drawMission() {
     pct = 1 - m.data.holdTime / m.data.maxHoldTime;
     label = lang === 'zh' ? '撤离中' : 'EXTRACTING';
     // 绘制撤离点
-    const ex = m.data.extractX - camera.x, ey = m.data.extractY - camera.y;
+    const ex = m.data.extractX, ey = m.data.extractY;
     ctx.strokeStyle = m.data.inZone ? '#00ff88' : '#ffdd44';
     ctx.lineWidth = 3;
     ctx.setLineDash([8, 8]);
@@ -4824,6 +4998,7 @@ function render() {
   }
 
   ctx.save();
+  ctx.scale(1 / PIXEL_SCALE, 1 / PIXEL_SCALE);
   ctx.translate(-camera.x + shakeX, -camera.y + shakeY);
 
   // World background
@@ -4912,6 +5087,11 @@ function render() {
     drawDamageNumber(d);
   }
 
+  // Floating hints (生存系统引导文字)
+  for (const h of floatingHints) {
+    drawFloatingHint(h);
+  }
+
   // Lighting overlay (vignette around player)
   drawLightingOverlay();
   // 天气效果（雨/雾/闪电）叠加在 lighting 之后
@@ -4927,6 +5107,7 @@ function render() {
   drawWaveBanner();
   drawComboIndicator();
   drawDashCooldown();
+  drawReloadBar();
   // 生存警告（生存状态条已移至 HTML #survivalPanel）
   drawSurvivalHUD();
 }
@@ -4935,7 +5116,7 @@ function drawGrid(ox, oy) {
   // Subtle animated grid for menu
   const time = performance.now() * 0.0002;
   ctx.strokeStyle = `rgba(0,255,136,${0.04 + Math.sin(time) * 0.01})`;
-  ctx.lineWidth = 1;
+  ctx.lineWidth = 2;
   const gridSize = 50;
   for (let x = 0; x < canvas.width; x += gridSize) {
     ctx.beginPath();
@@ -4950,28 +5131,22 @@ function drawGrid(ox, oy) {
 }
 
 function drawWorldBackground() {
-  // Dark base floor with subtle gradient
-  const grad = ctx.createLinearGradient(0, 0, WORLD_W, WORLD_H);
-  grad.addColorStop(0, '#0f1218');
-  grad.addColorStop(0.5, '#131620');
-  grad.addColorStop(1, '#0f1218');
-  ctx.fillStyle = grad;
+  // Dark flat floor (pixel style - no gradient)
+  ctx.fillStyle = '#1a1a2e';
   ctx.fillRect(0, 0, WORLD_W, WORLD_H);
 
-  // Subtle noise/dirt patches (deterministic positions for performance)
+  // Subtle noise/dirt patches (deterministic positions) - square pixel blocks
   ctx.fillStyle = 'rgba(40,50,40,0.15)';
   for (let i = 0; i < 60; i++) {
     const x = (i * 373) % WORLD_W;
     const y = (i * 617) % WORLD_H;
     const r = 30 + (i * 13) % 40;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(PX(x - r), PX(y - r), PX(r * 2), PX(r * 2));
   }
 
-  // Grid lines
-  ctx.strokeStyle = 'rgba(0,255,136,0.05)';
-  ctx.lineWidth = 1;
+  // Grid lines - 2px thick, pixel color
+  ctx.strokeStyle = '#12121e';
+  ctx.lineWidth = 2;
   const gridSize = 60;
   for (let x = 0; x <= WORLD_W; x += gridSize) {
     ctx.beginPath();
@@ -4984,7 +5159,7 @@ function drawWorldBackground() {
     ctx.stroke();
   }
 
-  // Brighter grid intersections near player
+  // Brighter grid intersections near player - small pixel squares
   const pgx = Math.floor(player.x / gridSize) * gridSize;
   const pgy = Math.floor(player.y / gridSize) * gridSize;
   for (let dx = -3; dx <= 3; dx++) {
@@ -4995,9 +5170,7 @@ function drawWorldBackground() {
       if (distSq < 60000) {
         const alpha = (1 - distSq / 60000) * 0.3;
         ctx.fillStyle = `rgba(0,255,136,${alpha})`;
-        ctx.beginPath();
-        ctx.arc(gx, gy, 1.5, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(gx, gy, 2, 2);
       }
     }
   }
@@ -5006,60 +5179,55 @@ function drawWorldBackground() {
 function drawTerrainFeatures() {
   for (const f of terrainFeatures) {
     if (f.type === 'grass') {
-      // Grass patch base
+      // Grass patch base - flat pixel block
       ctx.fillStyle = 'rgba(40,80,40,0.25)';
-      ctx.beginPath();
-      ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-      ctx.fill();
-      // Grass blades
+      ctx.fillRect(PX(f.x - f.radius), PX(f.y - f.radius), PX(f.radius * 2), PX(f.radius * 2));
+      // Grass blades - small pixel lines
       const time = performance.now() * 0.002;
+      ctx.fillStyle = 'rgba(80,140,60,0.7)';
       for (const blade of f.blades) {
         const sway = Math.sin(time + blade.phase) * 1.5;
-        ctx.strokeStyle = 'rgba(80,140,60,0.7)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(f.x + blade.x, f.y + blade.y);
-        ctx.lineTo(f.x + blade.x + sway, f.y + blade.y - blade.h);
-        ctx.stroke();
+        pxRect(f.x + blade.x, f.y + blade.y - blade.h, 1, blade.h, 'rgba(80,140,60,0.7)');
+        pxRect(f.x + blade.x + sway, f.y + blade.y - blade.h - 1, 1, 1, 'rgba(80,140,60,0.7)');
       }
-      // Highlight if player inside
+      // Highlight if player inside - pixel dashed square
       if (player.inGrass && Math.hypot(player.x - f.x, player.y - f.y) < f.radius) {
         ctx.strokeStyle = 'rgba(100,200,80,0.3)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([3, 3]);
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(PX(f.x - f.radius), PX(f.y - f.radius), PX(f.radius * 2), PX(f.radius * 2));
         ctx.setLineDash([]);
       }
     } else if (f.type === 'water') {
-      // Water puddle with gradient
-      const grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.radius);
-      grad.addColorStop(0, 'rgba(40,70,110,0.6)');
-      grad.addColorStop(0.7, 'rgba(30,50,80,0.4)');
-      grad.addColorStop(1, 'rgba(20,30,50,0.1)');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-      ctx.fill();
-      // Ripples
+      // Water puddle - flat color pixel block
+      pxCircle(f.x, f.y, f.radius, 'rgba(40,70,110,0.6)');
+      ctx.fillStyle = 'rgba(30,50,80,0.5)';
+      ctx.fillRect(PX(f.x - f.radius), PX(f.y - f.radius), PX(f.radius * 2), PX(f.radius * 2));
+      pxCircle(f.x, f.y, f.radius, 'rgba(40,70,110,0.5)');
+      // Ripples - pixel ring circles (thin ring only)
       const time = performance.now() * 0.001;
-      ctx.strokeStyle = `rgba(120,180,220,${0.2 + Math.sin(time) * 0.1})`;
-      ctx.lineWidth = 0.8;
       for (let i = 0; i < 2; i++) {
         const r = (time * 10 + i * 15) % f.radius;
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, r, 0, Math.PI * 2);
-        ctx.stroke();
+        const ringColor = `rgba(120,180,220,${0.2 + Math.sin(time) * 0.1})`;
+        ctx.fillStyle = ringColor;
+        var rrx = PX(f.x), rry = PX(f.y), rr = Math.ceil(r);
+        // Thin ring: only draw rows near the edge
+        for (var dy = -rr; dy <= rr; dy += 2) {
+          var dxOuter = Math.floor(Math.sqrt(rr * rr - dy * dy));
+          var innerR = rr - 2;
+          var dxInner = innerR > 0 ? Math.floor(Math.sqrt(innerR * innerR - dy * dy)) : 0;
+          if (dxOuter > dxInner) {
+            ctx.fillRect(rrx - dxOuter, rry + dy, dxOuter - dxInner, 2);
+            ctx.fillRect(rrx + dxInner, rry + dy, dxOuter - dxInner, 2);
+          }
+        }
       }
-      // Highlight if player inside
+      // Highlight if player inside - pixel dashed square
       if (player.inWater && Math.hypot(player.x - f.x, player.y - f.y) < f.radius) {
         ctx.strokeStyle = 'rgba(100,180,220,0.4)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([3, 3]);
-        ctx.beginPath();
-        ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-        ctx.stroke();
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.strokeRect(PX(f.x - f.radius), PX(f.y - f.radius), PX(f.radius * 2), PX(f.radius * 2));
         ctx.setLineDash([]);
       }
     }
@@ -5068,6 +5236,7 @@ function drawTerrainFeatures() {
 
 function drawWorldBounds() {
   ctx.save();
+  ctx.scale(1 / PIXEL_SCALE, 1 / PIXEL_SCALE);
   ctx.translate(-camera.x + shakeX, -camera.y + shakeY);
   // Outer glow
   ctx.strokeStyle = 'rgba(255,80,40,0.15)';
@@ -5084,25 +5253,17 @@ function drawWorldBounds() {
 
 function drawPoisonPool(pool) {
   const alpha = Math.min(1, pool.life / 60);
-  // Outer glow
-  const grad = ctx.createRadialGradient(pool.x, pool.y, 0, pool.x, pool.y, pool.radius);
-  grad.addColorStop(0, `rgba(120,220,60,${alpha * 0.7})`);
-  grad.addColorStop(0.6, `rgba(80,180,40,${alpha * 0.5})`);
-  grad.addColorStop(1, `rgba(40,100,20,${alpha * 0.2})`);
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(pool.x, pool.y, pool.radius, 0, Math.PI * 2);
-  ctx.fill();
-  // Bubbling effect
+  // Flat color pool (pixel style - no gradient)
+  pxCircle(pool.x, pool.y, pool.radius, `rgba(80,180,40,${alpha * 0.5})`);
+  // Darker center
+  pxCircle(pool.x, pool.y, pool.radius * 0.6, `rgba(60,140,30,${alpha * 0.5})`);
+  // Bubbling effect - small pixel squares
   const time = performance.now() * 0.003;
   for (let i = 0; i < 4; i++) {
     const a = i * Math.PI / 2 + time;
     const bx = pool.x + Math.cos(a) * pool.radius * 0.5;
     const by = pool.y + Math.sin(a) * pool.radius * 0.5;
-    ctx.fillStyle = `rgba(180,255,120,${alpha * 0.5})`;
-    ctx.beginPath();
-    ctx.arc(bx, by, 3 + Math.sin(time * 3 + i) * 1.5, 0, Math.PI * 2);
-    ctx.fill();
+    pxRect(bx - 2, by - 2, 4, 4, `rgba(180,255,120,${alpha * 0.6})`);
   }
 }
 
@@ -5110,20 +5271,18 @@ function drawPoisonPool(pool) {
 function drawFirePool(f) {
   const alpha = Math.min(1, f.life / 60);
   const flicker = 0.85 + Math.sin(performance.now() * 0.02) * 0.15;
-  // 外层光晕
-  const grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.radius);
-  grad.addColorStop(0, `rgba(255,180,60,${alpha * 0.7 * flicker})`);
-  grad.addColorStop(0.5, `rgba(255,80,30,${alpha * 0.5 * flicker})`);
-  grad.addColorStop(1, `rgba(120,20,10,${alpha * 0.2 * flicker})`);
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(f.x, f.y, f.radius, 0, Math.PI * 2);
-  ctx.fill();
-  // 中心亮区
-  ctx.fillStyle = `rgba(255,220,120,${alpha * 0.4 * flicker})`;
-  ctx.beginPath();
-  ctx.arc(f.x, f.y, f.radius * 0.4, 0, Math.PI * 2);
-  ctx.fill();
+  // Flat color fire pool (pixel style - no gradient)
+  pxCircle(f.x, f.y, f.radius, `rgba(255,80,30,${alpha * 0.5 * flicker})`);
+  // Center bright area
+  pxCircle(f.x, f.y, f.radius * 0.4, `rgba(255,220,120,${alpha * 0.4 * flicker})`);
+  // Bright pixel sparks
+  const time = performance.now() * 0.01;
+  for (let i = 0; i < 3; i++) {
+    const a = i * 2.1 + time;
+    const sx = f.x + Math.cos(a) * f.radius * 0.3;
+    const sy = f.y + Math.sin(a) * f.radius * 0.3;
+    pxRect(sx - 1, sy - 1, 2, 2, `rgba(255,240,180,${alpha * 0.6 * flicker})`);
+  }
 }
 
 function drawPickup(p) {
@@ -5131,21 +5290,13 @@ function drawPickup(p) {
   ctx.save();
   ctx.translate(p.x, p.y + bob);
 
-  // Shadow
+  // Shadow - pixel rect
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.beginPath();
-  ctx.ellipse(0, 10 - bob, 8, 3, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillRect(PX(-8), PX(10 - bob), PX(16), PX(6));
 
   if (p.type === 'health') {
-    // Glow
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 18);
-    grad.addColorStop(0, 'rgba(255,60,80,0.4)');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
-    ctx.fill();
+    // Glow - flat pixel circle
+    pxCircle(0, 0, 14, 'rgba(255,60,80,0.2)');
     // Health pack
     ctx.fillStyle = '#f0f0f0';
     ctx.fillRect(-8, -8, 16, 16);
@@ -5156,14 +5307,8 @@ function drawPickup(p) {
     ctx.fillRect(-5, -1.5, 10, 3);
     ctx.fillRect(-1.5, -5, 3, 10);
   } else if (p.type === 'ammo') {
-    // Glow
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 18);
-    grad.addColorStop(0, 'rgba(255,200,80,0.4)');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
-    ctx.fill();
+    // Glow - flat pixel circle
+    pxCircle(0, 0, 14, 'rgba(255,200,80,0.2)');
     // Ammo pack
     ctx.fillStyle = '#3a3a3a';
     ctx.fillRect(-9, -6, 18, 12);
@@ -5184,15 +5329,9 @@ function drawPickup(p) {
     if (buffType === 'rage') { color = '#ff4422'; icon = '\uD83D\uDD25'; }
     else if (buffType === 'shield') { color = '#44aaff'; icon = '\uD83D\uDEE1'; }
     else { color = '#ffdd44'; icon = '\u26A1'; }
-    // Pulsing glow
+    // Pulsing glow - flat pixel circle
     const pulse = (Math.sin(performance.now() * 0.008) + 1) * 0.5;
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 20 + pulse * 4);
-    grad.addColorStop(0, color + 'aa');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 20 + pulse * 4, 0, Math.PI * 2);
-    ctx.fill();
+    pxCircle(0, 0, 16, color + '30');
     // Diamond shape
     ctx.save();
     ctx.rotate(Math.PI / 4);
@@ -5209,13 +5348,7 @@ function drawPickup(p) {
     ctx.fillText(icon, 0, 1);
   } else if (p.type === 'food') {
     // 食物：罐头
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 18);
-    grad.addColorStop(0, 'rgba(212,160,74,0.4)');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
-    ctx.fill();
+    pxCircle(0, 0, 14, 'rgba(212,160,74,0.2)');
     // 罐头身
     ctx.fillStyle = '#8a6a3a';
     ctx.fillRect(-7, -8, 14, 16);
@@ -5232,16 +5365,10 @@ function drawPickup(p) {
     ctx.font = '700 6px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('FOOD', 0, 0);
+    ctx.fillText(lang === 'zh' ? '食物' : 'FOOD', 0, 0);
   } else if (p.type === 'water') {
     // 水：水壶
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 18);
-    grad.addColorStop(0, 'rgba(74,138,212,0.4)');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 18, 0, Math.PI * 2);
-    ctx.fill();
+    pxCircle(0, 0, 14, 'rgba(74,138,212,0.2)');
     // 水壶身
     ctx.fillStyle = '#4a8ad4';
     ctx.beginPath();
@@ -5267,14 +5394,8 @@ function drawPickup(p) {
     const wId = p.type.slice(7);
     const wDef = WEAPONS[wId];
     if (wDef) {
-      // 颜色光晕
-      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 22);
-      grad.addColorStop(0, wDef.color + '55');
-      grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(0, 0, 22, 0, Math.PI * 2);
-      ctx.fill();
+      // 颜色光晕 - flat pixel circle
+      pxCircle(0, 0, 18, wDef.color + '30');
       // 底座
       ctx.fillStyle = '#1a1e22';
       ctx.fillRect(-12, -10, 24, 20);
@@ -5354,15 +5475,9 @@ function drawPickup(p) {
     const attId = parts.slice(1).join('_');
     const att = ATTACHMENTS[attId];
     if (att) {
-      // 脉冲光晕
+      // 脉冲光晕 - flat pixel circle
       const pulse = (Math.sin(performance.now() * 0.006) + 1) * 0.5;
-      const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, 20 + pulse * 4);
-      grad.addColorStop(0, att.color + 'cc');
-      grad.addColorStop(1, 'transparent');
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(0, 0, 20 + pulse * 4, 0, Math.PI * 2);
-      ctx.fill();
+      pxCircle(0, 0, 16, att.color + '30');
       // 六边形底座
       ctx.save();
       ctx.rotate(performance.now() * 0.002);
@@ -5411,21 +5526,20 @@ function drawCrate(c) {
   ctx.fillRect(c.w / 2 - 2, -c.h / 2 + 2, 4, c.h);
   ctx.fillRect(-c.w / 2 + 2, c.h / 2 - 2, c.w - 4, 4);
 
-  // Top face (slight gradient)
-  const grad = ctx.createLinearGradient(0, -c.h / 2, 0, c.h / 2);
-  grad.addColorStop(0, '#a0683a');
-  grad.addColorStop(0.5, '#8b5a2b');
-  grad.addColorStop(1, '#6b4220');
-  ctx.fillStyle = grad;
+  // Top face (flat color - pixel style, no gradient)
+  ctx.fillStyle = '#8b5a2b';
   ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+  // Lighter top edge highlight
+  ctx.fillStyle = '#a0683a';
+  ctx.fillRect(-c.w / 2, -c.h / 2, c.w, 3);
+  // Darker bottom edge
+  ctx.fillStyle = '#6b4220';
+  ctx.fillRect(-c.w / 2, c.h / 2 - 3, c.w, 3);
 
-  // Wood plank lines
-  ctx.strokeStyle = '#5a3818';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(-c.w / 2, -2); ctx.lineTo(c.w / 2, -2);
-  ctx.moveTo(-c.w / 2, 2); ctx.lineTo(c.w / 2, 2);
-  ctx.stroke();
+  // Wood plank lines - pixel fillRect
+  ctx.fillStyle = '#5a3818';
+  ctx.fillRect(-c.w / 2, PX(-2), c.w, 2);
+  ctx.fillRect(-c.w / 2, PX(2), c.w, 2);
 
   // Border
   ctx.strokeStyle = '#4a2810';
@@ -5444,23 +5558,22 @@ function drawCrate(c) {
   ctx.fillRect(c.w / 2 - cs, c.h / 2 - 3, cs, 3);
   ctx.fillRect(c.w / 2 - 3, c.h / 2 - cs, 3, cs);
 
-  // Damage cracks
+  // Damage cracks - pixel blocks
   if (dmgRatio < 0.75) {
-    ctx.strokeStyle = '#2a1808';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-c.w / 4, -c.h / 3);
-    ctx.lineTo(-2, 0);
-    ctx.lineTo(c.w / 5, c.h / 4);
-    ctx.stroke();
+    ctx.fillStyle = '#2a1808';
+    pxRect(-c.w / 4, -c.h / 3, 2, 2);
+    pxRect(-2, 0, 2, 2);
+    pxRect(c.w / 5, c.h / 4, 2, 2);
+    ctx.fillRect(PX(-c.w / 4) + 2, PX(-c.h / 3) + 2, 2, 2);
+    ctx.fillRect(PX(c.w / 5) - 2, PX(c.h / 4) - 2, 2, 2);
   }
   if (dmgRatio < 0.5) {
-    ctx.strokeStyle = '#2a1808';
-    ctx.beginPath();
-    ctx.moveTo(c.w / 4, -c.h / 3);
-    ctx.lineTo(2, -2);
-    ctx.lineTo(-c.w / 5, c.h / 4);
-    ctx.stroke();
+    ctx.fillStyle = '#2a1808';
+    pxRect(c.w / 4, -c.h / 3, 2, 2);
+    pxRect(2, -2, 2, 2);
+    pxRect(-c.w / 5, c.h / 4, 2, 2);
+    ctx.fillRect(PX(c.w / 4) - 2, PX(-c.h / 3) + 2, 2, 2);
+    ctx.fillRect(PX(-c.w / 5) + 2, PX(c.h / 4) - 2, 2, 2);
   }
   if (dmgRatio < 0.25) {
     // Heavy damage: dark overlay
@@ -5474,45 +5587,32 @@ function drawMine(m) {
   ctx.save();
   ctx.translate(m.x, m.y);
 
-  // Shadow
+  // Shadow - pixel rect
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  ctx.beginPath();
-  ctx.ellipse(2, 3, m.radius, m.radius * 0.6, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillRect(PX(2 - m.radius), PX(3), PX(m.radius * 2), PX(m.radius * 0.6));
 
-  // Body (dark metallic)
-  const grad = ctx.createRadialGradient(-3, -3, 0, 0, 0, m.radius);
+  // Body (flat color - pixel style)
   if (m.triggered) {
-    grad.addColorStop(0, '#ff6644');
-    grad.addColorStop(0.6, '#cc2211');
-    grad.addColorStop(1, '#661100');
+    pxCircle(0, 0, m.radius, '#cc2211');
+    pxRect(-m.radius, -m.radius, 2, 2, '#661100');
+    pxRect(m.radius - 2, -m.radius, 2, 2, '#661100');
+    pxRect(-m.radius, m.radius - 2, 2, 2, '#661100');
+    pxRect(m.radius - 2, m.radius - 2, 2, 2, '#661100');
   } else {
-    grad.addColorStop(0, '#666');
-    grad.addColorStop(0.6, '#333');
-    grad.addColorStop(1, '#111');
+    pxCircle(0, 0, m.radius, '#333');
+    pxRect(-m.radius, -m.radius, 2, 2, '#111');
+    pxRect(m.radius - 2, -m.radius, 2, 2, '#111');
+    pxRect(-m.radius, m.radius - 2, 2, 2, '#111');
+    pxRect(m.radius - 2, m.radius - 2, 2, 2, '#111');
   }
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(0, 0, m.radius, 0, Math.PI * 2);
-  ctx.fill();
 
-  // Outline
-  ctx.strokeStyle = m.triggered ? '#ff8844' : '#444';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Spikes around the mine
+  // Spikes around the mine - pixel blocks
   ctx.fillStyle = m.triggered ? '#aa3322' : '#222';
   for (let i = 0; i < 6; i++) {
     const a = (i / 6) * Math.PI * 2;
     const sx = Math.cos(a) * m.radius;
     const sy = Math.sin(a) * m.radius;
-    ctx.beginPath();
-    ctx.moveTo(sx, sy);
-    ctx.lineTo(sx + Math.cos(a) * 4, sy + Math.sin(a) * 4);
-    ctx.lineTo(sx + Math.cos(a + 0.3) * 2, sy + Math.sin(a + 0.3) * 2);
-    ctx.closePath();
-    ctx.fill();
+    pxRect(sx - 1, sy - 1, 4, 4, m.triggered ? '#aa3322' : '#222');
   }
 
   // Blinking LED
@@ -5520,32 +5620,13 @@ function drawMine(m) {
   if (m.triggered) {
     const blink = Math.sin(time * 3) > 0;
     if (blink) {
-      const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 12);
-      glowGrad.addColorStop(0, 'rgba(255,50,50,0.8)');
-      glowGrad.addColorStop(1, 'transparent');
-      ctx.fillStyle = glowGrad;
-      ctx.beginPath();
-      ctx.arc(0, 0, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#ff0000';
-      ctx.beginPath();
-      ctx.arc(0, 0, 4, 0, Math.PI * 2);
-      ctx.fill();
+      pxCircle(0, 0, 8, 'rgba(255,50,50,0.5)');
+      pxRect(-2, -2, 4, 4, '#ff0000');
     }
   } else {
     const pulse = (Math.sin(time) + 1) * 0.5;
-    ctx.fillStyle = `rgba(0,255,136,${0.6 + pulse * 0.4})`;
-    ctx.beginPath();
-    ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-    // Subtle glow
-    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 8);
-    glowGrad.addColorStop(0, `rgba(0,255,136,${pulse * 0.4})`);
-    glowGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGrad;
-    ctx.beginPath();
-    ctx.arc(0, 0, 8, 0, Math.PI * 2);
-    ctx.fill();
+    pxCircle(0, 0, 6, `rgba(0,255,136,${pulse * 0.3})`);
+    pxRect(-1, -1, 2, 2, `rgba(0,255,136,${0.6 + pulse * 0.4})`);
   }
   ctx.restore();
 }
@@ -5568,12 +5649,8 @@ function drawShockwave(s) {
   ctx.arc(s.x, s.y, s.radius * 0.75, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Glow fill
-  const grad = ctx.createRadialGradient(s.x, s.y, s.radius * 0.5, s.x, s.y, s.radius);
-  grad.addColorStop(0, 'transparent');
-  grad.addColorStop(0.8, `rgba(255,180,80,${alpha * 0.15})`);
-  grad.addColorStop(1, `rgba(255,220,150,${alpha * 0.3})`);
-  ctx.fillStyle = grad;
+  // Glow fill — flat color, no gradient
+  ctx.fillStyle = `rgba(255,200,100,${alpha * 0.2})`;
   ctx.beginPath();
   ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
   ctx.fill();
@@ -5588,12 +5665,8 @@ function drawPoisonProjectile(p) {
     ctx.fill();
   }
 
-  // Glow
-  const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius * 2);
-  grad.addColorStop(0, 'rgba(160,255,100,0.7)');
-  grad.addColorStop(0.5, 'rgba(100,200,50,0.4)');
-  grad.addColorStop(1, 'transparent');
-  ctx.fillStyle = grad;
+  // Glow — flat color circle, no gradient
+  ctx.fillStyle = 'rgba(120,220,60,0.3)';
   ctx.beginPath();
   ctx.arc(p.x, p.y, p.radius * 2, 0, Math.PI * 2);
   ctx.fill();
@@ -5622,11 +5695,9 @@ function drawZombie(z) {
   const bob = Math.sin(z.walkPhase) * 1.5;
   const sway = Math.sin(z.walkPhase * 0.5) * 0.08;
 
-  // Shadow
+  // Shadow - pixel rect
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
-  ctx.beginPath();
-  ctx.ellipse(3, 4 + Math.abs(bob) * 0.3, z.radius * 1.1, z.radius * 0.55, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillRect(PX(3 - z.radius), PX(4 + Math.abs(bob) * 0.3), PX(z.radius * 2), Math.ceil(z.radius * 0.5));
 
   ctx.rotate(sway);
 
@@ -5644,16 +5715,15 @@ function drawZombie(z) {
     drawNormalZombie(z, flashWhite, bob);
   }
 
-  // Elite aura
+  // Elite aura - pixel dashed square
   if (z.isElite) {
     ctx.save();
     const pulse = (Math.sin(performance.now() * 0.005) + 1) * 0.5;
     ctx.strokeStyle = z.color + Math.floor(80 + pulse * 60).toString(16).padStart(2, '0');
     ctx.lineWidth = 2;
     ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.arc(0, 0, z.radius + 5 + pulse * 2, 0, Math.PI * 2);
-    ctx.stroke();
+    const aR = z.radius + 5 + pulse * 2;
+    ctx.strokeRect(PX(-aR), PX(-aR), PX(aR * 2), PX(aR * 2));
     ctx.setLineDash([]);
     ctx.restore();
   }
@@ -5678,56 +5748,35 @@ function drawZombie(z) {
 
 function drawNormalZombie(z, flash, bob) {
   const r = z.radius;
-  // Legs (animated)
+  // Legs (animated) - pixel fillRect snapped to grid
   const legSwing = Math.sin(z.walkPhase) * 4;
-  ctx.fillStyle = flash ? '#fff' : '#3a4a28';
-  ctx.fillRect(-5, r * 0.5, 4, 8 + legSwing * 0.3);
-  ctx.fillRect(1, r * 0.5, 4, 8 - legSwing * 0.3);
+  pxRect(-5, r * 0.5, 4, 8 + legSwing * 0.3, flash ? '#fff' : '#3a4a28');
+  pxRect(1, r * 0.5, 4, 8 - legSwing * 0.3, flash ? '#fff' : '#3a4a28');
 
-  // Body (torso)
-  const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 0, 0, 0, r);
-  if (flash) {
-    bodyGrad.addColorStop(0, '#ffffff');
-    bodyGrad.addColorStop(1, '#cccccc');
-  } else {
-    bodyGrad.addColorStop(0, '#7a9e4e');
-    bodyGrad.addColorStop(0.7, z.color);
-    bodyGrad.addColorStop(1, '#3a5020');
-  }
-  ctx.fillStyle = bodyGrad;
-  ctx.beginPath();
-  ctx.arc(0, bob, r, 0, Math.PI * 2);
-  ctx.fill();
+  // Body (torso) - flat color, no gradient
+  var bodyColor = flash ? '#ffffff' : z.color;
+  pxCircle(0, bob, r, bodyColor);
+  // Darker bottom edge
+  pxRect(-r + 2, bob + r - 4, r * 2 - 4, 4, flash ? '#cccccc' : '#3a5020');
 
-  // Outline
-  ctx.strokeStyle = flash ? '#fff' : '#2a3818';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  // Pixel border blocks on edges
+  pxRect(-r, bob - 2, 2, 2, flash ? '#fff' : '#2a3818');
+  pxRect(r - 2, bob - 2, 2, 2, flash ? '#fff' : '#2a3818');
+  pxRect(-r, bob + r - 4, 2, 2, flash ? '#fff' : '#2a3818');
+  pxRect(r - 2, bob + r - 4, 2, 2, flash ? '#fff' : '#2a3818');
 
-  // Arms reaching forward
-  ctx.fillStyle = flash ? '#fff' : '#5a7038';
-  ctx.fillRect(r * 0.3, -r * 0.5 + bob, r * 0.8, 4);
-  ctx.fillRect(r * 0.3, r * 0.2 + bob, r * 0.8, 4);
+  // Arms reaching forward - pixel fillRect
+  pxRect(r * 0.3, -r * 0.5 + bob, r * 0.8, 4, flash ? '#fff' : '#5a7038');
+  pxRect(r * 0.3, r * 0.2 + bob, r * 0.8, 4, flash ? '#fff' : '#5a7038');
 
-  // Eyes (glowing red)
-  ctx.fillStyle = 'rgba(255,40,20,0.4)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.2 + bob, 4, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.2 + bob, 4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#ff3300';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.2 + bob, 2, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.2 + bob, 2, 0, Math.PI * 2);
-  ctx.fill();
+  // Eyes (pixel blocks)
+  pxRect(-r * 0.4, -r * 0.3 + bob, 3, 3, 'rgba(255,40,20,0.4)');
+  pxRect(r * 0.2, -r * 0.3 + bob, 3, 3, 'rgba(255,40,20,0.4)');
+  pxRect(-r * 0.35, -r * 0.25 + bob, 2, 2, '#ff3300');
+  pxRect(r * 0.25, -r * 0.25 + bob, 2, 2, '#ff3300');
 
-  // Mouth
-  ctx.strokeStyle = '#1a0808';
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(-r * 0.25, r * 0.3 + bob);
-  ctx.lineTo(r * 0.25, r * 0.3 + bob);
-  ctx.stroke();
+  // Mouth - pixel fillRect
+  pxRect(-r * 0.25, r * 0.3 + bob, r * 0.5, 2, '#1a0808');
 }
 
 function drawRunnerZombie(z, flash, bob) {
@@ -5735,310 +5784,201 @@ function drawRunnerZombie(z, flash, bob) {
   const lean = 0.2; // lean forward
   ctx.rotate(lean);
 
-  // Legs (more animated, faster)
+  // Legs (more animated, faster) - pixel fillRect
   const legSwing = Math.sin(z.walkPhase * 2) * 6;
-  ctx.fillStyle = flash ? '#fff' : '#4a6028';
-  ctx.fillRect(-4, r * 0.4, 3, 7 + legSwing * 0.4);
-  ctx.fillRect(1, r * 0.4, 3, 7 - legSwing * 0.4);
+  pxRect(-4, r * 0.4, 3, 7 + legSwing * 0.4, flash ? '#fff' : '#4a6028');
+  pxRect(1, r * 0.4, 3, 7 - legSwing * 0.4, flash ? '#fff' : '#4a6028');
 
-  // Body (smaller, leaner)
-  const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 0, 0, 0, r);
-  if (flash) {
-    bodyGrad.addColorStop(0, '#fff');
-    bodyGrad.addColorStop(1, '#ccc');
-  } else {
-    bodyGrad.addColorStop(0, '#aee870');
-    bodyGrad.addColorStop(0.7, z.color);
-    bodyGrad.addColorStop(1, '#5a7028');
-  }
-  ctx.fillStyle = bodyGrad;
-  ctx.beginPath();
-  ctx.ellipse(0, bob, r * 0.85, r, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // Body (smaller, leaner) - flat color, no gradient
+  var bodyColor = flash ? '#ffffff' : z.color;
+  pxCircle(0, bob, r, bodyColor);
+  // Darker bottom edge
+  pxRect(-r + 2, bob + r - 4, r * 2 - 4, 4, flash ? '#cccccc' : '#5a7028');
 
-  ctx.strokeStyle = flash ? '#fff' : '#3a4818';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
+  // Pixel border blocks on edges
+  pxRect(-r, bob - 2, 2, 2, flash ? '#fff' : '#3a4818');
+  pxRect(r - 2, bob - 2, 2, 2, flash ? '#fff' : '#3a4818');
+  pxRect(-r, bob + r - 4, 2, 2, flash ? '#fff' : '#3a4818');
+  pxRect(r - 2, bob + r - 4, 2, 2, flash ? '#fff' : '#3a4818');
 
-  // Arms extended forward
-  ctx.fillStyle = flash ? '#fff' : '#7a9448';
-  ctx.fillRect(r * 0.2, -r * 0.4 + bob, r * 1.0, 3);
-  ctx.fillRect(r * 0.2, r * 0.2 + bob, r * 1.0, 3);
+  // Arms extended forward - pixel fillRect
+  pxRect(r * 0.2, -r * 0.4 + bob, r * 1.0, 3, flash ? '#fff' : '#7a9448');
+  pxRect(r * 0.2, r * 0.2 + bob, r * 1.0, 3, flash ? '#fff' : '#7a9448');
 
-  // Eyes (larger, more menacing)
-  ctx.fillStyle = 'rgba(255,80,20,0.5)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.25 + bob, 3.5, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.25 + bob, 3.5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#ff4400';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.25 + bob, 1.8, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.25 + bob, 1.8, 0, Math.PI * 2);
-  ctx.fill();
+  // Eyes (larger, pixel blocks)
+  pxRect(-r * 0.4, -r * 0.3 + bob, 3, 3, 'rgba(255,80,20,0.5)');
+  pxRect(r * 0.2, -r * 0.3 + bob, 3, 3, 'rgba(255,80,20,0.5)');
+  pxRect(-r * 0.35, -r * 0.25 + bob, 2, 2, '#ff4400');
+  pxRect(r * 0.25, -r * 0.25 + bob, 2, 2, '#ff4400');
 }
 
 function drawBruteZombie(z, flash, bob) {
   const r = z.radius;
-  // Legs (heavy, slow swing)
+  // Legs (heavy, slow swing) - pixel fillRect
   const legSwing = Math.sin(z.walkPhase * 0.5) * 3;
-  ctx.fillStyle = flash ? '#fff' : '#2a3e1a';
-  ctx.fillRect(-8, r * 0.6, 6, 10 + legSwing * 0.3);
-  ctx.fillRect(2, r * 0.6, 6, 10 - legSwing * 0.3);
+  pxRect(-8, r * 0.6, 6, 10 + legSwing * 0.3, flash ? '#fff' : '#2a3e1a');
+  pxRect(2, r * 0.6, 6, 10 - legSwing * 0.3, flash ? '#fff' : '#2a3e1a');
 
-  // Massive body
-  const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 0, 0, 0, r);
-  if (flash) {
-    bodyGrad.addColorStop(0, '#fff');
-    bodyGrad.addColorStop(1, '#ccc');
-  } else {
-    bodyGrad.addColorStop(0, '#6a8e3e');
-    bodyGrad.addColorStop(0.6, z.color);
-    bodyGrad.addColorStop(1, '#1a2810');
-  }
-  ctx.fillStyle = bodyGrad;
-  ctx.beginPath();
-  ctx.arc(0, bob, r, 0, Math.PI * 2);
-  ctx.fill();
+  // Massive body - flat color, no gradient
+  var bodyColor = flash ? '#ffffff' : z.color;
+  pxCircle(0, bob, r, bodyColor);
+  // Darker bottom edge
+  pxRect(-r + 2, bob + r - 4, r * 2 - 4, 4, flash ? '#cccccc' : '#1a2810');
 
-  // Bulging muscles
-  ctx.fillStyle = flash ? '#fff' : 'rgba(40,60,20,0.5)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.4, bob, r * 0.3, 0, Math.PI * 2);
-  ctx.arc(r * 0.4, bob, r * 0.3, 0, Math.PI * 2);
-  ctx.fill();
+  // Bulging muscles - pixel fillRect blocks
+  pxRect(-r * 0.55, bob - r * 0.3, r * 0.4, r * 0.6, flash ? '#fff' : 'rgba(40,60,20,0.5)');
+  pxRect(r * 0.15, bob - r * 0.3, r * 0.4, r * 0.6, flash ? '#fff' : 'rgba(40,60,20,0.5)');
 
-  // Outline (thick)
-  ctx.strokeStyle = flash ? '#fff' : '#1a2410';
-  ctx.lineWidth = 3;
-  ctx.stroke();
+  // Pixel border blocks on edges (thick)
+  pxRect(-r, bob - 4, 3, 3, flash ? '#fff' : '#1a2410');
+  pxRect(r - 3, bob - 4, 3, 3, flash ? '#fff' : '#1a2410');
+  pxRect(-r, bob + r - 4, 3, 3, flash ? '#fff' : '#1a2410');
+  pxRect(r - 3, bob + r - 4, 3, 3, flash ? '#fff' : '#1a2410');
 
-  // Massive arms
-  ctx.fillStyle = flash ? '#fff' : '#3a5020';
-  ctx.beginPath();
-  ctx.arc(-r * 0.8, bob, r * 0.35, 0, Math.PI * 2);
-  ctx.arc(r * 0.8, bob, r * 0.35, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = flash ? '#fff' : '#1a2410';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // Massive arms - pixel circles
+  pxCircle(-r * 0.8, bob, r * 0.35, flash ? '#fff' : '#3a5020');
+  pxCircle(r * 0.8, bob, r * 0.35, flash ? '#fff' : '#3a5020');
 
-  // Eyes (deep red, glowing)
-  ctx.fillStyle = 'rgba(255,20,0,0.5)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.35, -r * 0.25 + bob, 6, 0, Math.PI * 2);
-  ctx.arc(r * 0.35, -r * 0.25 + bob, 6, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#ff2200';
-  ctx.beginPath();
-  ctx.arc(-r * 0.35, -r * 0.25 + bob, 3, 0, Math.PI * 2);
-  ctx.arc(r * 0.35, -r * 0.25 + bob, 3, 0, Math.PI * 2);
-  ctx.fill();
+  // Eyes (deep red, pixel blocks)
+  pxRect(-r * 0.45, -r * 0.3 + bob, 4, 4, 'rgba(255,20,0,0.5)');
+  pxRect(r * 0.15, -r * 0.3 + bob, 4, 4, 'rgba(255,20,0,0.5)');
+  pxRect(-r * 0.4, -r * 0.25 + bob, 3, 3, '#ff2200');
+  pxRect(r * 0.2, -r * 0.25 + bob, 3, 3, '#ff2200');
 
-  // Glowing mouth
-  ctx.fillStyle = 'rgba(255,60,20,0.4)';
-  ctx.beginPath();
-  ctx.ellipse(0, r * 0.4 + bob, r * 0.4, r * 0.2, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#1a0808';
-  ctx.beginPath();
-  ctx.ellipse(0, r * 0.4 + bob, r * 0.35, r * 0.15, 0, 0, Math.PI * 2);
-  ctx.fill();
+  // Glowing mouth - pixel fillRect
+  pxRect(-r * 0.4, r * 0.3 + bob, r * 0.8, r * 0.25, 'rgba(255,60,20,0.4)');
+  pxRect(-r * 0.35, r * 0.35 + bob, r * 0.7, r * 0.15, '#1a0808');
 
-  // Poison glands on back (pulsing)
+  // Poison glands on back (pulsing) - pixel blocks
   const pulse = (Math.sin(performance.now() * 0.005) + 1) * 0.5;
-  ctx.fillStyle = `rgba(120,220,60,${0.4 + pulse * 0.4})`;
-  ctx.beginPath();
-  ctx.arc(-r * 0.4, -r * 0.6 + bob, 4 + pulse * 1.5, 0, Math.PI * 2);
-  ctx.arc(r * 0.4, -r * 0.6 + bob, 4 + pulse * 1.5, 0, Math.PI * 2);
-  ctx.fill();
+  pxRect(-r * 0.5, -r * 0.7 + bob, 5 + pulse * 2, 5 + pulse * 2, `rgba(120,220,60,${0.4 + pulse * 0.4})`);
+  pxRect(r * 0.3, -r * 0.7 + bob, 5 + pulse * 2, 5 + pulse * 2, `rgba(120,220,60,${0.4 + pulse * 0.4})`);
 }
 
 // ===== Elite: Spitter (purple, fast poison) =====
 function drawSpitterZombie(z, flash, bob) {
   const r = z.radius;
   const legSwing = Math.sin(z.walkPhase * 1.2) * 4;
-  ctx.fillStyle = flash ? '#fff' : '#4a2838';
-  ctx.fillRect(-5, r * 0.5, 4, 8 + legSwing * 0.3);
-  ctx.fillRect(1, r * 0.5, 4, 8 - legSwing * 0.3);
+  pxRect(-5, r * 0.5, 4, 8 + legSwing * 0.3, flash ? '#fff' : '#4a2838');
+  pxRect(1, r * 0.5, 4, 8 - legSwing * 0.3, flash ? '#fff' : '#4a2838');
 
-  const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 0, 0, 0, r);
-  if (flash) {
-    bodyGrad.addColorStop(0, '#fff');
-    bodyGrad.addColorStop(1, '#ccc');
-  } else {
-    bodyGrad.addColorStop(0, '#b86a8e');
-    bodyGrad.addColorStop(0.7, z.color);
-    bodyGrad.addColorStop(1, '#3a1828');
-  }
-  ctx.fillStyle = bodyGrad;
-  ctx.beginPath();
-  ctx.arc(0, bob, r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = flash ? '#fff' : '#2a0818';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // Body - flat color, no gradient
+  var bodyColor = flash ? '#ffffff' : z.color;
+  pxCircle(0, bob, r, bodyColor);
+  // Darker bottom edge
+  pxRect(-r + 2, bob + r - 4, r * 2 - 4, 4, flash ? '#cccccc' : '#3a1828');
 
-  // Sagging jaw (open, ready to spit)
-  ctx.fillStyle = '#1a0810';
-  ctx.beginPath();
-  ctx.ellipse(0, r * 0.4 + bob, r * 0.35, r * 0.2, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Dripping poison
+  // Pixel border blocks on edges
+  pxRect(-r, bob - 2, 2, 2, flash ? '#fff' : '#2a0818');
+  pxRect(r - 2, bob - 2, 2, 2, flash ? '#fff' : '#2a0818');
+  pxRect(-r, bob + r - 4, 2, 2, flash ? '#fff' : '#2a0818');
+  pxRect(r - 2, bob + r - 4, 2, 2, flash ? '#fff' : '#2a0818');
+
+  // Sagging jaw (open, ready to spit) - pixel fillRect
+  pxRect(-r * 0.35, r * 0.3 + bob, r * 0.7, r * 0.2, '#1a0810');
+  // Dripping poison - pixel block
   const dripPulse = (Math.sin(performance.now() * 0.008) + 1) * 0.5;
-  ctx.fillStyle = `rgba(140,220,80,${0.6 + dripPulse * 0.3})`;
-  ctx.beginPath();
-  ctx.arc(0, r * 0.55 + bob + dripPulse * 3, 2.5, 0, Math.PI * 2);
-  ctx.fill();
+  pxRect(-2, r * 0.5 + bob + dripPulse * 3, 4, 4, `rgba(140,220,80,${0.6 + dripPulse * 0.3})`);
 
-  // Eyes (toxic green)
-  ctx.fillStyle = 'rgba(180,255,80,0.5)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.2 + bob, 4, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.2 + bob, 4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#aaff44';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.2 + bob, 2, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.2 + bob, 2, 0, Math.PI * 2);
-  ctx.fill();
+  // Eyes (toxic green, pixel blocks)
+  pxRect(-r * 0.4, -r * 0.3 + bob, 3, 3, 'rgba(180,255,80,0.5)');
+  pxRect(r * 0.2, -r * 0.3 + bob, 3, 3, 'rgba(180,255,80,0.5)');
+  pxRect(-r * 0.35, -r * 0.25 + bob, 2, 2, '#aaff44');
+  pxRect(r * 0.25, -r * 0.25 + bob, 2, 2, '#aaff44');
 
-  // Sac on back (pulsing poison reservoir)
+  // Sac on back (pulsing poison reservoir) - pixel blocks
   const sacPulse = (Math.sin(performance.now() * 0.006) + 1) * 0.5;
-  ctx.fillStyle = `rgba(120,200,60,${0.5 + sacPulse * 0.4})`;
-  ctx.beginPath();
-  ctx.arc(-r * 0.5, -r * 0.5 + bob, 5 + sacPulse * 2, 0, Math.PI * 2);
-  ctx.arc(r * 0.5, -r * 0.5 + bob, 5 + sacPulse * 2, 0, Math.PI * 2);
-  ctx.fill();
+  pxRect(-r * 0.6, -r * 0.6 + bob, 6 + sacPulse * 2, 6 + sacPulse * 2, `rgba(120,200,60,${0.5 + sacPulse * 0.4})`);
+  pxRect(r * 0.2, -r * 0.6 + bob, 6 + sacPulse * 2, 6 + sacPulse * 2, `rgba(120,200,60,${0.5 + sacPulse * 0.4})`);
 }
 
 // ===== Elite: Tank (blue, armored) =====
 function drawTankZombie(z, flash, bob) {
   const r = z.radius;
   const legSwing = Math.sin(z.walkPhase * 0.4) * 2;
-  ctx.fillStyle = flash ? '#fff' : '#1a2a4a';
-  ctx.fillRect(-10, r * 0.6, 8, 12 + legSwing * 0.2);
-  ctx.fillRect(2, r * 0.6, 8, 12 - legSwing * 0.2);
+  pxRect(-10, r * 0.6, 8, 12 + legSwing * 0.2, flash ? '#fff' : '#1a2a4a');
+  pxRect(2, r * 0.6, 8, 12 - legSwing * 0.2, flash ? '#fff' : '#1a2a4a');
 
-  // Massive armored body
-  const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 0, 0, 0, r);
-  if (flash) {
-    bodyGrad.addColorStop(0, '#fff');
-    bodyGrad.addColorStop(1, '#ccc');
-  } else {
-    bodyGrad.addColorStop(0, '#6a8ece');
-    bodyGrad.addColorStop(0.6, z.color);
-    bodyGrad.addColorStop(1, '#1a2a48');
-  }
-  ctx.fillStyle = bodyGrad;
-  ctx.beginPath();
-  ctx.arc(0, bob, r, 0, Math.PI * 2);
-  ctx.fill();
+  // Massive armored body - flat color, no gradient
+  var bodyColor = flash ? '#ffffff' : z.color;
+  pxCircle(0, bob, r, bodyColor);
+  // Darker bottom edge
+  pxRect(-r + 2, bob + r - 4, r * 2 - 4, 4, flash ? '#cccccc' : '#1a2a48');
 
-  // Armor plates (metallic look)
-  ctx.fillStyle = flash ? '#fff' : 'rgba(180,200,240,0.4)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, bob, r * 0.35, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, bob, r * 0.35, 0, Math.PI * 2);
-  ctx.fill();
-  // Rivets
+  // Armor plates - pixel fillRect blocks
+  pxRect(-r * 0.6, bob - r * 0.3, r * 0.45, r * 0.6, flash ? '#fff' : 'rgba(180,200,240,0.4)');
+  pxRect(r * 0.15, bob - r * 0.3, r * 0.45, r * 0.6, flash ? '#fff' : 'rgba(180,200,240,0.4)');
+  // Rivets - pixel blocks
   ctx.fillStyle = flash ? '#fff' : '#88a8c8';
   for (let i = 0; i < 6; i++) {
     const a = (i / 6) * Math.PI * 2;
-    ctx.beginPath();
-    ctx.arc(Math.cos(a) * r * 0.7, Math.sin(a) * r * 0.7 + bob, 1.5, 0, Math.PI * 2);
-    ctx.fill();
+    pxRect(Math.cos(a) * r * 0.7 - 1, Math.sin(a) * r * 0.7 + bob - 1, 2, 2, flash ? '#fff' : '#88a8c8');
   }
 
-  ctx.strokeStyle = flash ? '#fff' : '#0a1428';
-  ctx.lineWidth = 3;
-  ctx.stroke();
+  // Pixel border blocks on edges (thick)
+  pxRect(-r, bob - 4, 3, 3, flash ? '#fff' : '#0a1428');
+  pxRect(r - 3, bob - 4, 3, 3, flash ? '#fff' : '#0a1428');
+  pxRect(-r, bob + r - 4, 3, 3, flash ? '#fff' : '#0a1428');
+  pxRect(r - 3, bob + r - 4, 3, 3, flash ? '#fff' : '#0a1428');
 
-  // Huge arms with armor
-  ctx.fillStyle = flash ? '#fff' : '#2a3a5a';
-  ctx.beginPath();
-  ctx.arc(-r * 0.85, bob, r * 0.4, 0, Math.PI * 2);
-  ctx.arc(r * 0.85, bob, r * 0.4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = flash ? '#fff' : '#0a1428';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // Huge arms with armor - pixel circles
+  pxCircle(-r * 0.85, bob, r * 0.4, flash ? '#fff' : '#2a3a5a');
+  pxCircle(r * 0.85, bob, r * 0.4, flash ? '#fff' : '#2a3a5a');
 
-  // Eyes (cold blue)
-  ctx.fillStyle = 'rgba(120,200,255,0.5)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.25 + bob, 6, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.25 + bob, 6, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#88ccff';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.25 + bob, 3, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.25 + bob, 3, 0, Math.PI * 2);
-  ctx.fill();
+  // Eyes (cold blue, pixel blocks)
+  pxRect(-r * 0.45, -r * 0.3 + bob, 4, 4, 'rgba(120,200,255,0.5)');
+  pxRect(r * 0.15, -r * 0.3 + bob, 4, 4, 'rgba(120,200,255,0.5)');
+  pxRect(-r * 0.4, -r * 0.25 + bob, 3, 3, '#88ccff');
+  pxRect(r * 0.2, -r * 0.25 + bob, 3, 3, '#88ccff');
 }
 
 // ===== Elite: Screamer (yellow, summoner) =====
 function drawScreamerZombie(z, flash, bob) {
   const r = z.radius;
   const legSwing = Math.sin(z.walkPhase * 1.5) * 5;
-  ctx.fillStyle = flash ? '#fff' : '#6a5028';
-  ctx.fillRect(-4, r * 0.5, 3, 7 + legSwing * 0.4);
-  ctx.fillRect(1, r * 0.5, 3, 7 - legSwing * 0.4);
+  pxRect(-4, r * 0.5, 3, 7 + legSwing * 0.4, flash ? '#fff' : '#6a5028');
+  pxRect(1, r * 0.5, 3, 7 - legSwing * 0.4, flash ? '#fff' : '#6a5028');
 
-  const bodyGrad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 0, 0, 0, r);
-  if (flash) {
-    bodyGrad.addColorStop(0, '#fff');
-    bodyGrad.addColorStop(1, '#ccc');
-  } else {
-    bodyGrad.addColorStop(0, '#e8c86a');
-    bodyGrad.addColorStop(0.7, z.color);
-    bodyGrad.addColorStop(1, '#5a4018');
-  }
-  ctx.fillStyle = bodyGrad;
-  ctx.beginPath();
-  ctx.ellipse(0, bob, r * 0.9, r, 0, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.strokeStyle = flash ? '#fff' : '#3a2810';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // Body - flat color, no gradient
+  var bodyColor = flash ? '#ffffff' : z.color;
+  pxCircle(0, bob, r, bodyColor);
+  // Darker bottom edge
+  pxRect(-r + 2, bob + r - 4, r * 2 - 4, 4, flash ? '#cccccc' : '#5a4018');
 
-  // Open screaming mouth (large, dark)
+  // Pixel border blocks on edges
+  pxRect(-r, bob - 2, 2, 2, flash ? '#fff' : '#3a2810');
+  pxRect(r - 2, bob - 2, 2, 2, flash ? '#fff' : '#3a2810');
+  pxRect(-r, bob + r - 4, 2, 2, flash ? '#fff' : '#3a2810');
+  pxRect(r - 2, bob + r - 4, 2, 2, flash ? '#fff' : '#3a2810');
+
+  // Open screaming mouth (pixel fillRect)
   const mouthPulse = (Math.sin(performance.now() * 0.015) + 1) * 0.5;
-  ctx.fillStyle = '#1a0808';
-  ctx.beginPath();
-  ctx.ellipse(0, r * 0.3 + bob, r * 0.3, r * 0.25 + mouthPulse * 2, 0, 0, Math.PI * 2);
-  ctx.fill();
-  // Sound waves emanating
+  pxRect(-r * 0.3, r * 0.2 + bob, r * 0.6, r * 0.25 + mouthPulse * 2, '#1a0808');
+  // Sound waves - pixel square outline
+  const waveR = r * 0.5 + mouthPulse * 4;
   ctx.strokeStyle = `rgba(255,220,80,${0.4 + mouthPulse * 0.4})`;
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.arc(0, r * 0.3 + bob, r * 0.5 + mouthPulse * 4, 0, Math.PI * 2);
-  ctx.stroke();
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 3]);
+  ctx.strokeRect(PX(-waveR), PX(r * 0.3 + bob - waveR), PX(waveR * 2), PX(waveR * 2));
+  ctx.setLineDash([]);
 
-  // Eyes (bright yellow, manic)
-  ctx.fillStyle = 'rgba(255,220,40,0.6)';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.25 + bob, 4, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.25 + bob, 4, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.fillStyle = '#ffee44';
-  ctx.beginPath();
-  ctx.arc(-r * 0.3, -r * 0.25 + bob, 2.5, 0, Math.PI * 2);
-  ctx.arc(r * 0.3, -r * 0.25 + bob, 2.5, 0, Math.PI * 2);
-  ctx.fill();
+  // Eyes (bright yellow, pixel blocks)
+  pxRect(-r * 0.4, -r * 0.3 + bob, 3, 3, 'rgba(255,220,40,0.6)');
+  pxRect(r * 0.2, -r * 0.3 + bob, 3, 3, 'rgba(255,220,40,0.6)');
+  pxRect(-r * 0.35, -r * 0.25 + bob, 2, 2, '#ffee44');
+  pxRect(r * 0.25, -r * 0.25 + bob, 2, 2, '#ffee44');
 
-  // Frantic arms raised
-  ctx.fillStyle = flash ? '#fff' : '#8a7028';
+  // Frantic arms raised - pixel fillRect
   const armSwing = Math.sin(performance.now() * 0.01) * 0.3;
   ctx.save();
   ctx.translate(-r * 0.5, bob);
   ctx.rotate(-0.8 + armSwing);
-  ctx.fillRect(0, -2, r * 0.7, 3);
+  pxRect(0, -2, r * 0.7, 3, flash ? '#fff' : '#8a7028');
   ctx.restore();
   ctx.save();
   ctx.translate(r * 0.5, bob);
   ctx.rotate(0.8 - armSwing);
-  ctx.fillRect(-r * 0.7, -2, r * 0.7, 3);
+  pxRect(-r * 0.7, -2, r * 0.7, 3, flash ? '#fff' : '#8a7028');
   ctx.restore();
 }
 
@@ -6088,22 +6028,14 @@ function drawFlameStream(fs) {
 
   // 末端扩散火球
   const endRadius = fs.width * 1.2 * flicker;
-  const endGrad = ctx.createRadialGradient(endX, endY, 0, endX, endY, endRadius);
-  endGrad.addColorStop(0, `rgba(255,220,120,0.8)`);
-  endGrad.addColorStop(0.4, `rgba(255,100,40,0.6)`);
-  endGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = endGrad;
+  ctx.fillStyle = `rgba(255,100,40,0.6)`;
   ctx.beginPath();
   ctx.arc(endX, endY, endRadius, 0, Math.PI * 2);
   ctx.fill();
 
   // 枪口闪光
   const muzzleRadius = fs.width * 0.9 * flicker;
-  const muzzleGrad = ctx.createRadialGradient(muzzleX, muzzleY, 0, muzzleX, muzzleY, muzzleRadius);
-  muzzleGrad.addColorStop(0, `rgba(255,240,180,0.9)`);
-  muzzleGrad.addColorStop(0.5, `rgba(255,120,40,0.6)`);
-  muzzleGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = muzzleGrad;
+  ctx.fillStyle = `rgba(255,120,40,0.6)`;
   ctx.beginPath();
   ctx.arc(muzzleX, muzzleY, muzzleRadius, 0, Math.PI * 2);
   ctx.fill();
@@ -6133,11 +6065,7 @@ function drawBullet(b) {
 
     // 1. 火焰拖尾（从火球向后延伸，渐变消散）
     const trailLen = r * 2.5;
-    const trailGrad = ctx.createLinearGradient(0, 0, -trailLen, 0);
-    trailGrad.addColorStop(0, `rgba(255,180,60,${0.7 * fade})`);
-    trailGrad.addColorStop(0.4, `rgba(255,100,40,${0.4 * fade})`);
-    trailGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = trailGrad;
+    ctx.fillStyle = `rgba(255,180,60,${0.7 * fade})`;
     ctx.beginPath();
     ctx.moveTo(0, -r * 0.7);
     ctx.lineTo(-trailLen, -r * 0.2);
@@ -6157,32 +6085,20 @@ function drawBullet(b) {
       const ox = t.ox + wobble;
       const oy = t.oy + Math.cos(time + t.phase) * r * 0.1;
       // 外层（暗红）
-      const tg = ctx.createRadialGradient(ox, oy, 0, ox, oy, t.rx);
-      tg.addColorStop(0, `rgba(255,180,80,${0.7 * fade})`);
-      tg.addColorStop(0.5, `rgba(255,80,30,${0.5 * fade})`);
-      tg.addColorStop(1, 'transparent');
-      ctx.fillStyle = tg;
+      ctx.fillStyle = `rgba(255,80,30,${0.5 * fade})`;
       ctx.beginPath();
       ctx.ellipse(ox, oy, t.rx, t.ry, 0, 0, Math.PI * 2);
       ctx.fill();
     }
 
     // 3. 主火球外层光晕（暗红，最大）
-    const outer = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 3);
-    outer.addColorStop(0, `rgba(255,140,50,${0.5 * fade})`);
-    outer.addColorStop(0.4, `rgba(220,50,20,${0.3 * fade})`);
-    outer.addColorStop(1, 'transparent');
-    ctx.fillStyle = outer;
+    ctx.fillStyle = `rgba(220,50,20,${0.3 * fade})`;
     ctx.beginPath();
     ctx.ellipse(0, 0, r * 3, r * 2, 0, 0, Math.PI * 2);
     ctx.fill();
 
     // 4. 主火球中层（橙红）
-    const mid = ctx.createRadialGradient(0, 0, 0, 0, 0, r * 1.8);
-    mid.addColorStop(0, `rgba(255,210,90,${0.85 * fade})`);
-    mid.addColorStop(0.5, `rgba(255,100,40,${0.6 * fade})`);
-    mid.addColorStop(1, 'transparent');
-    ctx.fillStyle = mid;
+    ctx.fillStyle = `rgba(255,100,40,${0.6 * fade})`;
     ctx.beginPath();
     ctx.ellipse(0, 0, r * 1.8, r * 1.3, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -6233,11 +6149,7 @@ function drawBullet(b) {
     ctx.translate(b.x, b.y);
     ctx.rotate(angle);
     // 外层光晕（蓝紫色）
-    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, b.radius * 3);
-    glowGrad.addColorStop(0, `rgba(100,200,255,${0.8 * fade})`);
-    glowGrad.addColorStop(0.5, `rgba(80,150,255,${0.3 * fade})`);
-    glowGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGrad;
+    ctx.fillStyle = `rgba(80,150,255,${0.3 * fade})`;
     ctx.beginPath();
     ctx.ellipse(0, 0, b.radius * 3, b.radius * 1.5, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -6253,10 +6165,7 @@ function drawBullet(b) {
     ctx.fill();
     // 拖尾
     const trailLen = b.radius * 4;
-    const trailGrad = ctx.createLinearGradient(0, 0, -trailLen, 0);
-    trailGrad.addColorStop(0, `rgba(100,200,255,${0.6 * fade})`);
-    trailGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = trailGrad;
+    ctx.fillStyle = `rgba(100,200,255,${0.6 * fade})`;
     ctx.beginPath();
     ctx.moveTo(0, -b.radius * 0.5);
     ctx.lineTo(-trailLen, -b.radius * 0.15);
@@ -6277,11 +6186,7 @@ function drawBullet(b) {
     ctx.translate(b.x, b.y);
     ctx.rotate(angle);
     // 外层光晕
-    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, b.radius * 3);
-    glowGrad.addColorStop(0, 'rgba(255,100,221,0.8)');
-    glowGrad.addColorStop(0.5, 'rgba(255,80,180,0.3)');
-    glowGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGrad;
+    ctx.fillStyle = 'rgba(255,80,180,0.3)';
     ctx.beginPath();
     ctx.arc(0, 0, b.radius * 3, 0, Math.PI * 2);
     ctx.fill();
@@ -6320,10 +6225,7 @@ function drawBullet(b) {
     ctx.translate(b.x, b.y);
     ctx.rotate(time);
     // 外层光晕
-    const glowGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, b.radius * 2.5);
-    glowGrad.addColorStop(0, 'rgba(136,221,68,0.7)');
-    glowGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGrad;
+    ctx.fillStyle = 'rgba(136,221,68,0.7)';
     ctx.beginPath();
     ctx.arc(0, 0, b.radius * 2.5, 0, Math.PI * 2);
     ctx.fill();
@@ -6353,10 +6255,7 @@ function drawBullet(b) {
     ctx.save();
     ctx.translate(b.x, b.y);
     ctx.rotate(angle);
-    const trailGrad = ctx.createLinearGradient(0, 0, -b.radius * 3, 0);
-    trailGrad.addColorStop(0, 'rgba(136,221,68,0.5)');
-    trailGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = trailGrad;
+    ctx.fillStyle = 'rgba(136,221,68,0.5)';
     ctx.beginPath();
     ctx.moveTo(0, -b.radius * 0.5);
     ctx.lineTo(-b.radius * 3, 0);
@@ -6375,11 +6274,7 @@ function drawBullet(b) {
     ctx.translate(b.x, b.y);
     ctx.rotate(angle);
     // 火焰拖尾
-    const trailGrad = ctx.createLinearGradient(0, 0, -b.radius * 4, 0);
-    trailGrad.addColorStop(0, 'rgba(255,153,68,0.8)');
-    trailGrad.addColorStop(0.5, 'rgba(255,200,68,0.4)');
-    trailGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = trailGrad;
+    ctx.fillStyle = 'rgba(255,153,68,0.8)';
     ctx.beginPath();
     ctx.moveTo(0, -b.radius * 0.6);
     ctx.lineTo(-b.radius * 4, -b.radius * 0.2);
@@ -6421,10 +6316,7 @@ function drawBullet(b) {
 
   // Trail
   if (!isFinite(b.x) || !isFinite(b.y) || !isFinite(b.vx) || !isFinite(b.vy)) return;
-  const trailGrad = ctx.createLinearGradient(b.x, b.y, b.x - b.vx * 2, b.y - b.vy * 2);
-  trailGrad.addColorStop(0, b.color);
-  trailGrad.addColorStop(1, 'transparent');
-  ctx.strokeStyle = trailGrad;
+  ctx.strokeStyle = b.color;
   ctx.lineWidth = b.radius * 1.5;
   ctx.lineCap = 'round';
   ctx.beginPath();
@@ -6433,11 +6325,7 @@ function drawBullet(b) {
   ctx.stroke();
 
   // Glow
-  const glowGrad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.radius * 3);
-  glowGrad.addColorStop(0, b.color);
-  glowGrad.addColorStop(0.4, b.color + '88');
-  glowGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = glowGrad;
+  ctx.fillStyle = b.color + '88';
   ctx.beginPath();
   ctx.arc(b.x, b.y, b.radius * 3, 0, Math.PI * 2);
   ctx.fill();
@@ -6453,10 +6341,7 @@ function drawParticle(p) {
   const alpha = p.life / p.maxLife;
   ctx.globalAlpha = alpha;
   // Glow
-  const glowGrad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 2);
-  glowGrad.addColorStop(0, p.color);
-  glowGrad.addColorStop(1, 'transparent');
-  ctx.fillStyle = glowGrad;
+  ctx.fillStyle = p.color;
   ctx.beginPath();
   ctx.arc(p.x, p.y, p.size * 2 * alpha, 0, Math.PI * 2);
   ctx.fill();
@@ -6481,38 +6366,48 @@ function drawLightingOverlay() {
   // Clamp and scale
   darkness = Math.min(1, Math.max(0, darkness)) * 0.6;
 
-  // Vignette around player to create atmosphere
+  // Vignette around player — pixel style flat rings (no gradient)
   const cx = player.x;
   const cy = player.y;
-  // Vision radius shrinks at night
   const radius = 400 - darkness * 200;
-  const grad = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius);
-  grad.addColorStop(0, 'transparent');
-  grad.addColorStop(0.7, `rgba(0,0,0,${0.15 + darkness * 0.3})`);
-  grad.addColorStop(1, `rgba(0,0,0,${0.45 + darkness * 0.4})`);
-  ctx.fillStyle = grad;
-  ctx.fillRect(camera.x - 50, camera.y - 50, canvas.width + 100, canvas.height + 100);
+  ctx.fillStyle = `rgba(0,0,0,${0.4 + darkness * 0.35})`;
+  ctx.fillRect(camera.x - 50, camera.y - 50, VIEW_W + 100, VIEW_H + 100);
+  // Carve vision circle with lighter overlay (no gradient — flat alpha rings)
+  const ringStep = 40;
+  for (let r = radius; r > 0; r -= ringStep) {
+    var a = (1 - r / radius) * (0.35 + darkness * 0.3);
+    ctx.fillStyle = `rgba(0,0,0,0)`;
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalCompositeOperation = 'source-over';
 
   // Blue tint at night
   if (darkness > 0.2) {
     ctx.fillStyle = `rgba(10,20,50,${darkness * 0.25})`;
-    ctx.fillRect(camera.x - 50, camera.y - 50, canvas.width + 100, canvas.height + 100);
+    ctx.fillRect(camera.x - 50, camera.y - 50, VIEW_W + 100, VIEW_H + 100);
   }
 
-  // Player flashlight cone at night (toward aim direction)
+  // Player flashlight cone at night — pixel style flat triangle (no gradient)
   if (darkness > 0.3) {
     ctx.save();
     ctx.globalCompositeOperation = 'lighter';
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle);
-    const flashGrad = ctx.createRadialGradient(0, 0, 20, 0, 0, 350);
-    flashGrad.addColorStop(0, `rgba(255,240,200,${darkness * 0.3})`);
-    flashGrad.addColorStop(0.5, `rgba(255,220,150,${darkness * 0.15})`);
-    flashGrad.addColorStop(1, 'transparent');
-    ctx.fillStyle = flashGrad;
+    // Flat cone — no gradient, just semi-transparent triangle
+    ctx.fillStyle = `rgba(255,240,200,${darkness * 0.15})`;
     ctx.beginPath();
     ctx.moveTo(0, 0);
     ctx.arc(0, 0, 350, -0.5, 0.5);
+    ctx.closePath();
+    ctx.fill();
+    // Brighter inner cone
+    ctx.fillStyle = `rgba(255,240,200,${darkness * 0.1})`;
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, 200, -0.5, 0.5);
     ctx.closePath();
     ctx.fill();
     ctx.restore();
@@ -6523,56 +6418,41 @@ function drawPlayer() {
   ctx.save();
   ctx.translate(player.x, player.y);
 
-  // Shadow
+  // Shadow - pixel rect (relative coords, context translated to player)
   ctx.fillStyle = 'rgba(0,0,0,0.45)';
-  ctx.beginPath();
-  ctx.ellipse(3, 5, player.radius * 1.1, player.radius * 0.55, 0, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.fillRect(PX(-player.radius), PX(5), player.radius * 2, player.radius * 0.5);
 
   // Walk bob
   const walkBob = Math.sin(player.walkPhase) * 1.5;
   const legSwing = Math.sin(player.walkPhase) * 3;
 
-  // Legs
-  ctx.fillStyle = '#1a3a28';
-  ctx.fillRect(-5, player.radius * 0.4, 4, 8 + legSwing * 0.4);
-  ctx.fillRect(1, player.radius * 0.4, 4, 8 - legSwing * 0.4);
+  // Legs - pixel fillRect
+  pxRect(-5, player.radius * 0.4, 4, 8 + legSwing * 0.4, '#1a3a28');
+  pxRect(1, player.radius * 0.4, 4, 8 - legSwing * 0.4, '#1a3a28');
 
   ctx.translate(0, walkBob);
 
-  // Body (tactical armor look)
-  const bodyGrad = ctx.createRadialGradient(-player.radius * 0.3, -player.radius * 0.3, 0, 0, 0, player.radius);
-  if (player.hurtFlash > 0 && Math.floor(player.hurtFlash / 3) % 2 === 0) {
-    bodyGrad.addColorStop(0, '#ffaaaa');
-    bodyGrad.addColorStop(1, '#ff4444');
-  } else {
-    bodyGrad.addColorStop(0, '#44ffbb');
-    bodyGrad.addColorStop(0.6, '#00cc88');
-    bodyGrad.addColorStop(1, '#005533');
-  }
-  ctx.fillStyle = bodyGrad;
-  ctx.beginPath();
-  ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
-  ctx.fill();
+  // Pixel body - flat color, no gradient (context already translated by walkBob)
+  var pr = player.radius;
+  var bodyColor = (player.hurtFlash > 0 && Math.floor(player.hurtFlash / 3) % 2 === 0) ? '#ff4444' : '#00cc88';
+  pxCircle(0, 0, pr, bodyColor);
 
-  // Armor plates
-  ctx.fillStyle = 'rgba(0,80,50,0.6)';
-  ctx.beginPath();
-  ctx.arc(0, 0, player.radius * 0.7, -Math.PI / 4, Math.PI / 4);
-  ctx.arc(0, 0, player.radius * 0.7, Math.PI * 3 / 4, Math.PI * 5 / 4);
-  ctx.fill();
+  // Armor plates - pixel rect blocks
+  pxRect(-pr * 0.6, -2, pr * 0.5, 4, 'rgba(0,80,50,0.6)');
+  pxRect(pr * 0.1, -2, pr * 0.5, 4, 'rgba(0,80,50,0.6)');
+  pxRect(-pr * 0.6, pr * 0.4, pr * 0.5, 4, 'rgba(0,80,50,0.6)');
+  pxRect(pr * 0.1, pr * 0.4, pr * 0.5, 4, 'rgba(0,80,50,0.6)');
 
-  // Outline
-  ctx.strokeStyle = '#00ff88';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  // Outline - pixel edge blocks
+  pxRect(-pr, -2, 2, 2, '#005533');
+  pxRect(pr - 2, -2, 2, 2, '#005533');
+  pxRect(-pr, pr - 2, 2, 2, '#005533');
+  pxRect(pr - 2, pr - 2, 2, 2, '#005533');
 
-  // Inner highlight
-  ctx.strokeStyle = 'rgba(180,255,220,0.4)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.arc(0, 0, player.radius - 2, -Math.PI * 0.8, -Math.PI * 0.2);
-  ctx.stroke();
+  // Inner highlight - lighter pixel blocks
+  pxRect(-pr * 0.5, -pr + 2, 2, 2, '#44ffbb');
+  pxRect(pr * 0.3, -pr + 2, 2, 2, '#44ffbb');
+  pxRect(-pr * 0.3, -pr + 4, 2, 2, '#44ffbb');
 
   // Rotate for weapon
   ctx.rotate(player.angle);
@@ -6789,11 +6669,8 @@ function drawSpawnTelegraph(s) {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // Inner fill (growing)
-  const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 25);
-  grad.addColorStop(0, `rgba(255,40,40,${0.4 * progress})`);
-  grad.addColorStop(1, 'transparent');
-  ctx.fillStyle = grad;
+  // Inner fill (growing) — flat color, no gradient
+  ctx.fillStyle = `rgba(255,40,40,${0.3 * progress})`;
   ctx.beginPath();
   ctx.arc(s.x, s.y, 25, 0, Math.PI * 2);
   ctx.fill();
@@ -6828,10 +6705,10 @@ function drawDamageNumber(d) {
 }
 
 function drawMinimap() {
-  const size = 140;
-  const pad = 18;
+  const size = 110;
+  const pad = 14;
   const x = canvas.width - size - pad;
-  const y = pad + 40; // below lang button
+  const y = pad + 34;
 
   // Background
   ctx.fillStyle = '#0d1014';
@@ -6840,8 +6717,8 @@ function drawMinimap() {
   ctx.lineWidth = 1;
   ctx.strokeRect(x + 0.5, y + 0.5, size - 1, size - 1);
 
-  // Top accent bar
-  ctx.fillStyle = '#c44a3a';
+  // Top accent bar (subtle)
+  ctx.fillStyle = '#3a3036';
   ctx.fillRect(x, y, size, 2);
 
   // Grid
@@ -6864,7 +6741,7 @@ function drawMinimap() {
   // Viewport rectangle
   ctx.strokeStyle = 'rgba(200,200,200,0.25)';
   ctx.lineWidth = 1;
-  ctx.strokeRect(x + camera.x * sx, y + camera.y * sy, canvas.width * sx, canvas.height * sy);
+  ctx.strokeRect(x + camera.x * sx, y + camera.y * sy, VIEW_W * sx, VIEW_H * sy);
 
   // Crates
   ctx.fillStyle = '#8b5a2b';
@@ -6921,7 +6798,7 @@ function drawMinimap() {
   ctx.fillStyle = '#5a6268';
   ctx.font = '9px "JetBrains Mono", monospace';
   ctx.textAlign = 'left';
-  ctx.fillText(lang === 'zh' ? 'TAC-MAP' : 'TAC-MAP', x + 4, y + 14);
+  ctx.fillText(lang === 'zh' ? '战术地图' : 'TAC-MAP', x + 4, y + 14);
   // Coords
   ctx.textAlign = 'right';
   ctx.fillText(Math.round(player.x) + ',' + Math.round(player.y), x + size - 4, y + 14);
@@ -6929,7 +6806,7 @@ function drawMinimap() {
   // Day-night indicator below minimap
   const dnY = y + size + 6;
   const dnW = size;
-  const dnH = 14;
+  const dnH = 16;
   ctx.fillStyle = '#0d1014';
   ctx.fillRect(x, dnY, dnW, dnH);
   ctx.strokeStyle = '#2a3036';
@@ -6951,14 +6828,14 @@ function drawMinimap() {
   ctx.fill();
   // Label
   ctx.fillStyle = '#e8e4d8';
-  ctx.font = '700 8px "JetBrains Mono", monospace';
+  ctx.font = '700 10px "JetBrains Mono", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(phaseLabel, x + dnW / 2, dnY + dnH / 2 + 1);
 
   // 天气指示条（位于昼夜指示下方）
   const wY = dnY + dnH + 2;
-  const wH = 12;
+  const wH = 14;
   ctx.fillStyle = '#0d1014';
   ctx.fillRect(x, wY, dnW, wH);
   ctx.strokeStyle = '#2a3036';
@@ -6978,7 +6855,7 @@ function drawMinimap() {
     ctx.fillRect(x + 1, wY + 1, dnW - 2, wH - 2);
   }
   ctx.fillStyle = '#e8e4d8';
-  ctx.font = '700 8px "JetBrains Mono", monospace';
+  ctx.font = '700 10px "JetBrains Mono", monospace';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(wLabel, x + dnW / 2, wY + wH / 2 + 1);
@@ -7020,6 +6897,17 @@ function drawWaveBanner() {
   else if (waveType === 'silent') subtitle = t('silentDesc');
   ctx.fillText(subtitle, 0, 18);
 
+  // 策略提示（第二行）
+  let strategy = '';
+  if (waveType === 'horde') strategy = lang === 'zh' ? '尸潮来袭！保持距离' : 'Horde incoming! Keep distance';
+  else if (waveType === 'boss') strategy = lang === 'zh' ? 'Boss出现！优先击杀召唤者' : 'Boss detected! Kill summoners first';
+  else if (waveType === 'silent') strategy = lang === 'zh' ? '无预警袭击！保持警惕' : 'Silent wave! Stay alert';
+  if (strategy) {
+    ctx.font = '700 11px "JetBrains Mono", monospace';
+    ctx.fillStyle = '#e8e4d8';
+    ctx.fillText(strategy, 0, 36);
+  }
+
   ctx.restore();
 }
 
@@ -7030,27 +6918,42 @@ function drawComboIndicator() {
 
   ctx.save();
   ctx.globalAlpha = alpha;
-  ctx.translate(canvas.width / 2, 90);
 
-  // Combo number
-  ctx.font = '700 28px "Oswald", sans-serif';
-  ctx.textAlign = 'center';
+  // Position: left-center, below wave info
+  const cx = 16;
+  const cy = 56;
+  const cw = 92;
+  const ch = 28;
+
+  // Background pill
+  ctx.fillStyle = 'rgba(13,16,19,0.85)';
+  ctx.fillRect(cx, cy, cw, ch);
+  ctx.strokeStyle = mult >= 3 ? '#c44a3a' : mult >= 2 ? '#e8b04a' : '#3a3036';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(cx + 0.5, cy + 0.5, cw - 1, ch - 1);
+  // Left accent
+  ctx.fillStyle = mult >= 3 ? '#c44a3a' : '#e8b04a';
+  ctx.fillRect(cx, cy, 2, ch);
+
+  // Combo number (compact)
+  ctx.font = '700 16px "Oswald", sans-serif';
+  ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#e8e4d8';
-  ctx.fillText(combo, 0, 0);
+  ctx.fillText(combo, cx + 8, cy + ch / 2);
 
   // Multiplier badge
-  ctx.font = '700 12px "JetBrains Mono", monospace';
+  ctx.font = '700 10px "JetBrains Mono", monospace';
   ctx.fillStyle = mult >= 3 ? '#c44a3a' : mult >= 2 ? '#e8b04a' : '#9aa0a6';
-  ctx.fillText('x' + mult + ' ' + t('combo'), 0, 22);
+  ctx.fillText('x' + mult + ' ' + t('combo'), cx + 28, cy + ch / 2);
 
-  // Combo timer bar
-  const barW = 60;
+  // Combo timer bar (inline)
+  const barW = cw - 36;
   const barH = 2;
   ctx.fillStyle = '#1a1e22';
-  ctx.fillRect(-barW / 2, 32, barW, barH);
+  ctx.fillRect(cx + 28, cy + ch - 5, barW, barH);
   ctx.fillStyle = mult >= 3 ? '#c44a3a' : '#e8b04a';
-  ctx.fillRect(-barW / 2, 32, barW * (comboTimer / COMBO_TIMEOUT), barH);
+  ctx.fillRect(cx + 28, cy + ch - 5, barW * (comboTimer / COMBO_TIMEOUT), barH);
 
   ctx.restore();
 }
@@ -7134,6 +7037,35 @@ function drawBuffs(x, y) {
   }
 }
 
+// 装弹进度条（屏幕空间，绘制于左下角冲刺栏上方）
+function drawReloadBar() {
+  if (state !== GameState.PLAYING) return;
+  if (!player.reloading) return;
+  const x = 18;
+  const w = 56;
+  const y = canvas.height - 120; // 位于冲刺栏上方
+  const h = 6;
+  const total = player.reloadDuration > 0 ? player.reloadDuration : 1;
+  const ratio = Math.max(0, Math.min(1, 1 - (player.reloadTimer / total)));
+  ctx.save();
+  // 背景
+  ctx.fillStyle = '#0d1014';
+  ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = '#2a3036';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  // 进度填充
+  ctx.fillStyle = '#e8b04a';
+  ctx.fillRect(x + 1, y + 1, (w - 2) * ratio, h - 2);
+  // 标签
+  ctx.font = '700 8px "JetBrains Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#e8b04a';
+  ctx.fillText('[R] ' + t('reloading'), x + w / 2, y - 7);
+  ctx.restore();
+}
+
 // =====================================================================
 // HUD UPDATE
 // =====================================================================
@@ -7178,6 +7110,11 @@ function updateHUD() {
   const ammoVal = ammo[player.weapon];
   const ammoStr = t('ammo') + (ammoVal === Infinity ? t('ammoInfinite') : ammoVal);
   document.getElementById('ammoText').textContent = ammoStr;
+  // 装弹状态指示
+  const reloadEl = document.getElementById('reloadIndicator');
+  if (reloadEl) {
+    reloadEl.textContent = player.reloading ? '! ' + t('reloading') + ' !' : '';
+  }
   document.getElementById('minesText').textContent = t('mines') + player.mines + '/' + player.mineMax;
 
   document.getElementById('waveText').textContent = t('wave') + wave;
@@ -7205,7 +7142,7 @@ function updateHUD() {
     if (owned && ammo[wId] !== Infinity) {
       ammoLabel = `<span class="slot-ammo" style="color:${ammo[wId] > 0 ? '#88a8c8' : '#ff4444'};font-size:9px">${ammo[wId]}</span>`;
     }
-    slotsHtml += `<div class="${cls}"><span class="key-num">${i+1}</span><span class="slot-name" style="color:${color}">${owned ? wLabel : '???'}</span>${att && owned ? `<span class="slot-att" style="color:${attColor}">${attIcon}</span>` : ''}${ammoLabel}</div>`;
+    slotsHtml += `<div class="${cls}"><span class="key-num">${i+1}</span><span class="slot-name" style="color:${color}">${owned ? wLabel : '—'}</span>${att && owned ? `<span class="slot-att" style="color:${attColor}">${attIcon}</span>` : ''}${ammoLabel}</div>`;
   }
   slotsEl.innerHTML = slotsHtml;
 
@@ -7228,19 +7165,80 @@ function updateHUD() {
   const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
   const mineKey = lang === 'zh' ? '地雷' : 'MINE';
   const dropKey = lang === 'zh' ? '丢弃' : 'DROP';
-  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">E</span>${mineKey}</span><span><span class="key">Q</span>${dropKey}</span><span><span class="key">1-9</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">E</span>${mineKey}</span><span><span class="key">Q</span>${dropKey}</span><span><span class="key">1-9</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
 
   // Countdown text
   const cdEl = document.getElementById('countdownText');
   if (!waveActive && state === GameState.PLAYING) {
-    cdEl.textContent = t('nextWave') + Math.ceil(waveCountdown) + 's';
+    const secs = Math.ceil(waveCountdown);
+    cdEl.textContent = t('nextWave') + secs + 's';
+    // Flash red when countdown ≤ 3s
+    if (secs <= 3) {
+      cdEl.style.color = '#ff4444';
+      cdEl.style.animation = 'flash-red 0.5s infinite';
+    } else {
+      cdEl.style.color = '';
+      cdEl.style.animation = '';
+    }
   } else if (waveActive) {
     const remaining = zombies.length + spawnQueue.length + spawnTelegraphs.length;
     cdEl.textContent = remaining + t('zombiesLeft');
+    cdEl.style.color = '';
+    cdEl.style.animation = '';
   } else {
     cdEl.textContent = '';
+    cdEl.style.color = '';
+    cdEl.style.animation = '';
   }
 }
+
+// =====================================================================
+// TUTORIAL OVERLAY - 首次游戏教程
+// =====================================================================
+let tutorialTimer = 0;
+let tutorialActive = false;
+
+function showTutorial() {
+  if (localStorage.getItem('zc_tutorial_done')) return;
+  const body = document.getElementById('tutorialBody');
+  const foot = document.getElementById('tutorialFoot');
+  const title = document.getElementById('tutorialTitle');
+  if (lang === 'zh') {
+    title.textContent = '操作指南';
+    body.innerHTML =
+      '<span class="k">WASD</span> 移动 &nbsp; <span class="k">鼠标</span> 瞄准 &nbsp; <span class="k">左键</span> 射击<br>' +
+      '<span class="k">R</span> 装弹 &nbsp; <span class="k">Shift</span> 冲刺 &nbsp; <span class="k">空格</span> 地雷<br>' +
+      '<span class="k">1-9</span> 切换武器 &nbsp; <span class="k">Q</span> 丢弃武器';
+    foot.textContent = '5 秒后消失，或按任意键继续';
+  } else {
+    title.textContent = 'CONTROLS';
+    body.innerHTML =
+      '<span class="k">WASD</span> Move &nbsp; <span class="k">Mouse</span> Aim &nbsp; <span class="k">LMB</span> Fire<br>' +
+      '<span class="k">R</span> Reload &nbsp; <span class="k">Shift</span> Dash &nbsp; <span class="k">Space</span> Mine<br>' +
+      '<span class="k">1-9</span> Switch Weapon &nbsp; <span class="k">Q</span> Drop';
+    foot.textContent = 'Disappears in 5s, or press any key to continue';
+  }
+  document.getElementById('tutorialOverlay').classList.remove('hidden');
+  tutorialTimer = 300; // 5 秒（60fps）
+  tutorialActive = true;
+}
+
+function hideTutorial() {
+  if (!tutorialActive) return;
+  document.getElementById('tutorialOverlay').classList.add('hidden');
+  tutorialActive = false;
+  tutorialTimer = 0;
+  localStorage.setItem('zc_tutorial_done', '1');
+}
+
+// 任意按键关闭教程（捕获阶段，避免按键同时触发游戏动作）
+document.addEventListener('keydown', function(e) {
+  if (tutorialActive) {
+    hideTutorial();
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
 
 // =====================================================================
 // GAME FLOW
@@ -7313,6 +7311,10 @@ function startGame() {
   terrainFeatures = [];
   dayNightTime = 0;
   waveType = 'normal';
+  floatingHints = [];
+  survivalHints.hunger = false;
+  survivalHints.thirst = false;
+  survivalHints.stamina = false;
 
   // 重置天气系统
   weather.type = 'clear';
@@ -7354,6 +7356,9 @@ function startGame() {
   document.getElementById('menuOverlay').classList.add('hidden');
   document.getElementById('gameOverOverlay').classList.add('hidden');
   document.getElementById('hud').classList.remove('hidden');
+
+  // 首次游戏教程
+  showTutorial();
 
   startWave(1);
   updateHUD();
@@ -7442,6 +7447,12 @@ function gameLoop(timestamp) {
 
   if (state === GameState.PLAYING) {
     update(dt);
+  }
+
+  // 教程倒计时
+  if (tutorialActive) {
+    tutorialTimer -= dt;
+    if (tutorialTimer <= 0) hideTutorial();
   }
 
   render();
