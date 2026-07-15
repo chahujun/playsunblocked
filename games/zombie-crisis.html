@@ -2424,15 +2424,16 @@ function spawnZombie(type) {
   else if (side === 2) { x = Math.random() * WORLD_W; y = WORLD_H - 20; }
   else { x = 20; y = Math.random() * WORLD_H; }
 
-  // Scale HP and damage with wave
-  const hpScale = 1 + (wave - 1) * 0.15;
-  const dmgScale = 1 + (wave - 1) * 0.08;
+  // Scale HP, damage, and speed with wave
+  const hpScale = 1 + (wave - 1) * 0.22; // 22% per wave
+  const dmgScale = 1 + (wave - 1) * 0.12; // 12% per wave
+  const speedScale = 1 + Math.min(0.6, (wave - 1) * 0.04); // speed +4%/wave, cap +60%
   zombies.push({
     x, y, vx: 0, vy: 0,
     type,
     hp: def.hp * hpScale,
     maxHp: def.hp * hpScale,
-    speed: def.speed,
+    speed: def.speed * speedScale,
     damage: Math.floor(def.damage * dmgScale),
     radius: def.radius,
     color: def.color,
@@ -2454,7 +2455,7 @@ function spawnZombie(type) {
 // 生成BOSS
 function spawnBoss(typeKey) {
   const def = BOSS_TYPES[typeKey];
-  const hpScale = 1 + (wave - 5) * 0.15; // 从第5波开始缩放
+  const hpScale = 1 + (wave - 4) * 0.18; // 从第4波开始缩放，18%/波
   boss = {
     type: typeKey,
     def: def,
@@ -2514,9 +2515,9 @@ function startWave(w) {
   damageNumbers = [];
   lightningEffects = [];
 
-  // Determine wave type: every 5th wave is boss, every 3rd is horde, every 7th is silent
+  // Determine wave type: every 4th wave is boss, every 3rd is horde, every 7th is silent
   if (w % 7 === 0) waveType = 'silent';
-  else if (w % 5 === 0) waveType = 'boss';
+  else if (w % 4 === 0) waveType = 'boss';
   else if (w % 3 === 0) waveType = 'horde';
   else waveType = 'normal';
 
@@ -2534,9 +2535,18 @@ function startWave(w) {
     comp.spitter += 2;
     comp.screamer += 1;
     comp.brute += 1;
-    // 生成BOSS（每5波一个，循环3种BOSS）
+    // 生成BOSS（每4波一个，随机选择）
     const bossKeys = Object.keys(BOSS_TYPES);
-    const bossIdx = Math.floor((w / 5 - 1)) % bossKeys.length;
+    // 前几次BOSS战用基础BOSS，后续随机全部BOSS
+    const bossCount = Math.floor(w / 4);
+    let bossIdx;
+    if (bossCount <= 2) {
+      // 前两个BOSS用前两种
+      bossIdx = (bossCount - 1) % 3;
+    } else {
+      // 之后随机选择
+      bossIdx = Math.floor(Math.random() * bossKeys.length);
+    }
     spawnBoss(bossKeys[bossIdx]);
   } else if (waveType === 'silent') {
     // No telegraphs, normal composition but spawns silently
@@ -2569,8 +2579,8 @@ function startWave(w) {
     waveBannerText = t('waveBanner') + w;
   }
 
-  // 第5波BOSS战解锁第二副武器
-  if (w === 5 && !player.secondWeaponUnlocked && player.class) {
+  // 第4波BOSS战解锁第二副武器
+  if (w === 4 && !player.secondWeaponUnlocked && player.class) {
     const cls = CLASSES[player.class];
     if (cls.secondWeapon && !player.ownedWeapons.includes(cls.secondWeapon)) {
       player.secondWeaponUnlocked = true;
@@ -2792,15 +2802,16 @@ function updateSpawnTelegraphs(dt) {
 function spawnZombieAt(type, x, y) {
   if (zombies.length >= MAX_ZOMBIES) return;
   const def = ZOMBIE_TYPES[type];
-  const hpScale = 1 + (wave - 1) * 0.15; // 15% per wave (was 12%)
-  const dmgScale = 1 + (wave - 1) * 0.08; // damage also scales
+  const hpScale = 1 + (wave - 1) * 0.22; // 22% per wave
+  const dmgScale = 1 + (wave - 1) * 0.12; // 12% per wave
+  const speedScale = 1 + Math.min(0.6, (wave - 1) * 0.04);
   zombies.push({
     x, y, vx: 0, vy: 0,
     type,
     hp: def.hp * hpScale,
     maxHp: def.hp * hpScale,
-    speed: def.speed,
-    damage: def.damage,
+    speed: def.speed * speedScale,
+    damage: Math.floor(def.damage * dmgScale),
     radius: def.radius,
     color: def.color,
     score: def.score,
@@ -3276,8 +3287,8 @@ function updateZombies(dt) {
         addBloodStain(z.x, z.y, z.radius);
         addDamageNumber(z.x, z.y - z.radius - 10, '+' + gained, '#00ff88');
         playZombieDeath();
-        // 掉落逻辑（后期波次增加弹药掉落率）
-        const ammoBonus = Math.min(0.15, wave * 0.01); // 每波+1%，上限+15%
+        // 掉落逻辑（后期波次大幅增加弹药掉落率）
+        const ammoBonus = Math.min(0.35, wave * 0.025); // 每波+2.5%，上限+35%
         const roll = Math.random();
         if (roll < 0.06) pickups.push({ x: z.x, y: z.y, type: 'health', radius: 12, life: 600, bob: 0 });
         else if (roll < 0.14) {
@@ -3286,7 +3297,21 @@ function updateZombies(dt) {
         }
         else if (roll < 0.19) pickups.push({ x: z.x, y: z.y, type: 'food', radius: 12, life: 600, bob: 0 });
         else if (roll < 0.24) pickups.push({ x: z.x, y: z.y, type: 'water', radius: 12, life: 600, bob: 0 });
-        else if (roll < 0.38 + ammoBonus) pickups.push({ x: z.x, y: z.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
+        else if (roll < 0.38 + ammoBonus) {
+          // 精英僵尸掉落更多弹药
+          const ammoType = z.isElite ? 'ammo' : 'ammo';
+          pickups.push({ x: z.x, y: z.y, type: ammoType, radius: 12, life: 600, bob: 0 });
+          // 后期波次精英僵尸额外掉落弹药包
+          if (z.isElite && wave >= 5 && Math.random() < 0.3) {
+            pickups.push({ x: z.x + 15, y: z.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
+          }
+        }
+        // 精英僵尸在后期波次有概率掉落新武器
+        if (z.isElite && wave >= 6 && Math.random() < 0.08) {
+          const newWeapons = ['tesla', 'acid', 'railgun'];
+          const nw = newWeapons[Math.floor(Math.random() * newWeapons.length)];
+          pickups.push({ x: z.x, y: z.y, type: 'weapon_' + nw, radius: 14, life: 900, bob: 0 });
+        }
         zombies.splice(i, 1);
         updateHUD();
         continue;
@@ -4053,11 +4078,11 @@ function updateBullets(dt) {
       const actualDmg = b.damage * (1 - (z.damageReduction || 0));
       z.hp -= actualDmg;
       z.hurtFlash = 8;
-      // 吸血：概率回复HP（每层8%概率，回1HP，有0.5秒内置CD）
-      if (b.lifesteal > 0 && Math.random() < b.lifesteal * 0.08 && (performance.now() - (player.lastLifesteal || 0) > 500)) {
-        player.hp = Math.min(player.maxHp, player.hp + 1);
-        player.lastLifesteal = performance.now();
-      }
+      // 吸血：概率回复HP（每层5%概率，回1HP，有0.8秒内置CD）
+        if (b.lifesteal > 0 && Math.random() < b.lifesteal * 0.05 && (performance.now() - (player.lastLifesteal || 0) > 800)) {
+          player.hp = Math.min(player.maxHp, player.hp + 1);
+          player.lastLifesteal = performance.now();
+        }
       spawnBloodParticles(b.x, b.y, 5, (b.weaponType === 'flame' || b.weaponType === 'laser') ? (b.weaponType === 'flame' ? '#ff6622' : '#66ddff') : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : '#cc1122'))));
       addBloodStain(z.x, z.y, z.radius * 0.5);
       addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (b.weaponType === 'flame' ? '#ff8833' : (b.weaponType === 'laser' ? '#44ddff' : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : '#ffdd44'))))), b.isCrit);
@@ -4232,9 +4257,10 @@ function updateBullets(dt) {
         const actualDmg = b.damage * shieldMult * (1 - boss.damageReduction);
         boss.hp -= actualDmg;
         boss.hurtFlash = 6;
-        // 吸血
-        if (b.lifesteal > 0) {
-          player.hp = Math.min(player.maxHp, player.hp + b.lifesteal);
+        // 吸血：对BOSS也走概率+CD
+        if (b.lifesteal > 0 && Math.random() < b.lifesteal * 0.05 && (performance.now() - (player.lastLifesteal || 0) > 800)) {
+          player.hp = Math.min(player.maxHp, player.hp + 1);
+          player.lastLifesteal = performance.now();
         }
         spawnBloodParticles(b.x, b.y, 6, '#ff4422');
         addDamageNumber(boss.x, boss.y - boss.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (b.weaponType === 'laser' ? '#44ddff' : '#ff8833'), b.isCrit);
@@ -5234,8 +5260,8 @@ const UPGRADE_POOL = [
   { id: 'crit',     icon: '✦', nameZh: '暴击专注', descZh: '暴击率 +10% & 暴击伤害 +25%', nameEn: 'FOCUS', descEn: 'Crit +10% & Crit dmg +25%',
     apply: (p) => { p.upgrades.critBonus += 0.10; p.critChance += 0.10; p.critMult = (p.critMult || 2) + 0.25; }, maxStacks: 6 },
   // 技能类（独特效果）
-  { id: 'lifesteal',icon: '✚', nameZh: '吸血',     descZh: '8%几率击中回复1HP(0.5sCD)', nameEn: 'LIFESTEAL', descEn: '8% chance to heal 1 HP on hit (0.5s CD)',
-    apply: (p) => { p.upgrades.lifesteal += 1; }, maxStacks: 4 },
+  { id: 'lifesteal',icon: '✚', nameZh: '吸血',     descZh: '5%几率击中回复1HP(0.8sCD)', nameEn: 'LIFESTEAL', descEn: '5% chance to heal 1 HP on hit (0.8s CD)',
+    apply: (p) => { p.upgrades.lifesteal += 1; }, maxStacks: 3 },
   { id: 'pierce',   icon: '⟶', nameZh: '火焰穿透', descZh: '火焰枪穿透 +1',          nameEn: 'PIERCE',    descEn: 'Flame pierce +1',
     apply: (p) => { p.upgrades.pierceBonus += 1; }, maxStacks: 3, classOnly: 'medic' },
   { id: 'shield',   icon: '◉', nameZh: '护盾再生', descZh: '每秒回复 3 护盾',        nameEn: 'SHIELD',    descEn: 'Regen 3 shield/sec',
