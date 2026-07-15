@@ -7,7 +7,7 @@
   if (lang !== 'en') return;
 
   var T = {
-    'WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9: 切换武器 | 空格: 地雷\nShift: 冲刺\n在无尽的尸潮中生存下去。': 'WASD: Move | Mouse: Aim | LMB: Fire\n1-9: Switch Weapon | Space: Mine\nShift: Dash\nSurvive the endless waves.',
+    'WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9/Q/E/滚轮: 切换武器 | 空格: 职业技能\nShift: 冲刺 | R: 装弹\n在无尽的尸潮中生存下去。': 'WASD: Move | Mouse: Aim | LMB: Fire\n1-9/Q/E/Wheel: Switch Weapon | Space: Class Ability\nShift: Dash | R: Reload\nSurvive the endless waves.',
     '僵尸危机：末日突围 — Zombie Crisis: Outbreak': 'Zombie Crisis: Outbreak',
     '[1-9] 武器  [Q/E] 切换武器  [滚轮] 切换武器  [空格] 地雷  [Shift] 冲刺': '[1-9] Weapon  [Q/E] Switch  [Wheel] Switch  [Space] Mine  [Shift] Dash',
     '选择你的兵种，每个职业拥有独特被动。': 'Choose your operative. Each class has unique passives.',
@@ -922,7 +922,7 @@ const I18n = {
     classSelect: "SELECT CLASS",
     classDesc: "Choose your operative. Each class has unique passives.",
     upgradeTitle: "LEVEL UP",
-    menuDesc: "WASD: Move | Mouse: Aim | LMB: Fire\n1-9: Switch Weapon | Space: Mine\nShift: Dash\nSurvive the endless waves.",
+    menuDesc: "WASD: Move | Mouse: Aim | LMB: Fire\n1-9/Q/E/Wheel: Switch Weapon | Space: Class Ability\nShift: Dash | R: Reload\nSurvive the endless waves.",
     ammoInfinite: "\u221e",
     mines: "MINES: ",
     waveCleared: "WAVE CLEARED!",
@@ -1007,7 +1007,7 @@ const I18n = {
     classSelect: "选择职业",
     classDesc: "选择你的兵种，每个职业拥有独特被动。",
     upgradeTitle: "升级强化",
-    menuDesc: "WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9: 切换武器 | 空格: 地雷\nShift: 冲刺\n在无尽的尸潮中生存下去。",
+    menuDesc: "WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9/Q/E/滚轮: 切换武器 | 空格: 职业技能\nShift: 冲刺 | R: 装弹\n在无尽的尸潮中生存下去。",
     ammoInfinite: "\u221e",
     mines: "地雷: ",
     waveCleared: "波次清除！",
@@ -8648,7 +8648,7 @@ document.getElementById('langBtn').addEventListener('click', () => {
 });
 
 document.getElementById('audioStart').addEventListener('click', () => {
-  initAudio();
+  try { initAudio(); } catch(e) { console.warn('Audio init failed:', e); }
   document.getElementById('audioOverlay').classList.add('hidden');
   document.getElementById('menuOverlay').classList.remove('hidden');
 });
@@ -8678,7 +8678,12 @@ function gameLoop(timestamp) {
   const dt = Math.min(2.5, rawDt / targetFrameTime);
 
   if (state === GameState.PLAYING) {
-    update(dt);
+    try {
+      update(dt);
+    } catch(e) {
+      console.error('Update error:', e);
+      // 防止单帧错误导致游戏完全卡死
+    }
   }
 
   // 教程倒计时
@@ -8687,7 +8692,11 @@ function gameLoop(timestamp) {
     if (tutorialTimer <= 0) hideTutorial();
   }
 
-  render();
+  try {
+    render();
+  } catch(e) {
+    console.error('Render error:', e);
+  }
   requestAnimationFrame(gameLoop);
 }
 
