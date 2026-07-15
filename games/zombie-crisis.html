@@ -9,7 +9,7 @@
   var T = {
     'WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9: 切换武器 | 空格: 地雷\nShift: 冲刺\n在无尽的尸潮中生存下去。': 'WASD: Move | Mouse: Aim | LMB: Fire\n1-9: Switch Weapon | Space: Mine\nShift: Dash\nSurvive the endless waves.',
     '僵尸危机：末日突围 — Zombie Crisis: Outbreak': 'Zombie Crisis: Outbreak',
-    '[1-9] 武器  [空格] 地雷  [Shift] 冲刺  [Q] 丢弃': '[1-9] Weapon  [Space] Mine  [Shift] Dash  [Q] Drop',
+    '[1-9] 武器  [Q/E] 切换武器  [滚轮] 切换武器  [空格] 地雷  [Shift] 冲刺': '[1-9] Weapon  [Q/E] Switch  [Wheel] Switch  [Space] Mine  [Shift] Dash',
     '选择你的兵种，每个职业拥有独特被动。': 'Choose your operative. Each class has unique passives.',
     '到达地图指定撤离点并坚持10秒': 'Reach the extract point and hold for 10s',
     '在据点范围内击杀15个僵尸': 'Kill 15 zombies within the zone',
@@ -1876,11 +1876,26 @@ let mouseDown = false;
 document.addEventListener('keydown', (e) => {
   keys[e.key.toLowerCase()] = true;
   if (e.code === 'Space') { e.preventDefault(); placeMine(); }
-  // 武器切换 1-9，仅切换已拥有的武器
+  // 武器切换 1-9，按已拥有武器的顺序切换
   if (e.key >= '1' && e.key <= '9') {
     const idx = parseInt(e.key) - 1;
-    const w = WEAPON_KEYS[idx];
+    const ownedWeapons = WEAPON_KEYS.filter(wId => player.ownedWeapons.includes(wId));
+    const w = ownedWeapons[idx];
     if (w) switchWeapon(w);
+  }
+  // Q 切换到上一个武器
+  if (e.key.toLowerCase() === 'q') {
+    const ownedWeapons = WEAPON_KEYS.filter(wId => player.ownedWeapons.includes(wId));
+    const curIdx = ownedWeapons.indexOf(player.weapon);
+    if (curIdx > 0) switchWeapon(ownedWeapons[curIdx - 1]);
+    else if (ownedWeapons.length > 1) switchWeapon(ownedWeapons[ownedWeapons.length - 1]);
+  }
+  // E 切换到下一个武器
+  if (e.key.toLowerCase() === 'e') {
+    const ownedWeapons = WEAPON_KEYS.filter(wId => player.ownedWeapons.includes(wId));
+    const curIdx = ownedWeapons.indexOf(player.weapon);
+    if (curIdx >= 0 && curIdx < ownedWeapons.length - 1) switchWeapon(ownedWeapons[curIdx + 1]);
+    else if (ownedWeapons.length > 1) switchWeapon(ownedWeapons[0]);
   }
   if (e.key === 'Shift' || e.key.toLowerCase() === 'shift') tryDash();
   if (e.key.toLowerCase() === 'r') tryReload();
@@ -1903,6 +1918,22 @@ canvas.addEventListener('mouseup', (e) => {
   }
 });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// 鼠标滚轮切换武器
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  if (state !== GameState.PLAYING) return;
+  const ownedWeapons = WEAPON_KEYS.filter(wId => player.ownedWeapons.includes(wId));
+  if (ownedWeapons.length <= 1) return;
+  const curIdx = ownedWeapons.indexOf(player.weapon);
+  let newIdx;
+  if (e.deltaY > 0) {
+    newIdx = (curIdx + 1) % ownedWeapons.length;
+  } else {
+    newIdx = (curIdx - 1 + ownedWeapons.length) % ownedWeapons.length;
+  }
+  switchWeapon(ownedWeapons[newIdx]);
+}, { passive: false });
 
 function switchWeapon(w) {
   if (state !== GameState.PLAYING) return;
@@ -8016,9 +8047,10 @@ function updateHUD() {
   // 武器槽位（右下角9个卡片）
   const slotsEl = document.getElementById('weaponSlots');
   let slotsHtml = '';
-  for (let i = 0; i < WEAPON_KEYS.length; i++) {
-    const wId = WEAPON_KEYS[i];
-    const owned = player.ownedWeapons.includes(wId);
+  // 只显示已拥有的武器，键位1-9对应已拥有武器的顺序
+  const ownedWeaponKeys = WEAPON_KEYS.filter(wId => player.ownedWeapons.includes(wId));
+  for (let i = 0; i < ownedWeaponKeys.length; i++) {
+    const wId = ownedWeaponKeys[i];
     const isCurrent = wId === player.weapon;
     const wDef = WEAPONS[wId];
     const wLabel = lang === 'zh' ? wDef.nameZh : wDef.name;
@@ -8028,15 +8060,15 @@ function updateHUD() {
     const attColor = att ? att.color : '';
     let cls = 'slot';
     if (isCurrent) cls += ' active';
-    else if (owned) cls += ' owned';
-    else cls += ' locked';
-    const color = isCurrent ? wDef.color : (owned ? '#9aa0a6' : '#3a4046');
+    else cls += ' owned';
+    const color = isCurrent ? wDef.color : '#9aa0a6';
     // 弹药显示（副武器显示剩余弹药）
     let ammoLabel = '';
-    if (owned && ammo[wId] !== Infinity) {
+    if (ammo[wId] !== Infinity) {
       ammoLabel = `<span class="slot-ammo" style="color:${ammo[wId] > 0 ? '#88a8c8' : '#ff4444'};font-size:9px">${ammo[wId]}</span>`;
     }
-    slotsHtml += `<div class="${cls}"><span class="key-num">${i+1}</span><span class="slot-name" style="color:${color}">${owned ? wLabel : '—'}</span>${att && owned ? `<span class="slot-att" style="color:${attColor}">${attIcon}</span>` : ''}${ammoLabel}</div>`;
+    const keyDisplay = i < 9 ? (i + 1) : '';
+    slotsHtml += `<div class="${cls}"><span class="key-num">${keyDisplay}</span><span class="slot-name" style="color:${color}">${wLabel}</span>${att ? `<span class="slot-att" style="color:${attColor}">${attIcon}</span>` : ''}${ammoLabel}</div>`;
   }
   slotsEl.innerHTML = slotsHtml;
 
@@ -8058,7 +8090,7 @@ function updateHUD() {
   const shootKey = lang === 'zh' ? '射击' : 'FIRE';
   const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
   const mineKey = lang === 'zh' ? '地雷' : 'MINE';
-  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${mineKey}</span><span><span class="key">1-9</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${mineKey}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
 
   // Countdown text
   const cdEl = document.getElementById('countdownText');
