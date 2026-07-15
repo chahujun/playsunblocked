@@ -1,6 +1,10 @@
-﻿{
+{
+  "cleanUrls": true,
   "redirects": [
     { "source": "/", "destination": "/pages/index-en.html", "permanent": true }
+  ],
+  "routes": [
+    { "src": "/pages/404-en\\.html", "status": 404, "dest": "/pages/404-en.html" }
   ],
   "headers": [
     { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },

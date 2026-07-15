@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Bytebreak - a daily color code puzzle game free online - no downloads, no sign-up. Works on school Chromebooks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"></noscript>
+<title>Bytebreak — Daily Color Code Puzzle</title>
+<style>
+:root {
+  --bg: #FFF8F0;
+  --bg2: #FFFFFF;
+  --ink: #1A1A1A;
+  --muted: #6B6B6B;
+  --rule: #E0DDD5;
+  --accent: #FF5C28;
+  --accent-light: #FFE5D9;
+  --shadow: 4px 4px 0 0 var(--ink);
+  --shadow-sm: 2px 2px 0 0 var(--ink);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --green: #00B86B;
+  --yellow: #FFB800;
+  --gray: #787C7E;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+/* ---- Game container ---- */
+#game-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+/* ---- Header ---- */
+.game-header {
+  text-align: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+.game-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 36px;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-transform: uppercase;
+  line-height: 1;
+}
+.game-subtitle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+/* ---- Streak bar ---- */
+.streak-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--ink);
+  color: var(--bg);
+  border: 2px solid var(--ink);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.streak-item { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.streak-item .num { font-family: var(--font-display); font-weight: 800; font-size: 20px; color: var(--accent); }
+.streak-item .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #999; }
+.streak-divider { width: 1px; height: 24px; background: #333; }
+/* ---- Grid ---- */
+#grid {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.grid-row { display: flex; gap: 6px; justify-content: center; }
+.cell {
+  width: 52px; height: 52px;
+  border: 3px solid var(--rule);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+  transition: transform 0.15s, border-color 0.15s;
+  cursor: pointer;
+  position: relative;
+}
+.cell.filled { border-color: var(--ink); transform: scale(1.05); }
+.cell.flip { animation: flip 0.5s ease forwards; }
+@keyframes flip {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+.cell.correct { background: var(--green); border-color: var(--green); }
+.cell.present { background: var(--yellow); border-color: var(--yellow); }
+.cell.absent { background: var(--gray); border-color: var(--gray); }
+.cell.correct .color-dot, .cell.present .color-dot, .cell.absent .color-dot {
+  filter: brightness(1.3) saturate(0.8);
+}
+/* ---- Color dot inside cell ---- */
+.color-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.2);
+}
+/* ---- Shake animation for invalid ---- */
+.shake { animation: shake 0.4s ease; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+/* ---- Color picker ---- */
+#color-picker {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.color-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 3px solid var(--ink);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+.color-btn:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+.color-btn:active { transform: translate(0, 0); box-shadow: none; }
+.color-btn.selected::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: pulse-ring 1s ease infinite;
+}
+@keyframes pulse-ring {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+}
+/* ---- Action buttons ---- */
+.actions { display: flex; gap: 8px; justify-content: center; width: 100%; max-width: 320px; }
+.btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--ink);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: var(--shadow-sm);
+  border-radius: 4px;
+}
+.btn:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+.btn:active { transform: translate(0, 0); box-shadow: none; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-secondary { background: var(--bg2); color: var(--ink); }
+.btn-ad {
+  background: var(--ink); color: var(--accent);
+  border-color: var(--accent);
+  font-size: 12px;
+  padding: 8px 12px;
+}
+.btn-ad::before { content: '▶ '; font-size: 10px; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: var(--shadow-sm); }
+/* ---- Toast ---- */
+#toast {
+  position: fixed;
+  top: 20px; left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  z-index: 100;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  box-shadow: var(--shadow);
+  white-space: nowrap;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+/* ---- Modal ---- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--bg2);
+  border: 3px solid var(--ink);
+  box-shadow: var(--shadow);
+  border-radius: 8px;
+  padding: 28px;
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+}
+.modal h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.modal p { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+.modal .share-preview {
+  background: var(--bg);
+  border: 2px solid var(--rule);
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre;
+  text-align: left;
+}
+.modal .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.modal .stat-box { text-align: center; }
+.modal .stat-box .val { font-family: var(--font-display); font-weight: 800; font-size: 28px; color: var(--accent); }
+.modal .stat-box .lbl { font-size: 10px; text-transform: uppercase; color: var(--muted); }
+.modal .modal-actions { display: flex; gap: 8px; }
+/* ---- Help panel ---- */
+.help-toggle {
+  position: fixed; top: 16px; right: 16px;
+  width: 36px; height: 36px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--bg2);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  z-index: 50;
+  transition: transform 0.1s;
+}
+.help-toggle:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+/* ---- Lang toggle ---- */
+.lang-toggle {
+  position: fixed; top: 16px; left: 16px;
+  padding: 4px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--bg2);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  z-index: 50;
+  transition: transform 0.1s;
+}
+.lang-toggle:hover { transform: translate(-1px, -1px); box-shadow: var(--shadow); }
+/* ---- Countdown ---- */
+.countdown {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 12px;
+  text-align: center;
+}
+.countdown .time { color: var(--accent); font-weight: 700; }
+/* ---- Responsive ---- */
+@media (max-width: 400px) {
+  .cell { width: 44px; height: 44px; }
+  .color-dot { width: 24px; height: 24px; }
+  .color-btn { width: 38px; height: 38px; }
+  .game-title { font-size: 28px; }
+}
+/* ---- Bounce on win ---- */
+.bounce { animation: bounce 0.6s ease; }
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-12px); }
+  60% { transform: translateY(-4px); }
+}
+</style>
+</head>
+<body>
+
+<!-- Lang Toggle -->
+<button class="lang-toggle" id="langToggle">EN / 中</button>
+
+<!-- Help Button -->
+<button class="help-toggle" id="helpToggle">?</button>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Game Container -->
+<div id="game-container">
+
+  <!-- Header -->
+  <div class="game-header">
+    <div class="game-title" id="gameTitle">BYTEBREAK</div>
+    <div class="game-subtitle" id="gameSubtitle">Daily Color Code · Puzzle #<span id="puzzleNum">--</span></div>
+  </div>
+
+  <!-- Streak Bar -->
+  <div class="streak-bar">
+    <div class="streak-item">
+      <div>
+        <div class="num" id="streakNum">0</div>
+        <div class="label" id="streakLabel">Day Streak</div>
+      </div>
+    </div>
+    <div class="streak-divider"></div>
+    <div class="streak-item">
+      <div>
+        <div class="num" id="playedNum">0</div>
+        <div class="label" id="playedLabel">Played</div>
+      </div>
+    </div>
+    <div class="streak-divider"></div>
+    <div class="streak-item">
+      <div>
+        <div class="num" id="winRate">0%</div>
+        <div class="label" id="winLabel">Win Rate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  <div id="grid"></div>
+
+  <!-- Color Picker -->
+  <div id="color-picker"></div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-secondary" id="clearBtn">Clear</button>
+    <button class="btn btn-primary" id="submitBtn">Submit</button>
+  </div>
+
+  <!-- Ad buttons row -->
+  <div class="actions" style="margin-top: 8px;">
+    <button class="btn btn-ad" id="hintBtn">Hint</button>
+    <button class="btn btn-ad" id="extraBtn" style="display:none;">+2 Guesses</button>
+  </div>
+
+  <!-- Countdown -->
+  <div class="countdown" id="countdown"></div>
+
+</div>
+
+<!-- Result Modal -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal">
+    <h2 id="resultTitle">Solved!</h2>
+    <p id="resultSubtitle">You cracked the code!</p>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="val" id="rStreak">0</div><div class="lbl">Streak</div></div>
+      <div class="stat-box"><div class="val" id="rPlayed">0</div><div class="lbl">Played</div></div>
+      <div class="stat-box"><div class="val" id="rWins">0</div><div class="lbl">Wins</div></div>
+      <div class="stat-box"><div class="val" id="rBest">0</div><div class="lbl">Best</div></div>
+    </div>
+    <div class="share-preview" id="sharePreview"></div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="closeModal">Close</button>
+      <button class="btn btn-primary" id="shareBtn">Share</button>
+    </div>
+  </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal" style="text-align:left;">
+    <h2 style="text-align:center;" id="helpTitle">How to Play</h2>
+    <div id="helpContent" style="font-size:14px;line-height:1.7;color:var(--ink);margin-bottom:20px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="closeHelp" style="flex:1;">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ===== Language System =====
+  var lang = new URLSearchParams(window.location.search).get('lang') || 'en';
+  var I18N = {
+    en: {
+      title: 'BYTEBREAK',
+      subtitle: 'Daily Color Code · Puzzle #',
+      streak: 'Day Streak',
+      played: 'Played',
+      winRate: 'Win Rate',
+      clear: 'Clear',
+      submit: 'Submit',
+      hint: 'Hint',
+      extra: '+2 Guesses',
+      solved: 'Solved!',
+      failed: 'Out of Guesses',
+      solvedSub: 'You cracked the code!',
+      failedSub: 'Better luck tomorrow!',
+      share: 'Share',
+      close: 'Close',
+      notEnough: 'Fill all slots first',
+      invalidGuess: 'Invalid guess',
+      hintReveal: 'Position {n} is {color}',
+      extraAdded: '+2 guesses added!',
+      nextPuzzle: 'Next puzzle in',
+      helpTitle: 'How to Play',
+      helpContent: '<p><b>Goal:</b> Crack the secret color code in 6 tries.</p>' +
+        '<p><b>Each day brings a new code</b> — everyone gets the same one.</p>' +
+        '<p style="margin-top:10px;"><b>Feedback after each guess:</b></p>' +
+        '<p>🟢 <b>Green</b> = right color, right position</p>' +
+        '<p>🟡 <b>Yellow</b> = right color, wrong position</p>' +
+        '<p>⚫ <b>Gray</b> = color not in the code</p>' +
+        '<p style="margin-top:10px;"><b>Colors can repeat</b> in the code!</p>' +
+        '<p style="margin-top:10px;color:var(--accent);"><b>★ Watch an ad for a hint or +2 extra guesses!</b></p>',
+      shareText: 'Bytebreak #{num} {tries}/6\n{grid}\n🔥 {streak}-day streak\nPlay at playsunblocked.com',
+      colors: { red:'Red', orange:'Orange', yellow:'Yellow', green:'Green', blue:'Blue', purple:'Purple' }
+    },
+    cn: {
+      title: '色彩密码',
+      subtitle: '每日挑战 · 第 #',
+      streak: '连续天数',
+      played: '已玩',
+      winRate: '胜率',
+      clear: '清除',
+      submit: '提交',
+      hint: '提示',
+      extra: '+2次机会',
+      solved: '破解成功！',
+      failed: '次数用完',
+      solvedSub: '你破解了密码！',
+      failedSub: '明天再试！',
+      share: '分享',
+      close: '关闭',
+      notEnough: '请填满所有位置',
+      invalidGuess: '无效猜测',
+      hintReveal: '第 {n} 位是 {color}',
+      extraAdded: '已获得 +2 次机会！',
+      nextPuzzle: '下一题倒计时',
+      helpTitle: '游戏规则',
+      helpContent: '<p><b>目标：</b>在 6 次内破解颜色密码。</p>' +
+        '<p><b>每天一题</b> — 所有玩家面对同一密码。</p>' +
+        '<p style="margin-top:10px;"><b>每次猜测后的反馈：</b></p>' +
+        '<p>🟢 <b>绿色</b> = 正确颜色，正确位置</p>' +
+        '<p>🟡 <b>黄色</b> = 正确颜色，错误位置</p>' +
+        '<p>⚫ <b>灰色</b> = 该颜色不在密码中</p>' +
+        '<p style="margin-top:10px;"><b>颜色可能重复</b>出现在密码中！</p>' +
+        '<p style="margin-top:10px;color:var(--accent);"><b>★ 看广告可获得提示或 +2 次额外机会！</b></p>',
+      shareText: '色彩密码 #{num} {tries}/6\n{grid}\n🔥 {streak}天连续\nplaysunblocked.com',
+      colors: { red:'红色', orange:'橙色', yellow:'黄色', green:'绿色', blue:'蓝色', purple:'紫色' }
+    }
+  };
+  var t = function(key) {
+    return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
+  };
+
+  // ===== Color Palette =====
+  var COLORS = [
+    { id: 'red',    hex: '#FF4D4D', name: { en: 'Red', cn: '红色' } },
+    { id: 'orange', hex: '#FF8C1A', name: { en: 'Orange', cn: '橙色' } },
+    { id: 'yellow', hex: '#FFD93D', name: { en: 'Yellow', cn: '黄色' } },
+    { id: 'green',  hex: '#00B86B', name: { en: 'Green', cn: '绿色' } },
+    { id: 'blue',   hex: '#2D5BFF', name: { en: 'Blue', cn: '蓝色' } },
+    { id: 'purple', hex: '#9B4DCA', name: { en: 'Purple', cn: '紫色' } }
+  ];
+
+  // ===== Difficulty Config (Day of Week) =====
+  // Monday=1 (easiest) → Sunday=7 (hardest)
+  var DIFFICULTY = {
+    1: { codeLength: 3, colorCount: 4, maxGuesses: 6 }, // Mon: 3 positions, 4 colors
+    2: { codeLength: 4, colorCount: 4, maxGuesses: 6 }, // Tue: 4 positions, 4 colors
+    3: { codeLength: 4, colorCount: 5, maxGuesses: 6 }, // Wed: 4 positions, 5 colors
+    4: { codeLength: 5, colorCount: 5, maxGuesses: 6 }, // Thu: 5 positions, 5 colors
+    5: { codeLength: 5, colorCount: 6, maxGuesses: 6 }, // Fri: 5 positions, 6 colors
+    6: { codeLength: 5, colorCount: 6, maxGuesses: 6 }, // Sat: 5 positions, 6 colors (harder seed)
+    7: { codeLength: 6, colorCount: 6, maxGuesses: 6 }  // Sun: 6 positions, 6 colors (hardest)
+  };
+
+  // ===== Date / Seed System =====
+  function getPuzzleDate() {
+    var now = new Date();
+    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  }
+  function dateToSeed(date) {
+    return date.getUTCFullYear() * 10000 + (date.getUTCMonth() + 1) * 100 + date.getUTCDate();
+  }
+  function getPuzzleNumber(date) {
+    var epoch = new Date(Date.UTC(2026, 0, 1)); // Jan 1, 2026
+    return Math.floor((date - epoch) / 86400000) + 1;
+  }
+  // Seeded PRNG (Mulberry32)
+  function mulberry32(seed) {
+    return function() {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function generateCode(date) {
+    var day = date.getUTCDay(); // 0=Sunday
+    var dayOfWeek = day === 0 ? 7 : day;
+    var config = DIFFICULTY[dayOfWeek];
+    var rng = mulberry32(dateToSeed(date));
+    var availableColors = COLORS.slice(0, config.colorCount);
+    var code = [];
+    for (var i = 0; i < config.codeLength; i++) {
+      code.push(availableColors[Math.floor(rng() * config.colorCount)]);
+    }
+    return { code: code, config: config, dayOfWeek: dayOfWeek };
+  }
+
+  // ===== Game State =====
+  var puzzleDate = getPuzzleDate();
+  var puzzleInfo = generateCode(puzzleDate);
+  var puzzleNum = getPuzzleNumber(puzzleDate);
+  var code = puzzleInfo.code;
+  var config = puzzleInfo.config;
+  var maxGuesses = config.maxGuesses;
+  var currentRow = 0;
+  var currentGuess = [];
+  var selectedColor = COLORS[0];
+  var gameOver = false;
+  var won = false;
+  var extraGuessesUsed = false;
+  var hintUsed = false;
+
+  // ===== localStorage State =====
+  var STORAGE_KEY = 'bytebreak_state';
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) { return {}; }
+  }
+  function saveState(state) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+  }
+  var state = loadState();
+  // Ensure fields exist
+  if (!state.history) state.history = {};
+  if (!state.stats) state.stats = { played: 0, wins: 0, currentStreak: 0, maxStreak: 0, guessDist: [0,0,0,0,0,0] };
+  if (!state.lastPlayedDate) state.lastPlayedDate = null;
+
+  var todayKey = dateToSeed(puzzleDate).toString();
+  var todayState = state.history[todayKey] || null;
+
+  // ===== DOM Elements =====
+  var gridEl = document.getElementById('grid');
+  var pickerEl = document.getElementById('color-picker');
+  var submitBtn = document.getElementById('submitBtn');
+  var clearBtn = document.getElementById('clearBtn');
+  var hintBtn = document.getElementById('hintBtn');
+  var extraBtn = document.getElementById('extraBtn');
+  var toastEl = document.getElementById('toast');
+  var resultModal = document.getElementById('resultModal');
+  var helpModal = document.getElementById('helpModal');
+
+  // ===== Apply Language =====
+  function applyLang() {
+    document.getElementById('gameTitle').textContent = t('title');
+    document.getElementById('gameSubtitle').innerHTML = t('subtitle') + '<span id="puzzleNum">' + puzzleNum + '</span>';
+    document.getElementById('streakLabel').textContent = t('streak');
+    document.getElementById('playedLabel').textContent = t('played');
+    document.getElementById('winLabel').textContent = t('winRate');
+    document.getElementById('streakNum').textContent = state.stats.currentStreak || 0;
+    document.getElementById('playedNum').textContent = state.stats.played || 0;
+    var wr = state.stats.played > 0 ? Math.round(state.stats.wins / state.stats.played * 100) : 0;
+    document.getElementById('winRate').textContent = wr + '%';
+    clearBtn.textContent = t('clear');
+    submitBtn.textContent = t('submit');
+    hintBtn.textContent = t('hint');
+    extraBtn.textContent = t('extra');
+    document.getElementById('helpTitle').textContent = t('helpTitle');
+    document.getElementById('helpContent').innerHTML = t('helpContent');
+    document.getElementById('closeHelp').textContent = t('close');
+  }
+
+  // ===== Build Grid =====
+  function buildGrid() {
+    gridEl.innerHTML = '';
+    for (var r = 0; r < maxGuesses; r++) {
+      var row = document.createElement('div');
+      row.className = 'grid-row';
+      row.id = 'row-' + r;
+      for (var c = 0; c < config.codeLength; c++) {
+        var cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.id = 'cell-' + r + '-' + c;
+        cell.addEventListener('click', function() {
+          if (gameOver || this.parentNode.id !== 'row-' + currentRow) return;
+          var parts = this.id.split('-');
+          var col = parseInt(parts[2]);
+          if (currentGuess[col]) {
+            currentGuess[col] = null;
+            this.innerHTML = '';
+            this.classList.remove('filled');
+          }
+        });
+        row.appendChild(cell);
+      }
+      gridEl.appendChild(row);
+    }
+  }
+
+  // ===== Build Color Picker =====
+  function buildPicker() {
+    pickerEl.innerHTML = '';
+    var available = COLORS.slice(0, config.colorCount);
+    available.forEach(function(color, i) {
+      var btn = document.createElement('button');
+      btn.className = 'color-btn' + (i === 0 ? ' selected' : '');
+      btn.style.background = color.hex;
+      btn.dataset.colorId = color.id;
+      btn.title = lang === 'cn' ? color.name.cn : color.name.en;
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.color-btn').forEach(function(b) { b.classList.remove('selected'); });
+        this.classList.add('selected');
+        selectedColor = color;
+      });
+      pickerEl.appendChild(btn);
+    });
+    selectedColor = available[0];
+  }
+
+  // ===== Toast =====
+  function showToast(msg, duration) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    setTimeout(function() { toastEl.classList.remove('show'); }, duration || 2000);
+  }
+
+  // ===== Evaluate Guess =====
+  function evaluateGuess(guess, secret) {
+    var result = [];
+    var secretCopy = secret.map(function(c) { return c.id; });
+    var guessCopy = guess.map(function(c) { return c.id; });
+
+    // First pass: correct positions
+    for (var i = 0; i < guess.length; i++) {
+      if (guessCopy[i] === secretCopy[i]) {
+        result[i] = 'correct';
+        secretCopy[i] = null;
+        guessCopy[i] = null;
+      }
+    }
+    // Second pass: present but wrong position
+    for (var j = 0; j < guess.length; j++) {
+      if (result[j]) continue;
+      var idx = secretCopy.indexOf(guessCopy[j]);
+      if (idx !== -1) {
+        result[j] = 'present';
+        secretCopy[idx] = null;
+      } else {
+        result[j] = 'absent';
+      }
+    }
+    return result;
+  }
+
+  // ===== Submit Guess =====
+  function submitGuess() {
+    if (gameOver) return;
+    if (currentGuess.length < config.codeLength || currentGuess.indexOf(null) !== -1) {
+      // Shake the current row
+      var row = document.getElementById('row-' + currentRow);
+      row.classList.add('shake');
+      setTimeout(function() { row.classList.remove('shake'); }, 400);
+      showToast(t('notEnough'));
+      return;
+    }
+
+    var results = evaluateGuess(currentGuess, code);
+
+    // Animate flip and apply colors
+    currentGuess.forEach(function(color, i) {
+      var cell = document.getElementById('cell-' + currentRow + '-' + i);
+      setTimeout(function() {
+        cell.classList.add('flip');
+        setTimeout(function() {
+          cell.classList.add(results[i]);
+        }, 250);
+      }, i * 150);
+    });
+
+    // Check win/lose after animation
+    setTimeout(function() {
+      var allCorrect = results.every(function(r) { return r === 'correct'; });
+      if (allCorrect) {
+        won = true;
+        gameOver = true;
+        // Bounce animation
+        currentGuess.forEach(function(_, i) {
+          var cell = document.getElementById('cell-' + currentRow + '-' + i);
+          setTimeout(function() { cell.classList.add('bounce'); }, i * 100);
+        });
+        recordResult(true, currentRow + 1);
+        setTimeout(function() { showResult(); }, 800);
+      } else {
+        currentRow++;
+        currentGuess = [];
+        if (currentRow >= maxGuesses) {
+          gameOver = true;
+          recordResult(false, maxGuesses);
+          setTimeout(function() { showResult(); }, 400);
+        } else {
+          // Show extra guesses button on last guess
+          if (currentRow === maxGuesses - 1 && !extraGuessesUsed) {
+            extraBtn.style.display = '';
+          }
+        }
+      }
+      saveProgress();
+    }, config.codeLength * 150 + 300);
+  }
+
+  // ===== Record Result =====
+  function recordResult(win, tries) {
+    // Only record if not already recorded today
+    if (todayState && todayState.finished) return;
+
+    state.history[todayKey] = { guesses: getGuessGrid(), finished: true, won: win, tries: tries };
+    state.stats.played++;
+    if (win) {
+      state.stats.wins++;
+      state.stats.guessDist[tries - 1]++;
+      // Streak logic
+      var yesterdayKey = dateToSeed(new Date(puzzleDate.getTime() - 86400000)).toString();
+      if (state.lastPlayedDate === yesterdayKey || state.lastPlayedDate === null && state.stats.played === 1) {
+        state.stats.currentStreak++;
+      } else if (state.lastPlayedDate !== todayKey) {
+        state.stats.currentStreak = 1;
+      }
+      if (state.stats.currentStreak > state.stats.maxStreak) {
+        state.stats.maxStreak = state.stats.currentStreak;
+      }
+    } else {
+      state.stats.currentStreak = 0;
+    }
+    state.lastPlayedDate = todayKey;
+    saveState(state);
+    applyLang();
+  }
+
+  // ===== Save Progress (partial guesses) =====
+  function saveProgress() {
+    if (!todayState || !todayState.finished) {
+      state.history[todayKey] = { guesses: getGuessGrid(), finished: gameOver, won: won };
+      saveState(state);
+    }
+  }
+
+  // ===== Get Guess Grid (for save/share) =====
+  function getGuessGrid() {
+    var grid = [];
+    for (var r = 0; r <= currentRow && r < maxGuesses; r++) {
+      var row = [];
+      for (var c = 0; c < config.codeLength; c++) {
+        var cell = document.getElementById('cell-' + r + '-' + c);
+        if (cell.classList.contains('correct')) row.push('🟢');
+        else if (cell.classList.contains('present')) row.push('🟡');
+        else if (cell.classList.contains('absent')) row.push('⚫');
+        else row.push('⬜');
+      }
+      if (row.some(function(x) { return x !== '⬜'; })) grid.push(row.join(''));
+    }
+    return grid;
+  }
+
+  // ===== Show Result Modal =====
+  function showResult() {
+    document.getElementById('resultTitle').textContent = won ? t('solved') : t('failed');
+    document.getElementById('resultSubtitle').textContent = won ? t('solvedSub') : t('failedSub');
+    document.getElementById('rStreak').textContent = state.stats.currentStreak;
+    document.getElementById('rPlayed').textContent = state.stats.played;
+    document.getElementById('rWins').textContent = state.stats.wins;
+    document.getElementById('rBest').textContent = state.stats.maxStreak;
+
+    // Build share text
+    var grid = getGuessGrid();
+    var tries = won ? (currentRow + 1) : 'X';
+    var shareText = t('shareText')
+      .replace('{num}', puzzleNum)
+      .replace('{tries}', tries)
+      .replace('{grid}', grid.join('\n'))
+      .replace('{streak}', state.stats.currentStreak);
+    document.getElementById('sharePreview').textContent = shareText;
+    resultModal.classList.add('show');
+  }
+
+  // ===== Share =====
+  function shareResult() {
+    var text = document.getElementById('sharePreview').textContent;
+    if (navigator.share) {
+      navigator.share({ text: text, url: 'https://playsunblocked.com' }).catch(function() {});
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('Copied to clipboard!');
+      }).catch(function() {
+        showToast('Copy failed');
+      });
+    } else {
+      // Fallback
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); showToast('Copied!'); } catch(e) {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  // ===== Hint (Ad) =====
+  function useHint() {
+    if (gameOver || hintUsed) return;
+    // Simulate rewarded ad
+    showToast('🎬 Loading ad...', 1500);
+    setTimeout(function() {
+      hintUsed = true;
+      hintBtn.disabled = true;
+      // Find a position not yet revealed
+      var revealed = [];
+      for (var i = 0; i < config.codeLength; i++) {
+        // Check if this position was already correctly guessed in any row
+        var alreadyKnown = false;
+        for (var r = 0; r < currentRow; r++) {
+          var cell = document.getElementById('cell-' + r + '-' + i);
+          if (cell.classList.contains('correct')) { alreadyKnown = true; break; }
+        }
+        if (!alreadyKnown) revealed.push(i);
+      }
+      if (revealed.length === 0) {
+        showToast('All positions revealed!');
+        return;
+      }
+      var pos = revealed[Math.floor(Math.random() * revealed.length)];
+      var colorName = lang === 'cn' ? code[pos].name.cn : code[pos].name.en;
+      showToast(t('hintReveal').replace('{n}', pos + 1).replace('{color}', colorName), 4000);
+    }, 1500);
+  }
+
+  // ===== Extra Guesses (Ad) =====
+  function useExtra() {
+    if (gameOver || extraGuessesUsed) return;
+    showToast('🎬 Loading ad...', 1500);
+    setTimeout(function() {
+      extraGuessesUsed = true;
+      extraBtn.style.display = 'none';
+      maxGuesses += 2;
+      buildGrid();
+      restoreProgress();
+      showToast(t('extraAdded'), 2000);
+    }, 1500);
+  }
+
+  // ===== Restore Progress =====
+  function restoreProgress() {
+    if (!todayState) return;
+    var saved = todayState.guesses;
+    if (!saved || saved.length === 0) return;
+
+    for (var r = 0; r < saved.length; r++) {
+      var guessResults = saved[r];
+      // We need to reconstruct the colors and results
+      // Since we only saved emoji grid, we can't fully restore colors
+      // So we only restore finished state
+    }
+    if (todayState.finished) {
+      gameOver = true;
+      won = todayState.won;
+      // Show the result modal again
+      if (won) {
+        // Reconstruct the winning row
+      }
+      // For simplicity, if already finished, show a "already played" state
+      submitBtn.disabled = true;
+      hintBtn.disabled = true;
+      extraBtn.style.display = 'none';
+      showToast(lang === 'cn' ? '今日已完成，明天再来！' : 'Already solved today! Come back tomorrow!', 3000);
+    }
+  }
+
+  // ===== Keyboard Input =====
+  document.addEventListener('keydown', function(e) {
+    if (gameOver || resultModal.classList.contains('show') || helpModal.classList.contains('show')) return;
+    if (e.key === 'Enter') {
+      submitGuess();
+    } else if (e.key === 'Backspace') {
+      if (currentGuess.length > 0) {
+        var lastIdx = currentGuess.length - 1;
+        while (lastIdx >= 0 && !currentGuess[lastIdx]) lastIdx--;
+        if (lastIdx >= 0) {
+          currentGuess[lastIdx] = null;
+          var cell = document.getElementById('cell-' + currentRow + '-' + lastIdx);
+          cell.innerHTML = '';
+          cell.classList.remove('filled');
+        }
+      }
+    } else if (e.key >= '1' && e.key <= '6') {
+      var idx = parseInt(e.key) - 1;
+      if (idx < config.colorCount) {
+        selectedColor = COLORS[idx];
+        document.querySelectorAll('.color-btn').forEach(function(b, i) {
+          b.classList.toggle('selected', i === idx);
+        });
+        placeColor();
+      }
+    }
+  });
+
+  // ===== Place Color in next empty slot =====
+  function placeColor() {
+    if (gameOver) return;
+    // Find first empty slot
+    var emptyIdx = -1;
+    for (var i = 0; i < config.codeLength; i++) {
+      if (!currentGuess[i]) { emptyIdx = i; break; }
+    }
+    if (emptyIdx === -1) return;
+    currentGuess[emptyIdx] = selectedColor;
+    var cell = document.getElementById('cell-' + currentRow + '-' + emptyIdx);
+    cell.innerHTML = '<div class="color-dot" style="background:' + selectedColor.hex + '"></div>';
+    cell.classList.add('filled');
+  }
+
+  // ===== Click on color picker also places immediately =====
+  function setupColorPickerClicks() {
+    document.querySelectorAll('.color-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        placeColor();
+      });
+    });
+  }
+
+  // ===== Clear current row =====
+  function clearRow() {
+    if (gameOver) return;
+    for (var i = 0; i < config.codeLength; i++) {
+      currentGuess[i] = null;
+      var cell = document.getElementById('cell-' + currentRow + '-' + i);
+      cell.innerHTML = '';
+      cell.classList.remove('filled');
+    }
+  }
+
+  // ===== Countdown Timer =====
+  function updateCountdown() {
+    var now = new Date();
+    var tomorrow = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    var diff = tomorrow - now;
+    var h = Math.floor(diff / 3600000);
+    var m = Math.floor((diff % 3600000) / 60000);
+    var s = Math.floor((diff % 60000) / 1000);
+    var el = document.getElementById('countdown');
+    el.innerHTML = t('nextPuzzle') + ' <span class="time">' +
+      String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + '</span>';
+  }
+
+  // ===== Event Listeners =====
+  submitBtn.addEventListener('click', submitGuess);
+  clearBtn.addEventListener('click', clearRow);
+  hintBtn.addEventListener('click', useHint);
+  extraBtn.addEventListener('click', useExtra);
+  document.getElementById('shareBtn').addEventListener('click', shareResult);
+  document.getElementById('closeModal').addEventListener('click', function() {
+    resultModal.classList.remove('show');
+  });
+  document.getElementById('helpToggle').addEventListener('click', function() {
+    helpModal.classList.add('show');
+  });
+  document.getElementById('closeHelp').addEventListener('click', function() {
+    helpModal.classList.remove('show');
+  });
+  document.getElementById('langToggle').addEventListener('click', function() {
+    lang = lang === 'en' ? 'cn' : 'en';
+    var url = new URL(window.location);
+    url.searchParams.set('lang', lang);
+    window.location.href = url.toString();
+  });
+
+  // ===== Init =====
+  applyLang();
+  buildGrid();
+  buildPicker();
+  setupColorPickerClicks();
+  restoreProgress();
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Show help on first visit
+  if (!state.hasSeenHelp) {
+    setTimeout(function() { helpModal.classList.add('show'); }, 500);
+    state.hasSeenHelp = true;
+    saveState(state);
+  }
+
+})();
+</script>
+</body>
+</html>

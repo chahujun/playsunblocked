@@ -330,6 +330,28 @@
       },
       featured: false,
       trending: false
+    },
+    {
+      slug: 'bytebreak',
+      title: { en: 'Bytebreak', cn: '色彩密码' },
+      subtitle: { en: 'Daily Color Code', cn: '每日解谜' },
+      category: 'Puzzle',
+      rating: 4.8,
+      plays: '0',
+      duration: { en: '3-5 min', cn: '3-5 分钟' },
+      controls: { en: 'Mouse / Keyboard', cn: '鼠标 / 键盘' },
+      difficulty: { en: 'Easy→Hard', cn: '由易到难' },
+      description: {
+        en: 'A daily color code puzzle. Crack the secret sequence of colors in 6 tries. Everyone gets the same code each day — compete with friends and keep your streak alive.',
+        cn: '每日颜色密码解谜。在 6 次内破解颜色密码序列。每天所有玩家面对同一密码 — 与朋友竞技，保持连续天数。'
+      },
+      howToPlay: {
+        en: ['Click colors to fill the slots', 'Green = right color, right spot', 'Yellow = right color, wrong spot', 'Gray = color not in code', 'Come back daily for a new puzzle!'],
+        cn: ['点击颜色填入空格', '绿色 = 正确颜色正确位置', '黄色 = 正确颜色错误位置', '灰色 = 该颜色不在密码中', '每天回来挑战新题目！']
+      },
+      featured: true,
+      trending: true,
+      isDaily: true
     }
   ];
 
@@ -351,13 +373,14 @@
     trending: GAMES.filter(function (g) { return g.trending; }),
     categories: ['All', 'Action', 'Puzzle', 'Arcade', 'Strategy', 'Adventure'],
     categoryGradients: CATEGORY_GRADIENTS,
-    // Render a gradient cover block (returns HTML string)
+    // Render a cover block with real image (gradient fallback)
     coverHtml: function (g) {
       var t = (g.title && g.title.en) ? g.title.en : g.slug;
       var sub = (g.subtitle && g.subtitle.en) ? g.subtitle.en : '';
       return ''
         + '<div class="game-cover" style="background: linear-gradient(135deg, ' + g.gradient[0] + ' 0%, ' + g.gradient[1] + ' 100%);">'
-        +   '<div class="game-cover-inner">'
+        +   '<img src="../assets/covers/' + g.slug + '.jpg" alt="' + t + ' cover art" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display=&quot;none&quot;;this.nextElementSibling.style.display=&quot;flex&quot;">'
+        +   '<div class="game-cover-inner" style="display:none;">'
         +     '<span class="game-cover-title">' + t + '</span>'
         +     (sub ? '<span class="game-cover-sub">' + sub + '</span>' : '')
         +   '</div>'
