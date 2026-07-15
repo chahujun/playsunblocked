@@ -1461,7 +1461,10 @@ const SECONDARY_AMMO = {
   laser: 15,
   homing: 6,
   grenade: 3,
-  micro_rocket: 8
+  micro_rocket: 8,
+  tesla: 25,
+  acid: 30,
+  railgun: 4
 };
 // 备弹总量（总子弹数，不含弹匣内）
 const TOTAL_SPARE_AMMO = {
@@ -1472,7 +1475,10 @@ const TOTAL_SPARE_AMMO = {
   laser: 60,
   homing: 24,
   grenade: 9,
-  micro_rocket: 32
+  micro_rocket: 32,
+  tesla: 75,
+  acid: 90,
+  railgun: 8
 };
 const ammo = {
   pistol: Infinity,
@@ -1483,7 +1489,10 @@ const ammo = {
   laser: 0,
   homing: 0,
   grenade: 0,
-  micro_rocket: 0
+  micro_rocket: 0,
+  tesla: 0,
+  acid: 0,
+  railgun: 0
 };
 // 备弹（弹匣外的剩余子弹）
 const spareAmmo = {
@@ -1495,7 +1504,10 @@ const spareAmmo = {
   laser: 0,
   homing: 0,
   grenade: 0,
-  micro_rocket: 0
+  micro_rocket: 0,
+  tesla: 0,
+  acid: 0,
+  railgun: 0
 };
 
 // Weapon definitions - 合金弹头风格
@@ -1537,14 +1549,27 @@ const WEAPONS = {
   micro_rocket: { name: 'MICRO', nameZh: '微型火箭',
              damage: 35, fireRate: 280, bulletSpeed: 14, spread: 0.05, auto: true,  pellets: 1, jitter: 0.03,
              color: '#ff9944', weaponClass: 'light', maxAmmo: 12, reload: 100, type: 'micro_rocket',
-             explodeRadius: 50, explodeDamage: 25 }
+             explodeRadius: 50, explodeDamage: 25 },
+  // ===== 新增武器 =====
+  tesla:   { name: 'TESLA',  nameZh: '电磁枪',
+             damage: 20, fireRate: 120, bulletSpeed: 20, spread: 0,    auto: true,  pellets: 1, jitter: 0,
+             color: '#aa66ff', weaponClass: 'light', maxAmmo: 25, reload: 90, type: 'tesla',
+             pierce: 10, chainRange: 120, chainDamage: 0.5, laserRange: 400, laserFadeStart: 280 },
+  acid:    { name: 'ACID',   nameZh: '酸液枪',
+             damage: 8,  fireRate: 80,  bulletSpeed: 9,  spread: 0.15, auto: true,  pellets: 1, jitter: 0.05,
+             color: '#66ff44', weaponClass: 'light', maxAmmo: 30, reload: 80, type: 'acid',
+             acidRadius: 35, acidLife: 180, acidDps: 0.8, slowMult: 0.5 },
+  railgun: { name: 'RAIL',   nameZh: '轨道炮',
+             damage: 180, fireRate: 1400, bulletSpeed: 40, spread: 0,    auto: false, pellets: 1, jitter: 0,
+             color: '#ffeeaa', weaponClass: 'heavy', maxAmmo: 4, reload: 180, type: 'railgun',
+             pierce: 99, railWidth: 6, railRange: 700, railFadeStart: 500 }
 };
 
 // Heavy weapon movespeed penalty
 const HEAVY_SPEED_PENALTY = 0.78;
 
 // Weapon slot mapping for number keys 1-9
-const WEAPON_KEYS = ['pistol', 'hmg', 'shotgun', 'flamethrower', 'rocket', 'laser', 'homing', 'grenade', 'micro_rocket'];
+const WEAPON_KEYS = ['pistol', 'hmg', 'shotgun', 'flamethrower', 'rocket', 'laser', 'homing', 'grenade', 'micro_rocket', 'tesla', 'acid', 'railgun'];
 
 // =====================================================================
 // ATTACHMENT SYSTEM - 枪械配件（单配件替换制）
@@ -1560,6 +1585,10 @@ const ATTACHMENTS = {
                 descZh: '伤害 +45% | 暴击率 +10%', descEn: 'Damage +45% | Crit +10%',
                 icon: '⤢', color: '#ff4466',
                 apply: (w) => { w.damage = Math.floor(w.damage * 1.45); w.critBonus = (w.critBonus || 0) + 0.10; } },
+  ext_mag:    { nameZh: '扩容弹匣', nameEn: 'EXT MAG',
+                descZh: '弹匣+备弹 +50% | 装弹 +20%', descEn: 'Mag+Spare +50% | Reload +20%',
+                icon: '▣', color: '#44ff88',
+                apply: (w) => { w.maxAmmo = Math.floor((w.maxAmmo || 30) * 1.5); w.reload = Math.floor((w.reload || 80) * 0.8); } },
   // 武器专属配件
   laser_sight:{ nameZh: '激光瞄准', nameEn: 'LASER SIGHT',
                 descZh: '散布 -90% | 弹速 +30%', descEn: 'Spread -90% | Bullet speed +30%',
@@ -1575,7 +1604,23 @@ const ATTACHMENTS = {
                 descZh: '爆炸范围 +60% | 爆炸伤害 +50%', descEn: 'Blast +60% | Blast damage +50%',
                 icon: '✺', color: '#ff8844',
                 apply: (w) => { w.explodeRadius = Math.floor((w.explodeRadius || 0) * 1.6); w.explodeDamage = Math.floor((w.explodeDamage || 0) * 1.5); },
-                weaponOnly: ['rocket', 'grenade', 'micro_rocket'] }
+                weaponOnly: ['rocket', 'grenade', 'micro_rocket'] },
+  // 新增专属配件
+  incendiary: { nameZh: '燃烧弹头', nameEn: 'INCENDIARY',
+                descZh: '命中点燃(3s) | 火焰范围 +50%', descEn: 'Ignite on hit(3s) | Flame +50%',
+                icon: '🔥', color: '#ff4422',
+                apply: (w) => { w.burnDuration = 180; w.burnDps = 0.5; w.firePoolRadius = Math.floor((w.firePoolRadius || 30) * 1.5); w.firePoolLife = 300; w.firePoolDps = 0.4; },
+                weaponOnly: ['hmg', 'shotgun', 'micro_rocket'] },
+  chain_lightning: { nameZh: '链式闪电', nameEn: 'CHAIN LIGHTNING',
+                descZh: '命中连锁到附近2敌 | 伤害-20%', descEn: 'Chain to 2 nearby | Damage -20%',
+                icon: '⚡', color: '#44ddff',
+                apply: (w) => { w.chainLightning = 2; w.damage = Math.floor(w.damage * 0.8); },
+                weaponOnly: ['laser', 'homing'] },
+  volatile_mix: { nameZh: '不稳定混合物', nameEn: 'VOLATILE MIX',
+                descZh: '爆炸2次(延迟0.5s) | 范围+30%', descEn: 'Double explosion(0.5s) | Radius +30%',
+                icon: '☣', color: '#88dd44',
+                apply: (w) => { w.volatileMix = true; w.explodeRadius = Math.floor((w.explodeRadius || 60) * 1.3); },
+                weaponOnly: ['grenade', 'rocket', 'micro_rocket'] }
 };
 
 // 保存原始武器数据（用于配件应用时重算，避免叠加）
@@ -1966,7 +2011,10 @@ function tryShoot() {
              (w.type === 'laser' ? (Math.random() < 0.5 ? '#44ddff' : '#aaffff') :
              (w.type === 'homing' ? (Math.random() < 0.5 ? '#ff66dd' : '#ffaadd') :
              (w.type === 'micro_rocket' ? (Math.random() < 0.5 ? '#ff9944' : '#ffcc66') :
-             (player.buffs.rage > 0 ? '#ff4422' : '#ffdd66')))))
+             (w.type === 'tesla' ? (Math.random() < 0.5 ? '#aa66ff' : '#cc99ff') :
+             (w.type === 'acid' ? (Math.random() < 0.5 ? '#66ff44' : '#aaff88') :
+             (w.type === 'railgun' ? '#ffffaa' :
+             (player.buffs.rage > 0 ? '#ff4422' : '#ffdd66')))))))
     });
   }
 
@@ -1982,10 +2030,14 @@ function tryShoot() {
     const isHoming = w.type === 'homing';
     const isGrenade = w.type === 'grenade';
     const isMicroRocket = w.type === 'micro_rocket';
+    const isTesla = w.type === 'tesla';
+    const isAcid = w.type === 'acid';
+    const isRailgun = w.type === 'railgun';
+    const isChain = isTesla || isLaser; // 穿透型武器共用 hitTargets 机制
     // 子弹大小
-    const bulletSize = w.type === 'rocket' ? 6 : (isFlame ? 16 : (isLaser ? 5 : (isHoming ? 7 : (isGrenade ? 8 : (isMicroRocket ? 4 : 3)))));
+    const bulletSize = w.type === 'rocket' ? 6 : (isFlame ? 16 : (isLaser ? 5 : (isHoming ? 7 : (isGrenade ? 8 : (isMicroRocket ? 4 : (isTesla ? 4 : (isAcid ? 6 : (isRailgun ? 8 : 3))))))))); 
     // 子弹生命
-    const bulletLife = w.type === 'rocket' ? 120 : (isFlame ? 40 : (isLaser ? 50 : (isHoming ? 200 : (isGrenade ? 100 : 80))));
+    const bulletLife = w.type === 'rocket' ? 120 : (isFlame ? 40 : (isLaser ? 50 : (isHoming ? 200 : (isGrenade ? 100 : (isTesla ? 60 : (isAcid ? 100 : (isRailgun ? 30 : 80))))))));
     bullets.push({
       x: muzzleX,
       y: muzzleY,
@@ -2003,16 +2055,16 @@ function tryShoot() {
       explodeDamage: (w.explodeDamage || 0) * player.damageMult * rageMult * classDmgMod,
       fragments: w.fragments || 0,
       fragmentDamage: (w.fragmentDamage || 0) * player.damageMult * rageMult * classDmgMod,
-      // 火焰枪/激光枪：穿透型参数
-      pierce: (isFlame || isLaser) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
-      hitTargets: (isFlame || isLaser) ? [] : null,
+      // 火焰枪/激光枪/电磁枪：穿透型参数
+      pierce: (isFlame || isLaser || isTesla || isRailgun) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
+      hitTargets: (isFlame || isLaser || isTesla || isRailgun) ? [] : null,
       distTraveled: 0,
       // 吸血：子弹携带吸血标记
       lifesteal: player.upgrades.lifesteal,
       flameRange: w.flameRange || 0,
       flameFadeStart: w.flameFadeStart || 0,
-      laserRange: w.laserRange || 0,
-      laserFadeStart: w.laserFadeStart || 0,
+      laserRange: w.laserRange || (isTesla ? w.laserRange || 0 : 0) || (isRailgun ? w.railRange || 0 : 0),
+      laserFadeStart: w.laserFadeStart || (isTesla ? w.laserFadeStart || 0 : 0) || (isRailgun ? w.railFadeStart || 0 : 0),
       burnDuration: w.burnDuration || 0,
       burnDps: w.burnDps || 0,
       firePoolRadius: w.firePoolRadius || 0,
@@ -2021,7 +2073,23 @@ function tryShoot() {
       // 追踪弹参数
       homingTurn: w.homingTurn || 0,
       homingRange: w.homingRange || 0,
-      homingTimer: 0
+      homingTimer: 0,
+      // 电磁枪链式参数
+      chainRange: w.chainRange || 0,
+      chainDamage: w.chainDamage || 0,
+      chainCount: 0,
+      // 酸液枪参数
+      acidRadius: w.acidRadius || 0,
+      acidLife: w.acidLife || 0,
+      acidDps: w.acidDps || 0,
+      slowMult: w.slowMult || 0,
+      // 轨道炮参数
+      railWidth: w.railWidth || 0,
+      railRange: w.railRange || 0,
+      railFadeStart: w.railFadeStart || 0,
+      // 配件附加参数
+      chainLightning: w.chainLightning || 0,
+      volatileMix: w.volatileMix || false
     });
   }
 
@@ -2275,6 +2343,7 @@ function startWave(w) {
   poisonProjectiles = [];
   firePools = [];
   damageNumbers = [];
+  lightningEffects = [];
 
   // Determine wave type: every 5th wave is boss, every 3rd is horde, every 7th is silent
   if (w % 7 === 0) waveType = 'silent';
@@ -2371,6 +2440,37 @@ function spawnBloodParticles(x, y, count, color) {
   }
 }
 
+// 闪电效果数组（临时视觉线段）
+let lightningEffects = [];
+function spawnLightningEffect(x1, y1, x2, y2) {
+  lightningEffects.push({ x1, y1, x2, y2, life: 8, maxLife: 8 });
+}
+function updateLightningEffects(dt) {
+  for (let i = lightningEffects.length - 1; i >= 0; i--) {
+    lightningEffects[i].life -= dt;
+    if (lightningEffects[i].life <= 0) lightningEffects.splice(i, 1);
+  }
+}
+function drawLightningEffects() {
+  for (const l of lightningEffects) {
+    const alpha = l.life / l.maxLife;
+    ctx.strokeStyle = `rgba(170,102,255,${alpha * 0.8})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(l.x1, l.y1);
+    // 锯齿线模拟闪电
+    const segs = 4;
+    for (let s = 1; s < segs; s++) {
+      const t = s / segs;
+      const mx = l.x1 + (l.x2 - l.x1) * t + (Math.random() - 0.5) * 15;
+      const my = l.y1 + (l.y2 - l.y1) * t + (Math.random() - 0.5) * 15;
+      ctx.lineTo(mx, my);
+    }
+    ctx.lineTo(l.x2, l.y2);
+    ctx.stroke();
+  }
+}
+
 function addBloodStain(x, y, radius) {
   bloodCtx.save();
   bloodCtx.globalAlpha = 0.5 + Math.random() * 0.3;
@@ -2439,6 +2539,7 @@ function update(dt) {
   updatePickups(dt);
   updateBarrels(dt);
   updateDamageNumbers(dt);
+  updateLightningEffects(dt);
   updateFloatingHints(dt);
   updateSpawnTelegraphs(dt);
   updateCamera();
@@ -2882,6 +2983,11 @@ function updateZombies(dt) {
     let speedMod = 1;
     if (player.inGrass && dist > 120) {
       speedMod = 0.3; // Reduced detection
+    }
+    // 酸液减速效果
+    if (z.slowTimer > 0) {
+      z.slowTimer -= dt;
+      speedMod *= (z.slowMult || 0.5);
     }
 
     // 按类型不同的AI行为
@@ -3417,9 +3523,13 @@ function updateBoss(dt) {
     addDamageNumber(boss.x, boss.y - boss.radius - 10, '+' + boss.score, '#00ff88');
     addShake(10);
     playZombieDeath();
-    // BOSS掉落：100%掉副武器 + 100%掉配件 + 生命+弹药+食物
+    // BOSS掉落：100%掉副武器 + 50%掉新武器 + 100%掉配件 + 生命+弹药+食物
     const sideW = CLASSES[player.class].startWeapon || 'shotgun';
     pickups.push({ x: boss.x, y: boss.y, type: 'weapon_' + sideW, radius: 14, life: 1200, bob: 0 });
+    // BOSS额外掉落新武器（随机一把）
+    const newWeapons = ['tesla', 'acid', 'railgun'];
+    const newW = newWeapons[Math.floor(Math.random() * newWeapons.length)];
+    pickups.push({ x: boss.x + 30, y: boss.y, type: 'weapon_' + newW, radius: 14, life: 1200, bob: 0 });
     // BOSS 100%掉落配件（随机给已拥有的武器）
     const attachableW = getAttachableWeapons();
     if (attachableW.length > 0) {
@@ -3684,8 +3794,8 @@ function updateBullets(dt) {
     for (let j = zombies.length - 1; j >= 0; j--) {
       const z = zombies[j];
       if (!circleCollide(b, z)) continue;
-      // 穿透型武器（火焰枪/激光枪）：已命中的目标跳过，避免重复伤害
-      if ((b.weaponType === 'flame' || b.weaponType === 'laser') && b.hitTargets && b.hitTargets.includes(z)) continue;
+      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：已命中的目标跳过，避免重复伤害
+      if ((b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') && b.hitTargets && b.hitTargets.includes(z)) continue;
 
       // Apply damage reduction (tank)
       const actualDmg = b.damage * (1 - (z.damageReduction || 0));
@@ -3696,9 +3806,9 @@ function updateBullets(dt) {
         player.hp = Math.min(player.maxHp, player.hp + 1);
         player.lastLifesteal = performance.now();
       }
-      spawnBloodParticles(b.x, b.y, 5, (b.weaponType === 'flame' || b.weaponType === 'laser') ? (b.weaponType === 'flame' ? '#ff6622' : '#66ddff') : '#cc1122');
+      spawnBloodParticles(b.x, b.y, 5, (b.weaponType === 'flame' || b.weaponType === 'laser') ? (b.weaponType === 'flame' ? '#ff6622' : '#66ddff') : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : '#cc1122'))));
       addBloodStain(z.x, z.y, z.radius * 0.5);
-      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (b.weaponType === 'flame' ? '#ff8833' : (b.weaponType === 'laser' ? '#44ddff' : '#ffdd44')), b.isCrit);
+      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (b.weaponType === 'flame' ? '#ff8833' : (b.weaponType === 'laser' ? '#44ddff' : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : '#ffdd44'))))), b.isCrit);
       // 火焰枪：附加燃烧DOT + 命中点残留小火焰
       if (b.weaponType === 'flame' && b.burnDuration > 0) {
         z.burnTime = b.burnDuration;
@@ -3707,6 +3817,31 @@ function updateBullets(dt) {
           firePools.push({ x: b.x, y: b.y, radius: b.firePoolRadius * 0.4, life: b.firePoolLife, maxLife: b.firePoolLife, dps: b.firePoolDps, tickTimer: 0 });
         }
       }
+      // 电磁枪：链式闪电跳跃到附近僵尸
+      if (b.weaponType === 'tesla' && b.chainRange > 0 && b.chainCount < 3) {
+        for (const z2 of zombies) {
+          if (z2 === z || (b.hitTargets && b.hitTargets.includes(z2))) continue;
+          const cd = Math.hypot(z2.x - z.x, z2.y - z.y);
+          if (cd < b.chainRange) {
+            z2.hp -= b.damage * b.chainDamage;
+            z2.hurtFlash = 6;
+            spawnBloodParticles(z2.x, z2.y, 4, '#aa66ff');
+            addDamageNumber(z2.x, z2.y - z2.radius, Math.round(b.damage * b.chainDamage), '#aa66ff');
+            // 链式闪电视觉：从命中点到链目标画一条临时线
+            spawnLightningEffect(z.x, z.y, z2.x, z2.y);
+            b.chainCount++;
+            break;
+          }
+        }
+      }
+      // 酸液枪：命中创建酸液池
+      if (b.weaponType === 'acid' && b.acidRadius > 0) {
+        poisonPools.push({ x: z.x, y: z.y, radius: b.acidRadius, life: b.acidLife, damage: b.acidDps, tickTimer: 0 });
+        // 酸液减速效果
+        z.slowTimer = 120;
+        z.slowMult = b.slowMult;
+      }
+      // 轨道炮：超高穿透，命中不消失
       // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹）：命中爆炸
       if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing') {
         explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
@@ -3722,15 +3857,19 @@ function updateBullets(dt) {
               pierce: 0, hitTargets: null, distTraveled: 0, lifesteal: 0,
               flameRange: 0, flameFadeStart: 0, laserRange: 0, laserFadeStart: 0,
               burnDuration: 0, burnDps: 0, firePoolRadius: 0, firePoolLife: 0, firePoolDps: 0,
-              homingTurn: 0, homingRange: 0, homingTimer: 0
+              homingTurn: 0, homingRange: 0, homingTimer: 0,
+              chainRange: 0, chainDamage: 0, chainCount: 0,
+              acidRadius: 0, acidLife: 0, acidDps: 0, slowMult: 0,
+              railWidth: 0, railRange: 0, railFadeStart: 0,
+              chainLightning: 0, volatileMix: false
             });
           }
         }
       }
 
-      // 穿透型武器（火焰枪/激光枪）：记录命中，消耗穿透次数；其他武器命中即消失
+      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：记录命中，消耗穿透次数；其他武器命中即消失
       let bulletDestroyed = false;
-      if (b.weaponType === 'flame' || b.weaponType === 'laser') {
+      if (b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') {
         if (b.hitTargets) b.hitTargets.push(z);
         b.pierce--;
         if (b.pierce < 0) { bullets.splice(i, 1); bulletDestroyed = true; }
@@ -4272,6 +4411,9 @@ function updatePickups(dt) {
         if (player.ownedWeapons.includes('homing')) spareAmmo.homing = Math.min(TOTAL_SPARE_AMMO.homing, spareAmmo.homing + 6);
         if (player.ownedWeapons.includes('grenade')) spareAmmo.grenade = Math.min(TOTAL_SPARE_AMMO.grenade, spareAmmo.grenade + 2);
         if (player.ownedWeapons.includes('micro_rocket')) spareAmmo.micro_rocket = Math.min(TOTAL_SPARE_AMMO.micro_rocket, spareAmmo.micro_rocket + 8);
+        if (player.ownedWeapons.includes('tesla')) spareAmmo.tesla = Math.min(TOTAL_SPARE_AMMO.tesla, spareAmmo.tesla + 15);
+        if (player.ownedWeapons.includes('acid')) spareAmmo.acid = Math.min(TOTAL_SPARE_AMMO.acid, spareAmmo.acid + 15);
+        if (player.ownedWeapons.includes('railgun')) spareAmmo.railgun = Math.min(TOTAL_SPARE_AMMO.railgun, spareAmmo.railgun + 2);
         playPickup();
       } else if (p.type.startsWith('buff_')) {
         const buffType = p.type.slice(5);
@@ -4796,6 +4938,7 @@ function updateWaveSystem(dt) {
     poisonPools = [];
     poisonProjectiles = [];
     firePools = [];
+    lightningEffects = [];
     // 触发波间升级（第1波后开始）
     if (wave >= 1 && state === GameState.PLAYING) {
       showUpgradeSelect();
@@ -5355,6 +5498,9 @@ function render() {
   for (const d of damageNumbers) {
     drawDamageNumber(d);
   }
+
+  // Lightning effects (电磁枪链式闪电)
+  drawLightningEffects();
 
   // Floating hints (生存系统引导文字)
   for (const h of floatingHints) {
@@ -6609,6 +6755,102 @@ function drawBullet(b) {
     return;
   }
 
+  // 电磁枪：紫色电弧弹 + 射程限制
+  if (b.weaponType === 'tesla') {
+    if (!isFinite(b.x) || !isFinite(b.y)) return;
+    const fade = b.laserRange > 0 ? Math.max(0, 1 - b.distTraveled / b.laserRange) : 1;
+    // 电弧拖尾
+    ctx.strokeStyle = `rgba(170,102,255,${fade * 0.5})`;
+    ctx.lineWidth = b.radius;
+    ctx.beginPath();
+    const trailLen = Math.min(b.distTraveled, 30);
+    const ta = Math.atan2(b.vy, b.vx);
+    ctx.moveTo(b.x - Math.cos(ta) * trailLen, b.y - Math.sin(ta) * trailLen);
+    for (let s = 0; s < 4; s++) {
+      const t = s / 4;
+      ctx.lineTo(b.x - Math.cos(ta) * trailLen * (1-t) + (Math.random()-0.5)*4, b.y - Math.sin(ta) * trailLen * (1-t) + (Math.random()-0.5)*4);
+    }
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+    // 核心
+    ctx.fillStyle = `rgba(200,150,255,${fade * 0.9})`;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.radius * 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = `rgba(255,255,255,${fade})`;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.radius * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+
+  // 酸液枪：绿色腐蚀弹
+  if (b.weaponType === 'acid') {
+    if (!isFinite(b.x) || !isFinite(b.y)) return;
+    const angle = Math.atan2(b.vy, b.vx);
+    const time = performance.now() * 0.008;
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    // 光晕
+    ctx.fillStyle = 'rgba(102,255,68,0.2)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 2.5, 0, Math.PI * 2);
+    ctx.fill();
+    // 拖尾
+    ctx.strokeStyle = 'rgba(102,255,68,0.4)';
+    ctx.lineWidth = b.radius * 0.8;
+    ctx.beginPath();
+    ctx.moveTo(-b.vx * 2, -b.vy * 2);
+    for (let i = 0; i < 5; i++) {
+      ctx.lineTo(-b.vx * 2 * (1 - i/5) + (Math.random()-0.5)*3, -b.vy * 2 * (1 - i/5) + (Math.random()-0.5)*3);
+    }
+    ctx.stroke();
+    // 核心（不规则形状模拟液滴）
+    ctx.fillStyle = '#66ff44';
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const r = b.radius * (0.8 + Math.sin(time + i) * 0.2);
+      if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
+      else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+    }
+    ctx.closePath();
+    ctx.fill();
+    // 高光
+    ctx.fillStyle = 'rgba(200,255,180,0.6)';
+    ctx.beginPath();
+    ctx.arc(-1, -1, b.radius * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+
+  // 轨道炮：超亮金色射线
+  if (b.weaponType === 'railgun') {
+    if (!isFinite(b.x) || !isFinite(b.y)) return;
+    const fade = b.railRange > 0 ? Math.max(0, 1 - b.distTraveled / b.railRange) : 1;
+    const angle = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(angle);
+    // 外层超宽光晕
+    ctx.fillStyle = `rgba(255,238,170,${fade * 0.15})`;
+    ctx.fillRect(-30, -b.radius * 4, 40, b.radius * 8);
+    // 中层光束
+    ctx.fillStyle = `rgba(255,255,200,${fade * 0.5})`;
+    ctx.fillRect(-20, -b.radius * 2, 30, b.radius * 4);
+    // 核心白热
+    ctx.fillStyle = `rgba(255,255,255,${fade})`;
+    ctx.fillRect(-15, -b.radius, 25, b.radius * 2);
+    // 头部亮点
+    ctx.fillStyle = `rgba(255,255,255,${fade})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+
   // Trail
   if (!isFinite(b.x) || !isFinite(b.y) || !isFinite(b.vx) || !isFinite(b.vy)) return;
   ctx.strokeStyle = b.color;
@@ -7589,6 +7831,9 @@ function startGame() {
   ammo.homing = 0;
   ammo.grenade = 0;
   ammo.micro_rocket = 0;
+  ammo.tesla = 0;
+  ammo.acid = 0;
+  ammo.railgun = 0;
   // 重置备弹
   spareAmmo.pistol = Infinity;
   for (const wk of WEAPON_KEYS) { if (wk !== 'pistol') spareAmmo[wk] = 0; }
@@ -7602,6 +7847,7 @@ function startGame() {
   shockwaves = [];
   poisonProjectiles = [];
   firePools = [];
+  lightningEffects = [];
   spawnQueue = [];
   damageNumbers = [];
   spawnTelegraphs = [];
