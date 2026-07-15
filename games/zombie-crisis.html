@@ -3067,13 +3067,20 @@ function updatePoisonProjectiles(dt) {
     p.x += p.vx * dt;
     p.y += p.vy * dt;
     p.life -= dt;
-    // 直接命中玩家造成伤害
+    // 直接命中玩家造成伤害（穿透无敌帧，毒伤不受无敌保护）
     const distToPlayer = Math.sqrt(distSq(p, player));
     if (distToPlayer < player.radius + p.radius) {
-      if (player.invuln <= 0) {
-        damagePlayer(8);
-        player.invuln = 20;
-      }
+      // 毒弹直接伤害，不检查invuln
+      const pdmg = 8;
+      player.hp -= pdmg;
+      player.hurtFlash = 12;
+      redFlashFrames = 3;
+      document.getElementById('redFlash').classList.add('active');
+      document.getElementById('vignette').classList.add('active');
+      setTimeout(() => document.getElementById('vignette').classList.remove('active'), 600);
+      playHurt();
+      updateHUD();
+      if (player.hp <= 0) { player.hp = 0; gameOver(); }
       // 命中时也生成毒液池
       poisonPools.push({ x: p.x, y: p.y, radius: 35, life: 150, damage: 3, tickTimer: 0 });
       poisonProjectiles.splice(i, 1);
@@ -3096,10 +3103,15 @@ function updatePoisonPools(dt) {
     if (pool.tickTimer <= 0) {
       pool.tickTimer = 30;
       if (Math.sqrt(distSq(pool, player)) < pool.radius + player.radius) {
-        if (player.invuln <= 0) {
-          damagePlayer(pool.damage);
-          player.invuln = 15;
-        }
+        // 毒气是DOT伤害，穿透无敌帧，但有自己的内置CD避免每帧都扣
+        const dmg = pool.damage || pool.dps || 3;
+        player.hp -= dmg;
+        player.hurtFlash = 8;
+        redFlashFrames = 2;
+        document.getElementById('redFlash').classList.add('active');
+        playHurt();
+        updateHUD();
+        if (player.hp <= 0) { player.hp = 0; gameOver(); }
       }
     }
     if (pool.life <= 0) poisonPools.splice(i, 1);
@@ -3430,7 +3442,7 @@ function bossSkill(b) {
       for (let i = 0; i < 6; i++) {
         const px = player.x + (Math.random() - 0.5) * 300;
         const py = player.y + (Math.random() - 0.5) * 300;
-        poisonPools.push({ x: px, y: py, radius: 35, life: 180, maxLife: 180, dps: 3, tickTimer: 0 });
+        poisonPools.push({ x: px, y: py, radius: 35, life: 180, maxLife: 180, damage: 3, tickTimer: 0 });
       }
       break;
     case 'teleport': // 传送
@@ -4861,6 +4873,43 @@ const MISSION_TYPES = [
       if (zombie.isElite) m.killCount++;
     },
     reward: 'buff'
+  },
+  {
+    id: 'survive', nameZh: '生存挑战', nameEn: 'SURVIVE',
+    descZh: '在毒气区中存活30秒', descEn: 'Survive in the poison zone for 30s',
+    init: () => {
+      const cx = WORLD_W / 2 + (Math.random() - 0.5) * 400;
+      const cy = WORLD_H / 2 + (Math.random() - 0.5) * 400;
+      // 在区域周围生成毒池
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2;
+        poisonPools.push({ x: cx + Math.cos(a) * 100, y: cy + Math.sin(a) * 100, radius: 50, life: 1800, damage: 4, tickTimer: 0 });
+      }
+      return { zoneX: cx, zoneY: cy, zoneRadius: 120, timer: 0, target: 1800 };
+    },
+    update: (m, dt) => {
+      m.timer += dt;
+      if (m.timer >= m.target) return 'success';
+      return null;
+    },
+    reward: 'ammo'
+  },
+  {
+    id: 'frenzy', nameZh: '狂热击杀', nameEn: 'FRENZY',
+    descZh: '15秒内连续击杀20个僵尸（不断连击）', descEn: 'Kill 20 zombies in 15s without breaking combo',
+    init: () => {
+      return { killCount: 0, target: 20, timeLeft: 900 };
+    },
+    update: (m, dt) => {
+      m.timeLeft -= dt;
+      if (m.timeLeft <= 0) return 'fail';
+      if (m.killCount >= m.target) return 'success';
+      return null;
+    },
+    onKill: (m) => {
+      m.killCount++;
+    },
+    reward: 'upgrade'
   }
 ];
 
@@ -4882,6 +4931,11 @@ function updateMission(dt) {
   const result = currentMission.def.update(currentMission.data, dt);
   if (result === 'success') {
     completeMission();
+  } else if (result === 'fail') {
+    waveBannerTime = 120;
+    waveBannerText = lang === 'zh' ? '任务失败！' : 'MISSION FAILED!';
+    currentMission = null;
+    updateHUD();
   }
 }
 
@@ -4895,13 +4949,40 @@ function completeMission() {
   // 给予奖励
   if (reward === 'health') {
     player.hp = player.maxHp;
+    waveBannerText = lang === 'zh' ? '任务完成！生命回满' : 'MISSION COMPLETE! Full heal';
   } else if (reward === 'buff') {
     player.buffs.rage = 480;
     player.buffs.haste = 480;
     player.buffs.shield = 1;
+    waveBannerText = lang === 'zh' ? '任务完成！获得增益' : 'MISSION COMPLETE! Buffs granted';
+  } else if (reward === 'ammo') {
+    // 补满所有副武器备弹
+    for (const wk of WEAPON_KEYS) {
+      if (wk !== 'pistol' && player.ownedWeapons.includes(wk)) {
+        ammo[wk] = SECONDARY_AMMO[wk] || 0;
+        spareAmmo[wk] = TOTAL_SPARE_AMMO[wk] || 0;
+      }
+    }
+    waveBannerText = lang === 'zh' ? '任务完成！弹药补满' : 'MISSION COMPLETE! Ammo refilled';
+  } else if (reward === 'upgrade') {
+    // 随机一个免费升级
+    const available = UPGRADE_POOL.filter(u => {
+      const stacks = player.upgrades._stacks || {};
+      return !(stacks[u.id] >= u.maxStacks);
+    });
+    if (available.length > 0) {
+      const up = available[Math.floor(Math.random() * available.length)];
+      up.apply(player);
+      if (!player.upgrades._stacks) player.upgrades._stacks = {};
+      player.upgrades._stacks[up.id] = (player.upgrades._stacks[up.id] || 0) + 1;
+      const upName = lang === 'zh' ? up.nameZh : up.nameEn;
+      waveBannerText = (lang === 'zh' ? '任务完成！获得升级：' : 'MISSION COMPLETE! Upgrade: ') + upName;
+    } else {
+      player.hp = player.maxHp;
+      waveBannerText = lang === 'zh' ? '任务完成！生命回满' : 'MISSION COMPLETE! Full heal';
+    }
   }
   waveBannerTime = 120;
-  waveBannerText = lang === 'zh' ? '任务完成！' : 'MISSION COMPLETE!';
   currentMission = null;
   updateHUD();
 }
@@ -4962,6 +5043,27 @@ function drawMission() {
   } else if (m.type === 'hunt') {
     pct = m.data.killCount / m.data.target;
     label = lang === 'zh' ? `狩猎精英 ${m.data.killCount}/${m.data.target}` : `HUNT ${m.data.killCount}/${m.data.target}`;
+  } else if (m.type === 'survive') {
+    pct = m.data.timer / m.data.target;
+    const sec = Math.ceil((m.data.target - m.data.timer) / 60);
+    label = lang === 'zh' ? `生存 ${sec}s` : `SURVIVE ${sec}s`;
+    // 绘制生存区域
+    const zx = m.data.zoneX, zy = m.data.zoneY;
+    ctx.strokeStyle = '#aa44ff';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([4, 8]);
+    ctx.beginPath();
+    ctx.arc(zx, zy, m.data.zoneRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = `rgba(170,68,255,${0.05 + Math.sin(performance.now() * 0.004) * 0.03})`;
+    ctx.beginPath();
+    ctx.arc(zx, zy, m.data.zoneRadius, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (m.type === 'frenzy') {
+    pct = m.data.killCount / m.data.target;
+    const sec = Math.ceil(m.data.timeLeft / 60);
+    label = lang === 'zh' ? `狂热 ${m.data.killCount}/${m.data.target} (${sec}s)` : `FRENZY ${m.data.killCount}/${m.data.target} (${sec}s)`;
   }
 
   ctx.fillStyle = '#ffaa33';
