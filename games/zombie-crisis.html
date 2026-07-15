@@ -1529,7 +1529,7 @@ const WEAPONS = {
   homing:  { name: 'HOMING', nameZh: '追踪弹',
              damage: 55, fireRate: 350, bulletSpeed: 12, spread: 0,    auto: true, pellets: 1, jitter: 0,
              color: '#ff66dd', weaponClass: 'light', maxAmmo: 18, reload: 90, type: 'homing',
-             homingTurn: 0.15, homingRange: 500, explodeRadius: 35, explodeDamage: 20 },
+             homingTurn: 0.25, homingRange: 600, explodeRadius: 40, explodeDamage: 25 },
   grenade: { name: 'NADE', nameZh: '超级榴弹',
              damage: 60, fireRate: 900, bulletSpeed: 8, spread: 0,    auto: false, pellets: 1, jitter: 0,
              color: '#88dd44', weaponClass: 'heavy', maxAmmo: 5, reload: 140, type: 'grenade',
@@ -3572,10 +3572,10 @@ function drawBoss() {
 function updateBullets(dt) {
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
-    // 追踪弹：每5帧寻找最近僵尸并调整方向
+    // 追踪弹：每2帧寻找最近僵尸并调整方向（更快反应）
     if (b.weaponType === 'homing' && b.homingTurn > 0) {
       b.homingTimer = (b.homingTimer || 0) + dt;
-      if (b.homingTimer >= 5) {
+      if (b.homingTimer >= 2) {
         b.homingTimer = 0;
         let nearest = null, nearestDist = b.homingRange;
         for (const z of zombies) {
@@ -3587,15 +3587,22 @@ function updateBullets(dt) {
           if (d < nearestDist) { nearestDist = d; nearest = boss; }
         }
         if (nearest) {
+          b.target = nearest; // 记录目标用于绘制锁定指示
           const targetAng = Math.atan2(nearest.y - b.y, nearest.x - b.x);
           const curAng = Math.atan2(b.vy, b.vx);
           let diff = targetAng - curAng;
           while (diff > Math.PI) diff -= Math.PI * 2;
           while (diff < -Math.PI) diff += Math.PI * 2;
-          const newAng = curAng + Math.sign(diff) * Math.min(Math.abs(diff), b.homingTurn);
+          // 转向速率随距离动态调整：近距离更灵活
+          const turnRate = b.homingTurn * (nearestDist < 100 ? 1.8 : 1.0);
+          const newAng = curAng + Math.sign(diff) * Math.min(Math.abs(diff), turnRate);
           const speed = Math.hypot(b.vx, b.vy);
-          b.vx = Math.cos(newAng) * speed;
-          b.vy = Math.sin(newAng) * speed;
+          // 追踪时略微加速，更有追逐感
+          const accel = nearestDist < 150 ? 1.02 : 1.0;
+          b.vx = Math.cos(newAng) * speed * accel;
+          b.vy = Math.sin(newAng) * speed * accel;
+        } else {
+          b.target = null;
         }
       }
     }
@@ -3742,6 +3749,46 @@ function updateBullets(dt) {
         addBloodStain(z.x, z.y, z.radius);
         addDamageNumber(z.x, z.y - z.radius - 10, '+' + gained, '#00ff88');
         playZombieDeath();
+
+        // 武器特殊击杀效果
+        if (b.weaponType === 'flame') {
+          // 火焰枪击杀：僵尸爆裂出火焰粒子
+          spawnBloodParticles(z.x, z.y, 10, '#ff6622');
+          spawnBloodParticles(z.x, z.y, 6, '#ffaa44');
+        } else if (b.weaponType === 'laser') {
+          // 激光击杀：蓝色电火花
+          spawnBloodParticles(z.x, z.y, 8, '#44ddff');
+          spawnBloodParticles(z.x, z.y, 4, '#ffffff');
+        } else if (b.weaponType === 'shotgun') {
+          // 霰弹击杀：大力击退周围僵尸
+          for (const z2 of zombies) {
+            const d2 = Math.hypot(z2.x - z.x, z2.y - z.y);
+            if (d2 < 60 && d2 > 0) {
+              z2.vx += (z2.x - z.x) / d2 * 3;
+              z2.vy += (z2.y - z.y) / d2 * 3;
+            }
+          }
+          addShake(1);
+        } else if (b.weaponType === 'homing') {
+          // 追踪弹击杀：粉色冲击波
+          for (let p = 0; p < 8; p++) {
+            const a = (p / 8) * Math.PI * 2;
+            spawnBloodParticles(z.x + Math.cos(a) * 10, z.y + Math.sin(a) * 10, 3, '#ff66dd');
+          }
+        } else if (b.weaponType === 'hmg') {
+          // 重机枪击杀：穿透到下一个僵尸
+          if (zombies.length > 0) {
+            const idx = zombies.indexOf(z);
+            if (idx >= 0 && idx + 1 < zombies.length) {
+              const next = zombies[idx + 1];
+              if (Math.hypot(next.x - z.x, next.y - z.y) < 80) {
+                next.hp -= b.damage * 0.3;
+                next.hurtFlash = 6;
+                spawnBloodParticles(next.x, next.y, 4, '#ffcc00');
+              }
+            }
+          }
+        }
         // BOSS波次精英僵尸100%掉落武器
         if (waveType === 'boss' && z.isElite) {
           const sideW = player.sideWeapon || CLASSES[player.class].startWeapon || 'shotgun';
@@ -3805,8 +3852,8 @@ function updateBullets(dt) {
           boss.burnTime = b.burnDuration;
           boss.burnDps = b.burnDps;
         }
-        // 爆炸型武器（火箭筒/榴弹/微型火箭）：命中爆炸
-        if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket') {
+        // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹）：命中爆炸
+        if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing') {
           explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
           // 榴弹：爆炸后散播破片
           if (b.weaponType === 'grenade' && b.fragments > 0) {
@@ -6399,9 +6446,35 @@ function drawBullet(b) {
     return;
   }
 
-  // 追踪弹：粉色弹丸，带螺旋拖尾
+  // 追踪弹：粉色弹丸，带螺旋拖尾 + 目标锁定指示
   if (b.weaponType === 'homing') {
     if (!isFinite(b.x) || !isFinite(b.y) || !b.radius) return;
+    // 目标锁定指示线（虚线连接到目标）
+    if (b.target) {
+      ctx.strokeStyle = 'rgba(255,102,221,0.25)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 6]);
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.target.x, b.target.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // 目标上的锁定标记（旋转方框）
+      const pulse = (Math.sin(performance.now() * 0.012) + 1) * 0.5;
+      ctx.save();
+      ctx.translate(b.target.x, b.target.y);
+      ctx.rotate(performance.now() * 0.003);
+      ctx.strokeStyle = `rgba(255,102,221,${0.4 + pulse * 0.3})`;
+      ctx.lineWidth = 1.5;
+      const ms = b.target.radius + 4;
+      ctx.beginPath();
+      ctx.moveTo(-ms, -ms * 0.5); ctx.lineTo(-ms, -ms); ctx.lineTo(-ms * 0.5, -ms);
+      ctx.moveTo(ms, -ms * 0.5); ctx.lineTo(ms, -ms); ctx.lineTo(ms * 0.5, -ms);
+      ctx.moveTo(-ms, ms * 0.5); ctx.lineTo(-ms, ms); ctx.lineTo(-ms * 0.5, ms);
+      ctx.moveTo(ms, ms * 0.5); ctx.lineTo(ms, ms); ctx.lineTo(ms * 0.5, ms);
+      ctx.stroke();
+      ctx.restore();
+    }
     const angle = Math.atan2(b.vy, b.vx);
     const time = performance.now() * 0.02;
     ctx.save();
