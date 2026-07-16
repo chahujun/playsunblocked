@@ -2305,14 +2305,22 @@ function placeMine() {
     player.hp = Math.min(player.maxHp, player.hp + 50);
     spawnBloodParticles(player.x, player.y, 12, '#44ff44');
   } else if (abilityType === 'turret') {
-    // 工程兵：放置穿甲炮台（15秒，高射速穿透型）
+    // 工程兵：放置强化穿甲炮台（20秒，高射速穿透+溅射型）
     player.mines--;
     player.abilityCD = 300;
     placeTurret('ap', player.x + Math.cos(player.angle) * 30, player.y + Math.sin(player.angle) * 30);
     const t = turrets[turrets.length - 1];
-    t.lifetime = 900; // 15秒
-    // 工程兵技能炮台强化：射速更快，伤害更高
-    t.def = Object.assign({}, t.def, { fireRate: 45, damage: 30, range: 320, pierce: 2 });
+    t.lifetime = 1200; // 20秒
+    t.hp = 400; t.maxHp = 400; // 高血量不易被摧毁
+    // 工程兵技能炮台大幅强化：射速极快，伤害高，穿透3，附带溅射爆炸
+    t.def = Object.assign({}, t.def, {
+      fireRate: 25,      // 约0.42秒/发
+      damage: 45,        // 单发45伤害
+      range: 380,        // 射程380
+      pierce: 3,         // 穿透3个敌人
+      explodeRadius: 35, // 命中后小范围溅射
+      explodeDamage: 20  // 溅射20伤害
+    });
   } else if (abilityType === 'cloak') {
     // 侦察兵：隐身4秒（僵尸丢失目标，移速+40%）
     player.mines--;
@@ -2497,6 +2505,8 @@ function fireTurretBullet(turret, target) {
   const def = turret.def;
   const ang = Math.atan2(target.y - turret.y, target.x - turret.x);
   const isRocket = turret.type === 'rocket';
+  // 有溅射效果的炮台子弹用 flak 类型以触发爆炸逻辑
+  const hasSplash = (def.explodeRadius || 0) > 0 && !isRocket;
   bullets.push({
     x: turret.x + Math.cos(ang) * 18,
     y: turret.y + Math.sin(ang) * 18,
@@ -2508,7 +2518,7 @@ function fireTurretBullet(turret, target) {
     life: 100,
     isCrit: false,
     from: 'turret',
-    weaponType: isRocket ? 'rocket' : 'normal',
+    weaponType: isRocket ? 'rocket' : (hasSplash ? 'flak' : 'normal'),
     explodeRadius: def.explodeRadius || 0,
     explodeDamage: def.explodeDamage || 0,
     fragments: 0, fragmentDamage: 0,
@@ -2521,7 +2531,9 @@ function fireTurretBullet(turret, target) {
     chainRange: 0, chainDamage: 0, chainCount: 0,
     acidRadius: 0, acidLife: 0, acidDps: 0, slowMult: 0,
     railWidth: 0, railRange: 0, railFadeStart: 0,
-    chainLightning: 0, volatileMix: false
+    chainLightning: 0, volatileMix: false,
+    rocketPierce: 0, fragmentExplodeRadius: 0, fragmentExplodeDamage: 0,
+    plasmaPoolRadius: 0, plasmaPoolLife: 0, plasmaPoolDps: 0
   });
 }
 
