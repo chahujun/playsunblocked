@@ -376,10 +376,24 @@
     }
   ];
 
-  // Pre-compute gradient covers
-  GAMES.forEach(function (g) {
+  // Pre-compute gradient covers and numeric fields for sorting
+  function parsePlays(s) {
+    if (!s || s === '0') return 0;
+    var n = parseFloat(s);
+    if (s.indexOf('M') !== -1) return Math.round(n * 1000000);
+    if (s.indexOf('K') !== -1) return Math.round(n * 1000);
+    return n;
+  }
+  GAMES.forEach(function (g, i) {
     g.gradient = CATEGORY_GRADIENTS[g.category] || ['#FF5C28', '#B8350A'];
+    g.playsNum = parsePlays(g.plays);
+    g.addedOrder = i; // higher = newer
+    if (g.isNew === undefined) g.isNew = false;
+    if (g.multiplayer === undefined) g.multiplayer = false;
   });
+  // Mark recent games as New
+  GAMES[GAMES.length - 1].isNew = true; // Crownfall
+  GAMES[GAMES.length - 2].isNew = true; // Bytebreak
 
   // ---- Public API ----
   var DATA = {
