@@ -2781,9 +2781,9 @@ function getWaveComposition(w) {
   if (w >= 5) comp.tank = Math.floor((w - 4) * 0.35);
   if (w >= 4) comp.screamer = Math.floor((w - 3) * 0.25);
   comp.crawler = 0; comp.exploder = 0; comp.healer = 0;
-  if (w >= 3) comp.crawler = Math.floor((w - 2) * 0.5);
-  if (w >= 5) comp.exploder = Math.floor((w - 4) * 0.3);
-  if (w >= 6) comp.healer = Math.floor((w - 5) * 0.2);
+  if (w >= 3) comp.crawler = Math.max(1, Math.floor((w - 2) * 0.8));
+  if (w >= 5) comp.exploder = Math.max(1, Math.floor((w - 4) * 0.5));
+  if (w >= 6) comp.healer = Math.max(1, Math.floor((w - 5) * 0.4));
   return comp;
 }
 
@@ -4486,9 +4486,12 @@ function updateBullets(dt) {
           player.hp = Math.min(player.maxHp, player.hp + 1);
           player.lastLifesteal = performance.now();
         }
-      spawnBloodParticles(b.x, b.y, 5, (b.weaponType === 'flame' || b.weaponType === 'laser') ? (b.weaponType === 'flame' ? '#ff6622' : '#66ddff') : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : (b.weaponType === 'sniper' ? '#ffcc44' : '#cc1122')))));
+      const _dmgColorMap = { flame: '#ff6622', laser: '#66ddff', tesla: '#aa66ff', acid: '#66ff44', railgun: '#ffeeaa', sniper: '#ffcc44', plasma: '#cc44ff', cryo: '#44ffff', flak: '#ff8844' };
+      const _dmgColor = _dmgColorMap[b.weaponType] || '#cc1122';
+      spawnBloodParticles(b.x, b.y, 5, _dmgColor);
       addBloodStain(z.x, z.y, z.radius * 0.5);
-      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (b.weaponType === 'flame' ? '#ff8833' : (b.weaponType === 'laser' ? '#44ddff' : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : (b.weaponType === 'sniper' ? '#ffcc44' : '#ffdd44')))))), b.isCrit);
+      const _numColorMap = { flame: '#ff8833', laser: '#44ddff', tesla: '#aa66ff', acid: '#66ff44', railgun: '#ffeeaa', sniper: '#ffcc44', plasma: '#cc66ff', cryo: '#66eeff', flak: '#ffaa66' };
+      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (_numColorMap[b.weaponType] || '#ffdd44'), b.isCrit);
       // 火焰枪：附加燃烧DOT + 命中点残留小火焰
       if (b.weaponType === 'flame' && b.burnDuration > 0) {
         z.burnTime = b.burnDuration;
@@ -7767,6 +7770,115 @@ function drawBullet(b) {
     ctx.lineTo(-b.radius, 0);
     ctx.lineTo(0, b.radius);
     ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+
+  // 等离子炮：紫色能量球+电弧
+  if (b.weaponType === 'plasma') {
+    if (!isFinite(b.x) || !isFinite(b.y)) return;
+    const angle = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    // 外层紫色光晕
+    ctx.fillStyle = 'rgba(180,40,255,0.25)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    // 中层
+    ctx.fillStyle = 'rgba(200,80,255,0.5)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 2, 0, Math.PI * 2);
+    ctx.fill();
+    // 核心
+    ctx.fillStyle = 'rgba(230,180,255,0.9)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 1.1, 0, Math.PI * 2);
+    ctx.fill();
+    // 白色中心
+    ctx.fillStyle = 'rgba(255,255,255,1)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    // 随机电弧
+    if (Math.random() < 0.5) {
+      ctx.strokeStyle = 'rgba(200,100,255,0.6)';
+      ctx.lineWidth = 1;
+      for (let k = 0; k < 3; k++) {
+        const a1 = Math.random() * Math.PI * 2;
+        const a2 = a1 + (Math.random() - 0.5) * 1;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a1) * b.radius * 2, Math.sin(a1) * b.radius * 2);
+        ctx.lineTo(Math.cos(a2) * b.radius * 3.5, Math.sin(a2) * b.radius * 3.5);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+    return;
+  }
+
+  // 冰冻枪：青色冰晶碎片
+  if (b.weaponType === 'cryo') {
+    if (!isFinite(b.x) || !isFinite(b.y)) return;
+    const angle = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(angle);
+    // 冰雾光晕
+    ctx.fillStyle = 'rgba(100,220,255,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(0, 0, b.radius * 2.5, b.radius * 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 冰晶主体（菱形）
+    ctx.fillStyle = 'rgba(150,240,255,0.8)';
+    ctx.beginPath();
+    ctx.moveTo(b.radius * 1.5, 0);
+    ctx.lineTo(0, -b.radius);
+    ctx.lineTo(-b.radius * 1.2, 0);
+    ctx.lineTo(0, b.radius);
+    ctx.closePath();
+    ctx.fill();
+    // 白色高光
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.beginPath();
+    ctx.moveTo(b.radius * 0.8, 0);
+    ctx.lineTo(0, -b.radius * 0.5);
+    ctx.lineTo(-b.radius * 0.5, 0);
+    ctx.lineTo(0, b.radius * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    // 冰晶拖尾粒子
+    if (Math.random() < 0.4) {
+      particles.push({
+        x: b.x - Math.cos(angle) * b.radius, y: b.y - Math.sin(angle) * b.radius,
+        vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+        life: 10, maxLife: 15, size: 1 + Math.random() * 2, color: '#aaeeff'
+      });
+    }
+    ctx.restore();
+    return;
+  }
+
+  // 高射炮：橙色小型弹丸
+  if (b.weaponType === 'flak') {
+    if (!isFinite(b.x) || !isFinite(b.y)) return;
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    // 橙色光晕
+    ctx.fillStyle = 'rgba(255,140,60,0.3)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 2, 0, Math.PI * 2);
+    ctx.fill();
+    // 弹体
+    ctx.fillStyle = 'rgba(255,180,80,0.9)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 1.2, 0, Math.PI * 2);
+    ctx.fill();
+    // 亮核
+    ctx.fillStyle = 'rgba(255,240,180,1)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 0.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     return;
