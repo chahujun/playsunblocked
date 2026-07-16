@@ -24,9 +24,9 @@
     '偷看了一眼底牌。一个符号的真实身份露出来了。': "Peeked under the hood. One glyph's truth is showing.",
     '这回合的洞察用完了。': 'No insights left this round.',
     '挑一个符号，看看它的真面目。': 'Pick a glyph to reveal what it really is.',
-    '能量从基线往上窜。有东西在往里灌。': "Energy jumps up from the baseline. Something's pumping in.",
-    '信号翻了一下，自己跟自己镜像。这是反转。': "The signal flips and mirrors itself. That's inversion.",
-    '信号往上爬，撞到天花板，停住了。': 'The signal climbs, hits a wall, and stops dead.',
+    '能量从基线往上窜。有东西在往里灌。': "The signal jumps up from baseline — something's pushing energy in.",
+    '信号翻了一下，自己跟自己镜像。这是反转。': "The wave flips and mirrors itself. An echo running backwards.",
+    '信号往上爬，撞到天花板，停住了。': 'The signal climbs, hits something solid, and goes flat.',
     '拿下三个了，词典开始有东西了。': "First three down. The lexicon's growing.",
     '过半。6 个符号到手。': 'Halfway there. 6 glyphs cracked.',
     '九个了，你已经能读懂这些了。': "Nine down. You're reading these fluently now.",
@@ -992,6 +992,12 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 
   /* Insight reveal glow on glyph card */
   .glyph-card.insight-reveal { animation: insightGlow 1.4s ease; }
+  .reveal-hint {
+    font-size: 9px; color: var(--accent); text-align: center;
+    padding: 2px 0; border-top: 1px solid var(--border);
+    animation: hintPulse 2s ease-in-out infinite;
+  }
+  @keyframes hintPulse { 0%,100% { opacity: 0.7; } 50% { opacity: 1; } }
   @keyframes insightGlow {
     0%,100% { box-shadow: none; }
     50% { box-shadow: 0 0 28px var(--accent-2); border-color: var(--accent-2); }
@@ -1256,12 +1262,12 @@ const Lang = {
     of: "of",
     dictEmpty: "Nothing decoded yet.\nProbe a glyph, tag it, crack it.",
     markHint: "What do you think this one is?",
-    probeHintV: "Energy jumps up from the baseline. Something's pumping in.",
-    probeHintI: "The signal flips and mirrors itself. That's inversion.",
-    probeHintL: "The signal climbs, hits a wall, and stops dead.",
-    probeV: "PULSE +Δ",
-    probeI: "MIRROR ◆",
-    probeL: "CEILING ─",
+    probeHintV: "The signal jumps up from baseline — something's pushing energy in.",
+    probeHintI: "The wave flips and mirrors itself. An echo running backwards.",
+    probeHintL: "The signal climbs, hits something solid, and goes flat.",
+    probeV: "PULSE PATTERN",
+    probeI: "MIRROR PATTERN",
+    probeL: "CEILING PATTERN",
     wrong: "WRONG",
     right: "CORRECT",
     insight: "INSIGHT",
@@ -1287,19 +1293,19 @@ const Lang = {
     tutStart: "BEGIN",
     tutPrev: "BACK",
     tut1Title: "WELCOME, OPERATOR",
-    tut1P1: "You found an alien console buried in the ice. Three glyph types flicker on its surface.",
-    tut1P2: "Each glyph carries a charge. Your job: figure out which ones are safe, and which will burn you.",
-    tut1Hint: "Click each glyph to inspect it. Right-click to mark it as dangerous.",
+    tut1P1: "You found an alien console buried in the ice. Strange glyphs flicker on its surface — they belong to no language you know.",
+    tut1P2: "Each glyph reacts differently when probed. Your job: figure out what type each glyph is by observing its behavior, then mark them correctly to stabilize the core.",
+    tut1Hint: "Click BEGIN to start. You'll probe glyphs, mark them, and calibrate.",
     tut2Title: "THREE GLYPH TYPES",
-    tut2P1: "VOLTAGE pumps energy in — it raises the charge of everything connected to it.",
-    tut2P2: "CONDUCTOR spreads charge between connected glyphs. A bridge for energy.",
-    tut2P3: "GROUND drains charge away. It's your safety valve — but too many means nothing works.",
+    tut2P1: "VOLTAGE — When probed, the signal pulses upward from the baseline. Energy pumps in.",
+    tut2P2: "INVERT — When probed, the signal mirrors itself. The wave flips and echoes.",
+    tut2P3: "LIMIT — When probed, the signal climbs but hits a ceiling and stops. Capped energy.",
     tut3Title: "THE LOOP",
-    tut3P1: "1. PROBE — Flip to PROBE mode. Click glyphs to read their charge.",
-    tut3P2: "2. MARK — Flip to MARK mode. Right-click glyphs to flag them as dangerous.",
-    tut3P3: "3. SOLVE — When you've probed and marked enough, click SOLVE to submit.",
-    tut3P4: "Wrong answers cost lives. Right ones earn scores. The loop continues.",
-    tut3Hint: "Shortcuts: P probe · M mark · S solve"
+    tut3P1: "1. PROBE — Switch to PROBE mode (P key). Click a glyph to watch its oscilloscope reaction. You get 3 probes per round.",
+    tut3P2: "2. MARK — Switch to MARK mode (M key). Click a glyph and pick its type from 3 options. Mark all 4 glyphs.",
+    tut3P3: "3. CALIBRATE — Click CALIBRATE (C key) to submit. All 4 correct = core hits 100%. Any wrong = core overloads.",
+    tut3P4: "Stuck? Use INSIGHT (I key) once per round to peek at a glyph's true type. Build your lexicon across rounds — decode all 12 to win.",
+    tut3Hint: "Shortcuts: P probe · M mark · I insight · C calibrate · R reset"
   },
   zh: {
     title: "读不懂的控制台",
@@ -1349,12 +1355,12 @@ const Lang = {
     of: "共",
     dictEmpty: "还没破译任何符号。\n探测一个，标记一个，搞定它。",
     markHint: "你觉得这个是什么？",
-    probeHintV: "能量从基线往上窜。有东西在往里灌。",
-    probeHintI: "信号翻了一下，自己跟自己镜像。这是反转。",
-    probeHintL: "信号往上爬，撞到天花板，停住了。",
-    probeV: "脉冲 +Δ",
-    probeI: "镜像 ◆",
-    probeL: "上限 ─",
+    probeHintV: "信号从基线向上跳——有东西在往里灌能量。",
+    probeHintI: "波形翻转并自我镜像。一个反向运行的回声。",
+    probeHintL: "信号攀升，撞到什么东西，然后变平了。",
+    probeV: "脉冲波形",
+    probeI: "镜像波形",
+    probeL: "钳位波形",
     wrong: "错了",
     right: "对了",
     insight: "洞察",
@@ -1380,19 +1386,19 @@ const Lang = {
     tutStart: "开始",
     tutPrev: "上一步",
     tut1Title: "欢迎，操作员",
-    tut1P1: "你在冰层下发现了一台外星控制台。三种符号在表面闪烁。",
-    tut1P2: "每个符号都带有电荷。你的任务：找出哪些安全，哪些会伤到你。",
-    tut1Hint: "左键点击符号查看详情。右键标记为危险。",
-    tut2Title: "三种符号",
-    tut2P1: "电压——泵入能量，提升所有连接符号的电荷。",
-    tut2P2: "导体——在连接的符号间传导电荷。能量的桥梁。",
-    tut2P3: "接地——排走电荷。是你的安全阀——但太多意味着什么都无法工作。",
+    tut1P1: "你在冰层下发现了一台外星控制台。陌生的符号在表面闪烁——不属于任何已知的语言。",
+    tut1P2: "每个符号被探测时反应不同。你的任务：观察行为判断符号类型，正确标记以稳定核心。",
+    tut1Hint: "点击「开始」进入。你需要探测符号、标记类型、然后校准。",
+    tut2Title: "三种符号类型",
+    tut2P1: "电压——探测时信号从基线向上脉冲。能量在泵入。",
+    tut2P2: "反转——探测时信号自我镜像。波形翻转并回响。",
+    tut2P3: "限制——探测时信号攀升但撞到天花板停止。能量被钳位。",
     tut3Title: "操作循环",
-    tut3P1: "1. 探测——切换到探测模式。左键点击符号读取电荷。",
-    tut3P2: "2. 标记——切换到标记模式。右键点击符号标记为危险。",
-    tut3P3: "3. 解答——探测和标记足够后，点击解答提交。",
-    tut3P4: "答错扣命，答对加分。循环继续。",
-    tut3Hint: "快捷键：P 探测 · M 标记 · S 解答"
+    tut3P1: "1. 探测——切换到探测模式（P键）。点击符号观看示波器反应。每回合 3 次探测。",
+    tut3P2: "2. 标记——切换到标记模式（M键）。点击符号并从 3 个选项中选择类型。标记全部 4 个符号。",
+    tut3P3: "3. 校准——点击校准（C键）提交。4 个全对=核心达到 100%。任一错误=核心过载。",
+    tut3P4: "卡住了？每回合可用 1 次洞察（I键）偷看符号真实类型。词典跨回合积累——破译全部 12 个即胜。",
+    tut3Hint: "快捷键：P 探测 · M 标记 · I 洞察 · C 校准 · R 重置"
   }
 };
 
@@ -1870,13 +1876,14 @@ function renderGlyphs() {
     if (state.dictionary[g.id]) card.classList.add('known');
     if (state.revealed[g.id]) card.classList.add('insight-reveal');
     const isTwin = state.twinPair.includes(g.id);
-    // Show revealed type as a forced mark if not yet marked
-    const showType = state.marks[g.id] || (state.revealed[g.id] ? g.type : null);
+    // Show player's mark; if revealed by insight but not yet marked, show hint
+    const showType = state.marks[g.id] || null;
+    const revealHint = state.revealed[g.id] && !state.marks[g.id];
     card.innerHTML = `
       ${isTwin ? '<span class="twin-mark">⚭</span>' : ''}
       <div class="glyph-id">${g.id}</div>
       <svg class="glyph-svg" viewBox="0 0 100 100">${g.svg}</svg>
-      ${markMarkup(showType)}
+      ${revealHint ? `<div class="reveal-hint">→ ${t(g.type)}</div>` : markMarkup(showType)}
     `;
     card.addEventListener('click', () => onGlyphClick(g, card));
     row.appendChild(card);
@@ -1992,12 +1999,12 @@ function useInsight(glyph) {
   if (state.insightsLeft <= 0) return;
   state.insightsLeft--;
   state.revealed[glyph.id] = true;
-  state.marks[glyph.id] = glyph.type; // auto-mark with truth
+  // Reveal the true type but DON'T auto-mark — player must mark it themselves
   $('lbl-insight').innerHTML = `${t('insight')}: <span id="insight-count" class="val">${state.insightsLeft}</span>`;
   log(`${t('insightUsed')} ${glyph.id} → ${t(glyph.type)}`, 'success');
-  toast(t('insightUsed'), 'info', t('insight'));
+  toast(`${t('insightUsed')} (${t(glyph.type)})`, 'info', t('insight'));
   beep(740, 0.08); setTimeout(()=>beep(990,0.1),90);
-  // Exit insight mode after use
+  // Switch to mark mode so player can tag it
   state.mode = 'mark';
   applyI18n();
   saveState();
@@ -2046,9 +2053,10 @@ function calibrate() {
 
   const allCorrect = state.activeGlyphs.every(g => state.marks[g.id] === g.type);
 
-  // Animate core through glyph applications
+  // Animate core through glyph applications — smooth ramp, no confusing values
   let val = 50;
   const cards = document.querySelectorAll('.glyph-card');
+  const correctCount = state.activeGlyphs.filter(g => state.marks[g.id] === g.type).length;
   state.activeGlyphs.forEach((g, i) => {
     setTimeout(() => {
       const mark = state.marks[g.id];
@@ -2056,13 +2064,11 @@ function calibrate() {
       const card = cards[i];
       if (card) card.classList.add(correct ? 'correct-flash' : 'wrong-flash');
 
+      // Smooth ramp: correct answers push toward 100, wrong ones drop
       if (correct) {
-        if (g.type === 'voltage') val = Math.min(150, val + 18);
-        else if (g.type === 'invert') val = 100 - val;
-        else if (g.type === 'limit') val = Math.min(val, 72);
+        val = 50 + Math.round((50 / state.activeGlyphs.length) * (i + 1) * (allCorrect ? 1 : 0.7));
       } else {
-        // Glitch
-        val = Math.max(0, Math.min(150, val + (Math.random() * 50 - 15)));
+        val = Math.max(20, val - 15);
       }
       state.coreValue = val;
       renderCore();
@@ -2194,6 +2200,13 @@ function newRound() {
   saveState();
 
   log(`${t('logNewRound')} (${t('round')} ${state.round})`, 'accent');
+  // Guided hint for the player
+  const knownCount = Object.keys(state.dictionary).length;
+  if (state.round === 1) {
+    toast(t('logNewRound') + ' ' + t('probeMode'), 'info');
+  } else if (knownCount < 4) {
+    toast(`${t('decoded')}: ${knownCount}/12`, 'info', t('round') + ' ' + state.round);
+  }
   applyI18n();
 }
 
