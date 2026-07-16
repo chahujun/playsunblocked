@@ -362,6 +362,22 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 </script>
 <!-- /playsunblocked in-game menu -->
 
+<!-- Help / Instructions button -->
+<style>
+#helpTutorBtn{
+  position:fixed;top:18px;right:60px;z-index:999998;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(0,0,0,.45);color:#fff;
+  border:1px solid rgba(255,255,255,.35);
+  box-sizing:border-box;padding:0;
+  font-family:inherit;font-size:15px;font-weight:700;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+}
+#helpTutorBtn:hover{background:rgba(0,0,0,.9);}
+</style>
+<button id="helpTutorBtn" title="Help" aria-label="Show instructions">?</button>
+
 <div id="game-container">
   <div id="top-bar">
     <span class="corner-deco tl"></span>
@@ -1784,6 +1800,11 @@ document.getElementById('reset-btn').addEventListener('click', ()=>{
 document.getElementById('start-btn').addEventListener('click', startGame);
 document.getElementById('next-level-btn').addEventListener('click', nextLevel);
 document.getElementById('play-again-btn').addEventListener('click', restartGame);
+
+// Re-open the start / instructions overlay from the help (?) button
+document.getElementById('helpTutorBtn').addEventListener('click', ()=>{
+  document.getElementById('start-overlay').style.display = 'flex';
+});
 
 function updateUILanguage(){
   // 顶部标题

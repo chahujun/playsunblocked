@@ -17,7 +17,7 @@
     '水': 'WATER',
     '当前层数：': 'Level:',
     '尘埃：': 'DUST:',
-    '流速升级：': 'Drip Speed:',
+    '泼洒速度升级：': 'Spray Speed Up:',
     '移动': 'Move',
     '切换': 'Select',
     '左键': 'LMB',
@@ -463,6 +463,22 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
     <div id="screen">
       <canvas id="cv"></canvas>
 
+      <!-- 重新查看教程入口按钮（覆盖层，仅游戏中可见） -->
+      <style>
+      #tut-replay-btn{
+        position:absolute; top:6px; right:6px; z-index:55;
+        width:28px; height:28px; border:none; border-radius:50%;
+        background:rgba(0,0,0,0.45); color:#fff;
+        font-size:15px; font-weight:bold; line-height:28px; text-align:center;
+        cursor:pointer; padding:0; font-family:'Share Tech Mono',monospace;
+        transition:background .15s ease, transform .1s ease;
+        box-shadow:0 1px 4px rgba(0,0,0,0.5);
+      }
+      #tut-replay-btn:hover{ background:rgba(0,0,0,1); transform:scale(1.08); }
+      #tut-replay-btn:active{ transform:scale(0.96); }
+      </style>
+      <button id="tut-replay-btn" title="重新查看教程 / Replay Tutorial" aria-label="重新查看教程">?</button>
+
       <!-- HUD -->
       <div id="hud">
         <div class="hud-block">
@@ -494,8 +510,8 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
       </div>
 
       <div id="bottomHint">
-        <span id="hintL"><b>WASD</b> 移动 · <b>1/2/3</b> 切换 · <b>左键</b> 泼洒</span>
-        <span id="hintR"><b id="lblDrip">流速升级：</b> <span id="dripVal">1.0×</span></span>
+        <span id="hintL"><b>WASD</b> 移动 · <b>1/2/3</b> 切换 · <b>左键</b> 泼洒 · <b>P</b> 暂停</span>
+        <span id="hintR"><b id="lblDrip">泼洒速度升级：</b> <span id="dripVal">1.0×</span></span>
       </div>
 
       <div id="banner"></div>
@@ -531,7 +547,7 @@ const I18N = {
   en:{
     title:"BREACH", sub:"BREACH",
     vialCap:"Vial Capacity:", reactant:"Reactant:", level:"Level:",
-    selectElement:"Select Element:", dripSpeed:"Drip Speed:",
+    selectElement:"Select Element:", dripSpeed:"Spray Speed Up:",
     evacSuccess:"EVACUATION SUCCESS",
     hp:"HP", shield:"SHIELD", dust:"DUST:",
     water:"WATER", oil:"CRUDE OIL", acid:"ACID",
@@ -539,14 +555,14 @@ const I18N = {
     desc:"A containment breach flooded the sub-levels. You are the last technician. Spray reagents, chain reactions, find the Evac Pass, descend deeper.",
     desc2:"Find the Evacuation Pass to unlock the blast door. Kill foes to harvest Organic Dust. Spend it at vending units.",
     keys:"<b>WASD / Arrow</b> — Move · <b>1 2 3</b> — Select Reagent · <b>Left Click</b> — Spray<br><b>Water</b> conducts electricity, extinguishes fire<br><b>Crude Oil</b> flows fast, ignites into raging fire<br><b>Acid</b> eats wood crates and iron doors, melts metal foes",
-    hintL:"<b>WASD</b> move · <b>1/2/3</b> select · <b>LMB</b> spray",
+    hintL:"<b>WASD</b> move · <b>1/2/3</b> select · <b>LMB</b> spray · <b>P</b> pause",
     dead:"CONTAINMENT FAILED", deadSub:"You collapsed in the leak.",
     levelClear:"LEVEL CLEAR",
     foundPass:"EVAC PASS ACQUIRED",
     doorLocked:"BLAST DOOR LOCKED — Find the Evac Pass",
     shopTitle:"VENDING UNIT", shopDust:"DUST:",
-    upgradeRange:"Range +", upgradeCap:"Vial Cap +", upgradeShield:"Shield +", upgradeSpeed:"Drip Speed +",
-    shopRange:"Spray Range", shopCap:"Vial Capacity", shopShield:"Shield Cell", shopSpeed:"Drip Speed",
+    upgradeRange:"Range +", upgradeCap:"Vial Cap +", upgradeShield:"Shield +", upgradeSpeed:"Spray Speed Up +",
+    shopRange:"Spray Range", shopCap:"Vial Capacity", shopShield:"Shield Cell", shopSpeed:"Spray Speed Up",
     shopRangeD:"Throw reagents farther.", shopCapD:"Carry more of each reagent.",
     shopShieldD:"Absorb one hit. Recharges per level.", shopSpeedD:"Spray faster.",
     buy:"BUY", owned:"OWNED", cant:"NOT ENOUGH",
@@ -562,12 +578,14 @@ const I18N = {
     reactWaterConduct:"Water conducts!",
     reactAcid:"Acid corrosion!",
     paused:"PAUSED",
-    pauseHint:"Press P / ESC to resume"
+    pauseHint:"Press P / ESC to resume",
+    hintGen:"Generator is live! Water near it conducts electricity — zaps nearby enemies.",
+    genTip:"Tip: Generators are live — water conducts electricity. Use chain reactions to clear obstacles."
   },
   zh:{
     title:"罐区失守", sub:"罐区失守",
     vialCap:"药水存量：", reactant:"反应物：", level:"当前层数：",
-    selectElement:"分配元素：", dripSpeed:"流速升级：",
+    selectElement:"分配元素：", dripSpeed:"泼洒速度升级：",
     evacSuccess:"撤离成功",
     hp:"生命", shield:"护盾", dust:"尘埃：",
     water:"水", oil:"原油", acid:"强酸",
@@ -575,14 +593,14 @@ const I18N = {
     desc:"机构失守，泄漏淹没了地下层。你是最后一名技术员。泼洒试剂，引发连锁反应，找到防灾通行证，向更深处撤离。",
     desc2:"拿到防灾通行证才能开启隔断门。击杀敌人收集有机尘埃，在贩卖机处升级装备。",
     keys:"<b>WASD / 方向键</b> — 移动 · <b>1 2 3</b> — 切换试剂 · <b>鼠标左键</b> — 泼洒<br><b>水</b> 导电、灭火<br><b>原油</b> 流速快，遇火成烈焰<br><b>强酸</b> 腐蚀木箱铁门，熔化金属敌人",
-    hintL:"<b>WASD</b> 移动 · <b>1/2/3</b> 切换 · <b>左键</b> 泼洒",
+    hintL:"<b>WASD</b> 移动 · <b>1/2/3</b> 切换 · <b>左键</b> 泼洒 · <b>P</b> 暂停",
     dead:"收容失败", deadSub:"你倒在了泄漏现场。",
     levelClear:"本层清理完毕",
     foundPass:"已获取防灾通行证",
     doorLocked:"隔断门已锁 — 请先找到防灾通行证",
     shopTitle:"自动贩卖机", shopDust:"尘埃：",
-    upgradeRange:"射程 +", upgradeCap:"容量 +", upgradeShield:"护盾 +", upgradeSpeed:"流速 +",
-    shopRange:"喷射射程", shopCap:"药水容量", shopShield:"护盾电池", shopSpeed:"流速升级",
+    upgradeRange:"射程 +", upgradeCap:"容量 +", upgradeShield:"护盾 +", upgradeSpeed:"泼洒速度 +",
+    shopRange:"喷射射程", shopCap:"药水容量", shopShield:"护盾电池", shopSpeed:"泼洒速度升级",
     shopRangeD:"泼洒距离更远。", shopCapD:"每种试剂携带更多。",
     shopShieldD:"抵挡一次伤害，每层回复。", shopSpeedD:"泼洒更快。",
     buy:"购买", owned:"已购", cant:"尘埃不足",
@@ -598,7 +616,9 @@ const I18N = {
     reactWaterConduct:"水导电！",
     reactAcid:"酸腐蚀！",
     paused:"已暂停",
-    pauseHint:"按 P / ESC 继续"
+    pauseHint:"按 P / ESC 继续",
+    hintGen:"发电机带电！水泼到发电机附近会导电，可以电击附近敌人。",
+    genTip:"提示：发电机持续带电，水可以导电。利用化学反应连锁反应清除障碍。"
   }
 };
 let LANG = new URLSearchParams(window.location.search).get('lang') || 'zh';
@@ -1842,11 +1862,33 @@ function updateBanner(){
 
 /* ---------- 15b. 教程提示 / 反应提示 / 暂停 ---------- */
 let hintTimer=0, hintTxt='';
-let tutFlags={ splashed:false, killed:false, gotPass:false };
+let tutFlags={ splashed:false, killed:false, gotPass:false, sawGen:false };
 let seenOilFire=false, seenWaterConduct=false, seenAcidCorrode=false;
 let paused=false;
 function showHint(txt,dur){ hintTxt=txt; hintTimer=dur; }
 function updateHint(){ if(hintTimer>0) hintTimer--; }
+// 重新查看教程：重置全部一次性教程/反应提示标志，并立即重新弹出首次操作提示
+function replayTutorialHints(){
+  tutFlags={ splashed:false, killed:false, gotPass:false, sawGen:false };
+  seenOilFire=false; seenWaterConduct=false; seenAcidCorrode=false;
+  hintTimer=0; hintTxt='';
+  if(state===ST_PLAY){
+    showHint(t('hintMove'),240);
+  }
+}
+// 首次看到发电机时给出教程提示（发电机进入屏幕视野即触发）
+function checkGenSight(){
+  if(tutFlags.sawGen||!gens||!gens.length||!player) return;
+  const camX=player.x-W/2, camY=player.y-H/2;
+  for(const g of gens){
+    const gx=g.x*TILE+TILE/2, gy=g.y*TILE+TILE/2;
+    if(gx>=camX && gx<=camX+W && gy>=camY && gy<=camY+H){
+      tutFlags.sawGen=true;
+      showHint(t('hintGen'),240);
+      break;
+    }
+  }
+}
 function drawHint(){
   if(hintTimer<=0||!hintTxt) return;
   let a=1; if(hintTimer<30) a=hintTimer/30;       // 末尾 0.5 秒淡出
@@ -1896,7 +1938,7 @@ function startGame(){
   player.selected=0;
   player.knockX=0; player.knockY=0; player.trail.length=0; player._lastTrail=0;
   shakeMag=0; shakeX=0; shakeY=0;
-  tutFlags={ splashed:false, killed:false, gotPass:false };
+  tutFlags={ splashed:false, killed:false, gotPass:false, sawGen:false };
   seenOilFire=false; seenWaterConduct=false; seenAcidCorrode=false;
   paused=false; hintTimer=0; hintTxt='';
   try{
@@ -1922,7 +1964,7 @@ function enterLevel(){
   // 护盾回复
   if(player.maxShield>0) player.shield=player.maxShield;
   spawnEnemies(r.startR);
-  showBanner((LANG==='zh'?'第 ':'LEVEL ')+levelNum+(LANG==='zh'?' 层':''),1500);
+  showBanner((LANG==='zh'?'第 ':'LEVEL ')+levelNum+(LANG==='zh'?' 层':''),2500);
   // 第 1 层新手提示
   if(levelNum===1) showHint(t('hintMove'),240);
 }
@@ -2034,6 +2076,7 @@ function showOverlay(o){
     <h2 id="ovSub">${o.sub}</h2>
     <p id="ovDesc">${o.desc||''}</p>
     ${o.desc2?`<p id="ovDesc2" style="color:rgba(126,224,138,0.6);font-size:12px;">${o.desc2}</p>`:''}
+    ${o.genTip?`<p id="ovGenTip" style="color:rgba(251,191,36,0.85);font-size:12px;">${o.genTip}</p>`:''}
     ${o.keys?`<div class="keys">${o.keys}</div>`:''}
     <button class="btn" id="startBtn">${o.btn}</button>
   `;
@@ -2052,6 +2095,7 @@ function tick(){
       updateFloats();
       ambientTick();
       updateHint();
+      checkGenSight();
     } else if(state!==ST_PLAY){
       updateParticles();
       updateFloats();
@@ -2119,7 +2163,7 @@ function applyLang(){
   if(state===ST_TITLE){
     showOverlay({
       title:t('title'), sub:'',
-      desc:t('desc'), desc2:t('desc2'), keys:t('keys'),
+      desc:t('desc'), desc2:t('desc2'), genTip:t('genTip'), keys:t('keys'),
       btn:t('start'), btnAct:startGame
     });
   }
@@ -2127,6 +2171,10 @@ function applyLang(){
 document.getElementById('langToggle').addEventListener('click',()=>{
   LANG = LANG==='zh'?'en':'zh';
   applyLang();
+});
+document.getElementById('tut-replay-btn').addEventListener('click',function(e){
+  e.stopPropagation();
+  replayTutorialHints();
 });
 
 /* ---------- 20. 启动 ---------- */

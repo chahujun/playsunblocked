@@ -1068,6 +1068,22 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 </script>
 <!-- /playsunblocked in-game menu -->
 
+<!-- Help / Tutorial button -->
+<style>
+#helpTutorBtn{
+  position:fixed;top:18px;right:60px;z-index:999998;
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(0,0,0,.45);color:#fff;
+  border:1px solid rgba(255,255,255,.35);
+  box-sizing:border-box;padding:0;
+  font-family:inherit;font-size:15px;font-weight:700;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+}
+#helpTutorBtn:hover{background:rgba(0,0,0,.9);}
+</style>
+<button id="helpTutorBtn" title="Tutorial" aria-label="Show tutorial">?</button>
+
   <div id="terminal">
     <header>
       <div class="title-wrap">
@@ -1185,10 +1201,11 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
         <p id="tut2-p1"><strong style="color:var(--accent)">VOLTAGE</strong> pumps energy in. The waveform jumps up.</p>
         <p id="tut2-p2"><strong style="color:var(--accent)">INVERT</strong> flips the signal. The waveform mirrors itself.</p>
         <p id="tut2-p3"><strong style="color:var(--accent)">LIMIT</strong> caps the output. The waveform hits a ceiling and stops.</p>
+        <p id="tut2-p4" class="tut-hint">Each round shows 4 glyphs, but each is one of these 3 types — so expect repeats.</p>
       </div>
       <div class="tut-step" data-step="2">
         <h2 id="tut3-title">THE LOOP</h2>
-        <p id="tut3-p1"><strong>1. PROBE</strong> — Flip to PROBE mode, click a glyph, watch how it behaves. You get a few probes per round, so spend them well.</p>
+        <p id="tut3-p1"><strong>1. PROBE</strong> — Flip to PROBE mode, click a glyph, watch how it behaves. You get 3 probes per round, but 4 glyphs to decode. You only have 3 probes — use them wisely.</p>
         <p id="tut3-p2"><strong>2. MARK</strong> — Back in MARK mode, tag each glyph with what you think it is. Your guess shows up under it, in both languages.</p>
         <p id="tut3-p3"><strong>3. CALIBRATE</strong> — When all four are tagged, hit calibrate. Get them right and the core locks at 100%. Get one wrong and it overloads.</p>
         <p id="tut3-p4">Every glyph you crack gets logged in your <strong style="color:var(--accent)">Lexicon</strong> for good. Decode all 12 and you own this console.</p>
@@ -1300,8 +1317,9 @@ const Lang = {
     tut2P1: "VOLTAGE — When probed, the signal pulses upward from the baseline. Energy pumps in.",
     tut2P2: "INVERT — When probed, the signal mirrors itself. The wave flips and echoes.",
     tut2P3: "LIMIT — When probed, the signal climbs but hits a ceiling and stops. Capped energy.",
+    tut2P4: "Each round shows 4 glyphs, but each is one of these 3 types — so expect repeats.",
     tut3Title: "THE LOOP",
-    tut3P1: "1. PROBE — Switch to PROBE mode (P key). Click a glyph to watch its oscilloscope reaction. You get 3 probes per round.",
+    tut3P1: "1. PROBE — Switch to PROBE mode (P key). Click a glyph to watch its oscilloscope reaction. You get 3 probes per round, but 4 glyphs to decode. You only have 3 probes — use them wisely.",
     tut3P2: "2. MARK — Switch to MARK mode (M key). Click a glyph and pick its type from 3 options. Mark all 4 glyphs.",
     tut3P3: "3. CALIBRATE — Click CALIBRATE (C key) to submit. All 4 correct = core hits 100%. Any wrong = core overloads.",
     tut3P4: "Stuck? Use INSIGHT (I key) once per round to peek at a glyph's true type. Build your lexicon across rounds — decode all 12 to win.",
@@ -1393,8 +1411,9 @@ const Lang = {
     tut2P1: "电压——探测时信号从基线向上脉冲。能量在泵入。",
     tut2P2: "反转——探测时信号自我镜像。波形翻转并回响。",
     tut2P3: "限制——探测时信号攀升但撞到天花板停止。能量被钳位。",
+    tut2P4: "每回合出现 4 个符号，但都属于这 3 种类型之一——因此会有重复。",
     tut3Title: "操作循环",
-    tut3P1: "1. 探测——切换到探测模式（P键）。点击符号观看示波器反应。每回合 3 次探测。",
+    tut3P1: "1. 探测——切换到探测模式（P键）。点击符号观看示波器反应。每回合 3 次探测，但要破译 4 个符号。你只有 3 次探测机会，需要合理分配。",
     tut3P2: "2. 标记——切换到标记模式（M键）。点击符号并从 3 个选项中选择类型。标记全部 4 个符号。",
     tut3P3: "3. 校准——点击校准（C键）提交。4 个全对=核心达到 100%。任一错误=核心过载。",
     tut3P4: "卡住了？每回合可用 1 次洞察（I键）偷看符号真实类型。词典跨回合积累——破译全部 12 个即胜。",
@@ -1539,7 +1558,7 @@ const state = {
   probed: {},       // glyphId -> true (probed this round)
   dictionary: {},   // glyphId -> type (confirmed, persistent)
   revealed: {},     // glyphId -> true (insight-revealed this round)
-  mode: 'mark',     // 'mark' | 'probe' | 'insight'
+  mode: 'probe',    // 'mark' | 'probe' | 'insight' — start in PROBE per tutorial
   twinPair: [],     // ids of twin glyphs this round (visual deception)
   gameOver: false,
   calibrating: false,
@@ -1816,6 +1835,7 @@ function applyI18n() {
   $('tut2-p1').textContent = t('tut2P1');
   $('tut2-p2').textContent = t('tut2P2');
   $('tut2-p3').textContent = t('tut2P3');
+  $('tut2-p4').textContent = t('tut2P4');
   $('tut3-title').textContent = t('tut3Title');
   $('tut3-p1').textContent = t('tut3P1');
   $('tut3-p2').textContent = t('tut3P2');
@@ -2142,7 +2162,7 @@ function newRound() {
   state.probed = {};
   state.revealed = {};
   state.twinPair = [];
-  state.mode = 'mark';
+  state.mode = 'probe';
 
   const knownIds = Object.keys(state.dictionary);
   const unknown = GLYPHS.filter(g => !state.dictionary[g.id]);
@@ -2220,7 +2240,7 @@ function resetRound() {
   state.probesLeft = 3;
   state.insightsLeft = 1;
   state.gameOver = false;
-  state.mode = 'mark';
+  state.mode = 'probe';
   log(t('logReset'), 'accent');
   beep(400, 0.08);
   applyI18n();
@@ -2314,6 +2334,23 @@ $('tut-skip').addEventListener('click', () => {
   $('tutorial-overlay').classList.add('hide');
   saveState();
   beep(500, 0.06);
+});
+
+// Re-open the tutorial from the help (?) button
+$('helpTutorBtn').addEventListener('click', () => {
+  // Reset the tutored flag so the tutorial can be shown again fresh
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      if (data && 'tutored' in data) {
+        delete data.tutored;
+        localStorage.setItem(STORE_KEY, JSON.stringify(data));
+      }
+    }
+  } catch(e) {}
+  showTutorial();
+  beep(660, 0.05);
 });
 
 // ===== Keyboard shortcuts =====

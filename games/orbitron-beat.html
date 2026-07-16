@@ -7,8 +7,8 @@
   if (lang !== 'en') return;
 
   var T = {
-    'Loop Beat · 转圈踩点': 'Loop Beat',
-    '转圈踩点': 'Loop Beat'
+    'Orbitron Beat · 转圈踩点': 'Orbitron Beat',
+    '转圈踩点': 'Orbitron Beat'
   };
 
   function tr(text) {
@@ -135,7 +135,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="description" content="Play Orbitron Beat - rhythm orbit game free online - no downloads, no sign-up. Works on school Chromebooks.">
-<title>Loop Beat · 转圈踩点</title>
+<title>Orbitron Beat · 转圈踩点</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
   html, body {
@@ -196,6 +196,50 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     text-shadow: 0 0 6px rgba(0,0,0,0.8);
     white-space: nowrap;
   }
+
+  /* 重新查看帮助按钮 */
+  #tutBtn {
+    position: fixed;
+    top: 58px; right: 14px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.45);
+    color: #fff; border: none;
+    font-size: 15px; font-weight: bold;
+    font-family: sans-serif;
+    line-height: 1; padding: 0;
+    cursor: pointer; pointer-events: auto;
+    z-index: 999980;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  #tutBtn:hover { background: rgba(0,0,0,0.85); }
+
+  /* 帮助弹窗 */
+  #helpPopup {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    z-index: 999985;
+    background: rgba(3,3,10,0.92);
+    border: 1px solid #7fffd4;
+    border-radius: 10px;
+    padding: 22px 28px;
+    max-width: 380px;
+    text-align: center;
+    color: #e6f7ff;
+    font-size: 14px;
+    line-height: 1.9;
+    letter-spacing: 1px;
+    box-shadow: 0 0 30px rgba(127,255,212,0.4);
+    pointer-events: auto;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  #helpPopup.hidden { opacity: 0; pointer-events: none; }
+  .help-popup-title { font-size: 20px; color:#7fffd4; font-weight:bold; margin-bottom:12px; letter-spacing:3px; }
+  .help-popup-sec { color:#7fffd4; font-size:13px; letter-spacing:2px; margin-bottom:6px; }
+  .help-popup-text { color:#cfeaff; margin-bottom:14px; }
+  .help-popup-tip { color:#ffd700; font-size:13px; }
+  .help-popup-close { color:#6fa3b8; font-size:11px; margin-top:14px; letter-spacing:2px; }
 
   /* 中央覆盖层 (Start / GameOver) */
   .overlay {
@@ -295,6 +339,25 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     20% { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
     100% { opacity: 0; transform: translate(-50%, -30px) scale(1); }
   }
+  #toastTip {
+    position: fixed; left: 50%; top: 18%;
+    transform: translateX(-50%);
+    background: rgba(127,255,212,0.12);
+    border: 1px solid #7fffd4;
+    color: #7fffd4;
+    padding: 10px 22px;
+    font-size: 14px; font-weight: bold;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    text-shadow: 0 0 8px #7fffd4;
+    box-shadow: 0 0 18px rgba(127,255,212,0.35);
+    pointer-events: none;
+    z-index: 6;
+    opacity: 0;
+    transition: opacity 0.3s;
+    white-space: nowrap;
+  }
+  #toastTip.show { opacity: 1; }
 </style>
 </head>
 <body>
@@ -335,6 +398,13 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 
 <canvas id="game"></canvas>
 
+<button id="tutBtn" title="Help" onclick="showHelp()">?</button>
+<div id="helpPopup" class="hidden">
+  <div class="help-popup-title" id="helpPopupTitle">?</div>
+  <div id="helpPopupBody"></div>
+  <div class="help-popup-close" id="helpPopupClose"></div>
+</div>
+
 <div id="hud">
   <div id="topBar">
     <div id="leftHud">
@@ -350,10 +420,11 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 
 <div id="practiceTag"></div>
 <div id="judgePop"></div>
+<div id="toastTip"></div>
 
 <!-- Start screen -->
 <div class="overlay" id="startScreen">
-  <div class="title" id="titleText">Loop Beat</div>
+  <div class="title" id="titleText">Orbitron Beat</div>
   <div class="sub" id="startSub">按空格或点击在节拍上切换轨道。</div>
   <div id="diffSelect" style="display:flex;gap:12px;margin-bottom:6px;">
     <button class="diffBtn" data-diff="easy" id="diffEasy">EASY</button>
@@ -374,39 +445,44 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 'use strict';
 
 /* ============================================================
-   Loop Beat - 转圈踩点
+   Orbitron Beat - 转圈踩点
    单文件实现：Web Audio 节拍合成 + 同心三轨圆周物理 + 霓虹粒子
    ============================================================ */
 
 /* ---------- 1. 中英双语 I18n ---------- */
 const I18N = {
   en: {
-    title: 'Loop Beat',
+    title: 'Orbitron Beat',
     start: 'START',
+    retry: 'RETRY',
     over: 'BEAT DROPPED!',
     score: 'SCORE: ',
     combo: 'COMBO: ',
     diff: 'BPM: ',
     help: 'Tap Space or click to switch orbits on the beat. Dodge obstacles, survive as long as you can!',
-    startSub: 'Tap Space or click to switch orbits on the beat.',
+    startSub: 'Switch lanes on the beat with SPACE or click. Dodge obstacles and survive!',
     diffEasy: 'EASY', diffNormal: 'NORMAL', diffHard: 'HARD',
     perfect: 'PERFECT',
     miss: 'MISS',
-    best: 'MAX COMBO: '
+    best: 'MAX COMBO: ',
+    arpTip: 'PERFECT unlocks more music layers!'
   },
   zh: {
     title: '转圈踩点',
     start: '开始游戏',
+    retry: '重新开始',
     over: '节奏断了！',
     score: '得分: ',
     combo: '连击: ',
     diff: 'BPM: ',
     help: '空格或点击，踩着鼓点切轨道。避开障碍，尽可能存活！',
-    startSub: '按空格或点击在节拍上切换轨道。',
+    startSub: '按空格或点击在节拍上切换轨道，避开障碍存活下去',
     diffEasy: '简单', diffNormal: '普通', diffHard: '困难',
     perfect: '完美',
+    good: '不错',
     miss: '踩空',
-    best: '最高连击: '
+    best: '最高连击: ',
+    arpTip: 'Perfect 命中激活更多音乐层！'
   }
 };
 let lang = new URLSearchParams(window.location.search).get('lang') || 'zh';
@@ -416,7 +492,7 @@ function applyI18n() {
   document.getElementById('titleText').textContent = t.title;
   document.getElementById('overTitle').textContent = t.over;
   document.getElementById('startBtn').textContent = t.start;
-  document.getElementById('retryBtn').textContent = t.start;
+  document.getElementById('retryBtn').textContent = t.retry;
   document.getElementById('scoreLine').innerHTML = t.score + '<span class="v" id="scoreV">0</span>';
   document.getElementById('comboLine').innerHTML = t.combo + '<span class="v" id="comboV">0</span>';
   document.getElementById('bpmTag').textContent = t.diff + '120';
@@ -427,6 +503,30 @@ function applyI18n() {
   document.getElementById('diffHard').textContent = t.diffHard;
   document.getElementById('langBtn').textContent = (lang === 'en') ? 'EN / 中' : '中 / EN';
 }
+
+/* ---------- 帮助弹窗（复用 startSub / helpBar 文案） ---------- */
+let helpPopupTimer = null;
+function showHelp() {
+  const t = I18N[lang];
+  const isZh = (lang === 'zh');
+  document.getElementById('helpPopupTitle').textContent = isZh ? '帮助' : 'HELP';
+  document.getElementById('helpPopupClose').textContent = isZh ? '（点击任意处关闭）' : '(click anywhere to close)';
+  // 复用 startSub（操作说明）与 help（玩法目标）文案
+  document.getElementById('helpPopupBody').innerHTML =
+    '<div class="help-popup-sec">' + (isZh ? '操作说明' : 'CONTROLS') + '</div>' +
+    '<div class="help-popup-text">' + t.startSub + '</div>' +
+    '<div class="help-popup-sec">' + (isZh ? '玩法目标' : 'GOAL') + '</div>' +
+    '<div class="help-popup-text">' + t.help + '</div>' +
+    '<div class="help-popup-tip">' + t.arpTip + '</div>';
+  const popup = document.getElementById('helpPopup');
+  popup.classList.remove('hidden');
+  clearTimeout(helpPopupTimer);
+  helpPopupTimer = setTimeout(function(){ popup.classList.add('hidden'); }, 6000);
+}
+document.getElementById('helpPopup').addEventListener('click', function(){
+  this.classList.add('hidden');
+  clearTimeout(helpPopupTimer);
+});
 
 /* ---------- 2. Canvas 与基础设置 ---------- */
 const canvas = document.getElementById('game');
@@ -468,6 +568,7 @@ let audioCtx = null;
 let masterGain = null;
 let arpGain = null;        // 琶音层 gain（动态控制开关）
 let arpEnabled = false;    // 是否激活琶音层（成功避障后开启）
+let arpToastShown = false; // 琶音层提示是否已显示（一次性）
 
 // 节拍调度器
 let nextBeatTime = 0;
@@ -618,6 +719,7 @@ function resetGame() {
   pendingSpawns = [];
   flashAlpha = 0; perfectGlowTimer = 0; slowTimer = 0; shake = 0;
   arpEnabled = false;
+  arpToastShown = false;
   if (arpGain) arpGain.gain.value = 0;
   player = newPlayer();
   beatQueue = [];
@@ -667,6 +769,7 @@ function jump() {
       arpGain.gain.cancelScheduledValues(audioCtx.currentTime);
       arpGain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
       arpGain.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.5);
+      showArpToast();
     }
   } else if (d > 0.25) {
     // Miss
@@ -686,6 +789,7 @@ function jump() {
   } else {
     // Good 区间（0.10 < d <= 0.25）：正常切换，无奖惩
     score += 20;
+    showJudge('good');
   }
 }
 
@@ -697,14 +801,32 @@ function playerAnglePos() {
 const judgePop = document.getElementById('judgePop');
 function showJudge(kind) {
   const t = I18N[lang];
-  judgePop.textContent = (kind === 'perfect') ? t.perfect : t.miss;
-  judgePop.style.color = (kind === 'perfect') ? '#7fffd4' : '#ff5e5e';
-  judgePop.style.textShadow = (kind === 'perfect')
-    ? '0 0 12px #7fffd4, 0 0 30px #1e90ff'
-    : '0 0 12px #ff5e5e, 0 0 30px #ff0040';
+  if (kind === 'perfect') {
+    judgePop.textContent = t.perfect;
+    judgePop.style.color = '#7fffd4';
+    judgePop.style.textShadow = '0 0 12px #7fffd4, 0 0 30px #1e90ff';
+  } else if (kind === 'good') {
+    judgePop.textContent = t.good;
+    judgePop.style.color = '#ffd700';
+    judgePop.style.textShadow = '0 0 12px #ffd700, 0 0 30px #ff8c00';
+  } else {
+    judgePop.textContent = t.miss;
+    judgePop.style.color = '#ff5e5e';
+    judgePop.style.textShadow = '0 0 12px #ff5e5e, 0 0 30px #ff0040';
+  }
   judgePop.classList.remove('show');
   void judgePop.offsetWidth;
   judgePop.classList.add('show');
+}
+
+// 一次性提示：Perfect 命中激活琶音层
+function showArpToast() {
+  if (arpToastShown) return;
+  arpToastShown = true;
+  const el = document.getElementById('toastTip');
+  el.textContent = I18N[lang].arpTip;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
 }
 
 /* ---------- 6. 障碍物生成 ---------- */

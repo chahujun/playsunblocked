@@ -7,10 +7,10 @@
   if (lang !== 'en') return;
 
   var T = {
-    '系统://因果引擎.v1 — 致命悖论': 'SYS://causal_engine.v1 — FATAL PARADOX',
-    '系统://因果引擎.v1 — 运行中': 'SYS://causal_engine.v1 — RUNNING',
-    '系统://因果引擎.v1 — 已解除': 'SYS://causal_engine.v1 — RESOLVED',
-    '系统://因果引擎.v1 — 就绪': 'SYS://causal_engine.v1 — READY',
+    '逻辑引擎 — 致命悖论': 'Logic Engine — FATAL PARADOX',
+    '逻辑引擎 — 运行中': 'Logic Engine — RUNNING',
+    '逻辑引擎 — 已解除': 'Logic Engine — RESOLVED',
+    '逻辑引擎 — 就绪': 'Logic Engine — READY',
     '点击节点 → 点击节点池 · 点击开始演算': 'TAP NODE → TAP POOL · TAP SIMULATE',
     '先点「那么: 行走」选中它，再从下方节点池选「那么: 跳跃」': 'Click [THEN: Walk] to select it, then pick [THEN: Jump] from the pool below.',
     '全部关卡已通过': 'ALL STAGES CLEARED',
@@ -21,10 +21,10 @@
     '横梁 — 蹲下穿过': 'Beam — duck under it',
     '感谢游玩。': 'Thanks for playing.',
     '下一关：': 'Next: ',
-    '如果: 地刺': 'IF: Spikes',
-    '如果: 毒水': 'IF: Poison',
-    '如果: 电网': 'IF: Grid',
-    '如果: 横梁': 'IF: Beam',
+    '遇到地刺时': 'When hitting spikes',
+    '遇到毒水时': 'When hitting poison',
+    '遇到电网时': 'When hitting grid',
+    '遇到横梁时': 'When hitting beam',
     '那么: 行走': 'THEN: Walk',
     '那么: 跳跃': 'THEN: Jump',
     '那么: 滑行': 'THEN: Slide',
@@ -236,17 +236,22 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
   }
   #headerRight { display: flex; align-items: center; gap: 6px; }
   #helpBtn {
-    background: transparent;
-    color: #6dffb8;
-    border: 1px solid #1f6b4a;
-    padding: 5px 9px;
+    position: relative;
+    z-index: 600;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.45);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,.35);
+    box-sizing: border-box;
+    padding: 0;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 15px; font-weight: 700; line-height: 1;
     cursor: pointer;
-    border-radius: 2px;
-    transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
   }
-  #helpBtn:hover { background: rgba(0,255,156,0.15); color: #00ff9c; }
+  #helpBtn:hover { background: rgba(0,0,0,.9); color: #fff; }
   #langToggle {
     display: flex; gap: 0;
     border: 1px solid #1f6b4a;
@@ -407,6 +412,14 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     border-left: 3px solid #00ff9c;
     padding-left: 6px;
     letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+  .pool-note {
+    font-size: 10px;
+    color: #6dffb8;
+    opacity: 0.7;
+    letter-spacing: 1px;
+    margin: 2px 0 4px;
     flex-shrink: 0;
   }
   #chains {
@@ -586,6 +599,15 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     max-width: 600px;
     line-height: 1.6;
   }
+  #overlayConcept {
+    font-size: clamp(11px, 2.4vw, 14px);
+    color: #6dffb8;
+    letter-spacing: 1px;
+    max-width: 620px;
+    line-height: 1.7;
+    opacity: 0.92;
+  }
+  #overlayConcept:empty { display: none; }
   #overlayStages {
     display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
     max-width: 700px;
@@ -634,7 +656,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     .chain { gap: 6px; padding: 5px 6px; }
     .panel-label { font-size: 10px; }
     #logicPanel { padding: 8px; gap: 6px; }
-    #helpBtn { padding: 5px 8px; font-size: 11px; }
+    #helpBtn { width: 26px; height: 26px; font-size: 13px; }
     #langToggle button { padding: 5px 8px; }
   }
   @media (max-width: 420px) {
@@ -696,7 +718,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 
   <div id="canvasWrap">
     <canvas id="game" width="960" height="280"></canvas>
-    <div id="hud">SYS://causal_engine.v1 — READY</div>
+    <div id="hud">Logic Engine — READY</div>
     <div id="statusMsg"></div>
     <div id="flashOverlay"></div>
     <div id="hint">TAP NODE → TAP POOL · TAP SIMULATE</div>
@@ -706,6 +728,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
     <div class="panel-label" id="lblDrop">Logic Flow</div>
     <div id="chains"></div>
     <div class="panel-label" id="lblPool">Node Pool</div>
+    <div id="poolNote" class="pool-note"></div>
     <div id="poolWrap">
       <div id="poolNodes"></div>
     </div>
@@ -719,6 +742,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 <div id="stageOverlay">
   <div id="overlayTitle" data-text="">IF/THEN</div>
   <div id="overlaySub"></div>
+  <div id="overlayConcept"></div>
   <div id="overlayStages"></div>
   <button id="overlayBtn">开始</button>
 </div>
@@ -739,10 +763,11 @@ const I18N = {
     reset: 'RESET',
     dropZone: 'Logic Flow',
     nodePool: 'Node Pool',
-    ifSpikes: 'IF: Spikes',
-    ifWater:  'IF: Poison',
-    ifElec:   'IF: Grid',
-    ifBeam:   'IF: Beam',
+    poolNote: 'Each action can only be used once',
+    ifSpikes: 'When hitting spikes',
+    ifWater:  'When hitting poison',
+    ifElec:   'When hitting grid',
+    ifBeam:   'When hitting beam',
     thenWalk: 'THEN: Walk',
     thenJump: 'THEN: Jump',
     thenSlide:'THEN: Slide',
@@ -753,10 +778,10 @@ const I18N = {
     death: 'FAILED',
     deathSub: 'Logic error',
     hint: 'TAP NODE → TAP POOL · TAP SIMULATE',
-    hudRun: 'SYS://causal_engine.v1 — RUNNING',
-    hudDead: 'SYS://causal_engine.v1 — FATAL PARADOX',
-    hudWin: 'SYS://causal_engine.v1 — RESOLVED',
-    hudIdle:'SYS://causal_engine.v1 — READY',
+    hudRun: 'Logic Engine — RUNNING',
+    hudDead: 'Logic Engine — FATAL PARADOX',
+    hudWin: 'Logic Engine — RESOLVED',
+    hudIdle:'Logic Engine — READY',
     nextStage: 'NEXT STAGE',
     retry: 'RETRY',
     selectStage: 'SELECT STAGE',
@@ -764,8 +789,12 @@ const I18N = {
     allClearedSub: 'Thanks for playing.',
     start: 'START',
     selectStagePrompt: 'Select a stage to begin',
+    conceptIntro: 'Write rules for your character: when hitting an obstacle, take the matching action. The character follows your rules automatically.',
     nextStageLabel: 'Next: ',
     tutorialTipL1: 'Click [THEN: Walk] to select it, then pick [THEN: Jump] from the pool below.',
+    tutorialTipL2: 'New: Toxic water — SLIDE under',
+    tutorialTipL3: 'New: Electric field — STOP and wait',
+    tutorialTipL4: 'New: Beam barrier — CROUCH under',
     hintWater: 'Poison — slide through it',
     hintSpikes: 'Spikes — jump over them',
     hintElec: 'Grid — stop and wait for it to retract',
@@ -781,10 +810,11 @@ const I18N = {
     reset: '重置',
     dropZone: '因果逻辑流',
     nodePool: '逻辑节点池',
-    ifSpikes: '如果: 地刺',
-    ifWater:  '如果: 毒水',
-    ifElec:   '如果: 电网',
-    ifBeam:   '如果: 横梁',
+    poolNote: '每个动作只能使用一次',
+    ifSpikes: '遇到地刺时',
+    ifWater:  '遇到毒水时',
+    ifElec:   '遇到电网时',
+    ifBeam:   '遇到横梁时',
     thenWalk: '那么: 行走',
     thenJump: '那么: 跳跃',
     thenSlide:'那么: 滑行',
@@ -795,10 +825,10 @@ const I18N = {
     death: '失败',
     deathSub: '逻辑错误',
     hint: '点击节点 → 点击节点池 · 点击开始演算',
-    hudRun: '系统://因果引擎.v1 — 运行中',
-    hudDead:'系统://因果引擎.v1 — 致命悖论',
-    hudWin: '系统://因果引擎.v1 — 已解除',
-    hudIdle:'系统://因果引擎.v1 — 就绪',
+    hudRun: '逻辑引擎 — 运行中',
+    hudDead:'逻辑引擎 — 致命悖论',
+    hudWin: '逻辑引擎 — 已解除',
+    hudIdle:'逻辑引擎 — 就绪',
     nextStage: '下一关',
     retry: '重试',
     selectStage: '选择关卡',
@@ -806,8 +836,12 @@ const I18N = {
     allClearedSub: '感谢游玩。',
     start: '开始游戏',
     selectStagePrompt: '选择一个关卡开始',
+    conceptIntro: '为角色编写规则：当遇到障碍时，执行对应动作。角色会自动按你的规则行动。',
     nextStageLabel: '下一关：',
     tutorialTipL1: '先点「那么: 行走」选中它，再从下方节点池选「那么: 跳跃」',
+    tutorialTipL2: '新增毒水 — 滑行通过',
+    tutorialTipL3: '新增电网 — 停下等待',
+    tutorialTipL4: '新增横梁 — 蹲下穿过',
     hintWater: '毒水 — 滑行通过',
     hintSpikes: '地刺 — 跳跃越过',
     hintElec: '电网 — 停下等它收起',
@@ -847,7 +881,7 @@ const LEVELS = [
     initActions: { water:'walk', spikes:'walk' },
     pool: ['walk','jump','slide'],
     flagX: 870,
-    tutorial: null
+    tutorial: 'L2'
   },
   {
     obstacles: [
@@ -858,7 +892,7 @@ const LEVELS = [
     initActions: { water:'walk', spikes:'walk', elec:'walk' },
     pool: ['walk','jump','slide','stop'],
     flagX: 870,
-    tutorial: null
+    tutorial: 'L3'
   },
   {
     obstacles: [
@@ -870,7 +904,7 @@ const LEVELS = [
     initActions: { water:'walk', spikes:'walk', elec:'walk', beam:'walk' },
     pool: ['walk','jump','slide','stop','duck'],
     flagX: 870,
-    tutorial: null
+    tutorial: 'L4'
   }
 ];
 
@@ -1432,9 +1466,9 @@ function loadLevel(idx){
   renderChains();
   renderPool();
   updateStageInfo();
-  // tutorial for L1
-  if(L.tutorial === 'L1'){
-    setTimeout(showTutorialTipL1, 400);
+  // tutorial tip for this level
+  if(L.tutorial){
+    setTimeout(showTutorialTip, 400);
   }
 }
 
@@ -1748,9 +1782,15 @@ function hideStatus(){
   const el = document.getElementById('statusMsg');
   el.classList.remove('show','win');
 }
-function showTutorialTipL1(){
+function tutorialTipKey(){
+  const tut = LEVELS[currentLevel] && LEVELS[currentLevel].tutorial;
+  return tut ? 'tutorialTip' + tut : null;
+}
+function showTutorialTip(){
+  const key = tutorialTipKey();
+  if(!key) return;
   const tip = document.getElementById('tutorialTip');
-  tip.textContent = t('tutorialTipL1');
+  tip.textContent = t(key);
   // position above the first chain's action node using viewport coords
   const firstAction = document.querySelector('.chain .node.action');
   if(firstAction){
@@ -1787,6 +1827,7 @@ function showStageOverlay(mode){
   const sub = document.getElementById('overlaySub');
   const stages = document.getElementById('overlayStages');
   const btn = document.getElementById('overlayBtn');
+  const concept = document.getElementById('overlayConcept');
 
   stages.innerHTML = '';
 
@@ -1794,6 +1835,7 @@ function showStageOverlay(mode){
     title.textContent = t('title');
     title.setAttribute('data-text', t('title'));
     sub.textContent = t('selectStagePrompt');
+    concept.textContent = t('conceptIntro');
     btn.textContent = t('start');
     btn.dataset.action = 'start-first';
     renderStageCards(stages);
@@ -1802,12 +1844,14 @@ function showStageOverlay(mode){
     title.textContent = t('success');
     title.setAttribute('data-text', t('success'));
     sub.innerHTML = `${t('successSub')}<br>${t('nextStageLabel')}${t('stageLabels')[currentLevel+1]||''} — ${nextName}`;
+    concept.textContent = '';
     btn.textContent = t('nextStage');
     btn.dataset.action = 'next';
   } else if(mode==='victory'){
     title.textContent = t('allCleared');
     title.setAttribute('data-text', t('allCleared'));
     sub.textContent = t('allClearedSub');
+    concept.textContent = t('conceptIntro');
     btn.textContent = t('selectStage');
     btn.dataset.action = 'restart';
     renderStageCards(stages);
@@ -1854,6 +1898,7 @@ function setLang(l){
   title.setAttribute('data-text', t('title'));
   document.getElementById('lblDrop').textContent = t('dropZone');
   document.getElementById('lblPool').textContent = t('nodePool');
+  document.getElementById('poolNote').textContent = t('poolNote');
   document.getElementById('btnSimulate').textContent = t('simulate');
   document.getElementById('btnReset').textContent = t('reset');
   document.getElementById('hint').textContent = t('hint');
@@ -1869,8 +1914,9 @@ function setLang(l){
   // Refresh tutorial tip text if visible
   const tip = document.getElementById('tutorialTip');
   if(tip.classList.contains('show')){
-    tip.textContent = t('tutorialTipL1');
-    showTutorialTipL1(); // reposition
+    const key = tutorialTipKey();
+    if(key) tip.textContent = t(key);
+    showTutorialTip(); // reposition
   }
   // Refresh error hint text if visible
   const eh = document.getElementById('errorHint');
@@ -1923,7 +1969,13 @@ document.querySelectorAll('#langToggle button').forEach(b=>{
 document.getElementById('helpBtn').addEventListener('click', ()=>{
   ensureAudio();
   playTypeClick();
-  showStageOverlay('start');
+  // Re-show the current level's tutorial tip when inside a level;
+  // otherwise fall back to the start / level-select overlay.
+  if(document.querySelector('.chain .node.action')){
+    showTutorialTip();
+  } else {
+    showStageOverlay('start');
+  }
 });
 document.getElementById('overlayBtn').addEventListener('click', ()=>{
   const btn = document.getElementById('overlayBtn');

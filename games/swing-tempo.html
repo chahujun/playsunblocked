@@ -178,6 +178,24 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     color: #fff;
   }
 
+  /* 重新查看教程按钮 */
+  #tutBtn {
+    position: fixed;
+    top: 58px; right: 14px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.45);
+    color: #fff; border: none;
+    font-size: 15px; font-weight: bold;
+    font-family: sans-serif;
+    line-height: 1; padding: 0;
+    cursor: pointer; pointer-events: auto;
+    z-index: 999980;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  #tutBtn:hover { background: rgba(0,0,0,0.85); }
+
   #startScreen, #gameOverScreen {
     position: absolute; top: 0; left: 0;
     width: 100%; height: 100%;
@@ -295,6 +313,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 <!-- /playsunblocked in-game menu -->
 
 <canvas id="game"></canvas>
+<button id="tutBtn" title="Replay Tutorial" onclick="replayTutorial()">?</button>
 <div id="vignette"></div>
 <div class="overlay">
   <div id="hud" style="display:none;">
@@ -325,19 +344,19 @@ const I18N = {
   en: {
     title: "HOOKBEAT",
     subtitle: "HOOK. SWING. RELEASE ON THE BEAT.",
-    start: "ENGAGE PROPULSION",
+    start: "START",
     distance: "DISTANCE: ",
     speed: "VELOCITY: ",
     combo: "COMBO: ",
     perfect: "TEMPO BOOST!",
     failure: "CRASHED!",
     reset: "RETRY",
-    instructions: "HOLD mouse  ->  grab the glowing anchor, swing like a pendulum\nRELEASE on the drum beat  ->  right at the lowest point of your swing\nNail the timing for a boost. Chain them to hit WARP SPEED.\nDodge the asteroids.",
+    instructions: "HOLD mouse  ->  grab the glowing anchor, swing like a pendulum\nRELEASE on the drum beat  ->  right at the lowest point of your swing\nNail the timing for a boost. Chain them to hit WARP SPEED.\nAfter release you can't steer — avoid asteroids in your flight path.",
     langBtn: "中文",
     statsDist: "DISTANCE TRAVELED",
     statsSpeed: "PEAK VELOCITY",
     statsCombo: "MAX COMBO",
-    rhythmLabel: "RELEASE ON SNARE",
+    rhythmLabel: "RELEASE HERE",
     hintHold: "HOLD MOUSE TO HOOK",
     fbGood: "GOOD",
     fbEarly: "TOO EARLY",
@@ -348,21 +367,21 @@ const I18N = {
   zh: {
     title: "钩与拍",
     subtitle: "钩住 · 荡起 · 踩着鼓点松手",
-    start: "引擎点火",
+    start: "开始",
     distance: "探索距离: ",
     speed: "星际速度: ",
     combo: "连击: ",
     perfect: "节拍弹射！",
     failure: "坠毁在深空之中！",
-    reset: "重新重构",
-    instructions: "按住鼠标  ->  抓住发光的锚点 像钟摆一样荡起来\n鼓点敲响时  ->  在摆到最低点的那一下松开\n踩准节拍就能加速 连续命中冲进超光速\n小心躲开陨石",
+    reset: "重新开始",
+    instructions: "按住鼠标  ->  抓住发光的锚点 像钟摆一样荡起来\n鼓点敲响时  ->  在摆到最低点的那一下松开\n踩准节拍就能加速 连续命中冲进超光速\n松手后无法转向，注意避开飞行路线上的陨石",
     langBtn: "EN",
     statsDist: "探索距离",
     statsSpeed: "最高速度",
     statsCombo: "最高连击",
-    rhythmLabel: "鼓点松开",
+    rhythmLabel: "在此松手",
     hintHold: "按住鼠标 抓住锚点",
-    fbGood: "不错",
+    fbGood: "好！",
     fbEarly: "太早了",
     fbLate: "太晚了",
     fbAngle: "角度不对",
@@ -1496,6 +1515,11 @@ function drawHint() {
   ctx.closePath();
   ctx.fill();
   ctx.restore();
+}
+
+// 重新查看教程 — 重置首次挂钩标志，drawHint 会自动重新显示新手提示
+function replayTutorial() {
+  firstHookDone = false;
 }
 
 function render() {

@@ -213,6 +213,21 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 <!-- /playsunblocked in-game menu -->
 
 <canvas id="game"></canvas>
+<!-- 重新查看教程入口按钮 -->
+<style>
+#tut-replay-btn{
+  position:fixed; top:18px; right:62px; z-index:999998;
+  width:28px; height:28px; border:none; border-radius:50%;
+  background:rgba(0,0,0,0.45); color:#fff;
+  font-size:15px; font-weight:bold; line-height:28px; text-align:center;
+  cursor:pointer; padding:0; font-family:sans-serif;
+  transition:background .15s ease, transform .1s ease;
+  box-shadow:0 1px 4px rgba(0,0,0,0.4);
+}
+#tut-replay-btn:hover{ background:rgba(0,0,0,1); transform:scale(1.08); }
+#tut-replay-btn:active{ transform:scale(0.96); }
+</style>
+<button id="tut-replay-btn" title="重新查看教程 / Replay Tutorial" aria-label="重新查看教程">?</button>
 <div id="langPanel">
   <span class="lbl">LANG</span>
   <button id="btnEN">EN</button>
@@ -484,6 +499,7 @@ const MATRIX = {
 let map = null;
 let currentRoom = null;
 let prestige = 0;
+let playTime = 0; // 本局存活时间（秒，仅活跃游玩时累计）
 
 const ROOM_TYPES = {
   START: "start", COMBAT: "combat", HAZARD: "hazard",
@@ -774,6 +790,7 @@ function startGame() {
   possessLine = null;
   bullets = []; enemyBullets = []; particles = []; floatTexts = [];
   hostCard = null;
+  playTime = 0;
   // 教程：仅在首次（未完成过）触发
   if (!tutorialDone) {
     tutorial.active = true;
@@ -1576,6 +1593,19 @@ function drawDoorIndicators() {
   ctx.restore();
 }
 
+// 根据核心房间坐标计算方位（x:0西/1中/2东，y:0北/1中/2南）
+function coreDir() {
+  const cx = map.coreX, cy = map.coreY;
+  const en = (LANG === "en");
+  const xName = (cx === 0) ? (en ? "W" : "西") : (cx === 2) ? (en ? "E" : "东") : "";
+  const yName = (cy === 0) ? (en ? "N" : "北") : (cy === 2) ? (en ? "S" : "南") : "";
+  if (!xName && !yName) return en ? "Center" : "中心";
+  if (xName && yName) return en ? (yName + xName + " corner") : (yName + xName + "角");
+  // 仅一端为边
+  if (en) return (yName === "N") ? "North" : (yName === "S") ? "South" : (xName === "E") ? "East" : "West";
+  return (yName === "北") ? "正北" : (yName === "南") ? "正南" : (xName === "东") ? "正东" : "正西";
+}
+
 function drawHUD() {
   // 左上：标题 + 信息
   ctx.save();
@@ -1589,7 +1619,8 @@ function drawHUD() {
   ctx.font = "12px Courier New";
   let y = 50;
   ctx.fillStyle = "#ff7799";
-  ctx.fillText(t("target") + (currentRoom.type === ROOM_TYPES.CORE ? t("core") : ("[" + (map.coreX+1) + "," + (map.coreY+1) + "]")), 16, y); y += 18;
+  const coreLabel = (currentRoom.type === ROOM_TYPES.CORE) ? t("core") : (coreDir() + " [" + map.coreX + "," + map.coreY + "]");
+  ctx.fillText(t("target") + coreLabel, 16, y); y += 18;
 
   // 电池
   const battPct = player.battery / player.maxBattery;
@@ -1648,9 +1679,16 @@ function drawIdle() {
   ctx.fillStyle = "#557755";
   ctx.font = "11px Courier New";
   const desc = (LANG === "en") ?
-    "// possess hosts · drain battery · breach the core" :
-    "// 寄生宿主 · 电量耗尽前 · 击穿核心";
+    "Possess enemies to use their abilities. Find and destroy the core in the matrix. Battery runs out = game over." :
+    "寄生敌人，借用其能力。在矩阵中找到并摧毁核心。电量耗尽即失败。";
   ctx.fillText(desc, VW/2, VH/2 + 70);
+  // 目标说明
+  ctx.fillStyle = "#ffcc66";
+  ctx.font = "12px Courier New";
+  const goal = (LANG === "en") ?
+    "Goal: Explore the 3×3 room grid, find the core room and destroy the core" :
+    "目标：探索3×3房间矩阵，找到核心房间并摧毁核心";
+  ctx.fillText(goal, VW/2, VH/2 + 92);
 }
 
 function drawGameOver() {
@@ -1662,9 +1700,13 @@ function drawGameOver() {
   ctx.shadowColor = "#ff3344"; ctx.shadowBlur = 14;
   ctx.fillText(t("over"), VW/2, VH/2);
   ctx.shadowBlur = 0;
+  ctx.fillStyle = "#ffcc88";
+  ctx.font = "14px Courier New";
+  const survived = Math.floor(playTime);
+  ctx.fillText((LANG === "en" ? "Survived: " + survived + "s · Floor " + (prestige + 1) : "存活时间：" + survived + "秒 · 第" + (prestige + 1) + "层"), VW/2, VH/2 + 30);
   ctx.fillStyle = "#ffaa66";
   ctx.font = "14px Courier New";
-  ctx.fillText((LANG === "en" ? "[ R or Click to re-init ]" : "[ R 或点击 重新接入 ]"), VW/2, VH/2 + 36);
+  ctx.fillText((LANG === "en" ? "[ R or Click to re-init ]" : "[ R 或点击 重新接入 ]"), VW/2, VH/2 + 58);
 }
 
 function drawWin() {
@@ -1743,6 +1785,20 @@ function advanceTutorial() {
   if (tutorial.step >= TUTORIAL_STEPS.length) {
     tutorial.active = false;
     tutorialDone = true;
+  }
+}
+
+// 重新查看教程：清除完成标记；若正处于游戏中则立即从第一步重新展示
+function replayTutorial() {
+  tutorialDone = false;
+  if (state === STATE.PLAYING && currentRoom) {
+    tutorial.active = true;
+    tutorial.step = 0;
+    tutorial.showing = true;
+    tutorial.startGx = currentRoom.gx;
+    tutorial.startGy = currentRoom.gy;
+    tutorial._hadHost = false;
+    tutorial._tick = 0;
   }
 }
 
@@ -1955,6 +2011,7 @@ function loop(now) {
       updateEnemies(dt);
       updateBullets();
       tryTransition();
+      playTime += dt;
     }
     updateParticles();
   } else {
@@ -1985,6 +2042,10 @@ function setLang(l) {
 }
 document.getElementById("btnEN").addEventListener("click", () => setLang("en"));
 document.getElementById("btnZH").addEventListener("click", () => setLang("zh"));
+document.getElementById("tut-replay-btn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  replayTutorial();
+});
 
 /* ---------- 23. 启动 ---------- */
 MATRIX.init();

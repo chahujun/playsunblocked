@@ -7,9 +7,9 @@
   if (lang !== 'en') return;
 
   var T = {
-    '鼠标或方向键瞄准飞来的音符，到节拍上时按空格击碎它。': 'Aim with mouse or arrows. Hit SPACE / TAP on the beat to deflect incoming notes.',
+    '鼠标或方向键瞄准飞来的音符，到节拍上时按空格弹开它。': 'Aim with mouse or arrows. Hit SPACE / TAP on the beat to deflect incoming notes.',
     '踩着节拍把它们弹回去': 'deflect the beat, build the song',
-    '节拍弹弹': 'Beat Bounce',
+    '共振反弹': 'Resonance Deflector',
     '游戏结束': 'GAME OVER',
     '新纪录!': 'NEW BEST!',
     '再来一局': 'PLAY AGAIN',
@@ -136,7 +136,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="description" content="Play Resonance Deflector - rhythm defense game free online - no downloads, no sign-up. Works on school Chromebooks.">
-<title>Beat Bounce</title>
+<title>Resonance Deflector</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { width: 100%; height: 100%; overflow: hidden; }
@@ -181,6 +181,23 @@ body {
     background: rgba(0, 255, 204, 0.25);
     box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
 }
+/* 重新查看教程按钮 */
+#tutBtn {
+    position: fixed;
+    top: 58px; right: 14px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.45);
+    color: #fff; border: none;
+    font-size: 15px; font-weight: bold;
+    font-family: sans-serif;
+    line-height: 1; padding: 0;
+    cursor: pointer; pointer-events: auto;
+    z-index: 999980;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+#tutBtn:hover { background: rgba(0,0,0,0.85); }
 .stats {
     position: absolute;
     top: 20px; left: 20px;
@@ -333,7 +350,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
 <canvas id="game"></canvas>
 <div id="ui">
     <div class="stats">
-        <div class="stat-line score-val" id="scoreLine">RESONANCE: 0</div>
+        <div class="stat-line score-val" id="scoreLine">SCORE: 0</div>
         <div class="stat-line high-val" id="highLine">RECORD: 0</div>
         <div class="stat-line mult-val" id="multLine">MULTIPLIER: x1.0</div>
         <div class="stat-line combo-val" id="comboLine">COMBO: 0</div>
@@ -350,8 +367,10 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
         <div class="overlay-title" id="overlayTitle">RESONANCE DEFLECTOR</div>
         <div class="overlay-subtitle" id="overlaySubtitle">CYBER RHYTHM DEFENSE</div>
         <div class="overlay-help" id="overlayHelp">Aim with Mouse or ARROWS. Press SPACE / TAP on beat to deflect colored waves.</div>
+        <div class="overlay-help" id="overlayFail" style="margin-bottom:25px;color:#ff7799;font-size:13px;"></div>
         <div class="overlay-prompt" id="overlayPrompt">CLICK / TAP TO START</div>
     </div>
+    <button id="tutBtn" title="Replay Tutorial" onclick="replayTutorial()">?</button>
 </div>
 
 <script>
@@ -379,9 +398,10 @@ const SIXTEENTH = BEAT_DURATION / 4;
 // ==============================
 const I18N = {
     en: {
-        title: 'Beat Bounce',
+        title: 'Resonance Deflector',
         subtitle: 'deflect the beat, build the song',
         help: 'Aim with mouse or arrows. Hit SPACE / TAP on the beat to deflect incoming notes.',
+        fail: 'Shield energy depleted = Game Over',
         score: 'SCORE: ',
         high: 'BEST: ',
         mult: 'MULT: ',
@@ -394,7 +414,7 @@ const I18N = {
         getReady: 'GET READY',
         langLabel: '中文',
         tutorialStep0: 'Move your mouse to aim the shield',
-        tutorialStep1: 'Notes come from 4 directions. Aim at the incoming note',
+        tutorialStep1: 'Notes fly in from multiple directions. Aim at the incoming note',
         tutorialStep2: 'Press SPACE or CLICK on beat to deflect!',
         tutorialStep3: 'Great! Keep the combo going for bonus multiplier',
         tutorialStep4: 'Tutorial complete! Survive as long as you can',
@@ -405,9 +425,10 @@ const I18N = {
         firstGood: 'GOOD! You got it!',
     },
     zh: {
-        title: '节拍弹弹',
+        title: '共振反弹',
         subtitle: '踩着节拍把它们弹回去',
         help: '鼠标或方向键瞄准飞来的音符，到节拍上时按空格弹开它。',
+        fail: '护盾能量耗尽即游戏结束',
         score: '得分: ',
         high: '最高: ',
         mult: '倍数: ',
@@ -420,7 +441,7 @@ const I18N = {
         getReady: '准备好',
         langLabel: 'EN',
         tutorialStep0: '移动鼠标来瞄准护盾',
-        tutorialStep1: '音符从4个方向飞来。瞄准飞来的音符',
+        tutorialStep1: '音符会从不同方向飞来。瞄准飞来的音符',
         tutorialStep2: '在节拍上按空格或点击来弹开！',
         tutorialStep3: '太棒了！保持连击获得倍数加成',
         tutorialStep4: '教程完成！尽可能存活下去',
@@ -438,6 +459,7 @@ function applyI18n() {
     document.getElementById('overlayTitle').textContent = t('title');
     document.getElementById('overlaySubtitle').textContent = t('subtitle');
     document.getElementById('overlayHelp').textContent = t('help');
+    document.getElementById('overlayFail').textContent = t('fail');
     document.getElementById('overlayPrompt').textContent = t('start');
     document.getElementById('langBtn').textContent = t('langLabel');
     document.getElementById('energyLabel').textContent = t('shield');
@@ -1771,6 +1793,17 @@ function finishTutorial() {
     // Clear remaining tutorial notes
     activeNotes = [];
     upcomingNotes = [];
+}
+
+// 重新查看教程 — 清除教程完成标志并重新触发教程流程
+// startGame() 会读取已清除的标志，重新初始化教程（tutorial.active = true）
+function replayTutorial() {
+    try { localStorage.removeItem('rd_tutorial_done'); } catch(e) {}
+    if (typeof startGame === 'function') {
+        startGame();
+    } else {
+        location.reload();
+    }
 }
 
 function updateTutorial(now, dt) {
