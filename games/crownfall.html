@@ -102,7 +102,7 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 .map-hp-bar{height:6px;background:var(--bg);border-radius:3px;margin-top:4px;overflow:hidden}
 .map-hp-fill{height:100%;background:var(--green);transition:width .3s}
 .map-hero-stats{font-size:10px;color:var(--text-dim);display:flex;justify-content:space-between;margin-top:3px}
-.map-node-info{position:absolute;bottom:8px;left:8px;background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--text);max-width:240px;z-index:5}
+.map-node-info{position:absolute;bottom:8px;left:8px;background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--text);max-width:240px;z-index:5;pointer-events:none}
 
 /* ===== BATTLE SCREEN ===== */
 #battle-screen{background:var(--navy);flex-direction:column;justify-content:flex-start;align-items:stretch;padding:4px}
@@ -362,6 +362,8 @@ const I18N = {
     critSuccess: 'CRITICAL SUCCESS!', success: 'SUCCESS', partialSuccess: 'PARTIAL SUCCESS',
     failure: 'FAILURE', critFailure: 'CRITICAL FAILURE!',
     noPotions: 'No potions left!', usedPotion: 'used a Healing Potion',
+    noTargetsInRange: 'No targets in range! Move closer first.',
+    noMoveTiles: 'No valid move tiles!',
     defended: 'is defending', enemyDefeated: 'Enemy defeated!',
     allEnemiesDefeated: 'All enemies defeated!', heroFallen: 'has fallen!',
     partyWiped: 'Your party has been wiped out...', rewardGold: 'Gold', rewardExp: 'EXP',
@@ -410,6 +412,8 @@ const I18N = {
     critSuccess: '大成功！', success: '成功', partialSuccess: '部分成功',
     failure: '失败', critFailure: '大失败！',
     noPotions: '没有药水了！', usedPotion: '使用了一瓶治疗药水',
+    noTargetsInRange: '攻击范围内无目标！请先靠近敌人。',
+    noMoveTiles: '没有可移动的格子！',
     defended: '正在防御', enemyDefeated: '敌人被击败！',
     allEnemiesDefeated: '所有敌人已被击败！', heroFallen: '倒下了！',
     partyWiped: '你的队伍全军覆没...', rewardGold: '金币', rewardExp: '经验',
@@ -444,7 +448,17 @@ const I18N = {
   }
 };
 let lang = 'en';
-function t(k){ return (I18N[lang]&&I18N[lang][k])||I18N.en[k]||k; }
+function t(k){
+  // Support dot notation for nested keys (e.g., 'nodes.battle')
+  const parts=k.split('.');
+  let val=I18N[lang];
+  for(const p of parts){ if(val==null) break; val=val[p]; }
+  if(val!=null) return val;
+  val=I18N.en;
+  for(const p of parts){ if(val==null) break; val=val[p]; }
+  if(val!=null) return val;
+  return k;
+}
 function L(obj){ return obj[lang]||obj.en; }
 
 /* ========================================================================
@@ -1234,10 +1248,13 @@ mapCanvas.addEventListener('click',e=>{
   const area=G.map.areas[G.map.currentArea];
   const nextArea=G.map.areas[G.map.currentArea+1];
   const allNodes=nextArea?[...area.nodes,...nextArea.nodes]:area.nodes;
+  let clickedNode=false;
   for(const node of allNodes){
     const dx=x-node.x, dy=y-node.y;
     if(Math.sqrt(dx*dx+dy*dy)<22){
+      clickedNode=true;
       if(isNodeAvailable(node)){
+        document.getElementById('map-node-info').classList.add('hidden');
         selectNode(node);
       } else if(node.visited||node.id===G.map.currentNode){
         // Show info
@@ -1247,6 +1264,10 @@ mapCanvas.addEventListener('click',e=>{
       }
       return;
     }
+  }
+  // Clicking empty area: hide node info
+  if(!clickedNode){
+    document.getElementById('map-node-info').classList.add('hidden');
   }
 });
 
@@ -1260,6 +1281,8 @@ function selectNode(node){
 }
 
 function travelToNode(node){
+  // Hide node info
+  document.getElementById('map-node-info').classList.add('hidden');
   // Mark old node as visited
   const area=G.map.areas[G.map.currentArea];
   const oldNode=area.nodes.find(n=>n.id===G.map.currentNode);
@@ -1307,16 +1330,24 @@ function closeModal(){ document.getElementById('modal-container').innerHTML=''; 
 /* ========================================================================
    TUTORIAL
    ======================================================================== */
-function showTip(text){
+function showTip(text,duration){
   const tip=document.getElementById('tutorial-tip');
   tip.textContent=text;
   tip.classList.remove('hidden');
   // Position at top center
   tip.style.top='60px'; tip.style.left='50%'; tip.style.transform='translateX(-50%)';
-  if(G.tutorial.active){
+  if(G.tutorial.active&&!duration){
     tip.onclick=()=>{ nextTutorialStep(); };
     tip.style.cursor='pointer';
     tip.innerHTML=text+`<div style="font-size:10px;color:var(--text-dim);margin-top:4px;text-align:center">[${t('nextTip')}]</div>`;
+  } else {
+    tip.onclick=null;
+    tip.style.cursor='default';
+  }
+  // Auto-hide for temporary tips
+  if(duration){
+    clearTimeout(showTip._timer);
+    showTip._timer=setTimeout(hideTip,duration);
   }
 }
 function hideTip(){ document.getElementById('tutorial-tip').classList.add('hidden'); }
@@ -1494,12 +1525,26 @@ function btAction(action){
     if(hero.ap<=0) endTurn();
     return;
   }
+  // Toggle off if clicking the same action mode
+  if(G.battle.actionMode===action){
+    G.battle.actionMode=null;
+    G.battle.validTargets=[];
+    G.battle.selectedSkill=null;
+    renderBattle();
+    return;
+  }
   G.battle.actionMode=action;
   G.battle.selectedSkill=null;
   if(action==='move'){
     G.battle.validTargets=getMoveTiles(hero);
+    if(G.battle.validTargets.length===0){ addLog('info',t('noMoveTiles')); }
   } else if(action==='attack'){
     G.battle.validTargets=getAttackTargets(hero);
+    if(G.battle.validTargets.length===0){
+      addLog('info',t('noTargetsInRange'));
+      showTip(t('noTargetsInRange'),3000);
+      G.battle.actionMode=null;
+    }
   } else if(action==='skill'){
     // Show skill selection
     showSkillMenu(hero);
@@ -1545,6 +1590,12 @@ function selectSkill(idx){
     G.battle.validTargets=getEnemiesInRange(hero,skill.range);
   } else {
     G.battle.validTargets=getAttackTargets(hero,skill.range||hero.range);
+  }
+  if(G.battle.validTargets.length===0&&skill.type!=='summon'){
+    addLog('info',t('noTargetsInRange'));
+    showTip(t('noTargetsInRange'),3000);
+    G.battle.actionMode=null;
+    G.battle.selectedSkill=null;
   }
   renderBattle();
 }
@@ -1625,34 +1676,45 @@ function handleBattleClick(gx,gy){
     }
     return;
   }
+  let acted=false;
   if(mode==='move'){
     const tile=G.battle.validTargets.find(t=>t.x===gx&&t.y===gy);
     if(tile){
-      moveUnit(hero,gx,gy);
-      hero.ap--;
       G.battle.actionMode=null;
       G.battle.validTargets=[];
+      moveUnit(hero,gx,gy);
+      hero.ap--;
       renderBattle();
       if(hero.ap<=0) endTurn();
+      acted=true;
     }
   } else if(mode==='attack'){
     const target=G.battle.validTargets.find(t=>t.x===gx&&t.y===gy);
     if(target){
-      hero.ap--;
-      performAttack(hero,target.unit);
       G.battle.actionMode=null;
       G.battle.validTargets=[];
+      hero.ap--;
+      performAttack(hero,target.unit);
+      acted=true;
     }
   } else if(mode==='skill'){
     const target=G.battle.validTargets.find(t=>t.x===gx&&t.y===gy);
     if(target){
       const skill=G.battle.selectedSkill;
-      hero.ap-=skill.ap||1;
-      executeSkill(hero,skill,target.unit);
       G.battle.actionMode=null;
       G.battle.validTargets=[];
       G.battle.selectedSkill=null;
+      hero.ap-=skill.ap||1;
+      executeSkill(hero,skill,target.unit);
+      acted=true;
     }
+  }
+  // Clicking an invalid tile cancels the action mode
+  if(!acted){
+    G.battle.actionMode=null;
+    G.battle.validTargets=[];
+    G.battle.selectedSkill=null;
+    renderBattle();
   }
 }
 
@@ -2317,8 +2379,12 @@ function renderBattleUI(){
       else if(act==='defend') btn.disabled=hero.ap<1;
       else if(act==='item') btn.disabled=hero.ap<1||G.potions<=0;
       else if(act==='end') btn.disabled=false;
+      // Highlight active action mode
+      if(G.battle.actionMode===act) btn.classList.add('active');
+      else btn.classList.remove('active');
     } else {
       btn.disabled=true;
+      btn.classList.remove('active');
     }
   });
   // Hero info bar
@@ -2723,6 +2789,7 @@ function checkBossPhaseTransition(){
    RETURN TO MAP & GAME OVER & VICTORY
    ======================================================================== */
 function returnToMap(){
+  document.getElementById('map-node-info').classList.add('hidden');
   saveGame();
   renderMapScreen();
   showScreen('map-screen');
