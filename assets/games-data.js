@@ -352,6 +352,27 @@
       featured: true,
       trending: true,
       isDaily: true
+    },
+    {
+      slug: 'crownfall',
+      title: { en: 'Crownfall: The Broken Realm', cn: '王冠陨落：破碎王国' },
+      subtitle: { en: 'Tactical RPG Adventure', cn: '战棋 RPG 冒险' },
+      category: 'Adventure',
+      rating: 4.9,
+      plays: '1.8M',
+      duration: { en: '10-20 min', cn: '10-20 分钟' },
+      controls: { en: 'Mouse + Keyboard', cn: '鼠标 + 键盘' },
+      difficulty: { en: 'Medium', cn: '中等' },
+      description: {
+        en: 'Lead a party of 3 heroes through a cursed kingdom in this turn-based tactical RPG. Roll dice, explore a branching map, fight grid battles, and defeat the Crownless Regent to restore the broken realm.',
+        cn: '带领三名英雄穿越被诅咒的王国。回合制战棋 RPG，投掷骰子、探索分支地图、进行网格战斗，击败无冠摄政王修复破碎王国。'
+      },
+      howToPlay: {
+        en: ['Choose 3 heroes from 6 unique classes', 'Navigate a branching map of battles and events', 'Each hero has 2 Action Points per turn', 'Roll d6 dice for ranged attacks and events', 'Use Luck points to reroll failed dice', 'Defeat the 3-phase boss to win'],
+        cn: ['从 6 个职业中选择 3 名英雄', '在分支地图上探索战斗和事件', '每名英雄每回合有 2 点行动力', '远程攻击和事件需投掷六面骰', '使用幸运点重新投掷失败骰子', '击败三阶段 Boss 获胜']
+      },
+      featured: true,
+      trending: true
     }
   ];
 
