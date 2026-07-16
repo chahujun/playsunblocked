@@ -962,13 +962,13 @@ const I18n = {
     assault: "ASSAULT",
     assaultDesc: "+20% dmg, fast reload | SPACE: Grenade",
     medic: "MEDIC",
-    medicDesc: "HP regen | SPACE: Med Kit (heal 35)",
+    medicDesc: "HP regen | SPACE: Med Kit (heal 50)",
     engineer: "ENGINEER",
     engineerDesc: "Explosives +30% | SPACE: Auto-Turret",
     scout: "SCOUT",
     scoutDesc: "+15% speed, long dash | SPACE: Cloak",
     heavy: "HEAVY",
-    heavyDesc: "-20% dmg taken, high HP | SPACE: Barricade",
+    heavyDesc: "-20% dmg taken, high HP | SPACE: Combat Drone",
     sniper: "SNIPER",
     sniperDesc: "+25% crit, +50% crit dmg | SPACE: Airstrike",
     berserker: "BERSERKER",
@@ -1047,13 +1047,13 @@ const I18n = {
     assault: "突击兵",
     assaultDesc: "伤害+20%，快速装弹 | 空格: 手雷",
     medic: "医护兵",
-    medicDesc: "生命回复 | 空格: 医疗包(回血35)",
+    medicDesc: "生命回复 | 空格: 医疗包(回血50)",
     engineer: "工程兵",
     engineerDesc: "爆炸+30% | 空格: 自动炮台",
     scout: "侦察兵",
     scoutDesc: "速度+15%，冲刺远 | 空格: 隐身",
     heavy: "重装机兵",
-    heavyDesc: "受伤-20%，高血量 | 空格: 路障",
+    heavyDesc: "受伤-20%，高血量 | 空格: 战斗无人机",
     sniper: "狙击手",
     sniperDesc: "暴击+25%，暴伤+50% | 空格: 空中打击",
     berserker: "狂战士",
@@ -1810,7 +1810,7 @@ const CLASSES = {
     dashSpeedMult: 0.7,
     passive: 'heavy',
     startShield: 10,
-    spaceAbility: 'barricade'
+    spaceAbility: 'drone'
   },
   sniper: {
     name: 'sniper', nameZh: '狙击手',
@@ -1893,6 +1893,7 @@ let grenades = [];
 let barricades = [];
 let pulseWaves = [];
 let airstrikes = [];
+let drones = [];
 let crates = [];
 let particles = [];
 let pickups = [];
@@ -2204,8 +2205,8 @@ function tryShoot() {
       pierce: (isFlame || isLaser || isTesla || isRailgun) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
       hitTargets: (isFlame || isLaser || isTesla || isRailgun) ? [] : null,
       distTraveled: 0,
-      // 吸血：子弹携带吸血标记
-      lifesteal: player.upgrades.lifesteal,
+      // 吸血：子弹携带吸血标记（狂热期间额外+10%概率）
+      lifesteal: player.upgrades.lifesteal + (player.buffs.frenzy > 0 ? 2 : 0),
       flameRange: w.flameRange || 0,
       flameFadeStart: w.flameFadeStart || 0,
       laserRange: w.laserRange || (isTesla ? w.laserRange || 0 : 0) || (isRailgun ? w.railRange || 0 : 0),
@@ -2263,52 +2264,65 @@ function placeMine() {
     grenades.push({
       x: player.x, y: player.y,
       vx: Math.cos(ang) * 12, vy: Math.sin(ang) * 12,
-      life: 60, explodeRadius: 130, damage: 150 * player.damageMult
+      life: 60, explodeRadius: 140, damage: 180 * player.damageMult
     });
   } else if (abilityType === 'medkit') {
-    // 医护兵：医疗包（瞬间回血35HP）
+    // 医护兵：医疗包（瞬间回血50HP）
     player.mines--;
     player.abilityCD = 300;
-    player.hp = Math.min(player.maxHp, player.hp + 35);
+    player.hp = Math.min(player.maxHp, player.hp + 50);
     spawnBloodParticles(player.x, player.y, 12, '#44ff44');
   } else if (abilityType === 'turret') {
-    // 工程兵：放置临时炮台（15秒后消失）
+    // 工程兵：放置穿甲炮台（15秒，高射速穿透型）
     player.mines--;
     player.abilityCD = 300;
-    placeTurret('mg', player.x + Math.cos(player.angle) * 30, player.y + Math.sin(player.angle) * 30);
+    placeTurret('ap', player.x + Math.cos(player.angle) * 30, player.y + Math.sin(player.angle) * 30);
     const t = turrets[turrets.length - 1];
     t.lifetime = 900; // 15秒
+    // 工程兵技能炮台强化：射速更快，伤害更高
+    t.def = Object.assign({}, t.def, { fireRate: 45, damage: 30, range: 320, pierce: 2 });
   } else if (abilityType === 'cloak') {
-    // 侦察兵：隐身3秒（僵尸丢失目标）
+    // 侦察兵：隐身4秒（僵尸丢失目标，移速+40%）
     player.mines--;
     player.abilityCD = 300;
-    player.buffs.cloak = 180; // 3秒
-  } else if (abilityType === 'barricade') {
-    // 重装机兵：放置路障（阻挡僵尸，有HP）
+    player.buffs.cloak = 240; // 4秒
+    player.buffs.haste = 240; // 移速加成同步
+  } else if (abilityType === 'drone') {
+    // 重装机兵：部署战斗无人机（跟随玩家，自动射击，12秒）
     player.mines--;
     player.abilityCD = 300;
-    barricades.push({ x: player.x + Math.cos(player.angle) * 35, y: player.y + Math.sin(player.angle) * 35, hp: 200, maxHp: 200, angle: player.angle });
+    drones.push({
+      x: player.x + 40, y: player.y - 20,
+      vx: 0, vy: 0,
+      angle: 0, fireTimer: 0,
+      lifetime: 720, // 12秒
+      damage: 25 * player.damageMult,
+      fireRate: 25, // 约0.4秒/发
+      range: 280,
+      bulletSpeed: 20,
+      hp: 1 // 不可被攻击，跟随玩家
+    });
   } else if (abilityType === 'airstrike') {
-    // 狙击手：空中打击（呼叫5波集束轰炸，覆盖玩家周围大范围区域）
+    // 狙击手：空中打击（3波集束轰炸，每波2发，覆盖玩家周围区域）
     player.mines--;
     player.abilityCD = 300;
-    const baseDmg = 120 * player.damageMult;
-    for (let wave = 0; wave < 5; wave++) {
-      for (let k = 0; k < 3; k++) {
+    const baseDmg = 80 * player.damageMult;
+    for (let wave = 0; wave < 3; wave++) {
+      for (let k = 0; k < 2; k++) {
         const ang = Math.random() * Math.PI * 2;
-        const r = 40 + Math.random() * 250;
+        const r = 60 + Math.random() * 220;
         const tx = player.x + Math.cos(ang) * r;
         const ty = player.y + Math.sin(ang) * r;
         airstrikes.push({
           x: tx, y: ty,
-          delay: wave * 25 + k * 8,
-          radius: 70,
+          delay: wave * 30 + k * 10,
+          radius: 60,
           damage: baseDmg,
           detonated: false
         });
       }
     }
-    addShake(8);
+    addShake(6);
   } else if (abilityType === 'pulse') {
     // 狙击手：脉冲波（前方直线秒杀普通僵尸，对精英和BOSS造成大量伤害）
     player.mines--;
@@ -2346,10 +2360,10 @@ function placeMine() {
     }
     addShake(6);
   } else if (abilityType === 'frenzy') {
-    // 狂战士：狂暴模式（8秒，攻速+100%，移速+30%，吸血+15%）
+    // 狂战士：狂暴模式（10秒，攻速+100%，伤害+50%，移速+30%，吸血+10%）
     player.mines--;
     player.abilityCD = 300;
-    player.buffs.frenzy = 480; // 8秒
+    player.buffs.frenzy = 600; // 10秒
   } else {
     // 默认：地雷
     player.mines--;
@@ -3005,6 +3019,7 @@ function update(dt) {
   updateBarricades(dt);
   updatePulseWaves(dt);
   updateAirstrikes(dt);
+  updateDrones(dt);
   updatePoisonProjectiles(dt);
   updatePoisonPools(dt);
   updateFirePools(dt);
@@ -4823,6 +4838,75 @@ function updateAirstrikes(dt) {
 }
 
 // =====================================================================
+// DRONES - 战斗无人机系统（重装机兵专属）
+// =====================================================================
+function updateDrones(dt) {
+  for (let i = drones.length - 1; i >= 0; i--) {
+    const d = drones[i];
+    d.lifetime -= dt;
+    if (d.lifetime <= 0) {
+      spawnBloodParticles(d.x, d.y, 8, '#44aaff');
+      drones.splice(i, 1);
+      continue;
+    }
+    // 跟随玩家（保持在玩家右上方）
+    const targetX = player.x + 40;
+    const targetY = player.y - 30;
+    const dx = targetX - d.x;
+    const dy = targetY - d.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 5) {
+      d.x += (dx / dist) * 4 * dt;
+      d.y += (dy / dist) * 4 * dt;
+    }
+    // 寻找最近僵尸
+    let nearest = null, nearestDist = d.range;
+    for (const z of zombies) {
+      const zd = Math.hypot(z.x - d.x, z.y - d.y);
+      if (zd < nearestDist) { nearestDist = zd; nearest = z; }
+    }
+    if (!nearest && boss) {
+      const bd = Math.hypot(boss.x - d.x, boss.y - d.y);
+      if (bd < nearestDist) { nearestDist = bd; nearest = boss; }
+    }
+    if (nearest) {
+      d.angle = Math.atan2(nearest.y - d.y, nearest.x - d.x);
+      d.fireTimer -= dt;
+      if (d.fireTimer <= 0) {
+        d.fireTimer = d.fireRate;
+        // 发射子弹
+        bullets.push({
+          x: d.x, y: d.y,
+          vx: Math.cos(d.angle) * d.bulletSpeed,
+          vy: Math.sin(d.angle) * d.bulletSpeed,
+          damage: d.damage,
+          radius: 3,
+          life: 80,
+          color: '#44ddff',
+          weaponType: 'drone',
+          pierce: 1,
+          hitTargets: [],
+          distTraveled: 0,
+          isCrit: false,
+          burnDuration: 0, burnDps: 0,
+          explodeRadius: 0, explodeDamage: 0,
+          homingTurn: 0, laserRange: 0, laserFadeStart: 0,
+          slowMult: 0, slowDuration: 0,
+          lifesteal: 0, sniperRange: 0, sniperFadeStart: 0,
+          eliteMult: 0, bossMult: 0,
+          railWidth: 0, railRange: 0, railFadeStart: 0
+        });
+        // 枪口闪光粒子
+        particles.push({
+          x: d.x + Math.cos(d.angle) * 6, y: d.y + Math.sin(d.angle) * 6,
+          vx: 0, vy: 0, life: 4, maxLife: 4, size: 3, color: '#44ddff'
+        });
+      }
+    }
+  }
+}
+
+// =====================================================================
 // EXPLODE AT - 通用爆炸函数（火箭筒/地雷共用）
 // =====================================================================
 function explodeAt(x, y, radius, damage, isPlayerWeapon) {
@@ -6270,6 +6354,47 @@ function render() {
       ctx.fillRect(b.x - 15, b.y - 12, 30, 3);
       ctx.fillStyle = '#6b8e23';
       ctx.fillRect(b.x - 15, b.y - 12, 30 * (b.hp / b.maxHp), 3);
+    }
+  }
+
+  // Drones (战斗无人机)
+  for (const d of drones) {
+    ctx.save();
+    ctx.translate(d.x, d.y);
+    // 旋翼光环
+    const spin = performance.now() * 0.03;
+    ctx.strokeStyle = `rgba(100,200,255,${0.3 + Math.sin(spin) * 0.1})`;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 14, 3, spin, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 14, 3, -spin, 0, Math.PI * 2);
+    ctx.stroke();
+    // 机身
+    ctx.fillStyle = '#2a4a6a';
+    ctx.beginPath();
+    ctx.arc(0, 0, 7, 0, Math.PI * 2);
+    ctx.fill();
+    // 核心
+    ctx.fillStyle = '#44ddff';
+    ctx.beginPath();
+    ctx.arc(0, 0, 3, 0, Math.PI * 2);
+    ctx.fill();
+    // 枪管指向目标
+    ctx.rotate(d.angle);
+    ctx.fillStyle = '#6688aa';
+    ctx.fillRect(3, -1.5, 8, 3);
+    ctx.restore();
+    // 寿命指示（最后3秒闪烁）
+    if (d.lifetime < 180) {
+      const blink = Math.sin(performance.now() * 0.02) > 0;
+      if (blink) {
+        ctx.fillStyle = 'rgba(255,100,100,0.5)';
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, 12, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
   }
 
@@ -8100,6 +8225,7 @@ function drawPlayer() {
       turret: lang === 'zh' ? '炮台' : 'TURR',
       cloak: lang === 'zh' ? '隐身' : 'CLOAK',
       barricade: lang === 'zh' ? '路障' : 'WALL',
+      drone: lang === 'zh' ? '无人机' : 'DRONE',
       pulse: lang === 'zh' ? '脉冲' : 'PULSE',
       airstrike: lang === 'zh' ? '空袭' : 'STRIKE',
       frenzy: lang === 'zh' ? '狂热' : 'FREN',
@@ -8974,6 +9100,7 @@ function startGame() {
   barricades = [];
   pulseWaves = [];
   airstrikes = [];
+  drones = [];
   damageNumbers = [];
   barrels = [];
   terrainFeatures = [];
