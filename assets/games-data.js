@@ -382,18 +382,17 @@
     var n = parseFloat(s);
     if (s.indexOf('M') !== -1) return Math.round(n * 1000000);
     if (s.indexOf('K') !== -1) return Math.round(n * 1000);
-    return n;
+    return Math.round(n);
   }
+  // Mark recent games as New — use slug-based check for stability
+  var NEW_GAME_SLUGS = ['crownfall', 'bytebreak'];
   GAMES.forEach(function (g, i) {
     g.gradient = CATEGORY_GRADIENTS[g.category] || ['#FF5C28', '#B8350A'];
     g.playsNum = parsePlays(g.plays);
     g.addedOrder = i; // higher = newer
-    if (g.isNew === undefined) g.isNew = false;
+    if (g.isNew === undefined) g.isNew = NEW_GAME_SLUGS.indexOf(g.slug) !== -1;
     if (g.multiplayer === undefined) g.multiplayer = false;
   });
-  // Mark recent games as New
-  GAMES[GAMES.length - 1].isNew = true; // Crownfall
-  GAMES[GAMES.length - 2].isNew = true; // Bytebreak
 
   // ---- Public API ----
   var DATA = {

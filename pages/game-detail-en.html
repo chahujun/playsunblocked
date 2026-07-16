@@ -21,6 +21,9 @@
     <meta property="og:title" content="Play Free Games - playsunblocked">
     <meta property="og:description" content="Play free browser games on playsunblocked. No downloads, no sign-up. Works on school Chromebooks.">
     <meta property="og:image" content="https://www.playsunblocked.net/assets/hero-gaming.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="theme-color" content="#1A1A1A">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Play Free Games - playsunblocked">
     <meta name="twitter:description" content="Play free browser games on playsunblocked. No downloads, no sign-up. Works on school Chromebooks.">
@@ -63,7 +66,8 @@
 
 </head>
 <body class="min-h-screen font-sans antialiased">
-    <main>
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" onfocus="this.style.cssText='position:fixed;top:8px;left:8px;z-index:100;width:auto;height:auto;padding:8px 16px;background:var(--color-primary);color:#fff;border-radius:4px;font-size:14px'" onblur="this.style.cssText='position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden'">Skip to main content</a>
+    <main id="main-content">
     
 
     <!-- Shell Styles -->
@@ -408,7 +412,7 @@
         </a>
 
         <!-- Nav links — each exposes data-nav-key + data-dom-id for leaf active-state injection -->
-        <nav class="hidden md:flex items-center gap-1" role="navigation" aria-label="Main navigation">
+        <nav class="hidden md:flex items-center gap-1" aria-label="Main navigation">
           <a href="index-en.html" data-nav-key="home" data-dom-id="nav-home" class="gh-nav-link" data-en="Home">
             Home
           </a>
@@ -422,7 +426,7 @@
             About
           </a>
         </nav>
-        <button type="button" class="gh-mobile-menu-btn md:hidden" aria-label="Menu" onclick="document.getElementById('mobileNav').classList.toggle('show')">
+        <button type="button" class="gh-mobile-menu-btn md:hidden" aria-label="Menu" aria-expanded="false" onclick="document.getElementById('mobileNav').classList.toggle('show')">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <!-- SLOT: activeNavItem — leaf pages set data-active="true" on the matching [data-nav-key] element above -->

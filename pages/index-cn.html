@@ -21,6 +21,9 @@
     <meta property="og:title" content="playsunblocked — 免费在线游戏">
     <meta property="og:description" content="17款免费浏览器游戏，可在学校Chromebook上运行。无需下载，无需注册。立即玩益智、动作、街机和策略游戏。">
     <meta property="og:image" content="https://www.playsunblocked.net/assets/hero-gaming.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="theme-color" content="#1A1A1A">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="playsunblocked — 免费在线游戏">
     <meta name="twitter:description" content="17款免费浏览器游戏，可在学校Chromebook上运行。无需下载，无需注册。立即玩益智、动作、街机和策略游戏。">
@@ -52,7 +55,8 @@
     </style>
 </head>
 <body class="min-h-screen font-sans antialiased">
-    <main>
+    <a href="#main-content" class="skip-link" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" onfocus="this.style.cssText='position:fixed;top:8px;left:8px;z-index:100;width:auto;height:auto;padding:8px 16px;background:var(--color-primary);color:#fff;border-radius:4px;font-size:14px'" onblur="this.style.cssText='position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden'">跳到主要内容</a>
+    <main id="main-content">
     
 
     <!-- Shell Styles -->
@@ -458,7 +462,7 @@
           </span>
           <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-2xl); letter-spacing: -0.02em;">playsunblocked</span>
         </a>
-        <nav class="hidden md:flex items-center gap-1" role="navigation" aria-label="主导航">
+        <nav class="hidden md:flex items-center gap-1" aria-label="主导航">
           <a href="index-cn.html" data-nav-key="home" data-dom-id="nav-home" class="gh-nav-link" data-active="true">
             首页
           </a>
@@ -472,7 +476,7 @@
             关于
           </a>
         </nav>
-        <button type="button" class="gh-mobile-menu-btn md:hidden" aria-label="Menu" onclick="document.getElementById('mobileNav').classList.toggle('show')">
+        <button type="button" class="gh-mobile-menu-btn md:hidden" aria-label="Menu" aria-expanded="false" onclick="document.getElementById('mobileNav').classList.toggle('show')">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <div class="relative hidden sm:flex flex-1 items-center max-w-xs">
