@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    playsunblocked — Shared Game Data
    Single source of truth for all pages (index / games / detail)
    Each game is a self-contained HTML file under /games/<slug>.html
@@ -76,7 +76,7 @@
         en: ['Click locations to investigate', 'Collect and combine clues', 'Watch your sanity meter', 'Make choices that shape the ending'],
         cn: ['点击地点展开调查', '收集并组合线索', '注意理智值变化', '关键抉择影响结局走向']
       },
-      featured: false,
+      featured: true,
       trending: true
     },
     {
@@ -118,7 +118,7 @@
         en: ['Click to spawn celestial bodies', 'Drag to adjust gravity wells', 'Chain supernovae for combos', 'Hit the target score before entropy wins'],
         cn: ['点击生成天体', '拖拽调整引力阱', '连锁超新星触发连击', '在熵增前达成目标分数']
       },
-      featured: false,
+      featured: true,
       trending: false
     },
     {
@@ -160,7 +160,7 @@
         en: ['Click nodes to rotate them', 'Connect the signal from input to output', 'Avoid short-circuit feedback loops', 'Light every synapse to win'],
         cn: ['点击节点旋转方向', '将信号从输入连通至输出', '避免短路的反馈环路', '点亮所有突触通关']
       },
-      featured: false,
+      featured: true,
       trending: true
     },
     {
@@ -181,7 +181,7 @@
         en: ['Type commands at the prompt', 'Observe the console\'s responses', 'Cross-reference glyphs to deduce meaning', 'Translate the final message to escape'],
         cn: ['在命令行输入指令', '观察终端反馈', '交叉比对符号推断含义', '翻译最终信息以脱困']
       },
-      featured: false,
+      featured: true,
       trending: false
     },
     {
@@ -202,7 +202,7 @@
         en: ['Switch spectra with number keys', 'Each spectrum reveals different elements', 'Plan routes across light bands', 'Reach the portal in the right spectrum'],
         cn: ['数字键切换光谱', '不同光谱显露不同元素', '跨光带规划路线', '以正确光谱抵达传送门']
       },
-      featured: false,
+      featured: true,
       trending: false
     },
     {
@@ -223,7 +223,7 @@
         en: ['Type IF/THEN statements to change rules', 'Watch how the simulation reacts', 'Stack paradoxes to break constraints', 'Find the exit condition the system forgot'],
         cn: ['输入 IF/THEN 语句改变规则', '观察模拟器的反应', '叠加悖论突破约束', '找到系统遗漏的出口条件']
       },
-      featured: false,
+      featured: true,
       trending: false
     },
     {
@@ -265,7 +265,7 @@
         en: ['Move the paddle with the mouse', 'Bounce the pulse into notes', 'Hit on-beat for bonus points', 'Don\'t let the pulse escape'],
         cn: ['鼠标移动挡板', '将脉冲反弹至音符', '踩拍命中获得奖励', '别让脉冲飞出']
       },
-      featured: false,
+      featured: true,
       trending: false
     },
     {
@@ -286,7 +286,7 @@
         en: ['Click to fire the grappling hook', 'Release on the beat to swing', 'Time releases to maintain momentum', 'Reach the end without losing rhythm'],
         cn: ['点击射出钩爪', '踩拍松钩摆荡', '把握时机保持动量', '不掉拍抵达终点']
       },
-      featured: false,
+      featured: true,
       trending: true
     },
     {
@@ -328,7 +328,7 @@
         en: ['Click valves to open or close them', 'Isolate leaking tanks first', 'Watch pressure gauges', 'Prevent the chain reaction'],
         cn: ['点击阀门开闭', '优先隔离泄漏储罐', '注意压力表读数', '阻止连锁反应发生']
       },
-      featured: false,
+      featured: true,
       trending: false
     },
     {
