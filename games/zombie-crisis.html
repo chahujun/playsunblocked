@@ -1483,7 +1483,8 @@ const SECONDARY_AMMO = {
   micro_rocket: 8,
   tesla: 25,
   acid: 30,
-  railgun: 4
+  railgun: 4,
+  sniper: 5
 };
 // 备弹总量（总子弹数，不含弹匣内）
 const TOTAL_SPARE_AMMO = {
@@ -1497,7 +1498,8 @@ const TOTAL_SPARE_AMMO = {
   micro_rocket: 32,
   tesla: 75,
   acid: 90,
-  railgun: 8
+  railgun: 8,
+  sniper: 15
 };
 const ammo = {
   pistol: Infinity,
@@ -1511,7 +1513,8 @@ const ammo = {
   micro_rocket: 0,
   tesla: 0,
   acid: 0,
-  railgun: 0
+  railgun: 0,
+  sniper: 0
 };
 // 备弹（弹匣外的剩余子弹）
 const spareAmmo = {
@@ -1526,7 +1529,8 @@ const spareAmmo = {
   micro_rocket: 0,
   tesla: 0,
   acid: 0,
-  railgun: 0
+  railgun: 0,
+  sniper: 0
 };
 
 // Weapon definitions - 合金弹头风格
@@ -1553,10 +1557,10 @@ const WEAPONS = {
              color: '#cc3322', weaponClass: 'heavy', maxAmmo: 5, reload: 150, type: 'rocket',
              explodeRadius: 90, explodeDamage: 60 },
   // ===== 第二副武器（第5波BOSS战解锁）=====
-  laser:   { name: 'LASER', nameZh: '激光枪',
-             damage: 9, fireRate: 30, bulletSpeed: 24, spread: 0,    auto: true,  pellets: 1, jitter: 0,
-             color: '#44ddff', weaponClass: 'light', maxAmmo: 50, reload: 100, type: 'laser',
-             pierce: 8, laserRange: 320, laserFadeStart: 220 },
+  laser:   { name: 'PULSE', nameZh: '脉冲炮',
+             damage: 45, fireRate: 200, bulletSpeed: 28, spread: 0,    auto: false, pellets: 1, jitter: 0,
+             color: '#44ddff', weaponClass: 'light', maxAmmo: 30, reload: 100, type: 'laser',
+             pierce: 5, laserRange: 400, laserFadeStart: 300 },
   homing:  { name: 'HOMING', nameZh: '追踪弹',
              damage: 55, fireRate: 350, bulletSpeed: 12, spread: 0,    auto: true, pellets: 1, jitter: 0,
              color: '#ff66dd', weaponClass: 'light', maxAmmo: 18, reload: 90, type: 'homing',
@@ -1581,14 +1585,18 @@ const WEAPONS = {
   railgun: { name: 'RAIL',   nameZh: '轨道炮',
              damage: 180, fireRate: 1400, bulletSpeed: 40, spread: 0,    auto: false, pellets: 1, jitter: 0,
              color: '#ffeeaa', weaponClass: 'heavy', maxAmmo: 4, reload: 180, type: 'railgun',
-             pierce: 99, railWidth: 6, railRange: 700, railFadeStart: 500 }
+             pierce: 99, railWidth: 6, railRange: 700, railFadeStart: 500 },
+  sniper:  { name: 'SNIPER', nameZh: '大口径狙击枪',
+             damage: 150, fireRate: 900, bulletSpeed: 36, spread: 0,    auto: false, pellets: 1, jitter: 0,
+             color: '#ffcc44', weaponClass: 'heavy', maxAmmo: 8, reload: 120, type: 'sniper',
+             pierce: 6, sniperRange: 600, sniperFadeStart: 450, eliteMult: 2.0, bossMult: 2.0 }
 };
 
 // Heavy weapon movespeed penalty
 const HEAVY_SPEED_PENALTY = 0.78;
 
 // Weapon slot mapping for number keys 1-9
-const WEAPON_KEYS = ['pistol', 'hmg', 'shotgun', 'flamethrower', 'rocket', 'laser', 'homing', 'grenade', 'micro_rocket', 'tesla', 'acid', 'railgun'];
+const WEAPON_KEYS = ['pistol', 'hmg', 'shotgun', 'flamethrower', 'rocket', 'laser', 'homing', 'grenade', 'micro_rocket', 'tesla', 'acid', 'railgun', 'sniper'];
 
 // =====================================================================
 // ATTACHMENT SYSTEM - 枪械配件（单配件替换制）
@@ -1786,9 +1794,9 @@ const CLASSES = {
     damageMult: 1.35,
     reloadMult: 1.0,
     mineMax: 2,
-    startWeapon: 'laser',
+    startWeapon: 'sniper',
     secondWeapon: 'railgun',
-    startAmmo: { laser: 25 },
+    startAmmo: { sniper: 5 },
     dashCooldownMult: 0.9,
     passive: 'sniper',
     spaceAbility: 'pulse'
@@ -2140,11 +2148,14 @@ function tryShoot() {
     const isTesla = w.type === 'tesla';
     const isAcid = w.type === 'acid';
     const isRailgun = w.type === 'railgun';
+    const isSniper = w.type === 'sniper';
     const isChain = isTesla || isLaser; // 穿透型武器共用 hitTargets 机制
     // 子弹大小
-    const bulletSize = w.type === 'rocket' ? 6 : (isFlame ? 16 : (isLaser ? 5 : (isHoming ? 7 : (isGrenade ? 8 : (isMicroRocket ? 4 : (isTesla ? 4 : (isAcid ? 6 : (isRailgun ? 8 : 3))))))));
+    const sizeMap = { rocket: 6, flame: 16, laser: 5, homing: 7, grenade: 8, micro_rocket: 4, tesla: 4, acid: 6, railgun: 8, sniper: 7 };
+    const bulletSize = sizeMap[w.type] || 3;
     // 子弹生命
-    const bulletLife = w.type === 'rocket' ? 120 : (isFlame ? 40 : (isLaser ? 50 : (isHoming ? 200 : (isGrenade ? 100 : (isTesla ? 60 : (isAcid ? 100 : (isRailgun ? 30 : 80)))))));
+    const lifeMap = { rocket: 120, flame: 40, laser: 50, homing: 200, grenade: 100, tesla: 60, acid: 100, railgun: 30, sniper: 25 };
+    const bulletLife = lifeMap[w.type] || 80;
     bullets.push({
       x: muzzleX,
       y: muzzleY,
@@ -2163,8 +2174,8 @@ function tryShoot() {
       fragments: w.fragments || 0,
       fragmentDamage: (w.fragmentDamage || 0) * player.damageMult * rageMult * frenzyDmgMult * classDmgMod,
       // 火焰枪/激光枪/电磁枪：穿透型参数
-      pierce: (isFlame || isLaser || isTesla || isRailgun) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
-      hitTargets: (isFlame || isLaser || isTesla || isRailgun) ? [] : null,
+      pierce: (isFlame || isLaser || isTesla || isRailgun || isSniper) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
+      hitTargets: (isFlame || isLaser || isTesla || isRailgun || isSniper) ? [] : null,
       distTraveled: 0,
       // 吸血：子弹携带吸血标记
       lifesteal: player.upgrades.lifesteal,
@@ -2194,6 +2205,11 @@ function tryShoot() {
       railWidth: w.railWidth || 0,
       railRange: w.railRange || 0,
       railFadeStart: w.railFadeStart || 0,
+      // 狙击枪参数
+      sniperRange: w.sniperRange || 0,
+      sniperFadeStart: w.sniperFadeStart || 0,
+      eliteMult: w.eliteMult || 0,
+      bossMult: w.bossMult || 0,
       // 配件附加参数
       chainLightning: w.chainLightning || 0,
       volatileMix: w.volatileMix || false
@@ -4276,11 +4292,17 @@ function updateBullets(dt) {
     for (let j = zombies.length - 1; j >= 0; j--) {
       const z = zombies[j];
       if (!circleCollide(b, z)) continue;
-      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：已命中的目标跳过，避免重复伤害
-      if ((b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') && b.hitTargets && b.hitTargets.includes(z)) continue;
+      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮/狙击枪）：已命中的目标跳过，避免重复伤害
+      if ((b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun' || b.weaponType === 'sniper') && b.hitTargets && b.hitTargets.includes(z)) continue;
+
+      // 狙击枪：对精英/BOSS额外伤害加成
+      let sniperBonus = 1;
+      if (b.weaponType === 'sniper') {
+        if (z.isElite) sniperBonus = b.eliteMult || 2.0;
+      }
 
       // Apply damage reduction (tank)
-      const actualDmg = b.damage * (1 - (z.damageReduction || 0));
+      const actualDmg = b.damage * sniperBonus * (1 - (z.damageReduction || 0));
       z.hp -= actualDmg;
       z.hurtFlash = 8;
       // 吸血：概率回复HP（每层5%概率，回1HP，有0.8秒内置CD）
@@ -4288,9 +4310,9 @@ function updateBullets(dt) {
           player.hp = Math.min(player.maxHp, player.hp + 1);
           player.lastLifesteal = performance.now();
         }
-      spawnBloodParticles(b.x, b.y, 5, (b.weaponType === 'flame' || b.weaponType === 'laser') ? (b.weaponType === 'flame' ? '#ff6622' : '#66ddff') : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : '#cc1122'))));
+      spawnBloodParticles(b.x, b.y, 5, (b.weaponType === 'flame' || b.weaponType === 'laser') ? (b.weaponType === 'flame' ? '#ff6622' : '#66ddff') : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : (b.weaponType === 'sniper' ? '#ffcc44' : '#cc1122')))));
       addBloodStain(z.x, z.y, z.radius * 0.5);
-      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (b.weaponType === 'flame' ? '#ff8833' : (b.weaponType === 'laser' ? '#44ddff' : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : '#ffdd44'))))), b.isCrit);
+      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (b.weaponType === 'flame' ? '#ff8833' : (b.weaponType === 'laser' ? '#44ddff' : (b.weaponType === 'tesla' ? '#aa66ff' : (b.weaponType === 'acid' ? '#66ff44' : (b.weaponType === 'railgun' ? '#ffeeaa' : (b.weaponType === 'sniper' ? '#ffcc44' : '#ffdd44')))))), b.isCrit);
       // 火焰枪：附加燃烧DOT + 命中点残留小火焰
       if (b.weaponType === 'flame' && b.burnDuration > 0) {
         z.burnTime = b.burnDuration;
@@ -4351,7 +4373,7 @@ function updateBullets(dt) {
 
       // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：记录命中，消耗穿透次数；其他武器命中即消失
       let bulletDestroyed = false;
-      if (b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') {
+      if (b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun' || b.weaponType === 'sniper') {
         if (b.hitTargets) b.hitTargets.push(z);
         b.pierce--;
         if (b.pierce < 0) { bullets.splice(i, 1); bulletDestroyed = true; }
@@ -4459,7 +4481,9 @@ function updateBullets(dt) {
       if (bd < boss.radius + b.radius) {
         // 护盾期间减伤
         const shieldMult = boss.shielded > 0 ? 0.3 : 1.0;
-        const actualDmg = b.damage * shieldMult * (1 - boss.damageReduction);
+        // 狙击枪：对BOSS额外伤害加成
+        const bossSniperBonus = b.weaponType === 'sniper' ? (b.bossMult || 2.0) : 1;
+        const actualDmg = b.damage * bossSniperBonus * shieldMult * (1 - boss.damageReduction);
         boss.hp -= actualDmg;
         boss.hurtFlash = 6;
         // 吸血：对BOSS也走概率+CD
@@ -4949,6 +4973,7 @@ function updatePickups(dt) {
         if (player.ownedWeapons.includes('tesla')) spareAmmo.tesla = Math.min(TOTAL_SPARE_AMMO.tesla, spareAmmo.tesla + 15);
         if (player.ownedWeapons.includes('acid')) spareAmmo.acid = Math.min(TOTAL_SPARE_AMMO.acid, spareAmmo.acid + 15);
         if (player.ownedWeapons.includes('railgun')) spareAmmo.railgun = Math.min(TOTAL_SPARE_AMMO.railgun, spareAmmo.railgun + 2);
+        if (player.ownedWeapons.includes('sniper')) spareAmmo.sniper = Math.min(TOTAL_SPARE_AMMO.sniper, spareAmmo.sniper + 3);
         playPickup();
       } else if (p.type.startsWith('buff_')) {
         const buffType = p.type.slice(5);
@@ -7158,7 +7183,7 @@ function drawBullet(b) {
     return;
   }
 
-  // 激光枪：蓝色光束，带拖尾和外层光晕
+  // 脉冲炮：明亮的能量脉冲球，带光环和粒子尾迹
   if (b.weaponType === 'laser') {
     if (!isFinite(b.x) || !isFinite(b.y) || !b.radius) return;
     const angle = Math.atan2(b.vy, b.vx);
@@ -7170,31 +7195,39 @@ function drawBullet(b) {
     ctx.save();
     ctx.translate(b.x, b.y);
     ctx.rotate(angle);
-    // 外层光晕（蓝紫色）
-    ctx.fillStyle = `rgba(80,150,255,${0.3 * fade})`;
+    // 外层大光环（蓝紫色脉冲）
+    ctx.fillStyle = `rgba(60,120,255,${0.18 * fade})`;
     ctx.beginPath();
-    ctx.ellipse(0, 0, b.radius * 3, b.radius * 1.5, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, b.radius * 5, b.radius * 2.5, 0, 0, Math.PI * 2);
     ctx.fill();
-    // 中层光束
-    ctx.fillStyle = `rgba(150,220,255,${0.9 * fade})`;
+    // 中层能量场
+    ctx.fillStyle = `rgba(100,200,255,${0.4 * fade})`;
     ctx.beginPath();
-    ctx.ellipse(0, 0, b.radius * 1.8, b.radius * 0.9, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, 0, b.radius * 2.8, b.radius * 1.4, 0, 0, Math.PI * 2);
     ctx.fill();
-    // 核心白光
+    // 核心亮光
+    ctx.fillStyle = `rgba(180,240,255,${0.95 * fade})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, b.radius * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    // 白色中心
     ctx.fillStyle = `rgba(255,255,255,${fade})`;
     ctx.beginPath();
-    ctx.ellipse(0, 0, b.radius * 0.8, b.radius * 0.4, 0, 0, Math.PI * 2);
+    ctx.arc(0, 0, b.radius * 0.7, 0, Math.PI * 2);
     ctx.fill();
-    // 拖尾
-    const trailLen = b.radius * 4;
-    ctx.fillStyle = `rgba(100,200,255,${0.6 * fade})`;
-    ctx.beginPath();
-    ctx.moveTo(0, -b.radius * 0.5);
-    ctx.lineTo(-trailLen, -b.radius * 0.15);
-    ctx.lineTo(-trailLen, b.radius * 0.15);
-    ctx.lineTo(0, b.radius * 0.5);
-    ctx.closePath();
-    ctx.fill();
+    // 粒子拖尾（随机散落）
+    if (Math.random() < 0.6) {
+      particles.push({
+        x: b.x - Math.cos(angle) * b.radius * 2 + (Math.random() - 0.5) * 6,
+        y: b.y - Math.sin(angle) * b.radius * 2 + (Math.random() - 0.5) * 6,
+        vx: -Math.cos(angle) * 0.5 + (Math.random() - 0.5) * 1.5,
+        vy: -Math.sin(angle) * 0.5 + (Math.random() - 0.5) * 1.5,
+        life: 8 + Math.random() * 8,
+        maxLife: 16,
+        size: 1 + Math.random() * 2.5,
+        color: Math.random() < 0.5 ? '#44ddff' : '#aaffff'
+      });
+    }
     ctx.restore();
     return;
   }
@@ -7453,6 +7486,38 @@ function drawBullet(b) {
     ctx.fillStyle = `rgba(255,255,255,${fade})`;
     ctx.beginPath();
     ctx.arc(0, 0, b.radius * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+
+  // 大口径狙击枪：金色穿甲弹道，带冲击波光环
+  if (b.weaponType === 'sniper') {
+    if (!isFinite(b.x) || !isFinite(b.y)) return;
+    const fade = b.sniperRange > 0 ? Math.max(0, 1 - b.distTraveled / b.sniperRange) : 1;
+    const angle = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(angle);
+    // 外层金色冲击光环
+    ctx.fillStyle = `rgba(255,200,60,${fade * 0.2})`;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, b.radius * 4, b.radius * 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 中层金色弹道
+    ctx.fillStyle = `rgba(255,220,80,${fade * 0.6})`;
+    ctx.fillRect(-b.radius * 3, -b.radius * 1.2, b.radius * 5, b.radius * 2.4);
+    // 核心白热穿甲线
+    ctx.fillStyle = `rgba(255,255,220,${fade})`;
+    ctx.fillRect(-b.radius * 2, -b.radius * 0.5, b.radius * 4, b.radius);
+    // 头部尖锐亮点
+    ctx.fillStyle = `rgba(255,255,255,${fade})`;
+    ctx.beginPath();
+    ctx.moveTo(b.radius * 2, 0);
+    ctx.lineTo(0, -b.radius);
+    ctx.lineTo(-b.radius, 0);
+    ctx.lineTo(0, b.radius);
+    ctx.closePath();
     ctx.fill();
     ctx.restore();
     return;
@@ -8519,6 +8584,7 @@ function startGame() {
   ammo.tesla = 0;
   ammo.acid = 0;
   ammo.railgun = 0;
+  ammo.sniper = 0;
   // 重置备弹
   spareAmmo.pistol = Infinity;
   for (const wk of WEAPON_KEYS) { if (wk !== 'pistol') spareAmmo[wk] = 0; }
