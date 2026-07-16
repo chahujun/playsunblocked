@@ -970,7 +970,7 @@ const I18n = {
     heavy: "HEAVY",
     heavyDesc: "-20% dmg taken, high HP | SPACE: Barricade",
     sniper: "SNIPER",
-    sniperDesc: "+25% crit, +50% crit dmg | SPACE: Pulse Strike",
+    sniperDesc: "+25% crit, +50% crit dmg | SPACE: Airstrike",
     berserker: "BERSERKER",
     berserkerDesc: "Low HP = more dmg | SPACE: Frenzy",
     // Weapons
@@ -1055,7 +1055,7 @@ const I18n = {
     heavy: "重装机兵",
     heavyDesc: "受伤-20%，高血量 | 空格: 路障",
     sniper: "狙击手",
-    sniperDesc: "暴击+25%，暴伤+50% | 空格: 脉冲波",
+    sniperDesc: "暴击+25%，暴伤+50% | 空格: 空中打击",
     berserker: "狂战士",
     berserkerDesc: "血越低伤害越高 | 空格: 狂热",
     // Weapons
@@ -1562,9 +1562,9 @@ const WEAPONS = {
              color: '#44ddff', weaponClass: 'light', maxAmmo: 30, reload: 100, type: 'laser',
              pierce: 5, laserRange: 400, laserFadeStart: 300 },
   homing:  { name: 'HOMING', nameZh: '追踪弹',
-             damage: 55, fireRate: 350, bulletSpeed: 12, spread: 0,    auto: true, pellets: 1, jitter: 0,
-             color: '#ff66dd', weaponClass: 'light', maxAmmo: 18, reload: 90, type: 'homing',
-             homingTurn: 0.25, homingRange: 600, explodeRadius: 40, explodeDamage: 25 },
+             damage: 90, fireRate: 300, bulletSpeed: 16, spread: 0,    auto: true, pellets: 1, jitter: 0,
+             color: '#ff66dd', weaponClass: 'light', maxAmmo: 18, reload: 80, type: 'homing',
+             homingTurn: 0.35, homingRange: 800, explodeRadius: 65, explodeDamage: 50, pierce: 1 },
   grenade: { name: 'NADE', nameZh: '超级榴弹',
              damage: 60, fireRate: 900, bulletSpeed: 8, spread: 0,    auto: false, pellets: 1, jitter: 0,
              color: '#88dd44', weaponClass: 'heavy', maxAmmo: 5, reload: 140, type: 'grenade',
@@ -1587,9 +1587,9 @@ const WEAPONS = {
              color: '#ffeeaa', weaponClass: 'heavy', maxAmmo: 4, reload: 180, type: 'railgun',
              pierce: 99, railWidth: 6, railRange: 700, railFadeStart: 500 },
   sniper:  { name: 'SNIPER', nameZh: '大口径狙击枪',
-             damage: 150, fireRate: 900, bulletSpeed: 36, spread: 0,    auto: false, pellets: 1, jitter: 0,
+             damage: 220, fireRate: 900, bulletSpeed: 40, spread: 0,    auto: false, pellets: 1, jitter: 0,
              color: '#ffcc44', weaponClass: 'heavy', maxAmmo: 8, reload: 120, type: 'sniper',
-             pierce: 6, sniperRange: 600, sniperFadeStart: 450, eliteMult: 2.0, bossMult: 2.0 }
+             pierce: 0, sniperRange: 600, sniperFadeStart: 450, eliteMult: 2.0, bossMult: 2.0 }
 };
 
 // Heavy weapon movespeed penalty
@@ -1799,7 +1799,7 @@ const CLASSES = {
     startAmmo: { sniper: 5 },
     dashCooldownMult: 0.9,
     passive: 'sniper',
-    spaceAbility: 'pulse'
+    spaceAbility: 'airstrike'
   },
   berserker: {
     name: 'berserker', nameZh: '狂战士',
@@ -1866,6 +1866,7 @@ let mines = [];
 let grenades = [];
 let barricades = [];
 let pulseWaves = [];
+let airstrikes = [];
 let crates = [];
 let particles = [];
 let pickups = [];
@@ -2173,9 +2174,9 @@ function tryShoot() {
       explodeDamage: (w.explodeDamage || 0) * player.damageMult * rageMult * frenzyDmgMult * classDmgMod,
       fragments: w.fragments || 0,
       fragmentDamage: (w.fragmentDamage || 0) * player.damageMult * rageMult * frenzyDmgMult * classDmgMod,
-      // 火焰枪/激光枪/电磁枪：穿透型参数
-      pierce: (isFlame || isLaser || isTesla || isRailgun || isSniper) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
-      hitTargets: (isFlame || isLaser || isTesla || isRailgun || isSniper) ? [] : null,
+      // 火焰枪/激光枪/电磁枪/轨道炮：穿透型参数（狙击枪不穿透）
+      pierce: (isFlame || isLaser || isTesla || isRailgun) ? (w.pierce || 0) + (isFlame ? player.upgrades.pierceBonus : 0) : 0,
+      hitTargets: (isFlame || isLaser || isTesla || isRailgun) ? [] : null,
       distTraveled: 0,
       // 吸血：子弹携带吸血标记
       lifesteal: player.upgrades.lifesteal,
@@ -2254,6 +2255,26 @@ function placeMine() {
     // 重装机兵：放置路障（阻挡僵尸，有HP）
     player.mines--;
     barricades.push({ x: player.x + Math.cos(player.angle) * 35, y: player.y + Math.sin(player.angle) * 35, hp: 200, maxHp: 200, angle: player.angle });
+  } else if (abilityType === 'airstrike') {
+    // 狙击手：空中打击（呼叫5波集束轰炸，覆盖玩家周围大范围区域）
+    player.mines--;
+    const baseDmg = 120 * player.damageMult;
+    for (let wave = 0; wave < 5; wave++) {
+      for (let k = 0; k < 3; k++) {
+        const ang = Math.random() * Math.PI * 2;
+        const r = 40 + Math.random() * 250;
+        const tx = player.x + Math.cos(ang) * r;
+        const ty = player.y + Math.sin(ang) * r;
+        airstrikes.push({
+          x: tx, y: ty,
+          delay: wave * 25 + k * 8,
+          radius: 70,
+          damage: baseDmg,
+          detonated: false
+        });
+      }
+    }
+    addShake(8);
   } else if (abilityType === 'pulse') {
     // 狙击手：脉冲波（前方直线秒杀普通僵尸，对精英和BOSS造成大量伤害）
     player.mines--;
@@ -2911,6 +2932,7 @@ function update(dt) {
   updateGrenades(dt);
   updateBarricades(dt);
   updatePulseWaves(dt);
+  updateAirstrikes(dt);
   updatePoisonProjectiles(dt);
   updatePoisonPools(dt);
   updateFirePools(dt);
@@ -4292,8 +4314,8 @@ function updateBullets(dt) {
     for (let j = zombies.length - 1; j >= 0; j--) {
       const z = zombies[j];
       if (!circleCollide(b, z)) continue;
-      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮/狙击枪）：已命中的目标跳过，避免重复伤害
-      if ((b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun' || b.weaponType === 'sniper') && b.hitTargets && b.hitTargets.includes(z)) continue;
+      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：已命中的目标跳过，避免重复伤害
+      if ((b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') && b.hitTargets && b.hitTargets.includes(z)) continue;
 
       // 狙击枪：对精英/BOSS额外伤害加成
       let sniperBonus = 1;
@@ -4371,9 +4393,9 @@ function updateBullets(dt) {
         }
       }
 
-      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：记录命中，消耗穿透次数；其他武器命中即消失
+      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：记录命中，消耗穿透次数；狙击枪命中即消失
       let bulletDestroyed = false;
-      if (b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun' || b.weaponType === 'sniper') {
+      if (b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') {
         if (b.hitTargets) b.hitTargets.push(z);
         b.pierce--;
         if (b.pierce < 0) { bullets.splice(i, 1); bulletDestroyed = true; }
@@ -4607,6 +4629,34 @@ function updatePulseWaves(dt) {
     const p = pulseWaves[i];
     p.life -= dt;
     if (p.life <= 0) pulseWaves.splice(i, 1);
+  }
+}
+
+// =====================================================================
+// AIRSTRIKES - 空中打击系统（狙击手专属）
+// =====================================================================
+function updateAirstrikes(dt) {
+  for (let i = airstrikes.length - 1; i >= 0; i--) {
+    const a = airstrikes[i];
+    a.delay -= dt;
+    if (a.delay <= 0 && !a.detonated) {
+      a.detonated = true;
+      // 爆炸效果
+      explodeAt(a.x, a.y, a.radius, a.damage, true);
+      // 额外火花粒子
+      for (let k = 0; k < 8; k++) {
+        const ang = Math.random() * Math.PI * 2;
+        const spd = 3 + Math.random() * 5;
+        particles.push({
+          x: a.x, y: a.y,
+          vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+          life: 15 + Math.random() * 10, maxLife: 25,
+          size: 2 + Math.random() * 3,
+          color: Math.random() < 0.5 ? '#ffaa44' : '#ffdd66'
+        });
+      }
+      airstrikes.splice(i, 1);
+    }
   }
 }
 
@@ -7740,6 +7790,7 @@ function drawPlayer() {
       cloak: lang === 'zh' ? '隐身' : 'CLOAK',
       barricade: lang === 'zh' ? '路障' : 'WALL',
       pulse: lang === 'zh' ? '脉冲' : 'PULSE',
+      airstrike: lang === 'zh' ? '空袭' : 'STRIKE',
       frenzy: lang === 'zh' ? '狂热' : 'FREN',
       mine: lang === 'zh' ? '地雷' : 'MINE'
     };
@@ -8606,6 +8657,7 @@ function startGame() {
   grenades = [];
   barricades = [];
   pulseWaves = [];
+  airstrikes = [];
   damageNumbers = [];
   barrels = [];
   terrainFeatures = [];
