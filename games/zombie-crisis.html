@@ -1477,36 +1477,36 @@ const SECONDARY_AMMO = {
   hmg: 30,
   shotgun: 8,
   flamethrower: 20,
-  rocket: 3,
+  rocket: 2,
   laser: 15,
   homing: 6,
-  grenade: 3,
-  micro_rocket: 8,
+  grenade: 2,
+  micro_rocket: 10,
   tesla: 25,
   acid: 30,
   railgun: 4,
   sniper: 5,
   plasma: 6,
   cryo: 25,
-  flak: 15
+  flak: 20
 };
 // 备弹总量（总子弹数，不含弹匣内）
 const TOTAL_SPARE_AMMO = {
   hmg: 120,
   shotgun: 32,
   flamethrower: 80,
-  rocket: 9,
+  rocket: 8,
   laser: 60,
   homing: 24,
-  grenade: 9,
-  micro_rocket: 32,
+  grenade: 8,
+  micro_rocket: 40,
   tesla: 75,
   acid: 90,
   railgun: 8,
   sniper: 15,
   plasma: 18,
   cryo: 75,
-  flak: 45
+  flak: 60
 };
 const ammo = {
   pistol: Infinity,
@@ -1566,9 +1566,9 @@ const WEAPONS = {
              firePoolRadius: 32, firePoolLife: 240, firePoolDps: 0.3,
              pierce: 5, flameRange: 220, flameFadeStart: 140 },
   rocket:  { name: 'ROCKET', nameZh: '火箭筒',
-             damage: 80, fireRate: 800, bulletSpeed: 10, spread: 0,    auto: false, pellets: 1, jitter: 0,
-             color: '#cc3322', weaponClass: 'heavy', maxAmmo: 5, reload: 150, type: 'rocket',
-             explodeRadius: 90, explodeDamage: 60 },
+             damage: 120, fireRate: 900, bulletSpeed: 12, spread: 0,    auto: false, pellets: 1, jitter: 0,
+             color: '#cc3322', weaponClass: 'heavy', maxAmmo: 4, reload: 160, type: 'rocket',
+             explodeRadius: 75, explodeDamage: 50, rocketPierce: 1 },
   // ===== 第二副武器（第5波BOSS战解锁）=====
   laser:   { name: 'PULSE', nameZh: '脉冲炮',
              damage: 45, fireRate: 200, bulletSpeed: 28, spread: 0,    auto: false, pellets: 1, jitter: 0,
@@ -1579,13 +1579,13 @@ const WEAPONS = {
              color: '#ff66dd', weaponClass: 'light', maxAmmo: 18, reload: 80, type: 'homing',
              homingTurn: 0.35, homingRange: 800, explodeRadius: 65, explodeDamage: 50, pierce: 1 },
   grenade: { name: 'NADE', nameZh: '超级榴弹',
-             damage: 60, fireRate: 900, bulletSpeed: 8, spread: 0,    auto: false, pellets: 1, jitter: 0,
-             color: '#88dd44', weaponClass: 'heavy', maxAmmo: 5, reload: 140, type: 'grenade',
-             explodeRadius: 120, explodeDamage: 80, fragments: 6, fragmentDamage: 20 },
+             damage: 30, fireRate: 1000, bulletSpeed: 8, spread: 0,    auto: false, pellets: 1, jitter: 0,
+             color: '#88dd44', weaponClass: 'heavy', maxAmmo: 4, reload: 160, type: 'grenade',
+             explodeRadius: 130, explodeDamage: 90, fragments: 8, fragmentDamage: 15, fragmentExplodeRadius: 40, fragmentExplodeDamage: 20 },
   micro_rocket: { name: 'MICRO', nameZh: '微型火箭',
-             damage: 35, fireRate: 280, bulletSpeed: 14, spread: 0.05, auto: true,  pellets: 1, jitter: 0.03,
-             color: '#ff9944', weaponClass: 'light', maxAmmo: 12, reload: 100, type: 'micro_rocket',
-             explodeRadius: 50, explodeDamage: 25 },
+             damage: 18, fireRate: 350, bulletSpeed: 14, spread: 0.15, auto: true,  pellets: 3, jitter: 0.06,
+             color: '#ff9944', weaponClass: 'light', maxAmmo: 15, reload: 100, type: 'micro_rocket',
+             explodeRadius: 40, explodeDamage: 15, homingTurn: 0.08, homingRange: 300 },
   // ===== 新增武器 =====
   tesla:   { name: 'TESLA',  nameZh: '电磁枪',
              damage: 20, fireRate: 120, bulletSpeed: 20, spread: 0,    auto: true,  pellets: 1, jitter: 0,
@@ -1605,17 +1605,17 @@ const WEAPONS = {
              pierce: 0, sniperRange: 600, sniperFadeStart: 450, eliteMult: 2.0, bossMult: 2.0 },
   // ===== 新增武器 =====
   plasma:  { name: 'PLASMA', nameZh: '等离子炮',
-             damage: 80, fireRate: 500, bulletSpeed: 18, spread: 0, auto: false, pellets: 1, jitter: 0,
-             color: '#dd44ff', weaponClass: 'heavy', maxAmmo: 6, reload: 140, type: 'plasma',
-             explodeRadius: 80, explodeDamage: 60, pierce: 2 },
+             damage: 50, fireRate: 600, bulletSpeed: 18, spread: 0, auto: false, pellets: 1, jitter: 0,
+             color: '#dd44ff', weaponClass: 'heavy', maxAmmo: 6, reload: 150, type: 'plasma',
+             explodeRadius: 70, explodeDamage: 40, pierce: 2, plasmaPoolRadius: 60, plasmaPoolLife: 180, plasmaPoolDps: 1.5 },
   cryo:    { name: 'CRYO', nameZh: '冰冻枪',
              damage: 25, fireRate: 100, bulletSpeed: 14, spread: 0.05, auto: true, pellets: 1, jitter: 0.02,
              color: '#44ffff', weaponClass: 'light', maxAmmo: 25, reload: 80, type: 'cryo',
              slowMult: 0.3, slowDuration: 120, pierce: 3 },
   flak:    { name: 'FLAK', nameZh: '高射炮',
-             damage: 30, fireRate: 250, bulletSpeed: 16, spread: 0.12, auto: true, pellets: 5, jitter: 0.08,
-             color: '#ff8844', weaponClass: 'light', maxAmmo: 15, reload: 100, type: 'flak',
-             explodeRadius: 30, explodeDamage: 15 }
+             damage: 15, fireRate: 200, bulletSpeed: 14, spread: 0.15, auto: true, pellets: 5, jitter: 0.06,
+             color: '#ff8844', weaponClass: 'light', maxAmmo: 20, reload: 90, type: 'flak',
+             explodeRadius: 35, explodeDamage: 25 }
 };
 
 // Heavy weapon movespeed penalty
@@ -2182,7 +2182,7 @@ function tryShoot() {
     const sizeMap = { rocket: 6, flame: 16, laser: 5, homing: 7, grenade: 8, micro_rocket: 4, tesla: 4, acid: 6, railgun: 8, sniper: 7, plasma: 8, cryo: 5, flak: 4 };
     const bulletSize = sizeMap[w.type] || 3;
     // 子弹生命
-    const lifeMap = { rocket: 120, flame: 40, laser: 50, homing: 200, grenade: 100, tesla: 60, acid: 100, railgun: 30, sniper: 25, plasma: 100, cryo: 60, flak: 50 };
+    const lifeMap = { rocket: 120, flame: 40, laser: 50, homing: 200, grenade: 100, tesla: 60, acid: 100, railgun: 30, sniper: 25, plasma: 100, cryo: 60, flak: 35 };
     const bulletLife = lifeMap[w.type] || 80;
     bullets.push({
       x: muzzleX,
@@ -2241,7 +2241,16 @@ function tryShoot() {
       bossMult: w.bossMult || 0,
       // 配件附加参数
       chainLightning: w.chainLightning || 0,
-      volatileMix: w.volatileMix || false
+      volatileMix: w.volatileMix || false,
+      // 火箭筒穿甲（穿过1个敌人后爆炸）
+      rocketPierce: w.rocketPierce || 0,
+      // 碎片二次爆炸
+      fragmentExplodeRadius: w.fragmentExplodeRadius || 0,
+      fragmentExplodeDamage: w.fragmentExplodeDamage || 0,
+      // 等离子残留场
+      plasmaPoolRadius: w.plasmaPoolRadius || 0,
+      plasmaPoolLife: w.plasmaPoolLife || 0,
+      plasmaPoolDps: w.plasmaPoolDps || 0
     });
   }
 
@@ -3848,8 +3857,9 @@ function updateFirePools(dt) {
     const f = firePools[i];
     f.life -= dt;
     f.tickTimer -= dt;
-    // 火焰粒子
+    // 火焰粒子（等离子场用紫色）
     if (Math.random() < 0.4) {
+      const isPlasma = f.isPlasma;
       particles.push({
         x: f.x + (Math.random() - 0.5) * f.radius * 0.8,
         y: f.y + (Math.random() - 0.5) * f.radius * 0.8,
@@ -3858,7 +3868,7 @@ function updateFirePools(dt) {
         life: 12 + Math.random() * 8,
         maxLife: 20,
         size: 2 + Math.random() * 2,
-        color: Math.random() < 0.5 ? '#ff4422' : '#ffaa33'
+        color: isPlasma ? (Math.random() < 0.5 ? '#aa22ff' : '#dd88ff') : (Math.random() < 0.5 ? '#ff4422' : '#ffaa33')
       });
     }
     // 每30帧（0.5秒）对范围内僵尸造成伤害并点燃
@@ -4372,7 +4382,7 @@ function updateBullets(dt) {
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
     // 追踪弹：每2帧寻找最近僵尸并调整方向（更快反应）
-    if (b.weaponType === 'homing' && b.homingTurn > 0) {
+    if ((b.weaponType === 'homing' || b.weaponType === 'micro_rocket') && b.homingTurn > 0) {
       b.homingTimer = (b.homingTimer || 0) + dt;
       if (b.homingTimer >= 2) {
         b.homingTimer = 0;
@@ -4438,7 +4448,11 @@ function updateBullets(dt) {
       // 爆炸型武器命中木箱也爆炸
       if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
         explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
-        // 榴弹：爆炸后散播破片
+        // 等离子炮：爆炸后留下等离子残留场
+        if (b.weaponType === 'plasma' && b.plasmaPoolRadius > 0) {
+          firePools.push({ x: b.x, y: b.y, radius: b.plasmaPoolRadius, life: b.plasmaPoolLife, maxLife: b.plasmaPoolLife, dps: b.plasmaPoolDps, tickTimer: 0, isPlasma: true });
+        }
+        // 榴弹：爆炸后散播破片（每枚碎片也有小爆炸）
         if (b.weaponType === 'grenade' && b.fragments > 0) {
           for (let f = 0; f < b.fragments; f++) {
             const fAng = (Math.PI * 2 / b.fragments) * f;
@@ -4446,11 +4460,14 @@ function updateBullets(dt) {
               x: b.x, y: b.y, vx: Math.cos(fAng) * 8, vy: Math.sin(fAng) * 8,
               damage: b.fragmentDamage, radius: 2, color: '#ffcc44', life: 20,
               from: 'player', weaponType: 'fragment', isCrit: false,
-              explodeRadius: 0, explodeDamage: 0, fragments: 0, fragmentDamage: 0,
+              explodeRadius: b.fragmentExplodeRadius || 0, explodeDamage: b.fragmentExplodeDamage || 0, fragments: 0, fragmentDamage: 0,
               pierce: 0, hitTargets: null, distTraveled: 0, lifesteal: 0,
               flameRange: 0, flameFadeStart: 0, laserRange: 0, laserFadeStart: 0,
               burnDuration: 0, burnDps: 0, firePoolRadius: 0, firePoolLife: 0, firePoolDps: 0,
-              homingTurn: 0, homingRange: 0, homingTimer: 0
+              homingTurn: 0, homingRange: 0, homingTimer: 0,
+              chainLightning: 0, volatileMix: false,
+              rocketPierce: 0, fragmentExplodeRadius: 0, fragmentExplodeDamage: 0,
+              plasmaPoolRadius: 0, plasmaPoolLife: 0, plasmaPoolDps: 0
             });
           }
         }
@@ -4546,9 +4563,17 @@ function updateBullets(dt) {
       }
       // 轨道炮：超高穿透，命中不消失
       // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹/等离子/高射炮）：命中爆炸
-      if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
+      // 火箭筒特殊：穿甲阶段（rocketPierce>0）只造成直击伤害不爆炸，穿透后才爆炸
+      if (b.weaponType === 'rocket' && b.rocketPierce > 0) {
+        // 穿甲阶段：只造成直击伤害，不爆炸，不消失
+        b.rocketPierce--;
+      } else if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
         explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
-        // 榴弹：爆炸后散播破片
+        // 等离子炮：爆炸后留下等离子残留场
+        if (b.weaponType === 'plasma' && b.plasmaPoolRadius > 0) {
+          firePools.push({ x: b.x, y: b.y, radius: b.plasmaPoolRadius, life: b.plasmaPoolLife, maxLife: b.plasmaPoolLife, dps: b.plasmaPoolDps, tickTimer: 0, isPlasma: true });
+        }
+        // 榴弹：爆炸后散播破片（每枚碎片也有小爆炸）
         if (b.weaponType === 'grenade' && b.fragments > 0) {
           for (let f = 0; f < b.fragments; f++) {
             const fAng = (Math.PI * 2 / b.fragments) * f;
@@ -4556,7 +4581,7 @@ function updateBullets(dt) {
               x: b.x, y: b.y, vx: Math.cos(fAng) * 8, vy: Math.sin(fAng) * 8,
               damage: b.fragmentDamage, radius: 2, color: '#ffcc44', life: 20,
               from: 'player', weaponType: 'fragment', isCrit: false,
-              explodeRadius: 0, explodeDamage: 0, fragments: 0, fragmentDamage: 0,
+              explodeRadius: b.fragmentExplodeRadius || 0, explodeDamage: b.fragmentExplodeDamage || 0, fragments: 0, fragmentDamage: 0,
               pierce: 0, hitTargets: null, distTraveled: 0, lifesteal: 0,
               flameRange: 0, flameFadeStart: 0, laserRange: 0, laserFadeStart: 0,
               burnDuration: 0, burnDps: 0, firePoolRadius: 0, firePoolLife: 0, firePoolDps: 0,
@@ -4564,18 +4589,23 @@ function updateBullets(dt) {
               chainRange: 0, chainDamage: 0, chainCount: 0,
               acidRadius: 0, acidLife: 0, acidDps: 0, slowMult: 0,
               railWidth: 0, railRange: 0, railFadeStart: 0,
-              chainLightning: 0, volatileMix: false
+              chainLightning: 0, volatileMix: false,
+              rocketPierce: 0, fragmentExplodeRadius: 0, fragmentExplodeDamage: 0,
+              plasmaPoolRadius: 0, plasmaPoolLife: 0, plasmaPoolDps: 0
             });
           }
         }
       }
 
-      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：记录命中，消耗穿透次数；狙击枪命中即消失
+      // 穿透型武器（火焰枪/激光枪/电磁枪/轨道炮）：记录命中，消耗穿透次数
+      // 火箭筒穿甲阶段：不消失；其他武器命中即消失
       let bulletDestroyed = false;
       if (b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') {
         if (b.hitTargets) b.hitTargets.push(z);
         b.pierce--;
         if (b.pierce < 0) { bullets.splice(i, 1); bulletDestroyed = true; }
+      } else if (b.weaponType === 'rocket' && b.rocketPierce > 0) {
+        // 火箭筒穿甲阶段：继续飞行，不消失
       } else {
         bullets.splice(i, 1); bulletDestroyed = true;
       }
@@ -4698,9 +4728,16 @@ function updateBullets(dt) {
           boss.burnDps = b.burnDps;
         }
         // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹/等离子/高射炮）：命中爆炸
-        if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
+        // 火箭筒穿甲阶段：只造成直击伤害不爆炸
+        if (b.weaponType === 'rocket' && b.rocketPierce > 0) {
+          b.rocketPierce--;
+        } else if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
           explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
-          // 榴弹：爆炸后散播破片
+          // 等离子炮：爆炸后留下等离子残留场
+          if (b.weaponType === 'plasma' && b.plasmaPoolRadius > 0) {
+            firePools.push({ x: b.x, y: b.y, radius: b.plasmaPoolRadius, life: b.plasmaPoolLife, maxLife: b.plasmaPoolLife, dps: b.plasmaPoolDps, tickTimer: 0, isPlasma: true });
+          }
+          // 榴弹：爆炸后散播破片（每枚碎片也有小爆炸）
           if (b.weaponType === 'grenade' && b.fragments > 0) {
             for (let f = 0; f < b.fragments; f++) {
               const fAng = (Math.PI * 2 / b.fragments) * f;
@@ -4708,17 +4745,20 @@ function updateBullets(dt) {
                 x: b.x, y: b.y, vx: Math.cos(fAng) * 8, vy: Math.sin(fAng) * 8,
                 damage: b.fragmentDamage, radius: 2, color: '#ffcc44', life: 20,
                 from: 'player', weaponType: 'fragment', isCrit: false,
-                explodeRadius: 0, explodeDamage: 0, fragments: 0, fragmentDamage: 0,
+                explodeRadius: b.fragmentExplodeRadius || 0, explodeDamage: b.fragmentExplodeDamage || 0, fragments: 0, fragmentDamage: 0,
                 pierce: 0, hitTargets: null, distTraveled: 0, lifesteal: 0,
                 flameRange: 0, flameFadeStart: 0, laserRange: 0, laserFadeStart: 0,
                 burnDuration: 0, burnDps: 0, firePoolRadius: 0, firePoolLife: 0, firePoolDps: 0,
-                homingTurn: 0, homingRange: 0, homingTimer: 0
+                homingTurn: 0, homingRange: 0, homingTimer: 0,
+                chainLightning: 0, volatileMix: false,
+                rocketPierce: 0, fragmentExplodeRadius: 0, fragmentExplodeDamage: 0,
+                plasmaPoolRadius: 0, plasmaPoolLife: 0, plasmaPoolDps: 0
               });
             }
           }
         }
-        // 非穿透武器命中BOSS消失，穿透武器继续（火焰枪/激光枪）
-        if (b.weaponType !== 'flame' && b.weaponType !== 'laser') {
+        // 非穿透武器命中BOSS消失，穿透武器继续（火焰枪/激光枪/火箭筒穿甲阶段）
+        if (b.weaponType !== 'flame' && b.weaponType !== 'laser' && !(b.weaponType === 'rocket' && b.rocketPierce > 0)) {
           bullets.splice(i, 1);
           hit = true;
         } else {
@@ -5261,18 +5301,18 @@ function updatePickups(dt) {
         if (player.ownedWeapons.includes('hmg')) spareAmmo.hmg = Math.min(TOTAL_SPARE_AMMO.hmg, spareAmmo.hmg + 30);
         if (player.ownedWeapons.includes('shotgun')) spareAmmo.shotgun = Math.min(TOTAL_SPARE_AMMO.shotgun, spareAmmo.shotgun + 8);
         if (player.ownedWeapons.includes('flamethrower')) spareAmmo.flamethrower = Math.min(TOTAL_SPARE_AMMO.flamethrower, spareAmmo.flamethrower + 20);
-        if (player.ownedWeapons.includes('rocket')) spareAmmo.rocket = Math.min(TOTAL_SPARE_AMMO.rocket, spareAmmo.rocket + 2);
+        if (player.ownedWeapons.includes('rocket')) spareAmmo.rocket = Math.min(TOTAL_SPARE_AMMO.rocket, spareAmmo.rocket + 1);
         if (player.ownedWeapons.includes('laser')) spareAmmo.laser = Math.min(TOTAL_SPARE_AMMO.laser, spareAmmo.laser + 15);
         if (player.ownedWeapons.includes('homing')) spareAmmo.homing = Math.min(TOTAL_SPARE_AMMO.homing, spareAmmo.homing + 6);
-        if (player.ownedWeapons.includes('grenade')) spareAmmo.grenade = Math.min(TOTAL_SPARE_AMMO.grenade, spareAmmo.grenade + 2);
-        if (player.ownedWeapons.includes('micro_rocket')) spareAmmo.micro_rocket = Math.min(TOTAL_SPARE_AMMO.micro_rocket, spareAmmo.micro_rocket + 8);
+        if (player.ownedWeapons.includes('grenade')) spareAmmo.grenade = Math.min(TOTAL_SPARE_AMMO.grenade, spareAmmo.grenade + 1);
+        if (player.ownedWeapons.includes('micro_rocket')) spareAmmo.micro_rocket = Math.min(TOTAL_SPARE_AMMO.micro_rocket, spareAmmo.micro_rocket + 10);
         if (player.ownedWeapons.includes('tesla')) spareAmmo.tesla = Math.min(TOTAL_SPARE_AMMO.tesla, spareAmmo.tesla + 15);
         if (player.ownedWeapons.includes('acid')) spareAmmo.acid = Math.min(TOTAL_SPARE_AMMO.acid, spareAmmo.acid + 15);
         if (player.ownedWeapons.includes('railgun')) spareAmmo.railgun = Math.min(TOTAL_SPARE_AMMO.railgun, spareAmmo.railgun + 2);
         if (player.ownedWeapons.includes('sniper')) spareAmmo.sniper = Math.min(TOTAL_SPARE_AMMO.sniper, spareAmmo.sniper + 3);
         if (player.ownedWeapons.includes('plasma')) spareAmmo.plasma = Math.min(TOTAL_SPARE_AMMO.plasma, spareAmmo.plasma + 3);
         if (player.ownedWeapons.includes('cryo')) spareAmmo.cryo = Math.min(TOTAL_SPARE_AMMO.cryo, spareAmmo.cryo + 15);
-        if (player.ownedWeapons.includes('flak')) spareAmmo.flak = Math.min(TOTAL_SPARE_AMMO.flak, spareAmmo.flak + 10);
+        if (player.ownedWeapons.includes('flak')) spareAmmo.flak = Math.min(TOTAL_SPARE_AMMO.flak, spareAmmo.flak + 15);
         playPickup();
       } else if (p.type.startsWith('buff_')) {
         const buffType = p.type.slice(5);
@@ -6658,6 +6698,19 @@ function drawPoisonPool(pool) {
 function drawFirePool(f) {
   const alpha = Math.min(1, f.life / 60);
   const flicker = 0.85 + Math.sin(performance.now() * 0.02) * 0.15;
+  if (f.isPlasma) {
+    // 等离子残留场：紫色
+    pxCircle(f.x, f.y, f.radius, `rgba(180,40,255,${alpha * 0.4 * flicker})`);
+    pxCircle(f.x, f.y, f.radius * 0.4, `rgba(220,120,255,${alpha * 0.5 * flicker})`);
+    const time = performance.now() * 0.01;
+    for (let i = 0; i < 3; i++) {
+      const a = i * 2.1 + time;
+      const sx = f.x + Math.cos(a) * f.radius * 0.3;
+      const sy = f.y + Math.sin(a) * f.radius * 0.3;
+      pxRect(sx - 1, sy - 1, 2, 2, `rgba(255,200,255,${alpha * 0.6 * flicker})`);
+    }
+    return;
+  }
   // Flat color fire pool (pixel style - no gradient)
   pxCircle(f.x, f.y, f.radius, `rgba(255,80,30,${alpha * 0.5 * flicker})`);
   // Center bright area
