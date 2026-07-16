@@ -407,13 +407,23 @@
     trending: GAMES.filter(function (g) { return g.trending; }),
     categories: ['All', 'Action', 'Puzzle', 'Arcade', 'Strategy', 'Adventure'],
     categoryGradients: CATEGORY_GRADIENTS,
+    // Escape HTML special characters to prevent XSS when interpolating into innerHTML
+    escapeHtml: function (s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    },
     // Render a cover block with real image (gradient fallback)
     coverHtml: function (g) {
-      var t = (g.title && g.title.en) ? g.title.en : g.slug;
-      var sub = (g.subtitle && g.subtitle.en) ? g.subtitle.en : '';
+      var esc = this.escapeHtml;
+      var t = (g.title && g.title.en) ? esc(g.title.en) : esc(g.slug);
+      var sub = (g.subtitle && g.subtitle.en) ? esc(g.subtitle.en) : '';
       return ''
         + '<div class="game-cover" style="background: linear-gradient(135deg, ' + g.gradient[0] + ' 0%, ' + g.gradient[1] + ' 100%);">'
-        +   '<img src="../assets/covers/' + g.slug + '.jpg" alt="' + t + ' cover art" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display=&quot;none&quot;;this.nextElementSibling.style.display=&quot;flex&quot;">'
+        +   '<img src="../assets/covers/' + esc(g.slug) + '.jpg" alt="' + t + ' cover art" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;" onerror="this.style.display=&quot;none&quot;;this.nextElementSibling.style.display=&quot;flex&quot;">'
         +   '<div class="game-cover-inner" style="display:none;">'
         +     '<span class="game-cover-title">' + t + '</span>'
         +     (sub ? '<span class="game-cover-sub">' + sub + '</span>' : '')

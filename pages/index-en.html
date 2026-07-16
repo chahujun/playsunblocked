@@ -92,7 +92,7 @@
         font-weight: var(--weight-bold);
         font-size: var(--text-base);
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-sm);
+        border-radius: var(--brand-radius-sm);
         box-shadow: var(--brutalist-shadow-sm);
         cursor: pointer;
         text-decoration: none;
@@ -133,7 +133,7 @@
         font-weight: var(--weight-bold);
         font-size: var(--text-base);
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         cursor: pointer;
         text-decoration: none;
         white-space: nowrap;
@@ -216,7 +216,7 @@
         font-weight: var(--weight-bold);
         font-size: var(--text-sm);
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-sm);
+        border-radius: var(--brand-radius-sm);
         box-shadow: 2px 2px 0 0 var(--color-border);
         cursor: pointer;
         white-space: nowrap;
@@ -243,7 +243,7 @@
         width: 56px;
         height: 56px;
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         background: var(--color-surface);
         box-shadow: var(--brutalist-shadow-sm);
       }
@@ -279,7 +279,7 @@
       .view-all-link:focus-visible {
         outline: 3px solid var(--color-primary);
         outline-offset: 2px;
-        border-radius: var(--radius-sm);
+        border-radius: var(--brand-radius-sm);
       }
 
       /* ---- Game card thumbnail tag ---- */
@@ -322,7 +322,7 @@
         border-radius: var(--radius-full);
         background: var(--color-surface-alt);
         color: var(--color-text-secondary);
-        font-family: var(--font-mono);
+        font-family: var(--brand-font-mono);
         font-size: 11px;
         font-weight: var(--weight-medium);
         white-space: nowrap;
@@ -352,10 +352,10 @@
         gap: 8px;
         padding: 12px 16px;
         border: 2px solid var(--color-bg);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         background: transparent;
         color: var(--color-bg);
-        font-family: var(--font-sans);
+        font-family: var(--brand-font-sans);
         font-size: var(--text-sm);
       }
       .footer-honest-note a {
@@ -447,7 +447,7 @@
     <header id="site-header" data-dom-id="site-header" class="sticky top-0 z-50 w-full" style="height: var(--header-height); background: var(--color-bg); border-bottom: 2px solid var(--color-border); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
       <div class="mx-auto flex h-full items-center gap-4 px-6 lg:gap-6" style="max-width: var(--max-width);">
         <a href="index-en.html" data-dom-id="nav-logo" class="flex shrink-0 items-center gap-2" aria-label="playsunblocked home">
-          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
+          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="2" y="6" width="20" height="12" rx="4"/>
               <line x1="6" y1="12" x2="10" y2="12"/>
@@ -477,7 +477,7 @@
         </button>
         <div class="relative hidden sm:flex flex-1 items-center max-w-xs">
           <i data-lucide="search" class="absolute left-3 pointer-events-none" style="width: 18px; height: 18px; color: var(--color-text-tertiary);" aria-hidden="true"></i>
-          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="Search games..." aria-label="Search games">
+          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="Search games..." aria-label="Search games">
         </div>
         <div class="flex shrink-0 items-center gap-3">
           <button type="button" data-dom-id="lang-toggle" class="gh-lang-btn flex items-center gap-1.5" style="height: 36px; padding: 0 12px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-surface); font-family: var(--font-display); font-size: var(--text-sm);" aria-label="Switch language">
@@ -512,7 +512,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 items-center" style="padding-top: 64px; padding-bottom: 80px;">
           <div class="lg:col-span-3 flex flex-col gap-6">
             <h1 class="hero-headline">BANNED AT SCHOOL? WE WON'T TELL.</h1>
-            <p class="font-sans" style="font-size: var(--text-lg); line-height: var(--leading-relaxed); color: var(--color-text-secondary); max-width: 520px;">
+            <p class="font-sans" style="font-size: var(--text-lg); line-height: var(--brand-leading-relaxed); color: var(--color-text-secondary); max-width: 520px;">
               17 browser games that actually work on school Chromebooks and office WiFi. No sign-up. No downloads. No snitching.
             </p>
             <div class="flex flex-wrap items-center gap-4">
@@ -614,17 +614,17 @@
       <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
         <div class="mb-10">
           <h2 class="section-heading">Why Students Love Us</h2>
-          <p class="font-sans mt-3" style="font-size: var(--text-base); color: var(--color-text-secondary); line-height: var(--leading-relaxed); max-width: 480px;">
+          <p class="font-sans mt-3" style="font-size: var(--text-base); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed); max-width: 480px;">
             We get it. Study hall is boring. Your break is short. We built this for you.
           </p>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="brutalist-card flex flex-col gap-4 p-6" style="border-radius: var(--radius-sm);">
+          <div class="brutalist-card flex flex-col gap-4 p-6" style="border-radius: var(--brand-radius-sm);">
             <div class="feature-icon-tile">
               <i data-lucide="shield" style="width:28px;height:28px;color:var(--color-primary);" aria-hidden="true"></i>
             </div>
             <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xl); color: var(--color-text);">Unblocked Everywhere</h3>
-            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed);">
               School WiFi blocking your favorite games? Not anymore. Our games bypass network restrictions so you can play anywhere, anytime.
             </p>
           </div>
@@ -633,16 +633,16 @@
               <i data-lucide="user-x" style="width:28px;height:28px;color:var(--color-primary);" aria-hidden="true"></i>
             </div>
             <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xl); color: var(--color-text);">Zero Sign-Up</h3>
-            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed);">
               No accounts, no emails, no tracking. Click and play. Your privacy stays yours &mdash; we don't even want to know who you are.
             </p>
           </div>
-          <div class="brutalist-card flex flex-col gap-4 p-6" style="border-radius: var(--radius-md);">
+          <div class="brutalist-card flex flex-col gap-4 p-6" style="border-radius: var(--brand-radius-md);">
             <div class="feature-icon-tile">
               <i data-lucide="laptop" style="width:28px;height:28px;color:var(--color-primary);" aria-hidden="true"></i>
             </div>
             <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xl); color: var(--color-text);">Chromebook Optimized</h3>
-            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed);">
               Every game is tested on school Chromebooks. Keyboard controls, touch support, and low-bandwidth modes built in. No lag, no crashes.
             </p>
           </div>
@@ -658,7 +658,7 @@
       <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
         <div class="mb-10">
           <h2 class="section-heading">Perfect for Your Break</h2>
-          <p class="font-sans mt-3" style="font-size: var(--text-base); color: var(--color-text-secondary); line-height: var(--leading-relaxed); max-width: 480px;">
+          <p class="font-sans mt-3" style="font-size: var(--text-base); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed); max-width: 480px;">
             Got 5 minutes? We've got a game for that.
           </p>
         </div>
@@ -668,7 +668,7 @@
               <i data-lucide="timer" style="width:28px;height:28px;color:var(--color-primary);" aria-hidden="true"></i>
             </div>
             <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xl); color: var(--color-text);">Quick Fix (2-5 min)</h3>
-            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed);">
               Bathroom break? Quick round between classes? These games load fast and play faster.
             </p>
             <div class="flex flex-wrap items-center gap-2 mt-auto pt-2">
@@ -676,12 +676,12 @@
               <span class="duration-game-chip">Event Horizon</span>
             </div>
           </div>
-          <div class="brutalist-card flex flex-col gap-4 p-6 md:col-span-2" style="border-radius: var(--radius-sm);">
+          <div class="brutalist-card flex flex-col gap-4 p-6 md:col-span-2" style="border-radius: var(--brand-radius-sm);">
             <div class="feature-icon-tile">
               <i data-lucide="coffee" style="width:28px;height:28px;color:var(--color-primary);" aria-hidden="true"></i>
             </div>
             <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xl); color: var(--color-text);">Lunch Break (10-15 min)</h3>
-            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed);">
               Got time for a real session? These games have enough depth to fill your lunch period.
             </p>
             <div class="flex flex-wrap items-center gap-2 mt-auto pt-2">
@@ -689,12 +689,12 @@
               <span class="duration-game-chip">Pawn Protocol</span>
             </div>
           </div>
-          <div class="brutalist-card flex flex-col gap-4 p-6 md:col-span-1" style="border-radius: var(--radius-md);">
+          <div class="brutalist-card flex flex-col gap-4 p-6 md:col-span-1" style="border-radius: var(--brand-radius-md);">
             <div class="feature-icon-tile">
               <i data-lucide="book-open" style="width:28px;height:28px;color:var(--color-primary);" aria-hidden="true"></i>
             </div>
             <h3 class="font-display" style="font-weight: var(--weight-bold); font-size: var(--text-xl); color: var(--color-text);">Study Hall Marathon (30+ min)</h3>
-            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--leading-relaxed);">
+            <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: var(--brand-leading-relaxed);">
               Teacher's absent? Sub doesn't care? Settle in for a long session with these deep games.
             </p>
             <div class="flex flex-wrap items-center gap-2 mt-auto pt-2">
@@ -727,6 +727,34 @@
     <!-- END TRENDING NOW -->
 
     <!-- ========================== -->
+    <!-- START LEGAL                 -->
+    <!-- ========================== -->
+    <section id="privacy" class="mx-auto px-6 py-12" style="max-width: var(--max-width); border-top: 1px solid var(--color-border);">
+      <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em; margin-bottom: 16px;">Privacy Policy</h2>
+      <div class="font-sans" style="font-size: var(--text-sm); line-height: var(--brand-leading-relaxed); color: var(--color-text-secondary); max-width: 720px;">
+        <p style="margin-bottom: 12px;">Playsunblocked does not collect personal information. We do not require accounts, email addresses, or login. No tracking pixels, no analytics profiles, no ad networks tied to your identity.</p>
+        <p style="margin-bottom: 12px;">Game progress is stored locally in your browser via localStorage. Clearing your browser data will erase all saved progress. We do not have access to this data.</p>
+        <p>If you contact us via email, we use your email address solely to respond to your inquiry and do not retain it beyond that purpose.</p>
+      </div>
+    </section>
+    <section id="terms" class="mx-auto px-6 py-12" style="max-width: var(--max-width); border-top: 1px solid var(--color-border);">
+      <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em; margin-bottom: 16px;">Terms of Service</h2>
+      <div class="font-sans" style="font-size: var(--text-sm); line-height: var(--brand-leading-relaxed); color: var(--color-text-secondary); max-width: 720px;">
+        <p style="margin-bottom: 12px;">All games on playsunblocked are free to play. You may use this site for personal, non-commercial entertainment purposes only.</p>
+        <p style="margin-bottom: 12px;">We do not guarantee that all games will work on all devices or browsers. Game content is provided &ldquo;as is&rdquo; without warranty of any kind.</p>
+        <p>Do not attempt to disrupt, reverse-engineer, or misuse the site or its games. We reserve the right to modify or remove content at any time without notice.</p>
+      </div>
+    </section>
+    <section id="cookies" class="mx-auto px-6 py-12" style="max-width: var(--max-width); border-top: 1px solid var(--color-border);">
+      <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em; margin-bottom: 16px;">Cookie Policy</h2>
+      <div class="font-sans" style="font-size: var(--text-sm); line-height: var(--brand-leading-relaxed); color: var(--color-text-secondary); max-width: 720px;">
+        <p style="margin-bottom: 12px;">Playsunblocked does not use tracking cookies. We do not run third-party ad networks or analytics that set cookies in your browser.</p>
+        <p>Your browser&rsquo;s localStorage is used to save game progress (scores, levels, settings). This data stays on your device and is never transmitted to our servers.</p>
+      </div>
+    </section>
+    <!-- END LEGAL -->
+
+    <!-- ========================== -->
     <!-- START FOOTER                -->
     <!-- ========================== -->
     <footer data-dom-id="site-footer" class="w-full" style="background: var(--color-text); color: var(--color-bg); border-top: 2px solid var(--color-primary);">
@@ -734,7 +762,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
           <div class="flex flex-col gap-4">
             <div class="flex items-center gap-2">
-              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--radius-md); color: var(--color-text-inverse);">
+              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--brand-radius-md); color: var(--color-text-inverse);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <rect x="2" y="6" width="20" height="12" rx="4"/>
                   <line x1="6" y1="12" x2="10" y2="12"/>
@@ -745,7 +773,7 @@
               </span>
               <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-xl); letter-spacing: -0.02em;">playsunblocked</span>
             </div>
-            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--leading-relaxed); color: var(--color-bg); opacity: 0.7;">
+            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--brand-leading-relaxed); color: var(--color-bg); opacity: 0.7;">
               Your daily dose of browser games. No downloads, no sign-ups — just instant play for casual gamers worldwide.
             </p>
             <div class="flex items-center gap-3" role="navigation" aria-label="Social media">
@@ -878,14 +906,15 @@
       var currentSearch = '';
 
       function makeHomeCard(g) {
+        var esc = PLAYSUNBLOCKED_GAMES.escapeHtml;
         return '<article class="brutalist-card overflow-hidden flex flex-col" style="border-radius: var(--radius-lg);">' +
-          '<a href="game-detail-en.html?slug=' + g.slug + '" style="text-decoration:none;color:inherit;display:block;">' +
+          '<a href="game-detail-en.html?slug=' + esc(g.slug) + '" style="text-decoration:none;color:inherit;display:block;">' +
           '<div class="relative" style="border-bottom: 2px solid var(--color-border); aspect-ratio: 1/1; overflow: hidden;">' +
             PLAYSUNBLOCKED_GAMES.coverHtml(g) +
-            '<span class="card-tag absolute left-2 top-2">' + g.category + '</span>' +
+            '<span class="card-tag absolute left-2 top-2">' + esc(g.category) + '</span>' +
           '</div>' +
           '<div class="flex flex-col gap-3 p-4 flex-1">' +
-            '<h3 class="font-display truncate" style="font-weight: var(--weight-bold); font-size: var(--text-lg); color: var(--color-text);">' + g.title.en + '</h3>' +
+            '<h3 class="font-display truncate" style="font-weight: var(--weight-bold); font-size: var(--text-lg); color: var(--color-text);">' + esc(g.title.en) + '</h3>' +
             '<div class="flex items-center gap-2">' +
               '<div class="flex items-center" style="gap: 2px;">' +
                 PLAYSUNBLOCKED_GAMES.starsHtml(g.rating) +
@@ -896,7 +925,7 @@
           '</a>' +
           '<div class="flex items-center justify-between gap-2 px-4 pb-4 pt-0">' +
             '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">' + g.plays + ' plays</span>' +
-            '<a href="../games/' + g.slug + '.html?lang=en" class="play-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:6px 16px;">' +
+            '<a href="../games/' + esc(g.slug) + '.html?lang=en" class="play-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:6px 16px;">' +
               '<i data-lucide="play" style="width:12px;height:12px;" aria-hidden="true"></i>PLAY' +
             '</a>' +
           '</div>' +

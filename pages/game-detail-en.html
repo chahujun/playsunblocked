@@ -120,7 +120,7 @@
         transition: color 0.15s ease;
       }
       .crumb-link:hover { color: var(--color-primary-hover); text-decoration: underline; text-underline-offset: 3px; }
-      .crumb-link:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+      .crumb-link:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--brand-radius-sm); }
       .crumb-sep { color: var(--color-text-tertiary); font-weight: var(--weight-bold); font-size: var(--text-sm); }
       .crumb-current { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; }
 
@@ -157,7 +157,7 @@
         border-bottom: 1px solid var(--color-border-light);
       }
       .info-row:last-child { border-bottom: none; }
-      .info-label { font-family: var(--font-sans); font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }
+      .info-label { font-family: var(--brand-font-sans); font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }
       .info-value { font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); text-align: right; }
 
       /* ---- Step number circle ---- */
@@ -170,7 +170,7 @@
         min-width: 40px;
         background: var(--color-primary);
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         color: var(--color-text-inverse);
         font-family: var(--font-display);
         font-weight: var(--weight-extrabold);
@@ -186,7 +186,7 @@
         height: 40px;
         padding: 0 14px;
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         background: var(--color-surface);
         box-shadow: var(--brutalist-shadow-sm);
         font-family: var(--font-display);
@@ -218,7 +218,7 @@
         height: 28px;
         min-width: 28px;
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         font-family: var(--font-display);
         font-weight: var(--weight-extrabold);
         font-size: var(--text-sm);
@@ -226,8 +226,8 @@
         background: var(--color-surface-alt);
       }
       .lb-rank-top { background: var(--color-primary); color: var(--color-text-inverse); border-color: var(--color-border); }
-      .lb-name { font-family: var(--font-sans); font-weight: var(--weight-semibold); font-size: var(--text-sm); color: var(--color-text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-      .lb-score { font-family: var(--font-mono); font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }
+      .lb-name { font-family: var(--brand-font-sans); font-weight: var(--weight-semibold); font-size: var(--text-sm); color: var(--color-text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .lb-score { font-family: var(--brand-font-mono); font-weight: var(--weight-medium); font-size: var(--text-sm); color: var(--color-text-secondary); white-space: nowrap; }
 
       /* ---- Like button ---- */
       .like-btn {
@@ -237,7 +237,7 @@
         height: 32px;
         padding: 0 10px;
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         background: var(--color-surface);
         font-family: var(--font-display);
         font-weight: var(--weight-bold);
@@ -270,7 +270,7 @@
         gap: 6px;
         height: 36px;
         border: 2px solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         background: var(--color-primary);
         box-shadow: var(--brutalist-shadow-sm);
         font-family: var(--font-display);
@@ -354,7 +354,7 @@
         word-break: break-word;
       }
       .game-cover-sub {
-        font-family: var(--font-sans);
+        font-family: var(--brand-font-sans);
         font-weight: var(--weight-semibold);
         font-size: clamp(11px, 1.4vw, 14px);
         letter-spacing: 0.04em;
@@ -399,7 +399,7 @@
 
         <!-- Logo: playsunblocked + geometric controller icon -->
         <a href="index-en.html" data-dom-id="nav-logo" class="flex shrink-0 items-center gap-2" aria-label="playsunblocked home">
-          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
+          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="2" y="6" width="20" height="12" rx="4"/>
               <line x1="6" y1="12" x2="10" y2="12"/>
@@ -434,7 +434,7 @@
         <!-- Search bar -->
         <div class="relative hidden sm:flex flex-1 items-center max-w-xs">
           <i data-lucide="search" class="absolute left-3 pointer-events-none" style="width: 18px; height: 18px; color: var(--color-text-tertiary);" aria-hidden="true"></i>
-          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="Search games..." aria-label="Search games">
+          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="Search games..." aria-label="Search games">
         </div>
 
         <!-- Right cluster: language toggle + user avatar (shared center alignment) -->
@@ -531,18 +531,18 @@
                     </div>
                     <span class="flex items-center gap-1.5 font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary);">
                       <i data-lucide="users" style="width: 16px; height: 16px;" aria-hidden="true"></i>
-                      <span style="font-variant-numeric: tabular-nums;">2.4M plays</span>
+                      <span data-role="plays-count" style="font-variant-numeric: tabular-nums;">2.4M plays</span>
                     </span>
                   </div>
                 </div>
 
                 <!-- Action buttons -->
                 <div class="flex items-center gap-2 shrink-0">
-                  <button type="button" class="flex items-center justify-center gap-2" style="height: 40px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);" onmouseover="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" aria-label="Add to favorites">
+                  <button type="button" class="flex items-center justify-center gap-2" style="height: 40px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);" onmouseover="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" aria-label="Add to favorites">
                     <i data-lucide="heart" style="width: 16px; height: 16px;" aria-hidden="true"></i>
                     <span>Favorite</span>
                   </button>
-                  <button type="button" class="flex items-center justify-center gap-2" style="height: 40px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);" onmouseover="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" aria-label="Fullscreen">
+                  <button type="button" class="flex items-center justify-center gap-2" style="height: 40px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s cubic-bezier(.2,.8,.2,1), box-shadow 0.1s cubic-bezier(.2,.8,.2,1);" onmouseover="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='translate(-1px,-1px)';this.style.boxShadow='var(--brutalist-shadow-md)'" aria-label="Fullscreen">
                     <i data-lucide="maximize" style="width: 16px; height: 16px;" aria-hidden="true"></i>
                     <span>Fullscreen</span>
                   </button>
@@ -552,17 +552,17 @@
 
             <!-- Platform & difficulty badges -->
             <div class="reveal flex items-center gap-2 flex-wrap">
-              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--state-success); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--state-success); border-radius: var(--brand-radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
                 <i data-lucide="monitor" style="width: 13px; height: 13px; color: var(--state-success);" aria-hidden="true"></i>PC
               </span>
-              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--brand-radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
                 <i data-lucide="laptop" style="width: 13px; height: 13px; color: var(--color-text-secondary);" aria-hidden="true"></i>Chromebook
                 <span style="color: var(--state-success); font-size: 10px; font-weight: var(--weight-bold);">Verified</span>
               </span>
-              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--brand-radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
                 <i data-lucide="smartphone" style="width: 13px; height: 13px; color: var(--color-text-secondary);" aria-hidden="true"></i>Mobile
               </span>
-              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
+              <span class="flex items-center gap-1.5" style="padding: 4px 10px; border: 1px solid var(--color-border-light); border-radius: var(--brand-radius-md); background: var(--color-surface-alt); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: 11px; color: var(--color-text); white-space: nowrap;">
                 <i data-lucide="gauge" style="width: 13px; height: 13px; color: var(--color-primary);" aria-hidden="true"></i>Difficulty: Easy
               </span>
             </div>
@@ -570,12 +570,12 @@
             <!-- How to Play card -->
             <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 24px;">
               <div class="flex items-center gap-3 mb-5">
-                <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md);">
+                <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--brand-radius-md);">
                   <i data-lucide="book-open" style="width: 18px; height: 18px; color: var(--color-text-inverse);" aria-hidden="true"></i>
                 </span>
                 <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em;">How to Play</h2>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" data-role="steps-grid">
                 <!-- Step 1 -->
                 <div class="flex items-start gap-4" style="padding: 16px; border: 2px solid var(--color-border); background: var(--color-surface-alt);">
                   <span class="step-num">1</span>
@@ -605,7 +605,7 @@
                 <i data-lucide="clock" style="width: 20px; height: 20px; color: var(--color-primary); flex-shrink: 0; margin-top: 1px;" aria-hidden="true"></i>
                 <div class="flex flex-col gap-1">
                   <h3 class="font-display" style="font-weight: var(--weight-extrabold); font-size: 16px; color: var(--color-text); letter-spacing: -0.01em;">Best Played During</h3>
-                  <p class="font-sans" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6;">Quick 5-minute sessions between classes. Progress saves automatically — close the tab and pick up where you left off.</p>
+                  <p class="font-sans" data-role="game-description" style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6;">Quick 5-minute sessions between classes. Progress saves automatically — close the tab and pick up where you left off.</p>
                 </div>
               </div>
             </div>
@@ -613,7 +613,7 @@
             <!-- Comments section -->
             <div class="reveal" style="border: 2px solid var(--color-border); background: var(--color-surface); box-shadow: var(--brutalist-shadow-md); padding: 24px;">
               <div class="flex items-center gap-3 mb-5">
-                <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md);">
+                <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--brand-radius-md);">
                   <i data-lucide="message-square" style="width: 18px; height: 18px; color: var(--color-text-inverse);" aria-hidden="true"></i>
                 </span>
                 <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em;">Comments</h2>
@@ -626,10 +626,10 @@
               <!-- Comment input -->
               <form class="mb-6" onsubmit="return false;">
                 <label for="comment-text" class="block font-sans mb-2" style="font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--color-text-secondary);">Leave a comment</label>
-                <textarea id="comment-text" class="comment-input w-full font-sans" style="min-height: 80px; padding: 12px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm); resize: vertical;" placeholder="Share your thoughts..." aria-label="Comment text"></textarea>
+                <textarea id="comment-text" class="comment-input w-full font-sans" style="min-height: 80px; padding: 12px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm); resize: vertical;" placeholder="Share your thoughts..." aria-label="Comment text"></textarea>
                 <div class="flex items-center justify-end gap-2 mt-2">
-                  <button type="button" class="flex items-center justify-center" style="height: 36px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform=''" onmouseout="this.style.transform=''" aria-label="Cancel">Cancel</button>
-                  <button type="submit" class="flex items-center justify-center gap-2" style="height: 36px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-primary); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text-inverse); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease, box-shadow 0.1s ease;" onmouseover="this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" aria-label="Post comment">
+                  <button type="button" class="flex items-center justify-center" style="height: 36px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease;" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform=''" onmouseout="this.style.transform=''" aria-label="Cancel">Cancel</button>
+                  <button type="submit" class="flex items-center justify-center gap-2" style="height: 36px; padding: 0 16px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-primary); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text-inverse); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease, box-shadow 0.1s ease;" onmouseover="this.style.boxShadow='var(--brutalist-shadow-md)'" onmouseout="this.style.boxShadow='var(--brutalist-shadow-sm)'" onmousedown="this.style.transform='scale(0.95)';this.style.boxShadow='none'" onmouseup="this.style.transform='';this.style.boxShadow='var(--brutalist-shadow-sm)'" aria-label="Post comment">
                     <i data-lucide="send" style="width: 15px; height: 15px;" aria-hidden="true"></i>
                     <span>Post</span>
                   </button>
@@ -695,7 +695,7 @@
 
               <!-- Load more -->
               <div class="flex justify-center mt-5">
-                <button type="button" class="flex items-center justify-center gap-2" style="height: 36px; padding: 0 20px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease;" onmouseover="this.style.transform='translate(-1px,-1px)'" onmouseout="this.style.transform=''" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='translate(-1px,-1px)'">
+                <button type="button" class="flex items-center justify-center gap-2" style="height: 36px; padding: 0 20px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); box-shadow: var(--brutalist-shadow-sm); font-family: var(--font-display); font-weight: var(--weight-bold); font-size: var(--text-sm); color: var(--color-text); white-space: nowrap; cursor: pointer; transition: transform 0.1s ease;" onmouseover="this.style.transform='translate(-1px,-1px)'" onmouseout="this.style.transform=''" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='translate(-1px,-1px)'">
                   <i data-lucide="chevron-down" style="width: 16px; height: 16px;" aria-hidden="true"></i>
                   <span>Load More</span>
                 </button>
@@ -747,23 +747,23 @@
               <div class="flex flex-col">
                 <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
                   <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
-                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Arrow Keys</b>: Move blocks left/right</span>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--brand-font-mono); font-weight: var(--weight-semibold);">Arrow Keys</b>: Move blocks left/right</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
                   <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
-                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Space</b>: Drop block instantly</span>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--brand-font-mono); font-weight: var(--weight-semibold);">Space</b>: Drop block instantly</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
                   <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
-                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Z</b>: Rotate counterclockwise</span>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--brand-font-mono); font-weight: var(--weight-semibold);">Z</b>: Rotate counterclockwise</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--color-border-light);">
                   <i data-lucide="keyboard" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
-                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">X</b>: Rotate clockwise</span>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--brand-font-mono); font-weight: var(--weight-semibold);">X</b>: Rotate clockwise</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px; padding: 9px 0;">
                   <i data-lucide="hand" style="width: 15px; height: 15px; color: var(--color-text-secondary); flex-shrink: 0;" aria-hidden="true"></i>
-                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--font-mono); font-weight: var(--weight-semibold);">Swipe</b>: Drag blocks on mobile</span>
+                  <span class="font-sans" style="font-size: var(--text-sm); color: var(--color-text); line-height: 1.4;"><b style="font-family: var(--brand-font-mono); font-weight: var(--weight-semibold);">Swipe</b>: Drag blocks on mobile</span>
                 </div>
               </div>
             </div>
@@ -854,7 +854,7 @@
     <section class="w-full reveal" style="padding-top: 16px; padding-bottom: 64px;">
       <div class="mx-auto px-6" style="max-width: var(--max-width);">
         <div class="flex items-center gap-3 mb-6">
-          <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md);">
+          <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--brand-radius-md);">
             <i data-lucide="gamepad-2" style="width: 18px; height: 18px; color: var(--color-text-inverse);" aria-hidden="true"></i>
           </span>
           <h2 class="font-display" style="font-weight: var(--weight-extrabold); font-size: var(--text-2xl); color: var(--color-text); letter-spacing: -0.02em;">Related Games</h2>
@@ -961,7 +961,7 @@
           <!-- Column 1: About playsunblocked + social icons -->
           <div class="flex flex-col gap-4">
             <div class="flex items-center gap-2">
-              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--radius-md); color: var(--color-text-inverse);">
+              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--brand-radius-md); color: var(--color-text-inverse);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <rect x="2" y="6" width="20" height="12" rx="4"/>
                   <line x1="6" y1="12" x2="10" y2="12"/>
@@ -972,7 +972,7 @@
               </span>
               <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-xl); letter-spacing: -0.02em;">playsunblocked</span>
             </div>
-            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--leading-relaxed); color: var(--color-bg); opacity: 0.7;">
+            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--brand-leading-relaxed); color: var(--color-bg); opacity: 0.7;">
               Your daily dose of browser games. No downloads, no sign-ups — just instant play for casual gamers worldwide.
             </p>
             <!-- Social icons: geometric Lucide icons in bordered squares -->
@@ -1139,6 +1139,8 @@
     return;
   }
 
+  var esc = PLAYSUNBLOCKED_GAMES.escapeHtml;
+
   document.title = game.title.en + ' - playsunblocked';
 
   // Update meta description
@@ -1218,20 +1220,20 @@
     ratingEl.setAttribute('aria-label', 'Rating: ' + game.rating + ' out of 5');
   }
 
-  var playsEl = document.querySelector('[style*="font-variant-numeric: tabular-nums"]');
+  var playsEl = document.querySelector('[data-role="plays-count"]');
   if (playsEl) playsEl.textContent = game.plays + ' plays';
 
-  var stepsGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.gap-4');
+  var stepsGrid = document.querySelector('[data-role="steps-grid"]');
   if (stepsGrid && game.howToPlay && game.howToPlay.en) {
     stepsGrid.innerHTML = game.howToPlay.en.map(function(step, i) {
       return '<div class="flex items-start gap-4" style="padding:16px;border:2px solid var(--color-border);background:var(--color-surface-alt);">' +
         '<span class="step-num">' + (i + 1) + '</span>' +
-        '<p class="font-sans pt-1.5" style="font-size:var(--text-base);color:var(--color-text);line-height:1.5;">' + step + '</p>' +
+        '<p class="font-sans pt-1.5" style="font-size:var(--text-base);color:var(--color-text);line-height:1.5;">' + esc(step) + '</p>' +
         '</div>';
     }).join('');
   }
 
-  var bpd = document.querySelector('p[style*="color: var(--color-text-secondary); line-height: 1.6"]');
+  var bpd = document.querySelector('[data-role="game-description"]');
   if (bpd) bpd.textContent = 'Perfect for ' + game.duration.en + ' sessions. No downloads, no sign-up — just open and play.';
 
   var infoRows = document.querySelectorAll('.info-row');
@@ -1240,11 +1242,11 @@
     if (playsInfo) playsInfo.textContent = game.plays;
   }
 
-  var player = document.querySelector('[data-game-player]') || document.querySelector('[style*="aspect-ratio: 16 / 9"]');
+  var player = document.querySelector('[data-game-player]');
   if (player) {
     player.innerHTML =
       '<div id="player-overlay" class="player-overlay">' +
-        '<button type="button" class="play-btn absolute flex items-center justify-center" style="top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:var(--radius-full);" aria-label="Play ' + game.title.en + '">' +
+        '<button type="button" class="play-btn absolute flex items-center justify-center" style="top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:var(--radius-full);" aria-label="Play ' + esc(game.title.en) + '">' +
           '<svg width="32" height="32" viewBox="0 0 24 24" fill="var(--color-text-inverse)" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>' +
         '</button>' +
       '</div>' +
@@ -1294,15 +1296,15 @@
           PLAYSUNBLOCKED_GAMES.coverHtml(g) +
         '</div>' +
         '<div class="flex flex-col gap-3 p-4">' +
-          '<h3 class="font-display" style="font-weight:var(--weight-extrabold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;line-height:1.2;">' + g.title.en + '</h3>' +
+          '<h3 class="font-display" style="font-weight:var(--weight-extrabold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;line-height:1.2;">' + esc(g.title.en) + '</h3>' +
           '<div class="flex items-center gap-2 flex-wrap">' +
-            '<span class="pill-tag" style="height:24px;font-size:var(--text-xs);padding:0 8px;">' + g.category + '</span>' +
+            '<span class="pill-tag" style="height:24px;font-size:var(--text-xs);padding:0 8px;">' + esc(g.category) + '</span>' +
             '<div class="flex items-center gap-0.5">' +
               PLAYSUNBLOCKED_GAMES.starsHtml(g.rating) +
               '<span class="font-display" style="font-weight:var(--weight-bold);font-size:var(--text-xs);color:var(--color-text);margin-left:2px;">' + g.rating + '/5</span>' +
             '</div>' +
           '</div>' +
-          '<a href="../games/' + g.slug + '.html?lang=en" class="play-cta w-full" style="text-decoration:none;">' +
+          '<a href="../games/' + esc(g.slug) + '.html?lang=en" class="play-cta w-full" style="text-decoration:none;">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>' +
             '<span>PLAY</span>' +
           '</a>' +

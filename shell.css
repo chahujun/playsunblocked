@@ -21,7 +21,7 @@ span[data-lang="cn"] { display: none; }
       .gh-nav-link:focus-visible {
         outline: 2px solid var(--color-primary);
         outline-offset: 2px;
-        border-radius: var(--radius-sm);
+        border-radius: var(--brand-radius-sm);
       }
       .gh-nav-link[data-active="true"] {
         color: var(--color-primary);
@@ -39,7 +39,7 @@ span[data-lang="cn"] { display: none; }
       .gh-search-input:focus {
         outline: none;
         border-color: var(--color-primary);
-        box-shadow: 0 0 0 2px var(--color-primary-light);
+        box-shadow: 0 0 0 2px var(--color-primary);
       }
 
       .gh-lang-btn .gh-lang-en { color: var(--color-primary); font-weight: var(--weight-bold); }
@@ -64,7 +64,7 @@ span[data-lang="cn"] { display: none; }
         width: 40px;
         height: 40px;
         border: 2px solid var(--color-bg);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         color: var(--color-bg);
         opacity: 0.8;
         transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.1s ease;
@@ -100,7 +100,7 @@ span[data-lang="cn"] { display: none; }
   width: 40px;
   height: 40px;
   border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--brand-radius-md);
   background: var(--color-surface);
   cursor: pointer;
   transition: background 0.15s ease;
@@ -116,7 +116,7 @@ span[data-lang="cn"] { display: none; }
   right: 0;
   bottom: 0;
   background: var(--color-bg);
-  z-index: 40;
+  z-index: 45;
   flex-direction: column;
   padding: 16px;
   gap: 4px;
@@ -143,7 +143,7 @@ span[data-lang="cn"] { display: none; }
   height: 44px;
   padding: 0 16px;
   border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--brand-radius-md);
   background: var(--color-surface);
   color: var(--color-text);
   font-size: 16px;

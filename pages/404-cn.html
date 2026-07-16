@@ -128,7 +128,7 @@
         font-family: var(--font-display);
         font-weight: var(--weight-bold);
         font-size: clamp(24px, 4vw, 36px);
-        line-height: var(--leading-tight);
+        line-height: var(--brand-leading-tight);
         letter-spacing: -0.02em;
         color: var(--color-text);
         text-align: center;
@@ -143,9 +143,9 @@
 
       /* ---- Subtitle ---- */
       .error-subtitle {
-        font-family: var(--font-sans);
+        font-family: var(--brand-font-sans);
         font-size: var(--text-lg);
-        line-height: var(--leading-relaxed);
+        line-height: var(--brand-leading-relaxed);
         color: var(--color-text-secondary);
         text-align: center;
         max-width: 500px;
@@ -158,7 +158,7 @@
       .easter-egg-card {
         background: var(--color-surface);
         border: var(--border-width) solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         box-shadow: var(--brutalist-shadow-md);
         padding: 20px 24px;
         max-width: 480px;
@@ -178,11 +178,11 @@
         justify-content: center;
         background: var(--color-primary-light);
         border: var(--border-width) solid var(--color-border);
-        border-radius: var(--radius-sm);
+        border-radius: var(--brand-radius-sm);
         color: var(--color-primary);
       }
       .easter-egg-card-text {
-        font-family: var(--font-sans);
+        font-family: var(--brand-font-sans);
         font-size: var(--text-sm);
         line-height: var(--leading-normal);
         color: var(--color-text-secondary);
@@ -208,7 +208,7 @@
         font-weight: var(--weight-bold);
         font-size: var(--text-base);
         border: var(--border-width) solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         cursor: pointer;
         text-decoration: none;
         white-space: nowrap;
@@ -253,7 +253,7 @@
 
       /* ---- Footer note ---- */
       .error-footer-note {
-        font-family: var(--font-sans);
+        font-family: var(--brand-font-sans);
         font-style: italic;
         font-size: var(--text-sm);
         color: var(--color-text-tertiary);
@@ -386,13 +386,13 @@
         font-family: var(--font-display);
         font-weight: var(--weight-extrabold);
         font-size: var(--text-3xl);
-        line-height: var(--leading-tight);
+        line-height: var(--brand-leading-tight);
         letter-spacing: -0.02em;
         color: var(--color-text);
         margin-bottom: 12px;
       }
       .reveal-card-text {
-        font-family: var(--font-sans);
+        font-family: var(--brand-font-sans);
         font-size: var(--text-base);
         line-height: var(--leading-normal);
         color: var(--color-text-secondary);
@@ -409,7 +409,7 @@
         font-weight: var(--weight-bold);
         font-size: var(--text-base);
         border: var(--border-width) solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         box-shadow: var(--brutalist-shadow-sm);
         text-decoration: none;
         white-space: nowrap;
@@ -438,7 +438,7 @@
         justify-content: center;
         background: var(--color-surface);
         border: var(--border-width) solid var(--color-border);
-        border-radius: var(--radius-md);
+        border-radius: var(--brand-radius-md);
         cursor: pointer;
         color: var(--color-text);
         transition: background 0.12s ease, color 0.12s ease;
@@ -473,7 +473,7 @@
     <header id="site-header" data-dom-id="site-header" class="sticky top-0 z-50 w-full" style="height: var(--header-height); background: var(--color-bg); border-bottom: 2px solid var(--color-border); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
       <div class="mx-auto flex h-full items-center gap-4 px-6 lg:gap-6" style="max-width: var(--max-width);">
         <a href="index-cn.html" data-dom-id="nav-logo" class="flex shrink-0 items-center gap-2" aria-label="playsunblocked 首页">
-          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
+          <span class="flex items-center justify-center" style="width: 36px; height: 36px; background: var(--color-primary); border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); box-shadow: var(--brutalist-shadow-sm); color: var(--color-text-inverse);">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <rect x="2" y="6" width="20" height="12" rx="4"/>
               <line x1="6" y1="12" x2="10" y2="12"/>
@@ -495,7 +495,7 @@
         </button>
         <div class="relative hidden sm:flex flex-1 items-center max-w-xs">
           <i data-lucide="search" class="absolute left-3 pointer-events-none" style="width: 18px; height: 18px; color: var(--color-text-tertiary);" aria-hidden="true"></i>
-          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="搜索游戏..." aria-label="搜索游戏">
+          <input type="search" class="gh-search-input w-full font-sans" style="height: 40px; padding: 0 12px 0 36px; border: 2px solid var(--color-border); border-radius: var(--brand-radius-md); background: var(--color-surface); color: var(--color-text); font-size: var(--text-sm);" placeholder="搜索游戏..." aria-label="搜索游戏">
         </div>
         <div class="flex shrink-0 items-center gap-3">
           <button type="button" data-dom-id="lang-toggle" class="gh-lang-btn flex items-center gap-1.5" style="height: 36px; padding: 0 12px; border: 2px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-surface); font-family: var(--font-display); font-size: var(--text-sm);" aria-label="切换语言">
@@ -638,7 +638,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
           <div class="flex flex-col gap-4">
             <div class="flex items-center gap-2">
-              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--radius-md); color: var(--color-text-inverse);">
+              <span class="flex items-center justify-center" style="width: 32px; height: 32px; background: var(--color-primary); border: 2px solid var(--color-bg); border-radius: var(--brand-radius-md); color: var(--color-text-inverse);">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <rect x="2" y="6" width="20" height="12" rx="4"/>
                   <line x1="6" y1="12" x2="10" y2="12"/>
@@ -649,7 +649,7 @@
               </span>
               <span class="font-display" style="font-weight: var(--weight-extrabold); color: var(--color-primary); font-size: var(--text-xl); letter-spacing: -0.02em;">playsunblocked</span>
             </div>
-            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--leading-relaxed); color: var(--color-bg); opacity: 0.7;">
+            <p class="font-sans" style="font-size: var(--text-sm); line-height: var(--brand-leading-relaxed); color: var(--color-bg); opacity: 0.7;">
               每日精选浏览器小游戏。无需下载，无需注册——全球休闲玩家即开即玩。
             </p>
             <div class="flex items-center gap-3" role="navigation" aria-label="社交媒体">
