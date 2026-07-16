@@ -1,7 +1,7 @@
 ﻿{
   "name": "playsunblocked",
   "short_name": "playsunblocked",
-  "description": "15 free browser games that work on school Chromebooks. No downloads, no sign-up.",
+  "description": "16 free browser games that work on school Chromebooks. No downloads, no sign-up.",
   "start_url": "/pages/index-en.html",
   "display": "standalone",
   "background_color": "#FFF8F0",

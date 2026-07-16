@@ -1,4 +1,4 @@
-User-agent: *
+﻿User-agent: *
 Allow: /
 
-Sitemap: https://playsunblocked.com/sitemap.xml
+Sitemap: https://www.playsunblocked.net/sitemap.xml

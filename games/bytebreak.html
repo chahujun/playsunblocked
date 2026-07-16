@@ -454,7 +454,7 @@ body {
         '<p>⚫ <b>Gray</b> = color not in the code</p>' +
         '<p style="margin-top:10px;"><b>Colors can repeat</b> in the code!</p>' +
         '<p style="margin-top:10px;color:var(--accent);"><b>★ Watch an ad for a hint or +2 extra guesses!</b></p>',
-      shareText: 'Bytebreak #{num} {tries}/6\n{grid}\n🔥 {streak}-day streak\nPlay at playsunblocked.com',
+      shareText: 'Bytebreak #{num} {tries}/6\n{grid}\n🔥 {streak}-day streak\nPlay at playsunblocked.net',
       colors: { red:'Red', orange:'Orange', yellow:'Yellow', green:'Green', blue:'Blue', purple:'Purple' }
     },
     cn: {
@@ -487,7 +487,7 @@ body {
         '<p>⚫ <b>灰色</b> = 该颜色不在密码中</p>' +
         '<p style="margin-top:10px;"><b>颜色可能重复</b>出现在密码中！</p>' +
         '<p style="margin-top:10px;color:var(--accent);"><b>★ 看广告可获得提示或 +2 次额外机会！</b></p>',
-      shareText: '色彩密码 #{num} {tries}/6\n{grid}\n🔥 {streak}天连续\nplaysunblocked.com',
+      shareText: '色彩密码 #{num} {tries}/6\n{grid}\n🔥 {streak}天连续\nplaysunblocked.net',
       colors: { red:'红色', orange:'橙色', yellow:'黄色', green:'绿色', blue:'蓝色', purple:'紫色' }
     }
   };
@@ -833,7 +833,7 @@ body {
   function shareResult() {
     var text = document.getElementById('sharePreview').textContent;
     if (navigator.share) {
-      navigator.share({ text: text, url: 'https://playsunblocked.com' }).catch(function() {});
+      navigator.share({ text: text, url: 'https://www.playsunblocked.net' }).catch(function() {});
     } else if (navigator.clipboard) {
       navigator.clipboard.writeText(text).then(function() {
         showToast('Copied to clipboard!');
