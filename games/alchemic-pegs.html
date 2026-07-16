@@ -609,7 +609,7 @@ const MAX_SPEED=24;
 const LAUNCHER_X=70, LAUNCHER_Y=H-90;
 const FAIL_LINE_X=95;
 const ENEMY_SPAWN_X=W-20;
-const DRAG_POWER_DIV=32, DRAG_POWER_MIN=0.6, DRAG_POWER_MAX=4.5;
+const DRAG_POWER_DIV=28, DRAG_POWER_MIN=0.6, DRAG_POWER_MAX=5.0;
 const LAUNCH_KICK=0.19;
 
 /* ---------- 难度曲线（再次降低） ---------- */
@@ -2473,13 +2473,15 @@ function getCanvasPos(e){
   const r=cv.getBoundingClientRect();
   const cx=e.clientX!==undefined?e.clientX:e.touches[0].clientX;
   const cy=e.clientY!==undefined?e.clientY:e.touches[0].clientY;
-  return {x:cx-r.left,y:cy-r.top};
+  // Account for CSS transform scale — rect is scaled but canvas internal coords are not
+  const scaleX=cv.width/r.width, scaleY=cv.height/r.height;
+  return {x:(cx-r.left)*scaleX, y:(cy-r.top)*scaleY};
 }
 function startDrag(e){
   if(state!==STATE.PLAYING)return;
   const p=getCanvasPos(e);
   // 箭塔放置模式：点击空白区域放置，点击法阵附近仍可发射
-  const nearLauncher=dist(p.x,p.y,LAUNCHER_X,LAUNCHER_Y-10)<=60;
+  const nearLauncher=dist(p.x,p.y,LAUNCHER_X,LAUNCHER_Y-10)<=100;
   if(canPlaceTower&&!nearLauncher){
     placeTower(p.x,p.y);
     return;
@@ -2496,8 +2498,11 @@ function moveDrag(e){
   mouseX=p.x;mouseY=p.y;mouseOnCanvas=true;
   if(!dragging)return;
   dragCurX=p.x;dragCurY=p.y;
-  if(dragCurX>LAUNCHER_X)dragCurX=LAUNCHER_X;
-  if(dragCurY>H-30)dragCurY=H-30;
+  // Allow dragging in a wider range — left, up, and slightly right of launcher
+  if(dragCurX>LAUNCHER_X+20)dragCurX=LAUNCHER_X+20;
+  if(dragCurX<5)dragCurX=5;
+  if(dragCurY>H-20)dragCurY=H-20;
+  if(dragCurY<30)dragCurY=30;
 }
 function endDrag(e){
   if(!dragging)return;
