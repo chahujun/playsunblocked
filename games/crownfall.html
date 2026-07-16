@@ -168,6 +168,8 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 .modal-desc{font-size:14px;line-height:1.6;color:var(--charcoal);margin-bottom:16px;text-align:center}
 .modal-btn{display:block;width:100%;padding:10px;margin:6px 0;background:var(--panel);color:var(--text);border:2px solid var(--border);border-radius:4px;font-size:14px;letter-spacing:1px;transition:all .15s}
 .modal-btn:hover{border-color:var(--gold);color:var(--gold)}
+.modal-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.modal-actions .modal-btn{flex:1;min-width:120px}
 .modal-btn.danger{border-color:var(--darkred)}
 .modal-btn.danger:hover{background:var(--darkred);color:var(--white)}
 
@@ -234,19 +236,19 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
   <div class="title-content">
     <div class="title-logo">CROWNFALL</div>
     <div class="title-logo" style="font-size:clamp(18px,3vw,28px);color:var(--text-dim);letter-spacing:6px">THE BROKEN REALM</div>
-    <div class="title-sub">Every road demands a sacrifice.</div>
-    <button class="title-btn" onclick="startNewGame()">Start New Journey</button>
-    <button class="title-btn" onclick="continueGame()">Continue Journey</button>
-    <button class="title-btn" onclick="showHowToPlay()">How to Play</button>
-    <button class="title-btn" onclick="showSettings()">Settings</button>
+    <div class="title-sub" id="title-sub">Every road demands a sacrifice.</div>
+    <button class="title-btn" id="btn-start" onclick="startNewGame()">Start New Journey</button>
+    <button class="title-btn" id="btn-continue" onclick="continueGame()">Continue Journey</button>
+    <button class="title-btn" id="btn-howto" onclick="showHowToPlay()">How to Play</button>
+    <button class="title-btn" id="btn-settings" onclick="showSettings()">Settings</button>
   </div>
 </div>
 
 <!-- ===== CHARACTER SELECT ===== -->
 <div id="char-select" class="screen hidden">
   <div class="cs-header">
-    <div class="cs-title">CHOOSE YOUR PARTY</div>
-    <div class="cs-hint">Select 3 heroes for your journey</div>
+    <div class="cs-title" id="cs-title">CHOOSE YOUR PARTY</div>
+    <div class="cs-hint" id="cs-hint">Select 3 heroes for your journey</div>
     <div class="cs-count" id="cs-count">0 / 3 selected</div>
   </div>
   <div class="cs-grid" id="cs-grid"></div>
@@ -325,16 +327,16 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 
 <!-- ===== GAME OVER ===== -->
 <div id="gameover-screen" class="screen hidden">
-  <div class="go-title">FALLEN</div>
-  <div class="go-sub">Your party has been wiped out. The realm remains broken.</div>
-  <button class="title-btn" onclick="location.reload()">RETURN TO TITLE</button>
+  <div class="go-title" id="go-title">FALLEN</div>
+  <div class="go-sub" id="go-sub"></div>
+  <button class="title-btn" onclick="returnToTitle()">RETURN TO TITLE</button>
 </div>
 
 <!-- ===== VICTORY ===== -->
 <div id="victory-screen" class="screen hidden">
-  <div class="vic-title">THE REALM REMEMBERS</div>
-  <div class="go-sub">The crown is mended. Light returns to the kingdom.</div>
-  <button class="title-btn" onclick="location.reload()">RETURN TO TITLE</button>
+  <div class="vic-title" id="vic-title">THE REALM REMEMBERS</div>
+  <div class="go-sub" id="vic-sub"></div>
+  <button class="title-btn" onclick="returnToTitle()">RETURN TO TITLE</button>
 </div>
 
 <!-- ===== TUTORIAL TIP ===== -->
@@ -906,7 +908,35 @@ function showSettings(){
     </div>`;
   showModal(t('settings'),html,[{text:t('close'),action:closeModal}]);
 }
-function toggleLang(){ lang=lang==='en'?'cn':'en'; closeModal(); showSettings(); }
+function toggleLang(){
+  lang=lang==='en'?'cn':'en';
+  closeModal();
+  // Update all static UI text
+  updateStaticTexts();
+  // Re-render current screen with new language
+  updateButtonTexts();
+  if(G.screen==='map'){ renderMapScreen(); }
+  else if(G.screen==='battle'&&G.battle){ renderBattle(); }
+  else if(G.screen==='char-select'){ renderCharSelect(); }
+}
+function updateStaticTexts(){
+  const el=id=>document.getElementById(id);
+  if(el('title-sub')) el('title-sub').textContent={en:'Every road demands a sacrifice.',cn:'每一条道路，都要求你付出代价。'}[lang];
+  if(el('btn-start')) el('btn-start').textContent=t('startNew');
+  if(el('btn-continue')) el('btn-continue').textContent=t('continueJ');
+  if(el('btn-howto')) el('btn-howto').textContent=t('howToPlay');
+  if(el('btn-settings')) el('btn-settings').textContent=t('settings');
+  if(el('cs-title')) el('cs-title').textContent=t('chooseParty');
+  if(el('cs-hint')) el('cs-hint').textContent=t('selectHint');
+  if(el('cs-confirm')) el('cs-confirm').textContent=t('beginJourney');
+}
+function updateButtonTexts(){
+  document.querySelectorAll('.bt-action-btn').forEach(btn=>{
+    const act=btn.dataset.action;
+    const labels={move:t('move'),attack:t('attack'),skill:t('skill'),defend:t('defend'),item:t('useItem'),end:t('endTurn')};
+    if(labels[act]) btn.textContent=labels[act];
+  });
+}
 function cycleTextSize(){ G.settings.textSize=G.settings.textSize>=1.5?1:G.settings.textSize+.25; document.body.style.fontSize=(14*G.settings.textSize)+'px'; }
 
 /* ========================================================================
@@ -1040,11 +1070,17 @@ function drawMap(){
   const ctx=mapCtx; const w=mapCanvas.width, h=mapCanvas.height;
   // Parchment background
   ctx.fillStyle='#d4c4a0'; ctx.fillRect(0,0,w,h);
-  // Texture
-  for(let i=0;i<200;i++){
-    ctx.fillStyle=`rgba(92,58,30,${Math.random()*.05})`;
-    ctx.fillRect(Math.random()*w,Math.random()*h,2,2);
+  // Pre-generated texture (stable, no flickering)
+  if(!G._mapTexture){
+    G._mapTexture=[];
+    for(let i=0;i<200;i++){
+      G._mapTexture.push({x:Math.random()*w,y:Math.random()*h,a:Math.random()*.05});
+    }
   }
+  G._mapTexture.forEach(p=>{
+    ctx.fillStyle=`rgba(92,58,30,${p.a})`;
+    ctx.fillRect(p.x,p.y,2,2);
+  });
   // Area separators
   for(let a=0;a<6;a++){
     const x=100+a*90;
@@ -1135,7 +1171,7 @@ mapCanvas.addEventListener('click',e=>{
       } else if(node.visited||node.id===G.map.currentNode){
         // Show info
         const info=document.getElementById('map-node-info');
-        info.textContent=`${t('nodes.'+node.type)}${node.visited?' ('+t('area1').split(' ')[0]+')':''}`;
+        info.textContent=`${t('nodes.'+node.type)}${node.visited?' ✓':''}`;
         info.classList.remove('hidden');
       }
       return;
@@ -1187,10 +1223,11 @@ function showModal(title,descHTML,buttons){
   const c=document.getElementById('modal-container');
   let btns='';
   buttons.forEach((b,i)=>{
-    btns+=`<button class="modal-btn ${b.secondary?'':'danger'}" data-i="${i}">${b.text}</button>`;
+    btns+=`<button class="modal-btn ${b.secondary?'':'danger'}" data-modal-action="${i}">${b.text}</button>`;
   });
-  c.innerHTML=`<div class="modal-overlay"><div class="modal-box"><div class="modal-title">${title}</div><div class="modal-desc">${descHTML}</div>${btns}</div></div>`;
-  c.querySelectorAll('.modal-btn').forEach((btn,i)=>{
+  c.innerHTML=`<div class="modal-overlay"><div class="modal-box"><div class="modal-title">${title}</div><div class="modal-desc">${descHTML}</div><div class="modal-actions">${btns}</div></div></div>`;
+  // Only bind onclick for buttons in modal-actions, NOT buttons inside descHTML
+  c.querySelectorAll('.modal-actions .modal-btn').forEach((btn,i)=>{
     btn.onclick=()=>{ buttons[i].action(); };
   });
 }
@@ -2064,6 +2101,8 @@ function showRewardScreen(rewards){
     else if(r.type==='potion'){ d.innerHTML=`🧪<br>+1<br>${t('rewardPotion')}`; }
     items.appendChild(d);
   });
+  document.getElementById('reward-title').textContent=t('victory');
+  document.querySelector('#reward-screen .reward-btn').textContent=t('continue');
   showScreen('reward-screen');
 }
 
@@ -2503,9 +2542,12 @@ function useShrine(idx){
    ======================================================================== */
 function openCamp(){
   playSound('click');
-  G.party.forEach(h=>{ h.hp=Math.min(h.maxHp,h.hp+Math.round(h.maxHp*0.3)); });
+  G.party.forEach(h=>{
+    if(!h.alive){ h.alive=true; h.hp=Math.round(h.maxHp*0.3); }
+    else { h.hp=Math.min(h.maxHp,h.hp+Math.round(h.maxHp*0.3)); }
+  });
   let html=`<div style="text-align:center;color:var(--charcoal)">
-    <div style="font-size:14px;margin-bottom:12px">${{en:'Your party rests and recovers 30% HP.',cn:'你的队伍休息并恢复30%生命值。'}[lang]}</div>`;
+    <div style="font-size:14px;margin-bottom:12px">${{en:'Your party rests and recovers 30% HP. Fallen heroes are revived.',cn:'你的队伍休息并恢复30%生命值。倒下的英雄被复活。'}[lang]}</div>`;
   G.party.forEach(h=>{
     const pct=Math.round(h.hp/h.maxHp*100);
     html+=`<div style="margin:4px 0">${h.icon} ${h.name}: ${h.hp}/${h.maxHp} (${pct}%)</div>`;
@@ -2621,14 +2663,34 @@ function returnToMap(){
 
 function showGameOver(){
   stopMusic();
+  document.getElementById('go-title').textContent=t('fallen');
+  document.getElementById('go-sub').textContent=t('fallenSub');
   showScreen('gameover-screen');
 }
 
 function showVictory(){
   stopMusic();
   playMusic('victory');
+  document.getElementById('vic-title').textContent=t('realmRemembers');
+  document.getElementById('vic-sub').textContent=t('realmSub');
   showScreen('victory-screen');
   localStorage.removeItem(G.saveSlot);
+}
+
+function returnToTitle(){
+  stopMusic();
+  G.battle=null; G.map=null; G.party=[]; G.selectedClasses=[];
+  G.gold=30; G.potions=2; G.luck=2; G.tempBuffs={atk:0,armor:0};
+  G.tutorial={active:false,step:0};
+  showScreen('title-screen');
+  // Re-check save state for continue button
+  if(!hasSave()){
+    const btns=document.querySelectorAll('.title-btn');
+    if(btns[1]){ btns[1].style.opacity='.4'; btns[1].style.pointerEvents='none'; }
+  } else {
+    const btns=document.querySelectorAll('.title-btn');
+    if(btns[1]){ btns[1].style.opacity='1'; btns[1].style.pointerEvents='auto'; }
+  }
 }
 
 /* ========================================================================
@@ -2698,7 +2760,7 @@ function init(){
   // Disable continue button if no save
   if(!hasSave()){
     const btns=document.querySelectorAll('.title-btn');
-    if(btns[1]) btns[1].style.opacity='.4';
+    if(btns[1]){ btns[1].style.opacity='.4'; btns[1].style.pointerEvents='none'; }
   }
 }
 init();
