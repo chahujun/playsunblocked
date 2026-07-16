@@ -921,7 +921,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
     </div>
 </div>
 
-<div id="save-indicator">SAVED</div>
+<div id="save-indicator">已保存</div>
 
 <!-- Help modal -->
 <div id="help-modal" class="modal-overlay">
@@ -988,6 +988,7 @@ window.addEventListener('resize', resize);
 const I18N = {
     en: {
         title: 'MINDLOOP',
+        subtitle: 'v1.0 · A NEURAL IDLE GAME',
         energy: 'Brain Power',
         impulse: 'Fire Pulse',
         impulseDesc: 'Tap the glowing core (or this button) to send a pulse racing through the network',
@@ -1030,9 +1031,9 @@ const I18N = {
         // Tutorial
         tutorial0: 'Click the glowing core to fire a pulse',
         tutorial1: 'Pulses travel through ×N and +N nodes to multiply energy',
-        tutorial2: 'Buy an Axon upgrade to add multiplier nodes to the network',
+        tutorial2: 'Buy a Grow Network upgrade to add multiplier nodes to the network',
         tutorial3: 'Watch pulses split and multiply through the network!',
-        tutorial4: 'Buy Myelin to increase pulse speed, or Split for more pathways',
+        tutorial4: 'Buy Signal Speed to increase pulse speed, or Signal Split for more pathways',
         tutorial5: 'Keep accumulating! At 1M total energy you can Rebirth for permanent bonuses',
         tutorialGotIt: 'GOT IT',
         // Help
@@ -1041,7 +1042,7 @@ const I18N = {
         help1: '• Click the glowing core to fire pulses',
         help2: '• ×N nodes multiply pulse energy, +N nodes add to it',
         help3: '• Pulses decay 10% per hop (0.9x)',
-        help4: '• Buy upgrades: Axon (multiplier nodes), Myelin (speed), Split (pathways)',
+        help4: '• Buy upgrades: Grow Network (multiplier nodes), Signal Speed (speed), Signal Split (pathways)',
         help5: '• Accumulate 1M total energy to Rebirth for singularity points',
         help6: '• Spend singularity points on permanent genes',
         // Save / Offline
@@ -1061,6 +1062,7 @@ const I18N = {
     },
     zh: {
         title: '念回路',
+        subtitle: 'v1.0 · 神经回路放置游戏',
         energy: '脑力',
         impulse: '发射电脉冲',
         impulseDesc: '点击中央发光核心（或这个按钮），让一道电流在网络里奔涌',
@@ -1103,18 +1105,18 @@ const I18N = {
         // 教程
         tutorial0: '点击发光的核心，发射一道脉冲',
         tutorial1: '脉冲穿过 ×N 和 +N 节点来倍增脑力',
-        tutorial2: '购买 Axon 升级，为网络添加更多乘法节点',
+        tutorial2: '购买「扩张网络」升级，添加更多乘法节点',
         tutorial3: '看脉冲在网络中分裂、倍增！',
-        tutorial4: '购买 Myelin 提升脉冲速度，或购买 Split 增加通路',
+        tutorial4: '购买「信号加速」提升脉冲速度，或购买「信号分裂」增加通路',
         tutorial5: '继续累积！累计脑力达 1M 时可转生获得永久加成',
         tutorialGotIt: '知道了',
         // 帮助
         helpTitle: '游戏说明',
         helpClose: '关闭',
         help1: '• 点击发光核心发射脉冲',
-        help2: '• ×N 节点倍增脉冲能量，+N 节点增加能量',
+        help2: '• ×N 节点倍增脑力，+N 节点增加脑力',
         help3: '• 脉冲每跳衰减 10%（×0.9）',
-        help4: '• 购买升级：Axon（乘法节点）、Myelin（速度）、Split（通路）',
+        help4: '• 购买升级：扩张网络（乘法节点）、信号加速（速度）、信号分裂（通路）',
         help5: '• 累计脑力达 1M 可转生获得奇点',
         help6: '• 用奇点购买永久基因',
         // 存档 / 离线
@@ -1958,6 +1960,8 @@ function updateUI() {
 
     // Title
     document.getElementById('game-title').textContent = t('title');
+    document.getElementById('game-subtitle').textContent = t('subtitle');
+    document.getElementById('save-indicator').textContent = t('savedLabel');
     document.getElementById('click-hint').textContent = t('clickHint');
     document.getElementById('lang-text').textContent = t('langLabel');
     document.getElementById('sect-upgrades').textContent = t('sectUpgrades');

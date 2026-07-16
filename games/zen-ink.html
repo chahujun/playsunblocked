@@ -25,7 +25,7 @@
     '五色墨': 'Five-Color Ink',
     '自动行笔': 'Golden Brush',
     '积墨重叠': 'Layered Wash',
-    '画卷开悟': "Painting's Awakening",
+    '画卷开悟': "Scroll Awakening",
     '禅意点数: ': 'Zen Focus: ',
     '禅意点数': 'Zen Focus',
     '积墨层': 'Shading Layers',
@@ -286,7 +286,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
   <div id="intro">
     <h1>半卷山水</h1>
     <div class="en">H A L F &nbsp; A &nbsp; S C R O L L</div>
-    <p id="introText">点墨于纸，氤氲成画。<br>墨迹所触，山水苏醒，禅意自生。</p>
+    <p id="introText">点一下纸面，墨就落下了。<br>它会自己晕开，碰到哪里，那里的山就醒过来。</p>
     <button id="startBtn">入 境</button>
   </div>
   <div id="topbar">
@@ -339,7 +339,7 @@ const I18N = {
     color:["Five-Color Ink","Add a hue, double what you earn"],
     brush:["Golden Brush","Ink drops on its own, in rhythm"],
     shading:["Layered Wash","Reset for a multiplier"],
-    ascend:["Painting's Awakening","Reset, keep the lessons"],
+    ascend:["Scroll Awakening","Reset, keep the lessons"],
     cost:"Costs {0}",
     max:"Mastered",
     shadeGain:"+{0} layers", ascGain:"+{0} inspiration",
@@ -781,13 +781,13 @@ function showGuide(type){
   if(type==='shade'){
     title = isZh? '积墨重叠' : 'Layered Wash';
     body = isZh? 
-      '你已积累足够的禅意，可以"重画一张"。\n\n积墨重叠会重置当前禅意和画面，但获得永久的积墨层加成（每层+50%收益）。\n\n这是水墨修行的一部分——放下当前画卷，换取更深远的境界。' :
-      'You have enough Zen to "repaint".\n\nLayered Wash resets your current Zen and canvas, but grants permanent shading layers (+50% income each).\n\nThis is part of ink practice — let go of the current scroll to reach deeper realms.';
+      '你已积累足够的禅意，可以"重画一张"。\n\n积墨重叠会重置当前禅意和画面，但获得永久的积墨层加成（每层+50%收益）。\n\n这是水墨修行的一部分——放下当前画卷，换取更深远的境界。\n\n积墨需 800 禅意 · 画卷开悟需 40000 禅意' :
+      'You have enough Zen to "repaint".\n\nLayered Wash resets your current Zen and canvas, but grants permanent shading layers (+50% income each).\n\nThis is part of ink practice — let go of the current scroll to reach deeper realms.\n\nShading requires 800 Zen · Scroll Awakening requires 40000 Zen';
   } else {
-    title = isZh? '灵感飞升' : 'Inspiration Ascension';
+    title = isZh? '画卷开悟' : 'Scroll Awakening';
     body = isZh?
-      '你的修为已至化境，可以飞升。\n\n灵感飞升重置一切（含积墨层），但获得灵感和自动画笔。\n\n灵感每点+12%扩散速度，自动画笔将自动滴墨，解放双手。' :
-      'Your practice has reached transcendence.\n\nAscension resets everything (including shading layers), but grants Inspiration and auto-brush.\n\nEach Inspiration +12% spread speed. Auto-brush drips ink automatically.';
+      '你的修为已至化境，可以开悟画卷。\n\n画卷开悟重置一切（含积墨层），但获得灵感和自动画笔。\n\n灵感每点+12%扩散速度，自动画笔将自动滴墨，解放双手。\n\n积墨需 800 禅意 · 画卷开悟需 40000 禅意' :
+      'Your practice has reached transcendence.\n\nScroll Awakening resets everything (including shading layers), but grants Inspiration and auto-brush.\n\nEach Inspiration +12% spread speed. Auto-brush drips ink automatically.\n\nShading requires 800 Zen · Scroll Awakening requires 40000 Zen';
   }
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(20,18,14,0.7);z-index:100;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
@@ -827,7 +827,7 @@ const ZEN_ACHIEVEMENTS = [
   { id:'firstAwaken', name:{zh:'山水初醒',en:'First Awakening'}, desc:{zh:'唤醒第一处景物',en:'Awaken first scenery'}, check:()=>scenery.some(s=>s.awakened) },
   { id:'allAwaken', name:{zh:'万象皆醒',en:'All Awakened'}, desc:{zh:'唤醒所有景物',en:'Awaken all scenery'}, check:()=>scenery.length>0 && scenery.every(s=>s.awakened) },
   { id:'shade1', name:{zh:'初积墨',en:'First Wash'}, desc:{zh:'首次积墨重叠',en:'First Layered Wash'}, check:()=>state.shad>0 },
-  { id:'asc1', name:{zh:'飞升',en:'Ascended'}, desc:{zh:'首次灵感飞升',en:'First Ascension'}, check:()=>state.asc>0 },
+  { id:'asc1', name:{zh:'飞升',en:'Ascended'}, desc:{zh:'首次画卷开悟',en:'First Scroll Awakening'}, check:()=>state.asc>0 },
   { id:'zen10k', name:{zh:'万禅',en:'Ten Thousand Zen'}, desc:{zh:'累计10,000禅意',en:'10,000 total Zen'}, check:()=>state.totalZen>=10000 },
   { id:'shade5', name:{zh:'五层积墨',en:'Five Layers'}, desc:{zh:'5层积墨',en:'5 shading layers'}, check:()=>state.shad>=5 },
 ];
@@ -1051,6 +1051,9 @@ function renderPrestige(key){
   const g=isShade?shadeGain():ascGain();
   const can = state.totalZen>=req && g>0;
   el.classList.toggle('locked', !can);
+  el.title = isShade
+    ? (LANG==='zh' ? '积墨层：重画一张，重置当前禅意，获得永久积墨层加成（每层+50%收益）。需 800 禅意。' : 'Shading Layers: repaint, reset current Zen, gain permanent shading bonus (+50% each). Needs 800 Zen.')
+    : (LANG==='zh' ? '画卷开悟：重置一切（含积墨层），获得灵感和自动画笔。需 40000 禅意。' : 'Scroll Awakening: reset all (incl. shading), gain Inspiration and auto-brush. Needs 40000 Zen.');
   const color = isShade?'var(--seal)':'var(--moss)';
   el.innerHTML =
     '<div class="upgRow"><span class="upgName">'+name+'</span></div>'+

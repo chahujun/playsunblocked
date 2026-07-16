@@ -257,7 +257,7 @@ const I18N = {
     cleared: "SYSTEM CLEARED!",
     start: "[ CLICK or SPACE to JACK IN ]",
     over: "ENERGY DEPLETED — SIGNAL LOST",
-    hint: "WASD move · Mouse aim · LMB shoot · Space possess · E eject host",
+    hint: "WASD move · Mouse aim · LMB shoot · Space possess · E eject host · R Restart",
     hostGuard: "GUARD", hostDrone: "DRONE", hostTurret: "TURRET",
     core: "CORE", locked: "LOCKED — hack console with DRONE",
     hacked: "CONSOLE HACKED — door opened",
@@ -278,7 +278,7 @@ const I18N = {
     cleared: "系统净化完成！",
     start: "[ 点击或空格 接入矩阵 ]",
     over: "电量耗尽 — 信号丢失",
-    hint: "WASD 移动 · 鼠标瞄准 · 左键射击 · 空格寄生 · E 脱离宿主",
+    hint: "WASD 移动 · 鼠标瞄准 · 左键射击 · 空格寄生 · E 脱离宿主 · R 重开",
     hostGuard: "警卫", hostDrone: "无人机", hostTurret: "重甲炮塔",
     core: "核心", locked: "已锁定 — 需用无人机黑入控制台",
     hacked: "控制台已破解 — 门已开启",
@@ -431,9 +431,13 @@ const TUTORIAL_STEPS = [
   { act: "move",    zh: ["第一步 · 移动", "使用 W A S D 移动你的能量球"],
                    en: ["Step 1 · Move", "Use W A S D to move your energy orb"] },
   { act: "possess", zh: ["第二步 · 寄生", "按 空格 发射寄生线，命中敌人即可寄生控制它"],
-                   en: ["Step 2 · Possess", "Press SPACE to fire a possess line; hit an enemy to control it"] },
+                   en: ["Step 2 · Possess", "Press SPACE to fire a possess line; hit an enemy to control it"],
+                   note: "注意：电量持续下降，宿主会随时间磨损。电量耗尽或宿主死亡需重新寄生",
+                   noteEn: "Note: Battery drains over time, hosts decay. Re-hijack when battery dies or host breaks" },
   { act: "shoot",   zh: ["第三步 · 宿主能力", "左键射击 · E 脱离宿主。试着按住左键射击"],
-                   en: ["Step 3 · Host Power", "LMB shoot · E eject. Hold LMB to fire"] },
+                   en: ["Step 3 · Host Power", "LMB shoot · E eject. Hold LMB to fire"],
+                   note: "Guard(守卫): 高血量远程射击 | Drone(无人机): 可飞越熔岩、黑入控制台开门 | Turret(炮台): 无限弹药固定防御",
+                   noteEn: "Guard: High HP ranged shooter | Drone: Flies over lava, hacks consoles to open doors | Turret: Infinite ammo fixed defense" },
   { act: "eject",   zh: ["第四步 · 脱离宿主", "按 E 脱离宿主，宿主会重新变回敌人"],
                    en: ["Step 4 · Eject", "Press E to eject; the host turns back into an enemy"] },
   { act: "room",    zh: ["第五步 · 切换房间", "查看右下角小地图，走到门边即可切换房间"],
@@ -1693,9 +1697,9 @@ function roundRect(x, y, w, h, r) {
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
-// 简单自动换行（按空格分词，超长 CJK 串按字符断行）
-function wrapText(text, x, y, maxWidth, lineHeight) {
-  const words = text.split(" ");
+// 计算文本自动换行后的行数组（不绘制），依赖当前 ctx.font 设置
+function measureWrapLines(text, maxWidth) {
+  const words = String(text).split(" ");
   const lines = [];
   let line = "";
   for (let w of words) {
@@ -1711,6 +1715,11 @@ function wrapText(text, x, y, maxWidth, lineHeight) {
     else { line = test; }
   }
   if (line.trim()) lines.push(line);
+  return lines;
+}
+
+function wrapText(text, x, y, maxWidth, lineHeight) {
+  const lines = measureWrapLines(text, maxWidth);
   const startY = y + (lines.length > 1 ? 0 : lineHeight / 2);
   for (let i = 0; i < lines.length; i++) ctx.fillText(lines[i], x, startY + i * lineHeight);
 }
@@ -1769,12 +1778,25 @@ function drawTutorialOverlay() {
   const s = TUTORIAL_STEPS[tutorial.step];
   if (!s) return;
   const [title, desc] = tutorialStepText();
+  const note = s ? (LANG === "en" ? s.noteEn : s.note) : null;
   ctx.save();
   if (tutorial.showing) {
     // ---- 完整叠加层 ----
     ctx.fillStyle = "rgba(0,0,0,0.55)";
     ctx.fillRect(0, 0, VW, VH);
-    const bw = Math.min(480, VW - 40), bh = 168;
+    const bw = Math.min(480, VW - 40);
+
+    // 测量描述与备注的换行行数，动态计算框高
+    ctx.font = "14px Courier New";
+    const descLines = measureWrapLines(desc, bw - 48);
+    let noteLines = [];
+    if (note) {
+      ctx.font = "12px Courier New";
+      noteLines = measureWrapLines(note, bw - 48);
+    }
+    const noteH = noteLines.length ? 12 + noteLines.length * 17 : 0;   // 12px 间隔 + 备注各行
+    const minContent = 72 + descLines.length * 20 + noteH + 40;        // 顶部72 + 描述 + 备注 + 底部进度点/提示
+    const bh = Math.max(168, minContent);
     const bx = (VW - bw) / 2, by = (VH - bh) / 2;
     ctx.fillStyle = "rgba(0,18,8,0.95)";
     ctx.strokeStyle = "#00ff66"; ctx.lineWidth = 2;
@@ -1799,6 +1821,16 @@ function drawTutorialOverlay() {
     ctx.font = "14px Courier New";
     ctx.textAlign = "center"; ctx.textBaseline = "top";
     wrapText(desc, bx + bw / 2, by + 72, bw - 48, 20);
+
+    // 备注（黄色小字，位于描述下方）
+    if (note) {
+      const noteY = by + 72 + descLines.length * 20 + 12;
+      ctx.fillStyle = "#ffcc66";
+      ctx.font = "12px Courier New";
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      const startY = noteY + (noteLines.length > 1 ? 0 : 17 / 2);
+      for (let i = 0; i < noteLines.length; i++) ctx.fillText(noteLines[i], bx + bw / 2, startY + i * 17);
+    }
 
     // 进度点
     const dots = TUTORIAL_STEPS.length;

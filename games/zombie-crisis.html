@@ -7,7 +7,7 @@
   if (lang !== 'en') return;
 
   var T = {
-    'WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9/Q/E/滚轮: 切换武器 | 空格: 职业技能\nShift: 冲刺 | R: 装弹\n在无尽的尸潮中生存下去。': 'WASD: Move | Mouse: Aim | LMB: Fire\n1-9/Q/E/Wheel: Switch Weapon | Space: Class Ability\nShift: Dash | R: Reload\nSurvive the endless waves.',
+    'WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9/Q/E/滚轮: 切换武器 | 空格: 地雷\nShift: 冲刺 | R: 装弹\n在无尽的尸潮中生存下去。': 'WASD: Move | Mouse: Aim | LMB: Fire\n1-9/Q/E/Wheel: Switch Weapon | Space: Mine\nShift: Dash | R: Reload\nSurvive the endless waves.',
     '僵尸危机：末日突围 — Zombie Crisis: Outbreak': 'Zombie Crisis: Outbreak',
     '[1-9] 武器  [Q/E] 切换武器  [滚轮] 切换武器  [空格] 地雷  [Shift] 冲刺': '[1-9] Weapon  [Q/E] Switch  [Wheel] Switch  [Space] Mine  [Shift] Dash',
     '选择你的兵种，每个职业拥有独特被动。': 'Choose your operative. Each class has unique passives.',
@@ -922,7 +922,7 @@ const I18n = {
     classSelect: "SELECT CLASS",
     classDesc: "Choose your operative. Each class has unique passives.",
     upgradeTitle: "LEVEL UP",
-    menuDesc: "WASD: Move | Mouse: Aim | LMB: Fire\n1-9/Q/E/Wheel: Switch Weapon | Space: Class Ability\nShift: Dash | R: Reload\nSurvive the endless waves.",
+    menuDesc: "WASD: Move | Mouse: Aim | LMB: Fire\n1-9/Q/E/Wheel: Switch Weapon | Space: Mine\nShift: Dash | R: Reload\nSurvive the endless waves.",
     ammoInfinite: "\u221e",
     mines: "MINES: ",
     waveCleared: "WAVE CLEARED!",
@@ -1007,7 +1007,7 @@ const I18n = {
     classSelect: "选择职业",
     classDesc: "选择你的兵种，每个职业拥有独特被动。",
     upgradeTitle: "升级强化",
-    menuDesc: "WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9/Q/E/滚轮: 切换武器 | 空格: 职业技能\nShift: 冲刺 | R: 装弹\n在无尽的尸潮中生存下去。",
+    menuDesc: "WASD: 移动 | 鼠标: 瞄准 | 左键: 射击\n1-9/Q/E/滚轮: 切换武器 | 空格: 地雷\nShift: 冲刺 | R: 装弹\n在无尽的尸潮中生存下去。",
     ammoInfinite: "\u221e",
     mines: "地雷: ",
     waveCleared: "波次清除！",
@@ -8381,7 +8381,7 @@ function updateHUD() {
   const shootKey = lang === 'zh' ? '射击' : 'FIRE';
   const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
   const mineKey = lang === 'zh' ? '地雷' : 'MINE';
-  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${lang === 'zh' ? '职业技能' : 'ABILITY'}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${lang === 'zh' ? '地雷' : 'MINE'}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
 
   // Countdown text
   const cdEl = document.getElementById('countdownText');
@@ -8424,14 +8424,16 @@ function showTutorial() {
     body.innerHTML =
       '<span class="k">WASD</span> 移动 &nbsp; <span class="k">鼠标</span> 瞄准 &nbsp; <span class="k">左键</span> 射击<br>' +
       '<span class="k">R</span> 装弹 &nbsp; <span class="k">Shift</span> 冲刺 &nbsp; <span class="k">空格</span> 地雷<br>' +
-      '<span class="k">1-9</span> 切换武器';
+      '<span class="k">1-9/Q/E/滚轮</span> 切换武器<br>' +
+      '注意：饥饿/口渴/体温/体力持续下降，击杀僵尸掉落补给';
     foot.textContent = '5 秒后消失，或按任意键继续';
   } else {
     title.textContent = 'CONTROLS';
     body.innerHTML =
       '<span class="k">WASD</span> Move &nbsp; <span class="k">Mouse</span> Aim &nbsp; <span class="k">LMB</span> Fire<br>' +
       '<span class="k">R</span> Reload &nbsp; <span class="k">Shift</span> Dash &nbsp; <span class="k">Space</span> Mine<br>' +
-      '<span class="k">1-9</span> Switch Weapon';
+      '<span class="k">1-9/Q/E/Wheel</span> Switch Weapon<br>' +
+      'Note: Hunger/Thirst/Temp/Stamina drain over time. Kill zombies for supplies.';
     foot.textContent = 'Disappears in 5s, or press any key to continue';
   }
   document.getElementById('tutorialOverlay').classList.remove('hidden');

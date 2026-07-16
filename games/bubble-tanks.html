@@ -11,13 +11,13 @@
     'WASD 移动 · 鼠标瞄准 · 左键发射': 'WASD Move · Mouse Aim · Left Click Fire',
     'BOSS · 轨道母舰': 'BOSS · Orbital Carrier',
     '连击': 'Combo',
-    '武 器 系 统 选 择': 'WEAPON SYSTEM SELECTION',
+    '武 器 系 统 选 择': 'WEAPON SYSTEM',
     '选择强化分支 · 不可撤销': 'Choose upgrade branch · Irreversible',
     '悬停卡片预览武器形态': 'Hover card to preview weapon form',
-    '泡 泡 坦 克 · 进 化 纪 元': 'BUBBLE TANKS · EVOLUTION ERA',
+    '泡 泡 坦 克 · 进 化 纪 元': 'Bubble combat in a fluid world',
     '鼠标': 'Mouse',
     '左键': 'Left Click',
-    '漂移移动（带水中阻力手感）': 'Drift movement (with water resistance)',
+    '移动（带水中阻力）': 'Move (with water drag)',
     '控制瞄准方向 · ': 'Control aim direction · ',
     '发射子泡泡': 'Fire bubbles',
     '连击越高伤害越高（每 5 连击 +1 伤害，上限 +3）': 'Higher combo = more damage (+1 per 5 combo, max +3)',
@@ -35,11 +35,11 @@
     '5 档超频': '5-Tier Overclock',
     '：全属性阶梯式强化': ': Stepped stat enhancement',
     '世界由 ': 'The world consists of ',
-    '5×5 圆柱形泡舱': '5x5 cylindrical bubble sectors',
+    '5×5泡舱网格': '5×5 bubble grid',
     ' 构成，越过边界即可跃迁至相邻泡舱': ', cross boundaries to warp to adjacent sectors',
-    '越靠近地图外侧角落，敌人越凶猛，甚至会出现 ': 'The closer to outer corners, the fiercer enemies become, even ',
-    '轨道 Boss': 'Orbital Boss',
-    '开 始 游 戏': 'START GAME',
+    '越靠近地图边缘，敌人越凶猛，甚至会出现 ': 'The closer to map edges, the fiercer enemies become, even ',
+    '轨道 Boss': 'Orbital Mothership boss',
+    '开 始 游 戏': 'START',
     '核 心 破 裂': 'CORE BREACH',
     '重 新 开 始': 'RESTART',
     '单管迷你泡泡炮': 'Single-barrel mini bubble cannon',
@@ -106,7 +106,8 @@
     ' · 爆炸': ' · Explosive',
     ' · 伤害+': ' · Damage+',
     ' · 射速-': ' · Fire Rate-',
-    '射速': 'Fire Rate'
+    '射速': 'Fire Rate',
+    '目标：探索泡舱，击败Boss，不断进化': 'Goal: Explore cells, defeat bosses, keep evolving'
   };
 
   function tr(text) {
@@ -855,15 +856,16 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
   <div class="gameTitle">BUBBLE <span class="accent">TANKS</span></div>
   <div class="subtitle">泡 泡 坦 克 · 进 化 纪 元</div>
   <div class="instructions">
-    <div class="instrRow"><span class="key">WASD</span> 漂移移动（带水中阻力手感）</div>
+    <div class="instrRow"><span class="key">WASD</span> 移动（带水中阻力）</div>
     <div class="instrRow"><span class="key">鼠标</span> 控制瞄准方向 · <span class="key">左键</span> 发射子泡泡</div>
     <div class="instrRow">连击越高伤害越高（每 5 连击 +1 伤害，上限 +3）</div>
     <div class="instrRow">击败敌方坦克后吞噬散落气泡以积累 <b>XP</b>，达到阈值实时进化为更强形态</div>
     <div class="instrRow">每次进化可选择武器系统：<b>激光炮</b>（高速直射·穿透）/ <b>散弹炮</b>（扇形多发·击退）/ <b>追踪导弹</b>（制导·分裂·爆炸）</div>
     <div class="instrRow">同武器可叠加升级（最高 4 级），炮管与弹道随等级进化 · 坦克光环颜色显示当前主武器</div>
     <div class="instrRow">满级后 XP 继续积累，触发 <b>5 档超频</b>：全属性阶梯式强化</div>
-    <div class="instrRow">世界由 <b>5×5 圆柱形泡舱</b> 构成，越过边界即可跃迁至相邻泡舱</div>
-    <div class="instrRow">越靠近地图外侧角落，敌人越凶猛，甚至会出现 <b>轨道 Boss</b></div>
+    <div class="instrRow">世界由 <b>5×5泡舱网格</b> 构成，越过边界即可跃迁至相邻泡舱</div>
+    <div class="instrRow">越靠近地图边缘，敌人越凶猛，甚至会出现 <b>轨道 Boss</b></div>
+    <div class="instrRow">目标：探索泡舱，击败Boss，不断进化</div>
   </div>
   <button class="startBtn" id="startBtn">开 始 游 戏</button>
   <button id="btnLang" style="position:absolute;top:12px;right:12px;background:rgba(20,30,50,0.8);color:#8cf;border:1px solid #48a;padding:4px 12px;border-radius:4px;cursor:pointer;font-size:12px;z-index:10;">EN</button>

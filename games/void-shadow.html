@@ -9,15 +9,15 @@
 
   var T = {
     '你在卧室中完成了祭祀仪式,虚空之影消散于晨光之中。你幸存了下来,但沃特里宅邸的秘密将永远萦绕在你心头。YOU SURVIVED.': 'You completed the ritual in the bedroom. The shadow of the void dissolves in the dawn light. You survived — but the secrets of the Wentworth manor will haunt you forever. YOU SURVIVED.',
-    '代币类型:+1/0/-1/-2(数值)、骷髅(减末日数)、古老印记(+2抽牌)、混沌触手(自动失败)': 'Token types: +1/0/-1/-2 (numeric), Skull (minus doom), Elder Sign (+2 & draw), Tentacle (auto-fail)',
+    '代币类型:+1/0/-1/-2(数值)、骷髅(减末日数)、远古印记(+2抽牌)、混沌触手(自动失败)': 'Token types: +1/0/-1/-2 (numeric), Skull (minus doom), Elder Sign (+2 & draw), Tentacle (auto-fail)',
     '你必须在理智与生命耗尽之前,搜集足够线索揭开真相,并在卧室内执行祭祀仪式,方能消解这场虚空之影。': 'Before your sanity or life runs dry, you must gather enough clues to uncover the truth, and perform the ritual in the Master Bedroom to dispel the shadow of the void.',
     '理智崩溃,你的心智被虚空彻底侵蚀。从此你只能在阿卡姆疗养院的墙壁间,喃喃自语着无人能懂的低语。': 'Sanity shattered. Your mind is wholly corrupted by the void. Now you can only wander the halls of the Arkham Asylum, muttering whispers no one understands.',
     '你奉命独自前往调查。宅邸内弥漫着不洁的气息,墙壁上的符文渗出黑色液体,虚空的低语在耳畔回响。': 'You have been sent alone to investigate. The air within reeks of the unclean. Sigils on the walls weep black fluid. The whispers of the void echo in your ears.',
-    '抽1枚代币。+1/-1/-2修正检定。骷髅=减末日数。触手=自动失败。远古印记=自动成功。': 'Draw a token. +1/-1/-2 modify your roll. Skull = doom. Tentacle = auto-fail. Elder Sign = auto-success.',
+    '抽1枚代币。+1/-1/-2修正检定。骷髅=减末日数。触手=自动失败。远古印记=+2并抽牌。': 'Draw a token. +1/-1/-2 modify your roll. Skull = minus doom. Tentacle = auto-fail. Elder Sign = +2 & draw a card.',
     '末日降临,虚空彻底吞噬了沃特里宅邸。你的灵魂被永远封印在虚空的彼岸,无人知晓你的故事。': 'The doom arrives. The void devours the Wentworth manor whole. Your soul is sealed beyond the void, your tale lost to all.',
     '一九二六年深秋,阿卡姆镇郊外的沃特里宅邸传出诡异声响。三名调查员进入其中后下落不明。': 'In late autumn of 1926, eerie sounds drift from the Wentworth manor on the outskirts of Arkham. Three investigators entered — and vanished.',
     '集齐线索推进三幕剧情,第三幕在主卧室执行祭祀仪式即可通关。生命或理智归零则失败。': 'Gather clues to advance through three acts. Perform the ritual in the Master Bedroom during Act III to win. Health or Sanity at 0 means defeat.',
-    '行动按钮。每轮3行动力:调查(智力vs遮蔽)、战斗、闪避、祭祀(终幕专用)。': 'Action buttons. 3 actions per round: Investigate (Intellect vs Shroud), Fight, Evade, Mend, Strategy, and Ritual (final act).',
+    '行动：调查、战斗、闪避、疗伤(恢复)、战略(增益)、祭祀(终幕专用)': 'Actions: Investigate, Fight, Evade, Mend (heal), Strategy (buff), Ritual (finale only)',
     '混沌袋。每次判定随机抽一枚代币,抽完不放回。骷髅=减末日数,触手=自动失败。': 'The chaos bag. Each test randomly draws a token (no replacement). Skull = -doom, Tentacle = auto-fail.',
     '欢迎来到《诡秘调查:虚空之影》。这是一款致敬《诡镇奇谈卡牌版》的单人桌游。': 'Welcome to Eldritch Investigation: Shadows of the Void. This is a solo card game inspired by Arkham Horror: The Card Game.',
     '密谋卡(左)记录末日标记。每回合+1,满额触发灾难事件。三幕密谋=失败。': 'The Agenda card (left) tracks doom. Each round +1 doom; when full, a disaster strikes. Three agendas = defeat.',
@@ -124,7 +124,7 @@
     '选择一张牌弃掉,方可继续抽牌': 'Select a card to discard before drawing',
     '— 末日+1,抽1张遭遇卡。': '— +1 doom, draw 1 encounter card.',
     '— 资源+1,抽1张玩家牌。': '— +1 resource, draw 1 player card.',
-    '古老印记 · +2并抽一张牌': 'Elder Sign · +2 and draw a card',
+    '远古印记 · +2并抽一张牌': 'Elder Sign · +2 and draw a card',
     '行动力重置,+1资源,抽1牌': 'reset actions, +1 resource, draw 1 card',
     '无交战 · 点击敌人可选中': 'None engaged · click an enemy to select',
     '调查员阶段 · 行动力3点': 'Investigator Phase · 3 Actions',
@@ -142,7 +142,7 @@
     '避难所生效,敌人无法攻击': 'Sanctuary active — enemies cannot attack',
     '资源 +1,抽取一张手牌': '+1 resource, drew a card',
     '末日降临!灾难事件触发!': 'Doom arrives! Disaster triggered!',
-    '古老印记!+2并抽一张牌': 'Elder Sign! +2 and draw a card',
+    '远古印记!+2并抽一张牌': 'Elder Sign! +2 and draw a card',
     '右键手牌卡可查看卡牌详情': 'Right-click a hand card for details',
     '末日+1,抽1张遭遇卡。': '+1 doom, draw 1 encounter card.',
     '资源+1,抽1张玩家牌。': '+1 resource, draw 1 player card.',
@@ -1885,7 +1885,7 @@ const STRINGS = {
   tutorial_3:        {en:'The Act card (right) tracks clues. Gather clues to advance the story. Complete 3 acts and perform the ritual in the Bedroom.',zh:'场景卡(右)记录线索。集齐线索可推进剧情,第三幕在卧室祭祀通关。'},
   tutorial_4:        {en:'The location map. Green-highlighted locations are adjacent and clickable. Gold "Explore" marks unexplored rooms.',zh:'地点地图。绿色高亮的是可移动的相邻地点,金色的"前往探索"是未探索地点。'},
   tutorial_5:        {en:'Investigator panel. Health or Sanity reaching 0 = defeat. Red or purple breathing glow signals danger.',zh:'调查员面板。生命/理智归零即失败。红色或紫色呼吸光表示危险。'},
-  tutorial_6:        {en:'Action buttons. 3 actions per round: Investigate (Intellect vs Shroud), Fight, Evade, Mend, Strategy, and Ritual (final act).',zh:'行动按钮。每轮3行动力:调查(智力vs遮蔽)、战斗、闪避、祭祀(终幕专用)。'},
+  tutorial_6:        {en:'Actions: Investigate, Fight, Evade, Mend (heal), Strategy (buff), Ritual (finale only)',zh:'行动：调查、战斗、闪避、疗伤(恢复)、战略(增益)、祭祀(终幕专用)'},
   tutorial_7:        {en:'Hand area. Left-click to play. Right-click for details. Event cards confirm before playing.',zh:'手牌区。左键打出,右键查看详情。事件卡使用前会确认。'},
   tutorial_8:        {en:'The chaos bag. Each test randomly draws a token (no replacement). Skull = -doom, Tentacle = auto-fail.',zh:'混沌袋。每次判定随机抽一枚代币,抽完不放回。骷髅=减末日数,触手=自动失败。'},
   tutorial_end:      {en:'❦ Tutorial complete. Good luck in the Wentworth manor...',zh:'❦ 教程结束。祝你在沃特里宅邸好运...'},
@@ -1902,7 +1902,7 @@ const STRINGS = {
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">Investigate:</b> Intellect vs Shroud. Success: gain 1 clue.</p>
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">Combat:</b> Combat vs enemy Combat. Success: deal weapon damage.</p>
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">Evade:</b> Agility vs enemy Combat. Success: enemy moves away, exhausted.</p>
-    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Chaos bag:</b> Draw a token. +1/-1/-2 modify your roll. Skull = doom. Tentacle = auto-fail. Elder Sign = auto-success.</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">Chaos bag:</b> Draw a token. +1/-1/-2 modify your roll. Skull = minus doom. Tentacle = auto-fail. Elder Sign = +2 & draw a card.</p>
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">Defeat:</b> Health 0 = Killed. Sanity 0 = Madness. Doom full (3rd agenda) = Void consumes all.</p>`,zh:`<p style="margin-bottom:8px;"><b style="color:var(--gold);">目标:</b>完成3幕场景(集齐线索),终幕在卧室执行祭祀仪式通关。</p>
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">阶段(每轮):</b></p>
     <p style="margin-left:12px;margin-bottom:6px;">1. <b>神话阶段</b> — 末日+1,抽1张遭遇卡。</p>
@@ -1912,7 +1912,7 @@ const STRINGS = {
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">调查:</b>智力vs遮蔽。成功:获得1线索。</p>
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">战斗:</b>战斗vs敌人战力。成功:造成武器伤害。</p>
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">闪避:</b>敏捷vs敌人战力。成功:敌人移走并疲惫。</p>
-    <p style="margin-bottom:8px;"><b style="color:var(--gold);">混沌袋:</b>抽1枚代币。+1/-1/-2修正检定。骷髅=减末日数。触手=自动失败。远古印记=自动成功。</p>
+    <p style="margin-bottom:8px;"><b style="color:var(--gold);">混沌袋:</b>抽1枚代币。+1/-1/-2修正检定。骷髅=减末日数。触手=自动失败。远古印记=+2并抽牌。</p>
     <p style="margin-bottom:8px;"><b style="color:var(--gold);">失败:</b>生命0=死亡。理智0=疯狂。末日满(第3幕)=虚空吞噬。</p>`},
   // 日志消息
   log_doom_plus:     {en:'+1 doom token',zh:'末日标记 +1'},
@@ -2009,7 +2009,7 @@ const STRINGS = {
   skill_use_card_hint:{en:'· Any stat +{V}',zh:'· 任意属性+{V}'},
   log_skill_card_used:{en:'Used skill card {N} (+{V})',zh:'使用技能卡 {N} (+{V})'},
   log_chaos_refill:  {en:'Chaos bag empty — refilled',zh:'混沌袋已空,重新填满'},
-  log_elder_sign:    {en:'Elder Sign! +2 and draw a card',zh:'古老印记!+2并抽一张牌'},
+  log_elder_sign:    {en:'Elder Sign! +2 and draw a card',zh:'远古印记!+2并抽一张牌'},
   log_test_result:  {en:'{S} {B} {M} = {F} vs {D} · {R}',zh:'{S} {B} {M} = {F} vs {D} · {R}'},
   test_success_label:{en:'Success',zh:'成功'},
   test_fail_label:   {en:'Failed',zh:'失败'},
@@ -2048,7 +2048,7 @@ const STRINGS = {
   rules_phase_enemy: {en:'<b style="color:#8b0000;">Enemy</b>: enemies at locations move toward you; engaged enemies attack',zh:'<b style="color:#8b0000;">敌人阶段</b>:地点敌人向玩家移动,交战敌人攻击'},
   rules_phase_upkeep: {en:'<b style="color:#7faacf;">Upkeep</b>: reset actions, +1 resource, draw 1 card',zh:'<b style="color:#7faacf;">维护阶段</b>:行动力重置,+1资源,抽1牌'},
   rules_chaos_title: {en:'◆ Chaos Bag Test',zh:'◆ 混沌袋判定'},
-  rules_chaos:       {en:'Skill value + equipment bonus + chaos token ≥ difficulty = success.<br>Token types: +1/0/-1/-2 (numeric), Skull (minus doom), Elder Sign (+2 & draw), Tentacle (auto-fail)<br>15 tokens total, drawn without replacement; refilled when empty.',zh:'属性值 + 装备加成 + 混沌代币 ≥ 难度 = 成功。<br>代币类型:+1/0/-1/-2(数值)、骷髅(减末日数)、古老印记(+2抽牌)、混沌触手(自动失败)<br>共15枚代币抽完不放回,用尽重置。'},
+  rules_chaos:       {en:'Skill value + equipment bonus + chaos token ≥ difficulty = success.<br>Token types: +1/0/-1/-2 (numeric), Skull (minus doom), Elder Sign (+2 & draw), Tentacle (auto-fail)<br>15 tokens total, drawn without replacement; refilled when empty.',zh:'属性值 + 装备加成 + 混沌代币 ≥ 难度 = 成功。<br>代币类型:+1/0/-1/-2(数值)、骷髅(减末日数)、远古印记(+2抽牌)、混沌触手(自动失败)<br>共15枚代币抽完不放回,用尽重置。'},
   rules_actions_title:{en:'◆ Action Costs',zh:'◆ 行动消耗'},
   rules_actions:     {en:'Move/Investigate/Fight/Evade/Play card: 1 action each<br>Skill cards: auto-prompted during tests, +2 to any stat, no action cost',zh:'移动/调查/战斗/闪避/打牌:各1行动力<br>技能卡:判定时自动询问使用,加属性+2不消耗行动力'},
   rules_card_types_title:{en:'◆ Card Types',zh:'◆ 卡牌类型'},
@@ -2075,7 +2075,7 @@ const STRINGS = {
   tutorial_3:        {en:'The Act card tracks clues. Gather clues to advance; perform the ritual in the Bedroom during Act III to win.',zh:'场景卡记录线索。集齐线索可推进剧情,第三幕在卧室祭祀通关。'},
   tutorial_4:        {en:'The location map. Green highlights are adjacent movable locations; the golden "Explore" marks unexplored locations.',zh:'地点地图。绿色高亮的是可移动的相邻地点,金色的"前往探索"是未探索地点。'},
   tutorial_5:        {en:'Investigator panel. Health/Sanity at 0 means defeat. Red or purple breathing glow signals danger.',zh:'调查员面板。生命/理智归零即失败。红色或紫色呼吸光表示危险。'},
-  tutorial_6:        {en:'Action buttons. 3 actions per round: Investigate (Intellect vs Shroud), Fight, Evade, Ritual (Final Act only).',zh:'行动按钮。每轮3行动力:调查(智力vs遮蔽)、战斗、闪避、祭祀(终幕专用)。'},
+  tutorial_6:        {en:'Actions: Investigate, Fight, Evade, Mend (heal), Strategy (buff), Ritual (finale only)',zh:'行动：调查、战斗、闪避、疗伤(恢复)、战略(增益)、祭祀(终幕专用)'},
   tutorial_7:        {en:'Hand area. Left-click to play, right-click for details. Event cards prompt for confirmation.',zh:'手牌区。左键打出,右键查看详情。事件卡使用前会确认。'},
   tutorial_8:        {en:'Chaos bag. Each test draws one token without replacement. Skull = minus doom, Tentacle = auto-fail.',zh:'混沌袋。每次判定随机抽一枚代币,抽完不放回。骷髅=减末日数,触手=自动失败。'},
   tutorial_end:      {en:'❦ Tutorial complete. Good luck in the Wentworth manor...',zh:'❦ 教程结束。祝你在沃特里宅邸好运...'},
@@ -2273,8 +2273,8 @@ const CHAOS_TOKENS = [
   {symbol:'-2',value:-2,type:'number',text:'虚空侵蚀',textEn:'Void Erosion'},
   {symbol:'☠',type:'skull',text:'骷髅 · 减去场上末日总数',textEn:'Skull · Minus total doom in play'},
   {symbol:'☠',type:'skull',text:'骷髅 · 减去场上末日总数',textEn:'Skull · Minus total doom in play'},
-  {symbol:'☆',type:'elder_sign',value:2,text:'古老印记 · +2并抽一张牌',textEn:'Elder Sign · +2 and draw a card'},
-  {symbol:'☆',type:'elder_sign',value:2,text:'古老印记 · +2并抽一张牌',textEn:'Elder Sign · +2 and draw a card'},
+  {symbol:'☆',type:'elder_sign',value:2,text:'远古印记 · +2并抽一张牌',textEn:'Elder Sign · +2 and draw a card'},
+  {symbol:'☆',type:'elder_sign',value:2,text:'远古印记 · +2并抽一张牌',textEn:'Elder Sign · +2 and draw a card'},
   {symbol:'🅾',type:'auto_fail',text:'混沌触手 · 自动失败',textEn:'Tentacle · Auto-fail'},
   {symbol:'🅾',type:'auto_fail',text:'混沌触手 · 自动失败',textEn:'Tentacle · Auto-fail'}
 ];

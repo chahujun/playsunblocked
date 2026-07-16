@@ -9,9 +9,11 @@
   var T = {
     'Bite-sized Cosmos · 一口一个宇宙': 'Bite-sized Cosmos',
     '点屏幕任意位置发射引力波': 'Click anywhere to fire a wave',
-    '触发超新星塌缩': 'Trigger Collapse',
+    '触发引力塌缩': 'Trigger Collapse',
     '深空 · 实时观测': 'Deep space · live feed',
     '点屏幕 · 或按空格': 'Click anywhere · or press Space',
+    '点击/空格 发射引力波吞噬粒子 · 积累质量升级 · 质量足够时点击塌缩转生': 'Click/Space to fire gravity wave, devour particles · Gain mass to upgrade · Collapse when massive enough',
+    '点击吞噬小粒子积累质量 → 升级引力 → 吞噬更大天体 → 塌缩转生获取永久加成': 'Click to devour particles, gain mass → Upgrade gravity → Eat larger bodies → Collapse for permanent bonuses',
     '暗物质生成器': 'Dark Matter Auto',
     '自动发射 · 开': 'Auto Wave · On',
     '自动发射 · 关': 'Auto Wave · Off',
@@ -239,6 +241,14 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     margin-bottom: 12px; padding-bottom: 10px;
     border-bottom: 1px solid rgba(0, 212, 255, 0.15);
     opacity: 0.7;
+  }
+  .title-goal {
+    font-size: 9px;
+    line-height: 1.55;
+    letter-spacing: 0.3px;
+    color: var(--cyan);
+    margin-bottom: 12px;
+    opacity: 0.9;
   }
   .stat-row {
     display: flex; justify-content: space-between;
@@ -504,6 +514,7 @@ html,body{margin:0!important;padding:0!important;overflow:hidden!important;width
     #stats, #upgrades, #actions { min-width: 200px; padding: 10px 12px; }
     #title { font-size: 11px; letter-spacing: 3px; }
     .title-sub { font-size: 8px; }
+    .title-goal { font-size: 8px; line-height: 1.45; }
     .stat-value { font-size: 13px; }
     .stat-label { font-size: 9px; }
     .upgrade-btn, .action-btn { font-size: 10px; padding: 8px 11px; }
@@ -561,6 +572,7 @@ document.addEventListener('click',function(e){if(!e.target.closest('#ps-menu-btn
     <span id="title-text">Bite-sized Cosmos</span>
   </div>
   <div class="title-sub" data-i18n="subtitle">GRAVITATIONAL SINGULARITY ENGINE</div>
+  <div class="title-goal" data-i18n="goal">Click to devour particles, gain mass → Upgrade gravity → Eat larger bodies → Collapse for permanent bonuses</div>
   <div class="stat-row"><span class="stat-label" data-i18n="mass">Mass</span><span class="stat-value" id="mass-val">0</span></div>
   <div class="stat-row"><span class="stat-label" data-i18n="range">Grav-Range</span><span class="stat-value range" id="range-val">0</span></div>
   <div class="stat-row"><span class="stat-label" data-i18n="crystal">Void Crystals</span><span class="stat-value crystal" id="crystal-val">0</span></div>
@@ -611,8 +623,9 @@ const I18N = {
   en: {
     title: 'Bite-sized Cosmos',
     subtitle: 'Eat the universe, one bite at a time.',
+    goal: 'Click to devour particles, gain mass → Upgrade gravity → Eat larger bodies → Collapse for permanent bonuses',
     coord1: 'Deep space · live feed',
-    footerHint: 'Click anywhere · or press Space',
+    footerHint: 'Click/Space to fire gravity wave, devour particles · Gain mass to upgrade · Collapse when massive enough',
     mass: 'Mass',
     range: 'Pull Range',
     crystal: 'Void Crystals',
@@ -641,8 +654,9 @@ const I18N = {
   zh: {
     title: '一口一个宇宙',
     subtitle: '慢慢嚼，别噎着',
+    goal: '点击吞噬小粒子积累质量 → 升级引力 → 吞噬更大天体 → 塌缩转生获取永久加成',
     coord1: '深空 · 实时观测',
-    footerHint: '点屏幕 · 或按空格',
+    footerHint: '点击/空格 发射引力波吞噬粒子 · 积累质量升级 · 质量足够时点击塌缩转生',
     mass: '当前质量',
     range: '引力范围',
     crystal: '虚空晶体',
@@ -655,7 +669,7 @@ const I18N = {
     actionTitle: '操作',
     waveBtn: '发射引力波',
     autoWave: '自动发射',
-    warpBtn: '触发超新星塌缩',
+    warpBtn: '触发引力塌缩',
     levelUp: '',
     cost: '消耗',
     level: 'Lv.',
@@ -929,9 +943,13 @@ function applyI18n() {
 }
 function toggleLang() {
   lang = lang === 'en' ? 'zh' : 'en';
-  // 禁用头部 i18n-script 的 MutationObserver（如果存在）
-  if (lang === 'zh' && window._i18nObserver) {
-    window._i18nObserver.disconnect();
+  // 头部 i18n-script 的 MutationObserver：中文模式下断开（避免把中文强制译成英文），英文模式下重新启用
+  if (window._i18nObserver) {
+    if (lang === 'zh') {
+      window._i18nObserver.disconnect();
+    } else {
+      window._i18nObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+    }
   }
   applyI18n();
   saveGame();
