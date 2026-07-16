@@ -5,16 +5,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
 <title>Crownfall: The Broken Realm</title>
 <style>
-/* ===== CSS VARIABLES ===== */
+/* ===== CSS VARIABLES — Western Indie RPG Palette ===== */
 :root{
-  --forest:#2d4a2b;--navy:#1a2744;--charcoal:#222;--orange:#c4621e;
-  --darkred:#6b2020;--gold:#c9a84c;--parchment:#e8dcc0;--parchment-d:#d4c4a0;
-  --iron:#555;--wood:#5c3a1e;--bg:#0d1117;--panel:#1a1f2e;--panel2:#232a3d;
-  --border:#3a4a5c;--text:#e0d8c8;--text-dim:#8a8a7a;--green:#4a7c3a;
-  --blue:#3a6a8a;--purple:#6a3a6a;--red:#c44;--white:#f0e8d8;
-  --rare-blue:#4488cc;--epic-purple:#8844cc;--legend-orange:#cc8800;
+  --navy:#17202B;--charcoal:#242321;--parchment:#D6C29A;--old-paper:#B9A47A;
+  --forest:#30483A;--iron:#5B5C57;--darkred:#743C38;--gold:#B18A45;--gray-white:#E5DDC8;
+  --bg:var(--navy);--panel:var(--charcoal);--panel2:#2A2926;
+  --border:var(--iron);--text:var(--gray-white);--text-dim:var(--old-paper);
+  --green:var(--forest);--red:var(--darkred);--orange:#8A6A3A;--white:var(--gray-white);
+  --blue:#4A6A7A;--purple:#6A4A6A;
+  --wood:#3D3530;--parchment-d:var(--old-paper);
+  --rare-blue:#4A6A7A;--epic-purple:#6A4A6A;--legend-orange:#9A7430;
   --font-display:'Georgia','Times New Roman',serif;
-  --font-body:'Georgia','serif';
+  --font-body:'Georgia',serif;
   --font-mono:'Courier New',monospace;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -33,48 +35,44 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 
 /* ===== TITLE SCREEN ===== */
 #title-screen{
-  background:radial-gradient(ellipse at 50% 30%,#1a2a1a 0%,#0a0e14 70%);
+  background:var(--navy);
   overflow:hidden;
 }
 #title-screen::before{
   content:'';position:absolute;top:0;left:0;width:100%;height:100%;
-  background:
-    radial-gradient(circle at 50% 20%,rgba(201,168,76,.08) 0%,transparent 40%),
-    radial-gradient(circle at 30% 60%,rgba(196,98,30,.05) 0%,transparent 30%),
-    radial-gradient(circle at 70% 50%,rgba(107,32,32,.05) 0%,transparent 30%);
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(214,194,154,.012) 2px,rgba(214,194,154,.012) 4px);
   pointer-events:none;
 }
-.title-ash{position:absolute;width:3px;height:3px;background:rgba(255,180,80,.6);border-radius:50%;pointer-events:none;animation:ashFloat linear infinite}
-@keyframes ashFloat{0%{transform:translateY(100vh) translateX(0);opacity:0}10%{opacity:.6}90%{opacity:.6}100%{transform:translateY(-10vh) translateX(20px);opacity:0}}
+.title-ash{display:none}
 .title-content{position:relative;z-index:2;text-align:center}
-.title-logo{font-size:clamp(32px,6vw,64px);font-weight:bold;color:var(--gold);letter-spacing:4px;text-shadow:0 0 20px rgba(201,168,76,.3),0 4px 8px rgba(0,0,0,.8);margin-bottom:8px;font-family:var(--font-display)}
+.title-logo{font-size:clamp(32px,6vw,64px);font-weight:bold;color:var(--gold);letter-spacing:4px;text-shadow:0 2px 4px rgba(0,0,0,.6);margin-bottom:8px;font-family:var(--font-display)}
 .title-sub{font-size:clamp(12px,2vw,18px);color:var(--text-dim);font-style:italic;margin-bottom:48px;letter-spacing:2px}
 .title-btn{
   display:block;width:280px;padding:12px 24px;margin:8px auto;
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:2px solid var(--border);border-radius:4px;
+  background:var(--panel);
+  border:1.5px solid var(--border);border-radius:3px;
   color:var(--text);font-size:16px;letter-spacing:2px;
-  transition:all .2s;text-transform:uppercase;
+  transition:all .15s;text-transform:uppercase;
 }
-.title-btn:hover{background:linear-gradient(180deg,var(--border),var(--panel2));border-color:var(--gold);color:var(--gold);box-shadow:0 0 12px rgba(201,168,76,.2)}
+.title-btn:hover{background:var(--panel2);border-color:var(--gold);color:var(--gold)}
 .title-btn:active{transform:scale(.98)}
-.title-crown{position:absolute;top:15%;left:50%;transform:translateX(-50%);width:120px;height:80px;opacity:.15;pointer-events:none}
+.title-crown{position:absolute;top:15%;left:50%;transform:translateX(-50%);width:120px;height:80px;opacity:.08;pointer-events:none}
 
 /* ===== CHARACTER SELECT ===== */
-#char-select{background:radial-gradient(ellipse at center,#1a1f2e 0%,#0a0e14 70%);padding:20px;overflow-y:auto;justify-content:flex-start}
+#char-select{background:var(--navy);padding:20px;overflow-y:auto;justify-content:flex-start}
 .cs-header{text-align:center;margin:20px 0}
 .cs-title{font-size:28px;color:var(--gold);letter-spacing:3px;margin-bottom:4px}
 .cs-hint{color:var(--text-dim);font-size:14px}
 .cs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:960px;width:100%;margin:0 auto}
 .cs-card{
-  background:linear-gradient(180deg,var(--panel2),var(--panel));
-  border:2px solid var(--border);border-radius:6px;padding:16px;
-  cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+  background:var(--panel);
+  border:1.5px solid var(--border);border-radius:4px;padding:16px;
+  cursor:pointer;transition:all .15s;position:relative;overflow:hidden;
 }
-.cs-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.4)}
-.cs-card.selected{border-color:var(--green);box-shadow:0 0 16px rgba(74,124,58,.3)}
-.cs-card.selected::after{content:'✓';position:absolute;top:8px;right:8px;color:var(--green);font-size:24px;font-weight:bold}
-.cs-portrait{width:80px;height:80px;margin:0 auto 8px;border-radius:50%;border:3px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--bg)}
+.cs-card:hover{border-color:var(--old-paper);transform:translateY(-2px)}
+.cs-card.selected{border-color:var(--forest);border-width:2px}
+.cs-card.selected::after{content:'';position:absolute;top:8px;right:8px;width:16px;height:16px;border:solid var(--forest);border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-4px}
+.cs-portrait{width:80px;height:80px;margin:0 auto 8px;border-radius:4px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--panel2)}
 .cs-name{font-size:18px;color:var(--gold);text-align:center;margin-bottom:2px}
 .cs-role{font-size:12px;color:var(--text-dim);text-align:center;margin-bottom:8px}
 .cs-desc{font-size:12px;color:var(--text);text-align:center;margin-bottom:8px;line-height:1.4;min-height:34px}
@@ -83,13 +81,13 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 .cs-stat span:first-child{color:var(--gold);font-size:14px;font-weight:bold}
 .cs-skills{font-size:11px;color:var(--text-dim);line-height:1.5}
 .cs-skills b{color:var(--text)}
-.cs-diff{position:absolute;top:8px;left:8px;font-size:10px;padding:2px 6px;border-radius:3px;background:var(--panel)}
-.cs-confirm{margin:20px auto;display:block;padding:12px 48px;font-size:18px;background:linear-gradient(180deg,var(--green),#3a5c2a);color:var(--white);border-radius:4px;letter-spacing:2px;border:2px solid var(--border)}
+.cs-diff{position:absolute;top:8px;left:8px;font-size:10px;padding:2px 6px;border-radius:2px;background:var(--panel2);color:var(--gold)}
+.cs-confirm{margin:20px auto;display:block;padding:12px 48px;font-size:18px;background:var(--forest);color:var(--gray-white);border-radius:3px;letter-spacing:2px;border:1.5px solid var(--iron)}
 .cs-confirm:disabled{opacity:.4;cursor:not-allowed}
 .cs-count{text-align:center;color:var(--gold);font-size:14px;margin:8px 0}
 
 /* ===== MAP SCREEN ===== */
-#map-screen{background:radial-gradient(ellipse at center,#1a1f2e 0%,#0a0e14 70%);padding:8px;flex-direction:column;justify-content:flex-start;align-items:stretch}
+#map-screen{background:var(--navy);padding:8px;flex-direction:column;justify-content:flex-start;align-items:stretch}
 .map-topbar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;background:var(--panel);border-bottom:2px solid var(--border);flex-shrink:0}
 .map-area-name{font-size:16px;color:var(--gold);letter-spacing:2px}
 .map-objective{font-size:12px;color:var(--text-dim)}
@@ -107,11 +105,11 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 .map-node-info{position:absolute;bottom:8px;left:8px;background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--text);max-width:240px;z-index:5}
 
 /* ===== BATTLE SCREEN ===== */
-#battle-screen{background:radial-gradient(ellipse at center,#1a1a2e 0%,#0a0a14 70%);flex-direction:column;justify-content:flex-start;align-items:stretch;padding:4px}
+#battle-screen{background:var(--navy);flex-direction:column;justify-content:flex-start;align-items:stretch;padding:4px}
 .bt-topbar{display:flex;justify-content:space-between;align-items:center;padding:4px 12px;background:var(--panel);border-bottom:1px solid var(--border);flex-shrink:0;font-size:12px}
 .bt-turn-order{display:flex;gap:4px;align-items:center}
-.bt-turn-icon{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;background:var(--panel2)}
-.bt-turn-icon.active{border-color:var(--gold);box-shadow:0 0 8px rgba(201,168,76,.4)}
+.bt-turn-icon{width:28px;height:28px;border-radius:3px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--panel2)}
+.bt-turn-icon.active{border-color:var(--gold);border-width:2px}
 .bt-phase{color:var(--orange);font-weight:bold;letter-spacing:1px}
 .bt-body{flex:1;display:flex;overflow:hidden}
 .bt-canvas-wrap{flex:1;position:relative;display:flex;align-items:center;justify-content:center}
@@ -136,7 +134,7 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 .bt-hero-card{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:3px;cursor:pointer;transition:all .15s}
 .bt-hero-card.active{background:var(--panel2);border:1px solid var(--gold)}
 .bt-hero-card.dead{opacity:.3}
-.bt-hero-portrait{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;background:var(--bg)}
+.bt-hero-portrait{width:32px;height:32px;border-radius:3px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;background:var(--panel2)}
 .bt-hero-hp{font-size:11px;line-height:1.2}
 .bt-hero-hp-bar{width:50px;height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
 .bt-hero-hp-fill{height:100%;background:var(--green);transition:width .3s}
@@ -145,25 +143,25 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 #dice-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:50;pointer-events:none}
 .dice-box{text-align:center}
 .dice-label{font-size:16px;color:var(--gold);margin-bottom:12px;letter-spacing:1px}
-.dice-face{width:80px;height:80px;margin:0 auto 12px;background:var(--parchment);border:3px solid var(--wood);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:bold;color:var(--charcoal);box-shadow:0 4px 16px rgba(0,0,0,.5)}
+.dice-face{width:80px;height:80px;margin:0 auto 12px;background:var(--parchment);border:2px solid var(--wood);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:bold;color:var(--charcoal);box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .dice-face.rolling{animation:diceRoll .6s ease-out}
 @keyframes diceRoll{0%{transform:rotate(0) scale(.5)}50%{transform:rotate(360deg) scale(1.2)}100%{transform:rotate(720deg) scale(1)}}
 .dice-result{font-size:24px;font-weight:bold;letter-spacing:2px;margin-top:8px}
-.dice-result.crit{color:var(--gold);text-shadow:0 0 10px rgba(201,168,76,.5)}
+.dice-result.crit{color:var(--gold);font-weight:bold}
 .dice-result.success{color:var(--green)}
 .dice-result.partial{color:var(--blue)}
 .dice-result.fail{color:var(--red)}
 .dice-result.critfail{color:var(--purple)}
-.dice-reroll-btn{margin-top:12px;padding:8px 24px;background:var(--orange);color:var(--white);border-radius:4px;font-size:14px;letter-spacing:1px;pointer-events:auto}
+.dice-reroll-btn{margin-top:12px;padding:8px 24px;background:var(--orange);color:var(--white);border:1.5px solid var(--iron);border-radius:3px;font-size:14px;letter-spacing:1px;pointer-events:auto;display:flex;align-items:center;gap:6px}
 
 /* ===== MODAL ===== */
 .modal-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:40}
 .modal-box{
-  background:linear-gradient(180deg,var(--parchment),var(--parchment-d));
-  border:3px solid var(--wood);border-radius:8px;padding:24px;max-width:480px;width:90%;
-  box-shadow:0 8px 32px rgba(0,0,0,.6);color:var(--charcoal);position:relative;
+  background:var(--parchment);
+  border:2px solid var(--wood);border-radius:4px;padding:24px;max-width:480px;width:90%;
+  box-shadow:0 4px 16px rgba(0,0,0,.5);color:var(--charcoal);position:relative;
 }
-.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,transparent 60%,rgba(92,58,30,.1) 100%);pointer-events:none;border-radius:6px}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(36,35,33,.02) 3px,rgba(36,35,33,.02) 6px);pointer-events:none;border-radius:3px}
 .modal-title{font-size:22px;color:var(--darkred);text-align:center;margin-bottom:12px;font-family:var(--font-display);letter-spacing:1px}
 .modal-desc{font-size:14px;line-height:1.6;color:var(--charcoal);margin-bottom:16px;text-align:center}
 .modal-btn{display:block;width:100%;padding:10px;margin:6px 0;background:var(--panel);color:var(--text);border:2px solid var(--border);border-radius:4px;font-size:14px;letter-spacing:1px;transition:all .15s}
@@ -175,7 +173,7 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 
 /* ===== EVENT CARD ===== */
 .event-card{max-width:440px}
-.event-illust{width:100%;height:120px;background:var(--panel);border:2px solid var(--wood);border-radius:4px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--gold)}
+.event-illust{width:100%;height:120px;background:var(--panel);border:1.5px solid var(--wood);border-radius:3px;margin-bottom:12px;display:flex;align-items:center;justify-content:center;color:var(--gold)}
 
 /* ===== SHOP ===== */
 .shop-card{max-width:520px;max-height:80vh;overflow-y:auto}
@@ -189,22 +187,21 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
 
 /* ===== REWARD SCREEN ===== */
 #reward-screen{background:rgba(0,0,0,.85);z-index:30}
-.reward-box{background:linear-gradient(180deg,var(--panel2),var(--panel));border:2px solid var(--gold);border-radius:8px;padding:24px;max-width:500px;width:90%;text-align:center}
+.reward-box{background:var(--panel);border:1.5px solid var(--gold);border-radius:4px;padding:24px;max-width:500px;width:90%;text-align:center}
 .reward-title{font-size:24px;color:var(--gold);margin-bottom:16px;letter-spacing:2px}
 .reward-items{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
 .reward-item{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:8px;font-size:12px;color:var(--text)}
 .reward-item.gold-item{border-color:var(--gold)}
-.reward-btn{padding:10px 32px;background:var(--green);color:var(--white);border-radius:4px;font-size:16px;letter-spacing:2px;border:2px solid var(--border)}
+.reward-btn{padding:10px 32px;background:var(--forest);color:var(--gray-white);border-radius:3px;font-size:16px;letter-spacing:2px;border:1.5px solid var(--iron)}
 
 /* ===== GAME OVER / VICTORY ===== */
 #gameover-screen,#victory-screen{background:rgba(0,0,0,.9);z-index:60;text-align:center}
 .go-title{font-size:36px;color:var(--darkred);letter-spacing:4px;margin-bottom:12px}
-.vic-title{font-size:36px;color:var(--gold);letter-spacing:4px;margin-bottom:12px;text-shadow:0 0 20px rgba(201,168,76,.3)}
+.vic-title{font-size:36px;color:var(--gold);letter-spacing:4px;margin-bottom:12px}
 .go-sub{font-size:16px;color:var(--text-dim);margin-bottom:24px;font-style:italic}
 
 /* ===== TUTORIAL ===== */
-.tutorial-tip{position:absolute;background:var(--panel);border:2px solid var(--gold);border-radius:6px;padding:8px 14px;font-size:13px;color:var(--gold);z-index:45;max-width:280px;box-shadow:0 0 12px rgba(201,168,76,.2);animation:tipPulse 2s ease-in-out infinite}
-@keyframes tipPulse{0%,100%{box-shadow:0 0 8px rgba(201,168,76,.15)}50%{box-shadow:0 0 16px rgba(201,168,76,.3)}}
+.tutorial-tip{position:absolute;background:var(--panel);border:1.5px solid var(--gold);border-radius:4px;padding:8px 14px;font-size:13px;color:var(--gold);z-index:45;max-width:280px}
 
 /* ===== STATUS EFFECTS ===== */
 .status-icon{display:inline-block;width:16px;height:16px;border-radius:3px;font-size:10px;text-align:center;line-height:16px;color:var(--white);font-weight:bold;margin:0 1px}
@@ -263,9 +260,9 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
       <div class="map-objective" id="map-objective">Reach the Fallen Crown</div>
     </div>
     <div class="map-resources">
-      <div class="map-res">🪙 <span id="map-gold">0</span></div>
-      <div class="map-res">🧪 <span id="map-potions">0</span></div>
-      <div class="map-res">🍀 <span id="map-luck">0</span></div>
+      <div class="map-res" id="map-res-gold"></div>
+      <div class="map-res" id="map-res-potions"></div>
+      <div class="map-res" id="map-res-luck"></div>
     </div>
   </div>
   <div class="map-body">
@@ -309,7 +306,7 @@ button{font-family:var(--font-display);cursor:pointer;border:none;outline:none}
     <div class="dice-label" id="dice-label">Rolling...</div>
     <div class="dice-face" id="dice-face">?</div>
     <div class="dice-result" id="dice-result"></div>
-    <button class="dice-reroll-btn hidden" id="dice-reroll" onclick="rerollDice()">USE LUCK 🍀</button>
+    <button class="dice-reroll-btn hidden" id="dice-reroll" onclick="rerollDice()"></button>
   </div>
 </div>
 
@@ -516,11 +513,84 @@ function setVolume(v){
 }
 
 /* ========================================================================
+   UNIFIED ICON SYSTEM — Western Indie RPG Line Art
+   All icons use 24x24 viewBox, stroke-based, no fill, no emoji.
+   Works in both DOM (inline SVG) and Canvas (Path2D).
+   ======================================================================== */
+const ICON_PATHS={
+  // Classes
+  shield:['M12 2L5 5v6c0 5 3 9 7 11 4-2 7-6 7-11V5z','M12 7v7'],
+  bow:['M19 5C15 5 8 8 5 12 8 16 15 19 19 19','M5 12h14','M16 9l3 3-3 3'],
+  flame:['M12 3c-1 3-4 5-4 9 0 4 2 7 4 7s4-3 4-7c0-2-1-3-1-5','M12 9c-1 2-2 3-2 6 0 1 1 2 2 2'],
+  halo:['M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10','M12 4v2','M6.5 6.5l1 1','M17.5 6.5l-1 1','M4 12h2','M18 12h2','M6.5 17.5l1-1','M17.5 17.5l-1-1'],
+  skull:['M12 3C8 3 5 6 5 10v2l2 2v3h2v-2h6v2h2v-3l2-2v-2c0-4-3-7-7-7','M9 10a.8 .8 0 1 0 1.6 0a.8 .8 0 1 0 -1.6 0','M14 10a.8 .8 0 1 0 1.6 0a.8 .8 0 1 0 -1.6 0','M11 14h2'],
+  wolf:['M5 8l2-4 2 3','M19 8l-2-4-2 3','M7 8c0 5 2 8 5 8s5-3 5-8','M9.5 10a.6 .6 0 1 0 1.2 0a.6 .6 0 1 0 -1.2 0','M14.5 10a.6 .6 0 1 0 1.2 0a.6 .6 0 1 0 -1.2 0','M12 13l-1 2h2z'],
+  // Enemies
+  goblin:['M6 6l3 3','M18 6l-3 3','M8 9c0 4 2 7 4 7s4-3 4-7','M10 11a.6 .6 0 1 0 1.2 0a.6 .6 0 1 0 -1.2 0','M13.5 11a.6 .6 0 1 0 1.2 0a.6 .6 0 1 0 -1.2 0','M11 14h2'],
+  hound:['M5 6l3 4','M19 6l-3 4','M8 10c0 3 2 5 4 5s4-2 4-5','M10 11a.6 .6 0 1 0 1.2 0a.6 .6 0 1 0 -1.2 0','M13.5 11a.6 .6 0 1 0 1.2 0a.6 .6 0 1 0 -1.2 0'],
+  orb:['M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10','M9 19h6','M10 18v2','M14 18v2','M12 7a2 2 0 0 0-2 2'],
+  sword:['M12 3v12','M8 15h8','M11 15v3','M13 15v3','M12 3l-1 2h2z'],
+  witchhat:['M6 18h12','M8 18l4-12 4 12','M10 10h4'],
+  giant:['M7 10h10','M7 10v5c0 2 2 4 5 4s5-2 5-4v-5','M9 7h6','M10 4h4','M9 13h6'],
+  // Boss
+  crown:['M4 18h16','M5 18V9l4 4 3-6 3 6 4-4v9','M5 9L4 6','M19 9l1-3','M12 3v3'],
+  // Events
+  bell:['M9 18h6','M10 18v-5a2 2 0 0 1 4 0v5','M11 5a1 1 0 0 1 2 0v2','M8 18h8','M12 19a1 1 0 1 0 0-2'],
+  bandage:['M4 12c0-4 4-8 8-8s8 4 8 8-4 8-8 8-8-4-8-8','M8 8l8 8','M16 8l-8 8'],
+  cart:['M4 8h11v6H4z','M4 14h11','M15 10h3l2 4v2h-5','M7 18a1 1 0 1 0 0 2','M13 18a1 1 0 1 0 0 2'],
+  raven:['M4 14c3-1 7-1 9-3l5 1-2 2-4 1c-2 2-5 2-8 1','M18 12l2-1'],
+  gem:['M12 4l6 5-6 11L6 9z','M6 9h12','M12 4v16','M9 9l3 11','M15 9l-3 11'],
+  tomb:['M8 20v-7a4 4 0 0 1 8 0v7','M8 20h8','M6 20h12','M10 11h4'],
+  bridge:['M3 18V12a4 4 0 0 1 8 0v6','M11 18V12a4 4 0 0 1 8 0v6','M3 18h18','M3 15h18'],
+  pack:['M8 6h8v14H8z','M10 6V4h4v2','M10 11h4','M10 14h4'],
+  // Map nodes
+  swords:['M5 5l9 9','M14 5l-9 9','M5 14l3 3','M14 14l-3 3','M7 7l-2-1','M17 7l2-1'],
+  scroll:['M7 5h10v14H7z','M7 5c-1 0-2 1-2 2v10c0 1 1 2 2 2','M17 5c1 0 2 1 2 2v10c0 1-1 2-2 2','M10 10h4','M10 13h4'],
+  coin:['M12 5a7 7 0 1 0 0 14 7 7 0 0 0 0-14','M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6'],
+  star:['M12 4l2.5 5 5.5.8-4 3.9 1 5.5-5-2.9-5 2.9 1-5.5-4-3.9 5.5-.8z'],
+  tent:['M12 5L4 19h16z','M12 5v14'],
+  chest:['M5 11h14v8H5z','M5 11c0-3 3-5 7-5s7 2 7 5','M5 15h14','M11 15v2h2v-2'],
+  // Status effects
+  drop:['M12 4c-3 4-5 7-5 10 0 3 2 5 5 5s5-2 5-5c0-3-2-6-5-10'],
+  poison:['M12 5a5 5 0 0 0-5 5v3l2 2v2h6v-2l2-2v-3a5 5 0 0 0-5-5','M10 9l4 4','M14 9l-4 4'],
+  stun:['M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12','M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6','M9 9l6 6'],
+  slow:['M8 12a4 4 0 1 1 8 0 4 4 0 0 1-8 0','M8 12c-2 0-3 1-3 3','M16 12c2 0 3 1 3 2','M12 8V5'],
+  weaken:['M12 5v14','M7 14l5 5 5-5'],
+  taunt:['M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12','M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6','M12 12h.01'],
+  haste:['M13 3L6 13h5l-1 8 7-10h-5z'],
+  // Rewards / Resources
+  flask:['M10 4h4','M10 4v5l-3 8c-1 2 0 3 2 3h6c2 0 3-1 2-3l-3-8V4','M8 14h8'],
+  clover:['M12 12c-2-2-4-2-4 0s2 2 4 0','M12 12c2-2 4-2 4 0s-2 2-4 0','M12 12c-2 2-4 2-4 0s2-2 4 0','M12 12c2 2 4 2 4 0s-2-2-4 0','M12 12v-6'],
+  // UI
+  check:['M5 12l5 5L19 7'],
+  question:['M12 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8','M12 15v3','M12 9h.01'],
+  bone:['M7 8a2 2 0 1 0-1 3l1 1 0 2 10 0 0-2 1-1a2 2 0 1 0-1-3l-1 1-8 0z'],
+  fire:['M12 3c-1 3-4 5-4 9 0 4 2 7 4 7s4-3 4-7c0-2-1-3-1-5','M12 9c-1 2-2 3-2 6 0 1 1 2 2 2']
+};
+function iconSVG(id,size=20,color='currentColor'){
+  const paths=ICON_PATHS[id]||ICON_PATHS.question;
+  const tags=paths.map(d=>`<path d="${d}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`).join('');
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:inline-block;vertical-align:middle">${tags}</svg>`;
+}
+function drawIcon(ctx,id,cx,cy,size,color){
+  const paths=ICON_PATHS[id]||ICON_PATHS.question;
+  const scale=size/24;
+  ctx.save();
+  ctx.translate(cx-12*scale,cy-12*scale);
+  ctx.scale(scale,scale);
+  ctx.strokeStyle=color||'#E5DDC8';
+  ctx.lineWidth=1.5/scale;
+  ctx.lineCap='round'; ctx.lineJoin='round';
+  paths.forEach(d=>{ try{ctx.stroke(new Path2D(d));}catch(e){} });
+  ctx.restore();
+}
+
+/* ========================================================================
    GAME DATA — Classes
    ======================================================================== */
 const CLASSES = {
   vanguard: {
-    id:'vanguard', icon:'🛡', color:'#4a7c3a', difficulty:1,
+    id:'vanguard', icon:'shield', color:'#4a7c3a', difficulty:1,
     name:{en:'The Vanguard',cn:'先锋'},
     role:{en:'Tank · Defense · Protect',cn:'坦克 · 防御 · 保护'},
     desc:{en:'A disciplined guardian who stands between danger and the party.',cn:'一名训练有素的守护者，永远站在队伍与危险之间。'},
@@ -533,7 +603,7 @@ const CLASSES = {
     passive:{name:{en:'Shield Block',cn:'盾牌格挡'},desc:{en:'Reduces incoming damage by 2.',cn:'减少受到的伤害2点。'}}
   },
   outrider: {
-    id:'outrider', icon:'🏹', color:'#c4621e', difficulty:2,
+    id:'outrider', icon:'bow', color:'#c4621e', difficulty:2,
     name:{en:'The Outrider',cn:'游骑斥候'},
     role:{en:'Ranged · Mobility · Crit',cn:'远程 · 机动 · 暴击'},
     desc:{en:'A fast-moving marksman who wins through distance and precision.',cn:'依靠距离和精准射击取胜的快速射手。'},
@@ -546,7 +616,7 @@ const CLASSES = {
     passive:{name:{en:'Distance Bonus',cn:'距离加成'},desc:{en:'+2 damage when 3+ tiles from target.',cn:'距离目标3格以上时+2伤害。'}}
   },
   emberwitch: {
-    id:'emberwitch', icon:'🔥', color:'#c44400', difficulty:3,
+    id:'emberwitch', icon:'flame', color:'#c44400', difficulty:3,
     name:{en:'The Ember Witch',cn:'余烬女巫'},
     role:{en:'AoE Magic · Fire · Burn',cn:'范围魔法 · 火焰 · 燃烧'},
     desc:{en:'A forbidden spellcaster who turns fire into a weapon.',cn:'将火焰化为武器的禁忌施法者。'},
@@ -559,7 +629,7 @@ const CLASSES = {
     passive:{name:{en:'Inner Flame',cn:'内在之焰'},desc:{en:'Burn effects deal +1 damage per turn.',cn:'燃烧效果每回合额外造成1点伤害。'}}
   },
   oathkeeper: {
-    id:'oathkeeper', icon:'✨', color:'#4488cc', difficulty:2,
+    id:'oathkeeper', icon:'halo', color:'#4488cc', difficulty:2,
     name:{en:'The Oathkeeper',cn:'誓约守护者'},
     role:{en:'Heal · Shield · Support',cn:'治疗 · 护盾 · 辅助'},
     desc:{en:'A faithful protector who keeps wounded allies alive.',cn:'守护受伤队友、维持队伍生存的忠诚保护者。'},
@@ -572,7 +642,7 @@ const CLASSES = {
     passive:{name:{en:'Blessing Aura',cn:'祝福光环'},desc:{en:'Adjacent allies regenerate 2 HP per turn.',cn:'相邻队友每回合恢复2点生命值。'}}
   },
   gravewarden: {
-    id:'gravewarden', icon:'💀', color:'#6a3a6a', difficulty:4,
+    id:'gravewarden', icon:'skull', color:'#6a3a6a', difficulty:4,
     name:{en:'The Grave Warden',cn:'墓地守卫'},
     role:{en:'Shadow · Summon · Debuff',cn:'暗影 · 召唤 · 削弱'},
     desc:{en:'A mysterious guardian who commands the spirits of the fallen.',cn:'能够命令亡者灵魂的神秘守卫。'},
@@ -585,7 +655,7 @@ const CLASSES = {
     passive:{name:{en:'Undying Will',cn:'不朽意志'},desc:{en:'When HP drops below 30%, gain +3 attack.',cn:'生命值低于30%时，攻击力+3。'}}
   },
   wildcaller: {
-    id:'wildcaller', icon:'🐺', color:'#7a5c2a', difficulty:3,
+    id:'wildcaller', icon:'wolf', color:'#7a5c2a', difficulty:3,
     name:{en:'The Wildcaller',cn:'荒野召唤者'},
     role:{en:'Nature · Pet · Control',cn:'自然 · 宠物 · 控制'},
     desc:{en:'A wilderness fighter who travels with a loyal wolf companion.',cn:'与忠诚狼伙伴一同战斗的荒野战士。'},
@@ -604,32 +674,32 @@ const CLASSES = {
    ======================================================================== */
 const ENEMIES = {
   bogGoblin: {
-    name:{en:'Bog Goblin',cn:'沼泽哥布林'}, icon:'👺', color:'#5a7a3a',
+    name:{en:'Bog Goblin',cn:'沼泽哥布林'}, icon:'goblin', color:'#5a7a3a',
     hp:14, armor:0, atk:5, spd:3, range:1, xp:8, gold:5,
     ai:'aggressive', desc:{en:'Low HP, swarms in groups. Weak to AoE.',cn:'生命值低，成群出现。弱范围攻击。'}
   },
   thornHound: {
-    name:{en:'Thorn Hound',cn:'荆棘猎犬'}, icon:'🐕', color:'#8a4a2a',
+    name:{en:'Thorn Hound',cn:'荆棘猎犬'}, icon:'hound', color:'#8a4a2a',
     hp:18, armor:0, atk:7, spd:5, range:1, xp:10, gold:6,
     ai:'flank', effect:'bleed', effectDur:2, desc:{en:'Fast, targets isolated heroes. Causes Bleed.',cn:'速度快，优先攻击落单英雄。造成流血。'}
   },
   ashCultist: {
-    name:{en:'Ash Cultist',cn:'灰烬教徒'}, icon:'🔮', color:'#6a4a3a',
+    name:{en:'Ash Cultist',cn:'灰烬教徒'}, icon:'orb', color:'#6a4a3a',
     hp:16, armor:0, atk:6, spd:3, range:3, xp:12, gold:8,
     ai:'caster', effect:'burn', effectDur:2, desc:{en:'Ranged, applies Burn. Low HP, prioritize.',cn:'远程攻击，施加燃烧。生命值低，需优先处理。'}
   },
   hollowKnight: {
-    name:{en:'Hollow Knight',cn:'空壳骑士'}, icon:'⚔', color:'#4a4a5a',
+    name:{en:'Hollow Knight',cn:'空壳骑士'}, icon:'sword', color:'#4a4a5a',
     hp:28, armor:5, atk:8, spd:2, range:1, xp:16, gold:12,
     ai:'tank', blockChance:1, desc:{en:'High armor, slow. Can block one attack. Weak to magic.',cn:'护甲高，速度慢。可格挡一次攻击。弱魔法。'}
   },
   mireWitch: {
-    name:{en:'Mire Witch',cn:'泥沼女巫'}, icon:'🧙', color:'#3a5a4a',
+    name:{en:'Mire Witch',cn:'泥沼女巫'}, icon:'witchhat', color:'#3a5a4a',
     hp:20, armor:0, atk:5, spd:3, range:3, xp:14, gold:10,
     ai:'healer', effect:'slow', effectDur:2, desc:{en:'Heals other enemies, slows heroes. Ranged magic.',cn:'治疗其他敌人，减速英雄。远程魔法。'}
   },
   crownlessGiant: {
-    name:{en:'Crownless Giant',cn:'无冠巨人'}, icon:'🗿', color:'#5a3a2a',
+    name:{en:'Crownless Giant',cn:'无冠巨人'}, icon:'giant', color:'#5a3a2a',
     hp:40, armor:3, atk:10, spd:2, range:2, xp:30, gold:25,
     ai:'elite', aoe:true, desc:{en:'Elite. Large attack range. Slow but devastating.',cn:'精英敌人。攻击范围大。速度慢但破坏力强。'}
   }
@@ -639,7 +709,7 @@ const ENEMIES = {
    GAME DATA — Boss (3 phases)
    ======================================================================== */
 const BOSS = {
-  name:{en:'The Crownless Regent',cn:'无冠摄政王'}, icon:'👑', color:'#8a6a2a',
+  name:{en:'The Crownless Regent',cn:'无冠摄政王'}, icon:'crown', color:'#8a6a2a',
   phases:[
     { hp:60, armor:3, atk:10, spd:3, range:2, skills:['swordSlash','charge','summonKnight'], desc:{en:'Phase 1: Sword combat, summons Hollow Knights.',cn:'阶段一：剑术战斗，召唤空壳骑士。'} },
     { hp:80, armor:2, atk:12, spd:3, range:3, skills:['shadowBolt','crownShards','dangerZone'], desc:{en:'Phase 2: Shadow magic, creates danger zones.',cn:'阶段二：暗影魔法，制造危险区域。'} },
@@ -650,7 +720,7 @@ const BOSS = {
 /* ========================================================================
    GAME DATA — Equipment
    ======================================================================== */
-const RARITY = { common:{c:'#888',n:'common'}, uncommon:{c:'#4a8',n:'uncommon'}, rare:{c:'#48c',n:'rare'}, epic:{c:'#84c',n:'epic'}, legendary:{c:'#c80',n:'legendary'} };
+const RARITY = { common:{c:'#5B5C57',n:'common'}, uncommon:{c:'#30483A',n:'uncommon'}, rare:{c:'#4A6A7A',n:'rare'}, epic:{c:'#6A4A6A',n:'epic'}, legendary:{c:'#9A7430',n:'legendary'} };
 const EQUIPMENT_POOL = [
   // Weapons
   {id:'w1',name:{en:'Rusty Sword',cn:'生锈之剑'},slot:'weapon',rarity:'common',atk:2,desc:{en:'+2 Attack',cn:'+2 攻击'}},
@@ -680,7 +750,7 @@ function randomEquip(rarityMax){ const pool=EQUIPMENT_POOL.filter(e=>RARITY[e.ra
 const EVENTS_POOL = [
   {
     id:'bell', title:{en:'The Bell Beneath the Hill',cn:'山丘下的钟声'},
-    icon:'🔔', desc:{en:'A bell rings beneath the abandoned chapel. No rope moves, yet the sound grows louder.',cn:'废弃教堂地下传来钟声。没有绳索在动，但声音越来越响。'},
+    icon:'bell', desc:{en:'A bell rings beneath the abandoned chapel. No rope moves, yet the sound grows louder.',cn:'废弃教堂地下传来钟声。没有绳索在动，但声音越来越响。'},
     choices:[
       {text:{en:'Enter the Chapel',cn:'进入教堂'},outcomes:[{type:'battle',chance:.4},{type:'relic',chance:.3,give:'item'},{type:'curse',chance:.3,hp:-4}]},
       {text:{en:'Search the Graveyard',cn:'搜索墓地'},outcomes:[{type:'gold',chance:.4,amount:15},{type:'item',chance:.3},{type:'damage',chance:.3,hp:-3}]},
@@ -689,7 +759,7 @@ const EVENTS_POOL = [
   },
   {
     id:'knight', title:{en:'The Wounded Knight',cn:'受伤的骑士'},
-    icon:'🤕', desc:{en:'A knight lies beside the road, bleeding from deep wounds. "Help me... and I will repay you."',cn:'一名骑士倒在路边，伤口很深。"帮助我……我会报答你。"'},
+    icon:'bandage', desc:{en:'A knight lies beside the road, bleeding from deep wounds. "Help me... and I will repay you."',cn:'一名骑士倒在路边，伤口很深。"帮助我……我会报答你。"'},
     choices:[
       {text:{en:'Give a Healing Potion',cn:'给药水'},outcomes:[{type:'blessing',chance:.5},{type:'gold',chance:.5,amount:20}]},
       {text:{en:'Bind the Wounds',cn:'包扎伤口'},outcomes:[{type:'item',chance:.4},{type:'damage',chance:.3,hp:-2},{type:'safe',chance:.3}]},
@@ -698,7 +768,7 @@ const EVENTS_POOL = [
   },
   {
     id:'caravan', title:{en:'The Attacked Caravan',cn:'被袭商队'},
-    icon:'🛒', desc:{en:'A merchant caravan lies in ruins. Bodies are scattered. Something still moves in the shadows.',cn:'商队已成废墟。尸体散落。阴影中似乎有什么在动。'},
+    icon:'cart', desc:{en:'A merchant caravan lies in ruins. Bodies are scattered. Something still moves in the shadows.',cn:'商队已成废墟。尸体散落。阴影中似乎有什么在动。'},
     choices:[
       {text:{en:'Investigate',cn:'调查'},outcomes:[{type:'battle',chance:.5},{type:'gold',chance:.3,amount:25},{type:'item',chance:.2}]},
       {text:{en:'Grab What You Can',cn:'拿走能拿的'},outcomes:[{type:'gold',chance:.5,amount:10},{type:'item',chance:.3},{type:'damage',chance:.2,hp:-4}]},
@@ -707,7 +777,7 @@ const EVENTS_POOL = [
   },
   {
     id:'raven', title:{en:'The Talking Raven',cn:'会说话的乌鸦'},
-    icon:'🐦‍⬛', desc:{en:'A raven lands on a branch and speaks in a human voice: "I know a secret. The price is steep."',cn:'一只乌鸦落在树枝上，用人的声音说道："我知道一个秘密。代价不菲。"'},
+    icon:'raven', desc:{en:'A raven lands on a branch and speaks in a human voice: "I know a secret. The price is steep."',cn:'一只乌鸦落在树枝上，用人的声音说道："我知道一个秘密。代价不菲。"'},
     choices:[
       {text:{en:'Pay 10 Gold',cn:'支付10金币'},outcomes:[{type:'luck',chance:.4,amount:2},{type:'item',chance:.3},{type:'gold',chance:.3,amount:15}]},
       {text:{en:'Refuse and Shoo It',cn:'赶走它'},outcomes:[{type:'safe',chance:.6},{type:'curse',chance:.2,hp:-2},{type:'luck',chance:.2,amount:1}]},
@@ -716,7 +786,7 @@ const EVENTS_POOL = [
   },
   {
     id:'crown', title:{en:'The Crown Fragment',cn:'王冠碎片'},
-    icon:'💎', desc:{en:'A shard of golden metal glows faintly in the mud. It pulses with a strange warmth.',cn:'一块金色金属碎片在泥土中微微发光。它带着奇异的温暖脉动。'},
+    icon:'gem', desc:{en:'A shard of golden metal glows faintly in the mud. It pulses with a strange warmth.',cn:'一块金色金属碎片在泥土中微微发光。它带着奇异的温暖脉动。'},
     choices:[
       {text:{en:'Touch It',cn:'触碰它'},outcomes:[{type:'item',chance:.4},{type:'curse',chance:.3,hp:-3},{type:'luck',chance:.3,amount:2}]},
       {text:{en:'Dig It Out',cn:'挖出来'},outcomes:[{type:'item',chance:.5},{type:'damage',chance:.3,hp:-2},{type:'gold',chance:.2,amount:15}]},
@@ -725,7 +795,7 @@ const EVENTS_POOL = [
   },
   {
     id:'grave', title:{en:'The Nameless Grave',cn:'无名墓碑'},
-    icon:'⚰', desc:{en:'An unmarked grave stands alone in the forest. Fresh flowers lie on it, though no one has been here in years.',cn:'一座无名墓碑孤零零立在森林中。上面放着新鲜的花，尽管这里多年无人造访。'},
+    icon:'tomb', desc:{en:'An unmarked grave stands alone in the forest. Fresh flowers lie on it, though no one has been here in years.',cn:'一座无名墓碑孤零零立在森林中。上面放着新鲜的花，尽管这里多年无人造访。'},
     choices:[
       {text:{en:'Pay Respects',cn:'致敬'},outcomes:[{type:'blessing',chance:.5},{type:'luck',chance:.3,amount:1},{type:'safe',chance:.2}]},
       {text:{en:'Dig It Up',cn:'挖掘'},outcomes:[{type:'item',chance:.4},{type:'curse',chance:.4,hp:-4},{type:'gold',chance:.2,amount:20}]},
@@ -734,7 +804,7 @@ const EVENTS_POOL = [
   },
   {
     id:'bridge', title:{en:'The Sealed Bridge',cn:'被封锁的古桥'},
-    icon:'🌉', desc:{en:'An old stone bridge is blocked by a magical barrier. A rune glows on its surface.',cn:'一座古老石桥被魔法屏障封锁。桥面上闪烁着符文。'},
+    icon:'bridge', desc:{en:'An old stone bridge is blocked by a magical barrier. A rune glows on its surface.',cn:'一座古老石桥被魔法屏障封锁。桥面上闪烁着符文。'},
     choices:[
       {text:{en:'Break the Rune',cn:'打破符文'},outcomes:[{type:'battle',chance:.4},{type:'item',chance:.3},{type:'damage',chance:.3,hp:-3}]},
       {text:{en:'Find Another Way',cn:'寻找其他路'},outcomes:[{type:'safe',chance:.5},{type:'damage',chance:.3,hp:-1},{type:'gold',chance:.2,amount:10}]},
@@ -743,7 +813,7 @@ const EVENTS_POOL = [
   },
   {
     id:'merchant', title:{en:'The Black Market',cn:'黑市商人'},
-    icon:'🧳', desc:{en:'A hooded figure waves you into an alley. "Special goods... no questions asked."',cn:'一个戴兜帽的人招手示意你进小巷。"特殊商品……不问来路。"'},
+    icon:'pack', desc:{en:'A hooded figure waves you into an alley. "Special goods... no questions asked."',cn:'一个戴兜帽的人招手示意你进小巷。"特殊商品……不问来路。"'},
     choices:[
       {text:{en:'Buy (15 Gold)',cn:'购买（15金币）'},outcomes:[{type:'item',chance:.6},{type:'curse',chance:.2,hp:-2},{type:'gold',chance:.2,amount:25}]},
       {text:{en:'Trade a Potion',cn:'用药水交换'},outcomes:[{type:'item',chance:.7},{type:'safe',chance:.3}]},
@@ -947,11 +1017,12 @@ function renderCharSelect(){
   Object.values(CLASSES).forEach(cls=>{
     const card=document.createElement('div');
     card.className='cs-card'; if(G.selectedClasses.includes(cls.id)) card.classList.add('selected');
-    const diff='★'.repeat(cls.difficulty)+'☆'.repeat(5-cls.difficulty);
+    let diff='';
+    for(let i=0;i<5;i++){ diff+=iconSVG('star',10,i<cls.difficulty?'var(--gold)':'var(--iron)'); }
     const skillHtml=cls.skills.map(s=>`<div>• <b>${L(s.name)}</b>: ${L(s.desc)}</div>`).join('');
     card.innerHTML=`
-      <div class="cs-diff" style="color:var(--gold)">${diff}</div>
-      <div class="cs-portrait" style="border-color:${cls.color}">${cls.icon}</div>
+      <div class="cs-diff">${diff}</div>
+      <div class="cs-portrait" style="border-color:${cls.color}">${iconSVG(cls.icon,40,cls.color)}</div>
       <div class="cs-name">${L(cls.name)}</div>
       <div class="cs-role">${L(cls.role)}</div>
       <div class="cs-desc">"${L(cls.desc)}"</div>
@@ -1046,15 +1117,15 @@ function renderMapScreen(){
   const area=G.map.areas[G.map.currentArea];
   document.getElementById('map-area').textContent=t(area.name);
   document.getElementById('map-objective').textContent=t('reachCrown');
-  document.getElementById('map-gold').textContent=G.gold;
-  document.getElementById('map-potions').textContent=G.potions;
-  document.getElementById('map-luck').textContent=G.luck;
+  document.getElementById('map-res-gold').innerHTML=iconSVG('coin',16,'var(--gold)')+' '+G.gold;
+  document.getElementById('map-res-potions').innerHTML=iconSVG('flask',16,'var(--gold)')+' '+G.potions;
+  document.getElementById('map-res-luck').innerHTML=iconSVG('clover',16,'var(--gold)')+' '+G.luck;
   // Sidebar heroes
   const sb=document.getElementById('map-sidebar'); sb.innerHTML='';
   G.party.forEach(h=>{
     const pct=Math.max(0,h.hp/h.maxHp*100);
     const d=document.createElement('div'); d.className='map-hero';
-    d.innerHTML=`<div class="map-hero-name">${h.icon} ${h.name} <span style="color:var(--text-dim)">${t('level')}${h.level}</span></div>
+    d.innerHTML=`<div class="map-hero-name">${iconSVG(h.icon,14,h.color)} ${h.name} <span style="color:var(--text-dim)">${t('level')}${h.level}</span></div>
       <div class="map-hp-bar"><div class="map-hp-fill" style="width:${pct}%;background:${pct>50?'var(--green)':pct>25?'var(--orange)':'var(--red)'}"></div></div>
       <div class="map-hero-stats"><span>${t('hp')}: ${h.hp}/${h.maxHp}</span><span>${t('atk')}: ${getHeroStats(h).atk}</span></div>`;
     sb.appendChild(d);
@@ -1069,7 +1140,7 @@ function drawMap(){
   if(!mapCtx) return;
   const ctx=mapCtx; const w=mapCanvas.width, h=mapCanvas.height;
   // Parchment background
-  ctx.fillStyle='#d4c4a0'; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#D6C29A'; ctx.fillRect(0,0,w,h);
   // Pre-generated texture (stable, no flickering)
   if(!G._mapTexture){
     G._mapTexture=[];
@@ -1078,13 +1149,13 @@ function drawMap(){
     }
   }
   G._mapTexture.forEach(p=>{
-    ctx.fillStyle=`rgba(92,58,30,${p.a})`;
+    ctx.fillStyle=`rgba(36,35,33,${p.a})`;
     ctx.fillRect(p.x,p.y,2,2);
   });
   // Area separators
   for(let a=0;a<6;a++){
     const x=100+a*90;
-    ctx.strokeStyle='rgba(92,58,30,.15)'; ctx.lineWidth=1;
+    ctx.strokeStyle='rgba(91,92,87,.12)'; ctx.lineWidth=1;
     ctx.setLineDash([3,6]);
     ctx.beginPath(); ctx.moveTo(x-45,20); ctx.lineTo(x-45,h-20); ctx.stroke();
     ctx.setLineDash([]);
@@ -1101,7 +1172,7 @@ function drawMap(){
     node.next.forEach(nid=>{
       const target=allNodes.find(n=>n.id===nid||n.id===String(nid));
       if(!target) return;
-      ctx.strokeStyle=node.visited?'rgba(139,90,43,.3)':'rgba(92,58,30,.4)';
+      ctx.strokeStyle=node.visited?'rgba(91,92,87,.25)':'rgba(36,35,33,.3)';
       ctx.lineWidth=2;
       ctx.beginPath(); ctx.moveTo(node.x,node.y); ctx.lineTo(target.x,target.y); ctx.stroke();
     });
@@ -1114,32 +1185,32 @@ function drawMap(){
     const r=isCurrent?18:14;
     // Node circle
     ctx.beginPath(); ctx.arc(node.x,node.y,r,0,Math.PI*2);
-    let fill='#5c3a1e';
-    if(node.visited) fill='#8a6a4a';
-    if(isAvailable) fill='#c9a84c';
-    if(isCurrent) fill='#c4621e';
-    if(node.type==='boss') fill='#6b2020';
+    let fill='#3D3530';
+    if(node.visited) fill='#5B5C57';
+    if(isAvailable) fill='#B18A45';
+    if(isCurrent) fill='#8A6A3A';
+    if(node.type==='boss') fill='#743C38';
     ctx.fillStyle=fill;
     ctx.fill();
-    ctx.strokeStyle=isCurrent?'#fff':isAvailable?'#c9a84c':'#3a2a1a';
-    ctx.lineWidth=isCurrent?3:2;
+    ctx.strokeStyle=isCurrent?'#E5DDC8':isAvailable?'#B18A45':'#3D3530';
+    ctx.lineWidth=isCurrent?2.5:1.5;
     ctx.stroke();
     // Icon
-    ctx.font='16px Georgia'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    const icons={battle:'⚔',event:'?',merchant:'$',shrine:'✦',camp:'⛺',elite:'💀',treasure:'★',boss:'👑'};
-    ctx.fillStyle='#e8dcc0'; ctx.fillText(icons[node.type]||'•',node.x,node.y);
-    // Available pulse
+    const nodeIcons={battle:'swords',event:'scroll',merchant:'coin',shrine:'star',camp:'tent',elite:'skull',treasure:'chest',boss:'crown'};
+    const iconColor=(isAvailable||isCurrent)?'#242321':'#E5DDC8';
+    drawIcon(ctx,nodeIcons[node.type]||'question',node.x,node.y,r*1.2,iconColor);
+    // Available indicator
     if(isAvailable&&!isCurrent){
-      const pulse=Math.sin(Date.now()/300)*0.3+0.7;
-      ctx.beginPath(); ctx.arc(node.x,node.y,r+4,0,Math.PI*2);
-      ctx.strokeStyle=`rgba(201,168,76,${pulse})`; ctx.lineWidth=2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(node.x,node.y,r+3,0,Math.PI*2);
+      ctx.strokeStyle='#B18A45'; ctx.lineWidth=1.5; ctx.setLineDash([3,3]); ctx.stroke(); ctx.setLineDash([]);
     }
   });
 
   // Legend
-  ctx.font='10px Georgia'; ctx.textAlign='left'; ctx.fillStyle='#5c3a1e';
+  ctx.font='10px Georgia'; ctx.textAlign='left'; ctx.fillStyle='#5B5C57';
   const legendY=h-15;
-  ctx.fillText(`★ ${t('area1')} → ${t('area6')}`,10,legendY);
+  drawIcon(ctx,'star',18,legendY,10,'#B18A45');
+  ctx.fillText(`${t('area1')} \u2192 ${t('area6')}`,28,legendY);
 }
 
 function isNodeAvailable(node){
@@ -1171,7 +1242,7 @@ mapCanvas.addEventListener('click',e=>{
       } else if(node.visited||node.id===G.map.currentNode){
         // Show info
         const info=document.getElementById('map-node-info');
-        info.textContent=`${t('nodes.'+node.type)}${node.visited?' ✓':''}`;
+        info.innerHTML=`${t('nodes.'+node.type)}${node.visited?' '+iconSVG('check',12,'var(--forest)'):''}`;
         info.classList.remove('hidden');
       }
       return;
@@ -1785,7 +1856,7 @@ function executeSkill(hero,skill,target){
     // Create summon
     const summon={
       id:Date.now()+Math.random(), name:skill.summonHp>14?'Wolf':'Skeleton',
-      icon:skill.summonHp>14?'🐺':'🦴', color:'#8a8a7a',
+      icon:skill.summonHp>14?'wolf':'bone', color:'#5B5C57',
       maxHp:skill.summonHp, hp:skill.summonHp, armor:0, atk:skill.summonAtk, spd:skill.summonSpd, range:1,
       isSummon:true, isHeroSummon:true, alive:true,
       x:hero.x+1, y:hero.y, statusEffects:[], defending:false, shield:0,
@@ -2088,8 +2159,8 @@ function showRewardScreen(rewards){
   items.innerHTML='';
   rewards.forEach(r=>{
     const d=document.createElement('div'); d.className='reward-item';
-    if(r.type==='gold'){ d.classList.add('gold-item'); d.innerHTML=`🪙<br><b>${r.amount}</b><br>${t('rewardGold')}`; }
-    else if(r.type==='exp'){ d.innerHTML=`⭐<br><b>${r.amount}</b><br>${t('rewardExp')}`; }
+    if(r.type==='gold'){ d.classList.add('gold-item'); d.innerHTML=`${iconSVG('coin',28,'#B18A45')}<br><b>${r.amount}</b><br>${t('rewardGold')}`; }
+    else if(r.type==='exp'){ d.innerHTML=`${iconSVG('star',28,'#B18A45')}<br><b>${r.amount}</b><br>${t('rewardExp')}`; }
     else if(r.type==='item'){
       const e=r.item; const rc=RARITY[e.rarity].c;
       d.style.borderColor=rc;
@@ -2098,7 +2169,7 @@ function showRewardScreen(rewards){
       const hero=G.party.find(h=>!h.equipment[e.slot]);
       if(hero){ hero.equipment[e.slot]=e.id; d.innerHTML+=`<br><span style="font-size:10px;color:var(--green)">→ ${hero.name}</span>`; }
     }
-    else if(r.type==='potion'){ d.innerHTML=`🧪<br>+1<br>${t('rewardPotion')}`; }
+    else if(r.type==='potion'){ d.innerHTML=`${iconSVG('flask',28,'#B18A45')}<br>+1<br>${t('rewardPotion')}`; }
     items.appendChild(d);
   });
   document.getElementById('reward-title').textContent=t('victory');
@@ -2120,31 +2191,29 @@ function renderBattle(){
   if(!btCtx||!G.battle) return;
   const ctx=btCtx; const w=btCanvas.width, h=btCanvas.height;
   // Background
-  ctx.fillStyle='#1a1a2e'; ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='#17202B'; ctx.fillRect(0,0,w,h);
   // Grid
   for(let y=0;y<GRID_H;y++){
     for(let x=0;x<GRID_W;x++){
       const px=x*CELL, py=y*CELL;
-      ctx.fillStyle=(x+y)%2===0?'#1e1e34':'#252540';
+      ctx.fillStyle=(x+y)%2===0?'#1C2530':'#232B36';
       ctx.fillRect(px,py,CELL,CELL);
-      ctx.strokeStyle='rgba(60,70,90,.3)'; ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(91,92,87,.12)'; ctx.lineWidth=1;
       ctx.strokeRect(px,py,CELL,CELL);
     }
   }
   // Danger zones
   G.battle.dangerZones.forEach(dz=>{
-    ctx.fillStyle='rgba(196,68,0,.3)';
+    ctx.fillStyle='rgba(116,60,56,.18)';
     ctx.fillRect(dz.x*CELL,dz.y*CELL,CELL,CELL);
-    ctx.font='20px Georgia'; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillStyle='rgba(255,100,0,.6)';
-    ctx.fillText('🔥',dz.x*CELL+CELL/2,dz.y*CELL+CELL/2);
+    drawIcon(ctx,'fire',dz.x*CELL+CELL/2,dz.y*CELL+CELL/2,24,'#743C38');
   });
   // Valid targets highlight
   if(G.battle.actionMode){
     G.battle.validTargets.forEach(t=>{
       ctx.fillStyle=G.battle.actionMode==='move'?'rgba(74,124,58,.3)':'rgba(196,68,0,.3)';
       ctx.fillRect(t.x*CELL,t.y*CELL,CELL,CELL);
-      ctx.strokeStyle=G.battle.actionMode==='move'?'#4a7c3a':'#c44'; ctx.lineWidth=2;
+      ctx.strokeStyle=G.battle.actionMode==='move'?'#30483A':'#743C38'; ctx.lineWidth=2;
       ctx.strokeRect(t.x*CELL+2,t.y*CELL+2,CELL-4,CELL-4);
     });
   }
@@ -2162,8 +2231,8 @@ function renderBattle(){
       const alpha=f.life/60;
       const yOffset=(60-f.life)*0.5;
       ctx.font='bold 18px Georgia'; ctx.textAlign='center';
-      const colors={physical:'#f44',magic:'#a4f',heal:'#4f4',burn:'#f80',bleed:'#c44',poison:'#4a4'};
-      ctx.fillStyle=`rgba(${f.amount<0?'100,255,100':'255,80,80'},${alpha})`;
+      const colors={physical:'#743C38',magic:'#6A4A6A',heal:'#30483A',burn:'#8A6A3A',bleed:'#743C38',poison:'#4A6A3A'};
+      ctx.fillStyle=`rgba(${f.amount<0?'48,72,58':'116,60,56'},${alpha})`;
       const txt=f.amount<0?`+${-f.amount}`:`${f.amount}`;
       ctx.fillText(txt,f.x,f.y-yOffset);
       return true;
@@ -2182,40 +2251,38 @@ function drawUnit(ctx,u){
   const r=20;
   // Body circle
   ctx.beginPath(); ctx.arc(px,py,r,0,Math.PI*2);
-  ctx.fillStyle=u.color||'#888'; ctx.fill();
-  ctx.strokeStyle=u===getCurrentUnit()?'#c9a84c':u.isEnemy?'#c44':'#4a7c3a';
-  ctx.lineWidth=u===getCurrentUnit()?3:2; ctx.stroke();
+  ctx.fillStyle=u.color||'#5B5C57'; ctx.fill();
+  ctx.strokeStyle=u===getCurrentUnit()?'#B18A45':u.isEnemy?'#743C38':'#30483A';
+  ctx.lineWidth=u===getCurrentUnit()?2.5:1.5; ctx.stroke();
   // Icon
-  ctx.font='18px Georgia'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillStyle='#fff'; ctx.fillText(u.icon||'?',px,py);
+  drawIcon(ctx,u.icon||'question',px,py,28,'#E5DDC8');
   // HP bar
   const barW=36, barH=4;
   const barX=px-barW/2, barY=py-r-8;
   ctx.fillStyle='#000'; ctx.fillRect(barX-1,barY-1,barW+2,barH+2);
-  ctx.fillStyle='#400'; ctx.fillRect(barX,barY,barW,barH);
+  ctx.fillStyle='#3D2018'; ctx.fillRect(barX,barY,barW,barH);
   const hpPct=u.hp/u.maxHp;
-  ctx.fillStyle=hpPct>0.5?'#4a7':'#c44'; ctx.fillRect(barX,barY,barW*hpPct,barH);
+  ctx.fillStyle=hpPct>0.5?'#30483A':'#743C38'; ctx.fillRect(barX,barY,barW*hpPct,barH);
   // Shield indicator
   if(u.shield>0){
-    ctx.fillStyle='#4af'; ctx.fillRect(barX,barY-3,barW*Math.min(1,u.shield/u.maxHp),2);
+    ctx.fillStyle='#4A6A7A'; ctx.fillRect(barX,barY-3,barW*Math.min(1,u.shield/u.maxHp),2);
   }
   // HP text
-  ctx.font='9px monospace'; ctx.fillStyle='#fff';
+  ctx.font='9px monospace'; ctx.fillStyle='#E5DDC8';
   ctx.fillText(`${u.hp}/${u.maxHp}`,px,barY-6);
   // Status effects
   if(u.statusEffects&&u.statusEffects.length>0){
-    const sIcons={burn:'🔥',bleed:'🩸',poison:'☠',stun:'💫',slow:'🐌',weaken:'💔',taunted:'🎯',protect:'🛡',haste:'⚡'};
+    const sIcons={burn:'flame',bleed:'drop',poison:'poison',stun:'stun',slow:'slow',weaken:'weaken',taunted:'taunt',protect:'shield',haste:'haste'};
     u.statusEffects.forEach((e,i)=>{
-      const sx=px-r+i*12, sy=py+r+4;
-      ctx.font='10px Georgia';
-      ctx.fillText(sIcons[e.type]||'?',sx,sy);
+      const sx=px-r+i*14+6, sy=py+r+8;
+      drawIcon(ctx,sIcons[e.type]||'question',sx,sy,12,'#E5DDC8');
     });
   }
   // AP dots for current hero
   if(u===G.battle.selectedHero&&!u.isEnemy){
     for(let i=0;i<u.maxAp;i++){
       ctx.beginPath(); ctx.arc(px-r+i*8,py-r-14,3,0,Math.PI*2);
-      ctx.fillStyle=i<u.ap?'#c9a84c':'#333'; ctx.fill();
+      ctx.fillStyle=i<u.ap?'#B18A45':'#3D3530'; ctx.fill();
     }
   }
 }
@@ -2226,8 +2293,8 @@ function renderBattleUI(){
   to.innerHTML='';
   G.battle.turnOrder.forEach((u,i)=>{
     const d=document.createElement('div'); d.className='bt-turn-icon'+(i===G.battle.turnIdx?' active':'');
-    d.style.background=u.color||'#888';
-    d.textContent=u.icon||'?';
+    d.style.background=u.color||'#5B5C57';
+    d.innerHTML=iconSVG(u.icon||'question',16,'#E5DDC8');
     to.appendChild(d);
   });
   // AP dots
@@ -2259,7 +2326,7 @@ function renderBattleUI(){
   hi.innerHTML='';
   G.battle.heroes.forEach(h=>{
     const d=document.createElement('div'); d.className='bt-hero-card'+(h===hero?' active':'')+(!h.alive?' dead':'');
-    d.innerHTML=`<div class="bt-hero-portrait" style="border-color:${h.color}">${h.icon}</div>
+    d.innerHTML=`<div class="bt-hero-portrait" style="border-color:${h.color}">${iconSVG(h.icon,16,h.color)}</div>
       <div class="bt-hero-hp">${h.name}<br><div class="bt-hero-hp-bar"><div class="bt-hero-hp-fill" style="width:${h.hp/h.maxHp*100}%;background:${h.hp/h.maxHp>0.5?'var(--green)':h.hp/h.maxHp>0.25?'var(--orange)':'var(--red)'}"></div></div></div>`;
     d.onclick=()=>{
       if(h.alive&&h===getCurrentUnit()){ G.battle.selectedHero=h; G.battle.actionMode=null; renderBattle(); }
@@ -2322,7 +2389,9 @@ function showDiceResult(result){
   playSound(result==='crit'?'crit':result==='critfail'?'death':'click');
   // Show reroll button if failed and has luck
   if((result==='fail'||result==='critfail'||result==='partial')&&G.luck>0&&!diceHasRerolled){
-    document.getElementById('dice-reroll').classList.remove('hidden');
+    const rb=document.getElementById('dice-reroll');
+    rb.innerHTML=iconSVG('clover',16,'var(--gray-white)')+' '+t('useLuck');
+    rb.classList.remove('hidden');
   } else {
     setTimeout(()=>finishDice(result),G.settings.reduceAnim?500:1200);
   }
@@ -2358,7 +2427,7 @@ function triggerEvent(){
     return `<button class="modal-btn" onclick="resolveEventChoice(${i})" style="text-align:center">${L(c.text)}</button>`;
   }).join('');
   showModal(L(evt.title),
-    `<div class="event-illust">${evt.icon}</div><div style="text-align:center;color:var(--charcoal);font-style:italic;margin-bottom:12px">${L(evt.desc)}</div>${choicesHtml}`,
+    `<div class="event-illust">${iconSVG(evt.icon,48,'var(--gold)')}</div><div style="text-align:center;color:var(--charcoal);font-style:italic;margin-bottom:12px">${L(evt.desc)}</div>${choicesHtml}`,
     [{text:t('leave'),action:()=>{closeModal();returnToMap();},secondary:true}]
   );
   // Store current event
@@ -2434,7 +2503,7 @@ function openShop(){
     itemsHtml+=`<div class="shop-item" onclick="buyShopItem(${i})">
       <div class="shop-item-name">${L(item.name)}</div>
       <div class="shop-item-desc">${L(item.desc)}</div>
-      <div class="shop-item-price">🪙 ${item.price}</div>
+      <div class="shop-item-price">${iconSVG('coin',14,'#B18A45')} ${item.price}</div>
     </div>`;
   });
   itemsHtml+='</div>';
@@ -2472,18 +2541,18 @@ function openEquipManager(){
   G.party.forEach((h,hi)=>{
     const stats=getHeroStats(h);
     html+=`<div style="background:rgba(0,0,0,.06);border:1px solid var(--wood);border-radius:4px;padding:8px;margin-bottom:8px">
-      <div style="font-weight:bold;color:var(--darkred)">${h.icon} ${h.name} ${t('level')}${h.level}</div>
+      <div style="font-weight:bold;color:var(--darkred)">${iconSVG(h.icon,14,h.color)} ${h.name} ${t('level')}${h.level}</div>
       <div style="font-size:11px">${t('hp')}: ${h.hp}/${stats.hp} | ${t('atk')}: ${stats.atk} | ${t('armor')}: ${stats.armor} | ${t('spd')}: ${stats.spd}</div>`;
     ['weapon','armor','accessory'].forEach(slot=>{
       const eqId=h.equipment[slot];
       const eq=eqId?getEquip(eqId):null;
-      const rc=eq?RARITY[eq.rarity].c:'#888';
+      const rc=eq?RARITY[eq.rarity].c:'#5B5C57';
       html+=`<div style="font-size:12px;margin:2px 0">${t(slot==='armor'?'armor_piece':slot)}: `;
       if(eq){
         html+=`<span style="color:${rc}">${L(eq.name)}</span> `;
         html+=`<button class="settings-btn" onclick="unequipItem(${hi},'${slot}')">${t('unequip')}</button>`;
       } else {
-        html+=`<span style="color:#888">${t('empty')}</span>`;
+        html+=`<span style="color:var(--text-dim)">${t('empty')}</span>`;
       }
       html+='</div>';
     });
@@ -2550,7 +2619,7 @@ function openCamp(){
     <div style="font-size:14px;margin-bottom:12px">${{en:'Your party rests and recovers 30% HP. Fallen heroes are revived.',cn:'你的队伍休息并恢复30%生命值。倒下的英雄被复活。'}[lang]}</div>`;
   G.party.forEach(h=>{
     const pct=Math.round(h.hp/h.maxHp*100);
-    html+=`<div style="margin:4px 0">${h.icon} ${h.name}: ${h.hp}/${h.maxHp} (${pct}%)</div>`;
+    html+=`<div style="margin:4px 0">${iconSVG(h.icon,14,h.color)} ${h.name}: ${h.hp}/${h.maxHp} (${pct}%)</div>`;
   });
   html+='</div>';
   showModal(t('camp'),html,[
@@ -2581,7 +2650,7 @@ function openTreasure(){
     const rc=RARITY[item.rarity].c;
     showModal({en:'Treasure Found!',cn:'发现宝藏！'}[lang],
       `<div style="text-align:center;color:var(--charcoal)">
-        <div style="font-size:32px;margin:8px">💎</div>
+        <div style="margin:8px">${iconSVG('gem',40,'#B18A45')}</div>
         <span style="color:${rc}">${t(item.rarity)}</span><br>
         <b style="font-size:16px">${L(item.name)}</b><br>
         ${L(item.desc)}<br>
