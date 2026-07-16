@@ -1376,6 +1376,7 @@ const player = {
   mineMax: 3,
   mines: 3,
   mineRegenTimer: 0,
+  abilityCD: 0,
   invuln: 0,         // invulnerability frames
   hurtFlash: 0,
   walkPhase: 0,
@@ -1484,7 +1485,10 @@ const SECONDARY_AMMO = {
   tesla: 25,
   acid: 30,
   railgun: 4,
-  sniper: 5
+  sniper: 5,
+  plasma: 6,
+  cryo: 25,
+  flak: 15
 };
 // 备弹总量（总子弹数，不含弹匣内）
 const TOTAL_SPARE_AMMO = {
@@ -1499,7 +1503,10 @@ const TOTAL_SPARE_AMMO = {
   tesla: 75,
   acid: 90,
   railgun: 8,
-  sniper: 15
+  sniper: 15,
+  plasma: 18,
+  cryo: 75,
+  flak: 45
 };
 const ammo = {
   pistol: Infinity,
@@ -1514,7 +1521,10 @@ const ammo = {
   tesla: 0,
   acid: 0,
   railgun: 0,
-  sniper: 0
+  sniper: 0,
+  plasma: 0,
+  cryo: 0,
+  flak: 0
 };
 // 备弹（弹匣外的剩余子弹）
 const spareAmmo = {
@@ -1530,7 +1540,10 @@ const spareAmmo = {
   tesla: 0,
   acid: 0,
   railgun: 0,
-  sniper: 0
+  sniper: 0,
+  plasma: 0,
+  cryo: 0,
+  flak: 0
 };
 
 // Weapon definitions - 合金弹头风格
@@ -1589,14 +1602,27 @@ const WEAPONS = {
   sniper:  { name: 'SNIPER', nameZh: '大口径狙击枪',
              damage: 220, fireRate: 900, bulletSpeed: 40, spread: 0,    auto: false, pellets: 1, jitter: 0,
              color: '#ffcc44', weaponClass: 'heavy', maxAmmo: 8, reload: 120, type: 'sniper',
-             pierce: 0, sniperRange: 600, sniperFadeStart: 450, eliteMult: 2.0, bossMult: 2.0 }
+             pierce: 0, sniperRange: 600, sniperFadeStart: 450, eliteMult: 2.0, bossMult: 2.0 },
+  // ===== 新增武器 =====
+  plasma:  { name: 'PLASMA', nameZh: '等离子炮',
+             damage: 80, fireRate: 500, bulletSpeed: 18, spread: 0, auto: false, pellets: 1, jitter: 0,
+             color: '#dd44ff', weaponClass: 'heavy', maxAmmo: 6, reload: 140, type: 'plasma',
+             explodeRadius: 80, explodeDamage: 60, pierce: 2 },
+  cryo:    { name: 'CRYO', nameZh: '冰冻枪',
+             damage: 25, fireRate: 100, bulletSpeed: 14, spread: 0.05, auto: true, pellets: 1, jitter: 0.02,
+             color: '#44ffff', weaponClass: 'light', maxAmmo: 25, reload: 80, type: 'cryo',
+             slowMult: 0.3, slowDuration: 120, pierce: 3 },
+  flak:    { name: 'FLAK', nameZh: '高射炮',
+             damage: 30, fireRate: 250, bulletSpeed: 16, spread: 0.12, auto: true, pellets: 5, jitter: 0.08,
+             color: '#ff8844', weaponClass: 'light', maxAmmo: 15, reload: 100, type: 'flak',
+             explodeRadius: 30, explodeDamage: 15 }
 };
 
 // Heavy weapon movespeed penalty
 const HEAVY_SPEED_PENALTY = 0.78;
 
 // Weapon slot mapping for number keys 1-9
-const WEAPON_KEYS = ['pistol', 'hmg', 'shotgun', 'flamethrower', 'rocket', 'laser', 'homing', 'grenade', 'micro_rocket', 'tesla', 'acid', 'railgun', 'sniper'];
+const WEAPON_KEYS = ['pistol', 'hmg', 'shotgun', 'flamethrower', 'rocket', 'laser', 'homing', 'grenade', 'micro_rocket', 'tesla', 'acid', 'railgun', 'sniper', 'plasma', 'cryo', 'flak'];
 
 // =====================================================================
 // ATTACHMENT SYSTEM - 枪械配件（单配件替换制）
@@ -2152,10 +2178,10 @@ function tryShoot() {
     const isSniper = w.type === 'sniper';
     const isChain = isTesla || isLaser; // 穿透型武器共用 hitTargets 机制
     // 子弹大小
-    const sizeMap = { rocket: 6, flame: 16, laser: 5, homing: 7, grenade: 8, micro_rocket: 4, tesla: 4, acid: 6, railgun: 8, sniper: 7 };
+    const sizeMap = { rocket: 6, flame: 16, laser: 5, homing: 7, grenade: 8, micro_rocket: 4, tesla: 4, acid: 6, railgun: 8, sniper: 7, plasma: 8, cryo: 5, flak: 4 };
     const bulletSize = sizeMap[w.type] || 3;
     // 子弹生命
-    const lifeMap = { rocket: 120, flame: 40, laser: 50, homing: 200, grenade: 100, tesla: 60, acid: 100, railgun: 30, sniper: 25 };
+    const lifeMap = { rocket: 120, flame: 40, laser: 50, homing: 200, grenade: 100, tesla: 60, acid: 100, railgun: 30, sniper: 25, plasma: 100, cryo: 60, flak: 50 };
     const bulletLife = lifeMap[w.type] || 80;
     bullets.push({
       x: muzzleX,
@@ -2202,6 +2228,7 @@ function tryShoot() {
       acidLife: w.acidLife || 0,
       acidDps: w.acidDps || 0,
       slowMult: w.slowMult || 0,
+      slowDuration: w.slowDuration || 0,
       // 轨道炮参数
       railWidth: w.railWidth || 0,
       railRange: w.railRange || 0,
@@ -2224,12 +2251,14 @@ function tryShoot() {
 function placeMine() {
   if (state !== GameState.PLAYING) return;
   if (player.mines <= 0) return;
+  if (player.abilityCD > 0) return;
   const cls = player.class ? CLASSES[player.class] : null;
   const abilityType = cls ? (cls.spaceAbility || 'mine') : 'mine';
 
   if (abilityType === 'grenade') {
     // 突击兵：投掷手雷（向前方投掷，落点爆炸）
     player.mines--;
+    player.abilityCD = 300;
     const ang = player.angle;
     grenades.push({
       x: player.x, y: player.y,
@@ -2239,25 +2268,30 @@ function placeMine() {
   } else if (abilityType === 'medkit') {
     // 医护兵：医疗包（瞬间回血35HP）
     player.mines--;
+    player.abilityCD = 300;
     player.hp = Math.min(player.maxHp, player.hp + 35);
     spawnBloodParticles(player.x, player.y, 12, '#44ff44');
   } else if (abilityType === 'turret') {
     // 工程兵：放置临时炮台（15秒后消失）
     player.mines--;
+    player.abilityCD = 300;
     placeTurret('mg', player.x + Math.cos(player.angle) * 30, player.y + Math.sin(player.angle) * 30);
     const t = turrets[turrets.length - 1];
     t.lifetime = 900; // 15秒
   } else if (abilityType === 'cloak') {
     // 侦察兵：隐身3秒（僵尸丢失目标）
     player.mines--;
+    player.abilityCD = 300;
     player.buffs.cloak = 180; // 3秒
   } else if (abilityType === 'barricade') {
     // 重装机兵：放置路障（阻挡僵尸，有HP）
     player.mines--;
+    player.abilityCD = 300;
     barricades.push({ x: player.x + Math.cos(player.angle) * 35, y: player.y + Math.sin(player.angle) * 35, hp: 200, maxHp: 200, angle: player.angle });
   } else if (abilityType === 'airstrike') {
     // 狙击手：空中打击（呼叫5波集束轰炸，覆盖玩家周围大范围区域）
     player.mines--;
+    player.abilityCD = 300;
     const baseDmg = 120 * player.damageMult;
     for (let wave = 0; wave < 5; wave++) {
       for (let k = 0; k < 3; k++) {
@@ -2278,6 +2312,7 @@ function placeMine() {
   } else if (abilityType === 'pulse') {
     // 狙击手：脉冲波（前方直线秒杀普通僵尸，对精英和BOSS造成大量伤害）
     player.mines--;
+    player.abilityCD = 300;
     const ang = player.angle;
     pulseWaves.push({ x: player.x, y: player.y, angle: ang, range: 500, width: 40, life: 20 });
     // 立即判定伤害
@@ -2313,10 +2348,12 @@ function placeMine() {
   } else if (abilityType === 'frenzy') {
     // 狂战士：狂暴模式（8秒，攻速+100%，移速+30%，吸血+15%）
     player.mines--;
+    player.abilityCD = 300;
     player.buffs.frenzy = 480; // 8秒
   } else {
     // 默认：地雷
     player.mines--;
+    player.abilityCD = 300;
     const explosionMult = cls && cls.explosionMult ? cls.explosionMult : 1.0;
     mines.push({
       x: player.x, y: player.y, radius: 14, triggerRadius: 28,
@@ -2583,7 +2620,11 @@ const ZOMBIE_TYPES = {
   // Elite variants
   spitter: { hp: 120, speed: 0.9, damage: 10, radius: 18, color: '#8e4a6b', score: 40, throwsPoison: true, poisonInterval: 150, isElite: true },
   tank:    { hp: 400, speed: 0.5, damage: 22, radius: 32, color: '#3a4a8e', score: 60, isElite: true, damageReduction: 0.5 },
-  screamer:{ hp: 80,  speed: 2.2, damage: 8,  radius: 14, color: '#c8a83a', score: 35, isElite: true, summons: true, summonInterval: 300 }
+  screamer:{ hp: 80,  speed: 2.2, damage: 8,  radius: 14, color: '#c8a83a', score: 35, isElite: true, summons: true, summonInterval: 300 },
+  // 新增小怪
+  crawler: { hp: 40, speed: 3.5, damage: 5, radius: 10, color: '#7a5a3a', score: 20, isCrawler: true },
+  exploder: { hp: 60, speed: 1.8, damage: 35, radius: 16, color: '#aa3a2a', score: 25, isExploder: true, explodeRadius: 60, explodeDamage: 40 },
+  healer: { hp: 100, speed: 0.6, damage: 5, radius: 14, color: '#3a8a5a', score: 30, isElite: true, isHealer: true, healRange: 150, healInterval: 200 }
 };
 
 // BOSS类型定义
@@ -2626,6 +2667,19 @@ const BOSS_TYPES = {
     hp: 850, speed: 1.2, damage: 25, radius: 34, color: '#1a0a2a', score: 450,
     phase2Threshold: 0.5,
     skills: ['shadow_dash', 'summon', 'teleport', 'poison_burst']
+  },
+  ice_titan: {
+    nameZh: '冰霜泰坦', nameEn: 'ICE TITAN',
+    hp: 1100, speed: 0.5, damage: 26, radius: 46, color: '#1a4a6a', score: 400,
+    phase2Threshold: 0.45,
+    skills: ['ice_nova', 'freeze_breath', 'summon', 'stomp'],
+    damageReduction: 0.3
+  },
+  necro_lord: {
+    nameZh: '死灵领主', nameEn: 'NECRO LORD',
+    hp: 900, speed: 0.7, damage: 22, radius: 38, color: '#3a1a4a', score: 450,
+    phase2Threshold: 0.5,
+    skills: ['raise_dead', 'poison_burst', 'teleport', 'shadow_dash']
   }
 };
 
@@ -2665,6 +2719,14 @@ function spawnZombie(type) {
     damageReduction: def.damageReduction || 0,
     summons: def.summons || false,
     summonTimer: def.summonInterval || 0,
+    isCrawler: def.isCrawler || false,
+    isExploder: def.isExploder || false,
+    isHealer: def.isHealer || false,
+    explodeRadius: def.explodeRadius || 0,
+    explodeDamage: def.explodeDamage || 0,
+    healRange: def.healRange || 0,
+    healInterval: def.healInterval || 0,
+    healTimer: 0,
     burnTime: 0,      // 燃烧剩余时间（帧）
     burnDps: 0        // 燃烧每秒伤害
   });
@@ -2718,6 +2780,10 @@ function getWaveComposition(w) {
   if (w >= 3) comp.spitter = Math.floor((w - 2) * 0.4);
   if (w >= 5) comp.tank = Math.floor((w - 4) * 0.35);
   if (w >= 4) comp.screamer = Math.floor((w - 3) * 0.25);
+  comp.crawler = 0; comp.exploder = 0; comp.healer = 0;
+  if (w >= 3) comp.crawler = Math.floor((w - 2) * 0.5);
+  if (w >= 5) comp.exploder = Math.floor((w - 4) * 0.3);
+  if (w >= 6) comp.healer = Math.floor((w - 5) * 0.2);
   return comp;
 }
 
@@ -2747,6 +2813,7 @@ function startWave(w) {
     // 2x normal zombies, faster spawn
     comp.normal *= 2;
     comp.runner = Math.floor(comp.runner * 1.5);
+    comp.crawler = Math.floor(comp.crawler * 1.5);
   } else if (waveType === 'boss') {
     // Mostly elites, fewer normal
     comp.normal = Math.floor(comp.normal * 0.3);
@@ -2754,6 +2821,8 @@ function startWave(w) {
     comp.spitter += 2;
     comp.screamer += 1;
     comp.brute += 1;
+    comp.exploder += 1;
+    comp.healer += 1;
     // 生成BOSS（每4波一个，随机选择）
     const bossKeys = Object.keys(BOSS_TYPES);
     // 前几次BOSS战用基础BOSS，后续随机全部BOSS
@@ -2771,7 +2840,7 @@ function startWave(w) {
     // No telegraphs, normal composition but spawns silently
   }
 
-  zombiesToSpawn = comp.normal + comp.runner + comp.brute + comp.spitter + comp.tank + comp.screamer;
+  zombiesToSpawn = comp.normal + comp.runner + comp.brute + comp.spitter + comp.tank + comp.screamer + comp.crawler + comp.exploder + comp.healer;
   spawnQueue = [];
   for (let i = 0; i < comp.normal; i++) spawnQueue.push('normal');
   for (let i = 0; i < comp.runner; i++) spawnQueue.push('runner');
@@ -2779,6 +2848,9 @@ function startWave(w) {
   for (let i = 0; i < comp.spitter; i++) spawnQueue.push('spitter');
   for (let i = 0; i < comp.tank; i++) spawnQueue.push('tank');
   for (let i = 0; i < comp.screamer; i++) spawnQueue.push('screamer');
+  for (let i = 0; i < comp.crawler; i++) spawnQueue.push('crawler');
+  for (let i = 0; i < comp.exploder; i++) spawnQueue.push('exploder');
+  for (let i = 0; i < comp.healer; i++) spawnQueue.push('healer');
   // Shuffle
   for (let i = spawnQueue.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -3047,6 +3119,14 @@ function spawnZombieAt(type, x, y) {
     damageReduction: def.damageReduction || 0,
     summons: def.summons || false,
     summonTimer: def.summonInterval || 0,
+    isCrawler: def.isCrawler || false,
+    isExploder: def.isExploder || false,
+    isHealer: def.isHealer || false,
+    explodeRadius: def.explodeRadius || 0,
+    explodeDamage: def.explodeDamage || 0,
+    healRange: def.healRange || 0,
+    healInterval: def.healInterval || 0,
+    healTimer: 0,
     burnTime: 0,      // 燃烧剩余时间（帧）
     burnDps: 0        // 燃烧每秒伤害
   });
@@ -3300,6 +3380,9 @@ function updatePlayer(dt) {
     }
   }
 
+  // Ability cooldown
+  if (player.abilityCD > 0) player.abilityCD -= dt;
+
   // Crate collision (push crates)
   for (const crate of crates) {
     if (circleRectCollide(player.x, player.y, player.radius, crate.x, crate.y, crate.w, crate.h)) {
@@ -3465,6 +3548,13 @@ function updateZombies(dt) {
       moveY = ny * z.speed * speedMod + repY;
     }
 
+    // crawler：蛇形移动
+    if (z.isCrawler) {
+      const perpAng = Math.atan2(dy, dx) + Math.PI / 2;
+      moveX += Math.cos(perpAng) * Math.sin(z.walkPhase * 3) * z.speed * 0.5;
+      moveY += Math.sin(perpAng) * Math.sin(z.walkPhase * 3) * z.speed * 0.5;
+    }
+
     z.x += moveX * dt;
     z.y += moveY * dt;
 
@@ -3549,6 +3639,28 @@ function updateZombies(dt) {
         zombies.splice(i, 1);
         updateHUD();
         continue;
+      }
+    }
+
+    // exploder：接近玩家时自爆
+    if (z.isExploder && dist < z.radius + player.radius + 20) {
+      explodeAt(z.x, z.y, z.explodeRadius, z.explodeDamage, false);
+      spawnBloodParticles(z.x, z.y, 20, '#ff4400');
+      z.hp = 0;
+    }
+
+    // healer：定期治疗附近僵尸
+    if (z.isHealer) {
+      z.healTimer -= dt;
+      if (z.healTimer <= 0) {
+        z.healTimer = z.healInterval;
+        for (const z2 of zombies) {
+          if (z2 !== z && Math.hypot(z2.x - z.x, z2.y - z.y) < z.healRange) {
+            z2.hp = Math.min(z2.maxHp, z2.hp + 20);
+            // 治疗粒子
+            particles.push({ x: z2.x, y: z2.y - z2.radius, vx: 0, vy: -1, life: 20, maxLife: 20, size: 3, color: '#44ff44' });
+          }
+        }
       }
     }
 
@@ -4129,6 +4241,48 @@ function bossSkill(b) {
       }
       spawnBloodParticles(b.x, b.y, 15, '#6a0a6a');
       break;
+    case 'ice_nova': // 冰霜新星：环形冰冻扩散
+      for (let i = 0; i < 16; i++) {
+        const ang = (i / 16) * Math.PI * 2;
+        const fx = b.x + Math.cos(ang) * 100, fy = b.y + Math.sin(ang) * 100;
+        firePools.push({ x: fx, y: fy, radius: 35, life: 120, maxLife: 120, dps: 0.3, tickTimer: 0 });
+      }
+      addShake(5);
+      spawnBloodParticles(b.x, b.y, 25, '#44aaff');
+      if (dist < 200) {
+        damagePlayer(b.damage * 0.4, b);
+        player.buffs.haste = 0; // 临时减速效果（取消加速）
+      }
+      break;
+    case 'freeze_breath': // 冰霜吐息：前方扇形冰冻
+      for (let i = 0; i < 8; i++) {
+        const spread = (Math.random() - 0.5) * 0.6;
+        const ba = Math.atan2(dy, dx) + spread;
+        const dist2 = 50 + Math.random() * 120;
+        const fx = b.x + Math.cos(ba) * dist2, fy = b.y + Math.sin(ba) * dist2;
+        firePools.push({ x: fx, y: fy, radius: 30, life: 90, maxLife: 90, dps: 0.4, tickTimer: 0 });
+      }
+      spawnBloodParticles(b.x, b.y, 15, '#44ddff');
+      if (dist < 180) damagePlayer(b.damage * 0.3, b);
+      break;
+    case 'raise_dead': // 亡者复活：大量召唤
+      for (let i = 0; i < 6; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const sx = b.x + Math.cos(ang) * 70, sy = b.y + Math.sin(ang) * 70;
+        const types = ['normal', 'runner', 'crawler'];
+        const st = types[Math.floor(Math.random() * types.length)];
+        const sdef = ZOMBIE_TYPES[st];
+        zombies.push({
+          x: sx, y: sy, vx: 0, vy: 0,
+          type: st, hp: sdef.hp, maxHp: sdef.hp, speed: sdef.speed, damage: sdef.damage, radius: sdef.radius,
+          color: sdef.color, score: sdef.score, attackCooldown: 0, hurtFlash: 0,
+          walkPhase: Math.random() * Math.PI * 2, burnTime: 0, burnDps: 0,
+          isCrawler: sdef.isCrawler || false,
+          damageReduction: sdef.damageReduction || 0
+        });
+      }
+      spawnBloodParticles(b.x, b.y, 20, '#6a0a8a');
+      break;
   }
 }
 
@@ -4267,7 +4421,7 @@ function updateBullets(dt) {
     }
     if (hit) {
       // 爆炸型武器命中木箱也爆炸
-      if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket') {
+      if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
         explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
         // 榴弹：爆炸后散播破片
         if (b.weaponType === 'grenade' && b.fragments > 0) {
@@ -4300,7 +4454,7 @@ function updateBullets(dt) {
         barrel.triggerTimer = 18; // 0.3s delay
         spawnBloodParticles(b.x, b.y, 4, '#ffaa33');
         // 爆炸型武器命中油桶也爆炸
-        if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket') {
+        if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
           explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
         }
         bullets.splice(i, 1);
@@ -4367,9 +4521,14 @@ function updateBullets(dt) {
         z.slowTimer = 120;
         z.slowMult = b.slowMult;
       }
+      // 冰冻枪：命中减速
+      if (b.weaponType === 'cryo' && b.slowMult > 0) {
+        z.slowTimer = b.slowDuration || 120;
+        z.slowMult = b.slowMult;
+      }
       // 轨道炮：超高穿透，命中不消失
-      // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹）：命中爆炸
-      if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing') {
+      // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹/等离子/高射炮）：命中爆炸
+      if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
         explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
         // 榴弹：爆炸后散播破片
         if (b.weaponType === 'grenade' && b.fragments > 0) {
@@ -4520,8 +4679,8 @@ function updateBullets(dt) {
           boss.burnTime = b.burnDuration;
           boss.burnDps = b.burnDps;
         }
-        // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹）：命中爆炸
-        if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing') {
+        // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹/等离子/高射炮）：命中爆炸
+        if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
           explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
           // 榴弹：爆炸后散播破片
           if (b.weaponType === 'grenade' && b.fragments > 0) {
@@ -5024,6 +5183,9 @@ function updatePickups(dt) {
         if (player.ownedWeapons.includes('acid')) spareAmmo.acid = Math.min(TOTAL_SPARE_AMMO.acid, spareAmmo.acid + 15);
         if (player.ownedWeapons.includes('railgun')) spareAmmo.railgun = Math.min(TOTAL_SPARE_AMMO.railgun, spareAmmo.railgun + 2);
         if (player.ownedWeapons.includes('sniper')) spareAmmo.sniper = Math.min(TOTAL_SPARE_AMMO.sniper, spareAmmo.sniper + 3);
+        if (player.ownedWeapons.includes('plasma')) spareAmmo.plasma = Math.min(TOTAL_SPARE_AMMO.plasma, spareAmmo.plasma + 3);
+        if (player.ownedWeapons.includes('cryo')) spareAmmo.cryo = Math.min(TOTAL_SPARE_AMMO.cryo, spareAmmo.cryo + 15);
+        if (player.ownedWeapons.includes('flak')) spareAmmo.flak = Math.min(TOTAL_SPARE_AMMO.flak, spareAmmo.flak + 10);
         playPickup();
       } else if (p.type.startsWith('buff_')) {
         const buffType = p.type.slice(5);
@@ -6840,6 +7002,43 @@ function drawZombie(z) {
     ctx.fillRect(-barW / 2, barY, barW * hpRatio, barH);
   }
 
+  // 新增怪物特殊外观
+  if (z.isCrawler) {
+    ctx.fillStyle = z.color;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, z.radius, z.radius * 0.6, 0, 0, Math.PI * 2);
+    ctx.fill();
+    // 4条腿
+    for (let i = 0; i < 4; i++) {
+      const la = (i / 4) * Math.PI * 2 + z.walkPhase;
+      ctx.strokeStyle = z.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(la) * z.radius * 0.7, Math.sin(la) * z.radius * 0.5);
+      ctx.lineTo(Math.cos(la) * z.radius * 1.3, Math.sin(la) * z.radius * 0.8);
+      ctx.stroke();
+    }
+  }
+  if (z.isExploder) {
+    const pulse = Math.sin(performance.now() * 0.01) * 0.2 + 1;
+    ctx.fillStyle = `rgba(255,68,0,${0.3})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, z.radius * pulse * 1.3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = z.color;
+    ctx.beginPath();
+    ctx.arc(0, 0, z.radius * pulse, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if (z.isHealer) {
+    // 治疗光环
+    ctx.strokeStyle = `rgba(68,255,68,${0.3 + Math.sin(performance.now() * 0.005) * 0.2})`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(0, 0, z.healRange * 0.3, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
   ctx.restore();
 }
 
@@ -7796,10 +7995,11 @@ function drawPlayer() {
     };
     const abilName = abilityNames[cls && cls.spaceAbility ? cls.spaceAbility : 'mine'] || (lang === 'zh' ? '地雷' : 'MINE');
     const pulse2 = (Math.sin(performance.now() * 0.005) + 1) * 0.5;
-    ctx.fillStyle = `rgba(255,170,68,${0.7 + pulse2 * 0.3})`;
+    ctx.fillStyle = player.abilityCD > 0 ? 'rgba(255,80,80,0.8)' : `rgba(255,170,68,${0.7 + pulse2 * 0.3})`;
     ctx.font = 'bold 11px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('[SPACE] ' + abilName + ' ' + player.mines + '/' + player.mineMax, player.x, player.y - player.radius - 12);
+    const cdText = player.abilityCD > 0 ? ' (' + Math.ceil(player.abilityCD / 60) + 's)' : '';
+    ctx.fillText('[SPACE] ' + abilName + ' ' + player.mines + '/' + player.mineMax + cdText, player.x, player.y - player.radius - 12);
   }
 }
 
@@ -8588,6 +8788,7 @@ function startGame() {
   player.mineMax = 3;
   player.mines = 3;
   player.mineRegenTimer = 0;
+  player.abilityCD = 0;
   player.weapon = 'pistol';
   player.ownedWeapons = ['pistol'];
   player.invuln = 0;
@@ -8636,6 +8837,9 @@ function startGame() {
   ammo.acid = 0;
   ammo.railgun = 0;
   ammo.sniper = 0;
+  ammo.plasma = 0;
+  ammo.cryo = 0;
+  ammo.flak = 0;
   // 重置备弹
   spareAmmo.pistol = Infinity;
   for (const wk of WEAPON_KEYS) { if (wk !== 'pistol') spareAmmo[wk] = 0; }
