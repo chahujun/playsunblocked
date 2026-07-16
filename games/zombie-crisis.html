@@ -4630,6 +4630,7 @@ function updateBullets(dt) {
       // 轨道炮：超高穿透，命中不消失
       // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹/等离子/高射炮）：命中爆炸
       // 火箭筒特殊：穿甲阶段（rocketPierce>0）只造成直击伤害不爆炸，穿透后才爆炸
+      const _wasRocketPiercing = b.weaponType === 'rocket' && b.rocketPierce > 0;
       if (b.weaponType === 'rocket' && b.rocketPierce > 0) {
         // 穿甲阶段：只造成直击伤害，不爆炸，不消失
         b.rocketPierce--;
@@ -4670,8 +4671,8 @@ function updateBullets(dt) {
         if (b.hitTargets) b.hitTargets.push(z);
         b.pierce--;
         if (b.pierce < 0) { bullets[i] = bullets[bullets.length - 1]; bullets.pop(); bulletDestroyed = true; }
-      } else if (b.weaponType === 'rocket' && b.rocketPierce > 0) {
-        // 火箭筒穿甲阶段：继续飞行，不消失
+      } else if (_wasRocketPiercing) {
+        // 火箭筒穿甲阶段：继续飞行，不消失（即使rocketPierce已减到0）
       } else {
         bullets[i] = bullets[bullets.length - 1]; bullets.pop(); bulletDestroyed = true;
       }
@@ -4796,6 +4797,7 @@ function updateBullets(dt) {
         }
         // 爆炸型武器（火箭筒/榴弹/微型火箭/追踪弹/等离子/高射炮）：命中爆炸
         // 火箭筒穿甲阶段：只造成直击伤害不爆炸
+        const _wasRocketPiercingBoss = b.weaponType === 'rocket' && b.rocketPierce > 0;
         if (b.weaponType === 'rocket' && b.rocketPierce > 0) {
           b.rocketPierce--;
         } else if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'homing' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
@@ -4825,7 +4827,7 @@ function updateBullets(dt) {
           }
         }
         // 非穿透武器命中BOSS消失，穿透武器继续（火焰枪/激光枪/火箭筒穿甲阶段）
-        if (b.weaponType !== 'flame' && b.weaponType !== 'laser' && !(b.weaponType === 'rocket' && b.rocketPierce > 0)) {
+        if (b.weaponType !== 'flame' && b.weaponType !== 'laser' && !_wasRocketPiercingBoss) {
           bullets[i] = bullets[bullets.length - 1];
           bullets.pop();
           hit = true;
