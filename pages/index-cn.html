@@ -589,6 +589,7 @@
             <button type="button" class="category-pill shrink-0" data-category="Arcade">街机</button>
             <button type="button" class="category-pill shrink-0" data-category="Strategy">策略</button>
             <button type="button" class="category-pill shrink-0" data-category="Adventure">冒险</button>
+            <button type="button" class="category-pill shrink-0" data-category="Board">棋盘</button>
           </div>
         </div>
       </div>
@@ -747,6 +748,26 @@
       </div>
     </section>
     <!-- END TRENDING NOW -->
+
+    <!-- ========================== -->
+    <!-- START CLASSIC GAMES         -->
+    <!-- ========================== -->
+    <section class="w-full reveal" style="background: var(--color-bg); padding: 64px 0;">
+      <div class="mx-auto px-4 sm:px-6 lg:px-8" style="max-width: var(--max-width);">
+        <div class="flex items-end justify-between gap-4 mb-8">
+          <h2 class="section-heading">经典游戏 即开即玩</h2>
+          <a href="games-cn.html" class="view-all-link">
+            查看全部
+            <i data-lucide="arrow-right" style="width:16px;height:16px;" aria-hidden="true"></i>
+          </a>
+        </div>
+        <p class="font-sans" style="font-size: var(--text-sm); font-style: italic; color: var(--color-text-tertiary); margin-bottom: 24px;">
+          永恒经典，无需下载，无需注册，打开即玩。
+        </p>
+        <div id="classic-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4"></div>
+      </div>
+    </section>
+    <!-- END CLASSIC GAMES -->
 
     <!-- ========================== -->
     <!-- START LEGAL                 -->
@@ -1006,6 +1027,15 @@
           } else {
             trending.innerHTML = trendGames.map(makeHomeCard).join('');
           }
+        }
+
+        var classic = document.getElementById('classic-grid');
+        if (classic) {
+          var classicSlugs = ['game-2048', 'snake', 'minesweeper', 'gomoku', 'sokoban', 'ludo'];
+          var classicGames = classicSlugs.map(function(slug) {
+            return PLAYSUNBLOCKED_GAMES.all.find(function(g) { return g.slug === slug; });
+          }).filter(Boolean);
+          classic.innerHTML = classicGames.map(makeHomeCard).join('');
         }
 
         if (window.lucide) lucide.createIcons();

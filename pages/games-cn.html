@@ -659,10 +659,11 @@
                 <div class="flex flex-col gap-2">
                   <button type="button" class="category-item" data-active="true" data-cat="All"><span>全部游戏</span><span class="category-count">23</span></button>
                   <button type="button" class="category-item" data-cat="Action"><span>动作</span><span class="category-count">3</span></button>
-                  <button type="button" class="category-item" data-cat="Puzzle"><span>益智</span><span class="category-count">6</span></button>
+                  <button type="button" class="category-item" data-cat="Puzzle"><span>益智</span><span class="category-count">8</span></button>
                   <button type="button" class="category-item" data-cat="Arcade"><span>街机</span><span class="category-count">4</span></button>
                   <button type="button" class="category-item" data-cat="Strategy"><span>策略</span><span class="category-count">2</span></button>
                   <button type="button" class="category-item" data-cat="Adventure"><span>冒险</span><span class="category-count">2</span></button>
+                  <button type="button" class="category-item" data-cat="Board"><span>棋盘</span><span class="category-count">2</span></button>
                 </div>
               </div>
 
@@ -873,7 +874,7 @@
       var grid = document.getElementById('games-grid');
       if (!grid) return;
 
-      var CAT_CN = { 'Action': '动作', 'Puzzle': '益智', 'Arcade': '街机', 'Strategy': '策略', 'Adventure': '冒险' };
+      var CAT_CN = { 'Action': '动作', 'Puzzle': '益智', 'Arcade': '街机', 'Strategy': '策略', 'Adventure': '冒险', 'Board': '棋盘' };
 
       function playsToCn(value) {
         value = Number(value) || 0;
