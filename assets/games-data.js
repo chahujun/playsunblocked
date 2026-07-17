@@ -500,6 +500,27 @@
       },
       featured: true,
       trending: false
+    },
+    {
+      slug: 'pixel-guardians',
+      title: { en: 'Pixel Guardians', cn: '像素守护者' },
+      subtitle: { en: 'Pixel Art Tower Defense', cn: '像素塔防' },
+      category: 'Strategy',
+      rating: 0,
+      plays: null,
+      duration: { en: '15-40 min', cn: '15-40 分钟' },
+      controls: { en: 'Mouse', cn: '鼠标' },
+      difficulty: { en: 'Medium', cn: '中等' },
+      description: {
+        en: 'A pixel-art classic path tower defense. Build 6 unique towers — Archer, Cannon, Frost, Lightning, Poison, and Guardian — to repel 7 enemy types across 3 difficulties. Each run grants 3 random buffs for endless replayability.',
+        cn: '像素风经典路线塔防。建造 6 种特色防御塔——弓箭、加农炮、冰霜、闪电、剧毒、守护——抵御 7 种敌人。每局随机 3 项强化，3 种难度，高重开率设计。'
+      },
+      howToPlay: {
+        en: ['Click build spots to place towers', 'Each tower type has unique strengths — read the tooltips', 'Earn coins by defeating enemies', 'Click a placed tower to upgrade or sell it', 'Survive all waves to win — protect your base!'],
+        cn: ['点击建造点放置防御塔', '每种塔有独特优势——查看说明', '击败敌人获得金币', '点击已放置的塔可升级或出售', '守住基地，撑过所有波次即获胜']
+      },
+      featured: true,
+      trending: true
     }
   ];
 
@@ -512,7 +533,7 @@
     return Math.round(n);
   }
   // Mark recent games as New — use slug-based check for stability
-  var NEW_GAME_SLUGS = ['crownfall', 'bytebreak'];
+  var NEW_GAME_SLUGS = ['crownfall', 'bytebreak', 'pixel-guardians'];
   GAMES.forEach(function (g, i) {
     g.gradient = CATEGORY_GRADIENTS[g.category] || ['#FF5C28', '#B8350A'];
     g.playsNum = parsePlays(g.plays);
@@ -530,8 +551,8 @@
       }
       return null;
     },
-    featured: GAMES.filter(function (g) { return g.featured; }),
-    trending: GAMES.filter(function (g) { return g.trending; }),
+    featured: GAMES.filter(function (g) { return g.featured; }).sort(function (a, b) { return b.addedOrder - a.addedOrder; }),
+    trending: GAMES.filter(function (g) { return g.trending; }).sort(function (a, b) { return b.addedOrder - a.addedOrder; }),
     categories: ['All', 'Action', 'Puzzle', 'Arcade', 'Strategy', 'Adventure', 'Board'],
     categoryGradients: CATEGORY_GRADIENTS,
     // Escape HTML special characters to prevent XSS when interpolating into innerHTML
