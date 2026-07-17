@@ -945,7 +945,7 @@ const I18n = {
     maxCombo: "Max Combo: ",
     enter: "ENTER",
     audioDesc: "Click to activate audio system",
-    weaponHint: "[1-9] Weapon  [Space] Skill  [F] Swap  [Shift] Dash",
+    weaponHint: "[1-9] Weapon  [Space] Skill  [F] Swap  [G] Ult Wpn  [X] Ult Skill  [Shift] Dash",
     waveStart: "Wave ",
     zombiesLeft: " left",
     reloading: "RELOADING",
@@ -1030,7 +1030,7 @@ const I18n = {
     maxCombo: "最高连击: ",
     enter: "进入",
     audioDesc: "点击屏幕启动音频系统",
-    weaponHint: "[1-9] 武器  [空格] 技能  [F] 切换  [Shift] 冲刺",
+    weaponHint: "[1-9] 武器  [空格] 技能  [F] 切换  [G] 终极武器  [X] 终极技  [Shift] 冲刺",
     waveStart: "第 ",
     zombiesLeft: " 只剩余",
     reloading: "装弹中",
@@ -1419,7 +1419,7 @@ const player = {
   critChance: 0.15,
   critMult: 2,
   // Buffs
-  buffs: { rage: 0, shield: 0, haste: 0, cloak: 0, frenzy: 0 },
+  buffs: { rage: 0, shield: 0, haste: 0, cloak: 0, frenzy: 0, bloodFrenzy: 0 },
   // Terrain
   inGrass: false,
   inWater: false,
@@ -1902,6 +1902,120 @@ const SKILL_DEFS = {
 };
 
 // =====================================================================
+// ULTIMATE WEAPONS - 终极武器定义（每职业1把，不占武器槽，G键切换）
+// =====================================================================
+const ULTIMATE_WEAPONS = {
+  // 突击兵：毁灭者机枪 - 超高射速穿透型
+  destroyer: {
+    nameZh: '毁灭者', nameEn: 'DESTROYER', classId: 'assault',
+    damage: 35, fireRate: 80, bulletSpeed: 22, spread: 0.05, auto: true, pellets: 1, jitter: 0.02,
+    color: '#ff4422', type: 'normal', pierce: 3,
+    cooldown: 600, // 10秒CD
+    descZh: '超高射速穿透机枪，10秒持续输出', descEn: 'High fire rate piercing MG, 10s duration'
+  },
+  // 医护兵：生命汲取器 - 吸血型能量武器
+  lifedrain: {
+    nameZh: '生命汲取', nameEn: 'LIFEDRAIN', classId: 'medic',
+    damage: 25, fireRate: 100, bulletSpeed: 18, spread: 0, auto: true, pellets: 1, jitter: 0,
+    color: '#44ff66', type: 'normal', pierce: 5, lifesteal: 5,
+    cooldown: 600,
+    descZh: '吸血能量弹，穿透5敌，每次命中回5HP', descEn: 'Lifesteal piercing shot, heal 5HP per hit'
+  },
+  // 工程兵：聚变轨道炮 - 超级穿透爆炸型
+  fusion_rail: {
+    nameZh: '聚变轨道炮', nameEn: 'FUSION RAIL', classId: 'engineer',
+    damage: 300, fireRate: 1500, bulletSpeed: 50, spread: 0, auto: false, pellets: 1, jitter: 0,
+    color: '#ffee44', type: 'railgun', pierce: 99, railWidth: 10, railRange: 800, railFadeStart: 600,
+    explodeRadius: 100, explodeDamage: 150,
+    cooldown: 900, // 15秒CD
+    descZh: '超高伤害穿透+大爆炸，一炮清线', descEn: 'Ultra damage pierce + big explosion'
+  },
+  // 侦察兵：幻影双枪 - 快速追踪型
+  phantom_twin: {
+    nameZh: '幻影双枪', nameEn: 'PHANTOM', classId: 'scout',
+    damage: 40, fireRate: 120, bulletSpeed: 24, spread: 0.1, auto: true, pellets: 2, jitter: 0.05,
+    color: '#aa88ff', type: 'homing', homingTurn: 0.25, homingRange: 600,
+    explodeRadius: 40, explodeDamage: 30, pierce: 1,
+    cooldown: 600,
+    descZh: '双发追踪弹，自动锁定敌人', descEn: 'Twin homing rounds, auto-lock'
+  },
+  // 重装机兵：毁灭火炮 - 大范围爆炸型
+  annihilator: {
+    nameZh: '毁灭火炮', nameEn: 'ANNIHILATOR', classId: 'heavy',
+    damage: 80, fireRate: 500, bulletSpeed: 14, spread: 0, auto: false, pellets: 1, jitter: 0,
+    color: '#ff6600', type: 'rocket', explodeRadius: 120, explodeDamage: 100, rocketPierce: 2,
+    cooldown: 750, // 12.5秒CD
+    descZh: '巨型火箭，穿2敌后大爆炸', descEn: 'Huge rocket, pierce 2 + big boom'
+  },
+  // 狙击手：反物质狙击 - 超远程秒杀型
+  antimatter: {
+    nameZh: '反物质狙击', nameEn: 'ANTIMATTER', classId: 'sniper',
+    damage: 600, fireRate: 2000, bulletSpeed: 60, spread: 0, auto: false, pellets: 1, jitter: 0,
+    color: '#ffffaa', type: 'sniper', pierce: 99, sniperRange: 900, sniperFadeStart: 700,
+    eliteMult: 3.0, bossMult: 3.0,
+    cooldown: 1200, // 20秒CD
+    descZh: '超高单发伤害，精英/BOSS额外x3', descEn: 'Ultra single-shot, elite/boss x3'
+  },
+  // 狂战士：血锯 - 近战范围型
+  bloodsaw: {
+    nameZh: '血锯', nameEn: 'BLOODSAW', classId: 'berserker',
+    damage: 60, fireRate: 60, bulletSpeed: 10, spread: 0.3, auto: true, pellets: 3, jitter: 0.1,
+    color: '#ff0044', type: 'flame', pierce: 8, flameRange: 150, flameFadeStart: 100,
+    burnDuration: 60, burnDps: 1.0, lifesteal: 3,
+    cooldown: 600,
+    descZh: '近距离血锯，高伤+燃烧+吸血', descEn: 'Close-range bloodsaw, burn + lifesteal'
+  }
+};
+
+// =====================================================================
+// ULTIMATE SKILLS - 终极技能定义（每职业1个，X键释放，长CD）
+// =====================================================================
+const ULTIMATE_SKILLS = {
+  // 突击兵：轨道轰炸 - 全屏轰炸
+  orbital_strike: {
+    nameZh: '轨道轰炸', nameEn: 'ORBITAL STRIKE', classId: 'assault', icon: '🛰',
+    cooldown: 3600, // 60秒
+    descZh: '轨道激光全屏轰炸，对所有僵尸造成500伤害', descEn: 'Orbital laser, 500 dmg to all zombies'
+  },
+  // 医护兵：圣光复活 - 全恢复+无敌
+  holy_revive: {
+    nameZh: '圣光复活', nameEn: 'HOLY REVIVE', classId: 'medic', icon: '🌟',
+    cooldown: 3600,
+    descZh: '回满HP+5秒无敌+清除所有负面效果', descEn: 'Full heal + 5s invincibility'
+  },
+  // 工程兵：机械风暴 - 全屏炮台
+  mech_storm: {
+    nameZh: '机械风暴', nameEn: 'MECH STORM', classId: 'engineer', icon: '⚙',
+    cooldown: 3600,
+    descZh: '在周围部署4个强化炮台，持续30秒', descEn: 'Deploy 4 buffed turrets, 30s'
+  },
+  // 侦察兵：时间静止 - 冻结全屏
+  time_freeze: {
+    nameZh: '时间静止', nameEn: 'TIME FREEZE', classId: 'scout', icon: '⏸',
+    cooldown: 3600,
+    descZh: '冻结所有僵尸5秒，期间无法移动', descEn: 'Freeze all zombies 5s'
+  },
+  // 重装机兵：核弹发射 - 巨型爆炸
+  nuke: {
+    nameZh: '核弹发射', nameEn: 'NUKE', classId: 'heavy', icon: '☢',
+    cooldown: 4200, // 70秒
+    descZh: '发射核弹，超大范围800伤害+辐射', descEn: 'Nuke, huge radius 800 dmg + radiation'
+  },
+  // 狙击手：死亡标记 - 全屏秒杀普通僵尸
+  death_mark: {
+    nameZh: '死亡标记', nameEn: 'DEATH MARK', classId: 'sniper', icon: '💀',
+    cooldown: 3600,
+    descZh: '秒杀所有普通僵尸，精英/BOSS受1000伤害', descEn: 'Kill all normals, 1000 dmg to elite/boss'
+  },
+  // 狂战士：嗜血狂暴 - 超级强化
+  blood_frenzy: {
+    nameZh: '嗜血狂暴', nameEn: 'BLOOD FRENZY', classId: 'berserker', icon: '👹',
+    cooldown: 3600,
+    descZh: '10秒内伤害x3，攻速x2，移速+50%，吸血30%', descEn: '10s: dmg x3, AS x2, speed +50%, lifesteal 30%'
+  }
+};
+
+// =====================================================================
 // WEATHER SYSTEM - 天气系统
 // =====================================================================
 const WEATHER_TYPES = {
@@ -1989,6 +2103,30 @@ document.addEventListener('keydown', (e) => {
     if (player.equippedSkills && player.equippedSkills.length > 1) {
       player.currentSkillIdx = (player.currentSkillIdx + 1) % player.equippedSkills.length;
       updateHUD();
+    }
+  }
+  // G键：切换终极武器
+  if (e.key.toLowerCase() === 'g') {
+    if (player.ultimateWeapon && player.ultimateWeaponCD <= 0) {
+      if (player.ultimateWeaponActive) {
+        // 切回普通武器
+        player.ultimateWeaponActive = false;
+        if (player.preUltimateWeapon) player.weapon = player.preUltimateWeapon;
+      } else {
+        // 切到终极武器
+        player.preUltimateWeapon = player.weapon;
+        player.ultimateWeaponActive = true;
+        player.ultimateWeaponTimer = ULTIMATE_WEAPONS[player.ultimateWeapon].cooldown;
+        player.ultimateWeaponAmmo = Math.floor(ULTIMATE_WEAPONS[player.ultimateWeapon].cooldown / ULTIMATE_WEAPONS[player.ultimateWeapon].fireRate);
+      }
+      hudDirty.weapon = true; hudDirty.ammo = true;
+      updateHUD();
+    }
+  }
+  // X键：释放终极技能
+  if (e.key.toLowerCase() === 'x') {
+    if (player.ultimateSkill && player.ultimateSkillCD <= 0 && state === GameState.PLAYING) {
+      activateUltimateSkill();
     }
   }
   // 武器切换 1-9，按已拥有武器的顺序切换
@@ -2145,8 +2283,101 @@ const MAX_AMMO = { pistol: Infinity, hmg: 100, shotgun: 24, flamethrower: 100, r
 function tryShoot() {
   if (state !== GameState.PLAYING) return;
   const now = performance.now();
+
+  // 终极武器射击逻辑
+  if (player.ultimateWeaponActive && player.ultimateWeapon) {
+    const uw = ULTIMATE_WEAPONS[player.ultimateWeapon];
+    if (player.ultimateWeaponAmmo <= 0) {
+      // 弹药耗尽，自动切回普通武器
+      player.ultimateWeaponActive = false;
+      player.ultimateWeaponCD = uw.cooldown;
+      if (player.preUltimateWeapon) player.weapon = player.preUltimateWeapon;
+      hudDirty.weapon = true; hudDirty.ammo = true;
+      updateHUD();
+      return;
+    }
+    if (now - player.lastShot < uw.fireRate) return;
+    player.lastShot = now;
+    player.ultimateWeaponAmmo--;
+
+    const worldMX = mouseX * PIXEL_SCALE + camera.x;
+    const worldMY = mouseY * PIXEL_SCALE + camera.y;
+    const baseAngle = Math.atan2(worldMY - player.y, worldMX - player.x);
+    player.angle = baseAngle;
+
+    // 创建终极武器子弹
+    for (let i = 0; i < uw.pellets; i++) {
+      let angle = baseAngle;
+      if (uw.pellets > 1) angle = baseAngle - uw.spread + (uw.spread * 2 / (uw.pellets - 1)) * i;
+      if (uw.jitter > 0) angle += (Math.random() - 0.5) * uw.jitter * 2;
+
+      const isCrit = Math.random() < player.critChance;
+      const dmg = uw.damage * player.damageMult * (isCrit ? player.critMult : 1);
+
+      // 枪口闪光
+      const muzzleX = player.x + Math.cos(angle) * (player.radius + 14);
+      const muzzleY = player.y + Math.sin(angle) * (player.radius + 14);
+      for (let p = 0; p < 5; p++) {
+        particles.push({
+          x: muzzleX, y: muzzleY,
+          vx: Math.cos(angle) * (2 + Math.random() * 3) + (Math.random() - 0.5) * 2,
+          vy: Math.sin(angle) * (2 + Math.random() * 3) + (Math.random() - 0.5) * 2,
+          life: 10 + Math.random() * 8, maxLife: 18,
+          size: 3 + Math.random() * 2, color: uw.color
+        });
+      }
+
+      // 创建子弹（复用现有子弹系统）
+      const bType = uw.type;
+      const isRailgun = bType === 'railgun';
+      const isSniper = bType === 'sniper';
+      const isHoming = bType === 'homing';
+      const isRocket = bType === 'rocket';
+      const isFlame = bType === 'flame';
+
+      bullets.push({
+        x: muzzleX, y: muzzleY,
+        vx: Math.cos(angle) * uw.bulletSpeed,
+        vy: Math.sin(angle) * uw.bulletSpeed,
+        damage: dmg, radius: isRailgun ? 8 : (isSniper ? 5 : 4),
+        color: uw.color, life: isRailgun ? 30 : (isSniper ? 25 : 120),
+        isCrit, from: 'player',
+        weaponType: bType,
+        pierce: uw.pierce || 0,
+        hitTargets: (uw.pierce || 0) > 0 ? [] : null,
+        distTraveled: 0,
+        lifesteal: uw.lifesteal || 0,
+        explodeRadius: uw.explodeRadius || 0,
+        explodeDamage: uw.explodeDamage || 0,
+        fragments: 0, fragmentDamage: 0,
+        flameRange: uw.flameRange || 0, flameFadeStart: uw.flameFadeStart || 0,
+        laserRange: 0, laserFadeStart: 0,
+        burnDuration: uw.burnDuration || 0, burnDps: uw.burnDps || 0,
+        firePoolRadius: 0, firePoolLife: 0, firePoolDps: 0,
+        homingTurn: uw.homingTurn || 0, homingRange: uw.homingRange || 0, homingTimer: 0,
+        chainRange: 0, chainDamage: 0, chainCount: 0,
+        acidRadius: 0, acidLife: 0, acidDps: 0,
+        slowMult: uw.slowMult || 0, slowDuration: uw.slowDuration || 0,
+        railWidth: uw.railWidth || 0, railRange: uw.railRange || 0, railFadeStart: uw.railFadeStart || 0,
+        sniperRange: uw.sniperRange || 0, sniperFadeStart: uw.sniperFadeStart || 0,
+        eliteMult: uw.eliteMult || 0, bossMult: uw.bossMult || 0,
+        chainLightning: 0, volatileMix: false,
+        rocketPierce: uw.rocketPierce || 0,
+        fragmentExplodeRadius: 0, fragmentExplodeDamage: 0,
+        plasmaPoolRadius: 0, plasmaPoolLife: 0, plasmaPoolDps: 0
+      });
+    }
+    triggerShootFX();
+    // 后坐力
+    if (isRocket || uw.type === 'flame') {
+      player.vx -= Math.cos(baseAngle) * 3;
+      player.vy -= Math.sin(baseAngle) * 3;
+    }
+    return; // 终极武器射击后直接返回，不执行普通武器逻辑
+  }
+
   const w = WEAPONS[player.weapon];
-  if (now - player.lastShot < w.fireRate * (player.buffs.frenzy > 0 ? 0.5 : 1)) return;
+  if (now - player.lastShot < w.fireRate * (player.buffs.frenzy > 0 ? 0.5 : 1) * (player.buffs.bloodFrenzy > 0 ? 0.5 : 1)) return;
 
   // 副武器弹药检查
   const wAmmo = ammo[player.weapon];
@@ -2202,6 +2433,7 @@ function tryShoot() {
   if (player.buffs.frenzy > 0) frenzyDmgMult *= 1.5;
   if (player.buffs.rageBurst > 0) frenzyDmgMult *= 1.8;
   if (player.buffs.bloodRage > 0) frenzyDmgMult *= 2.0;
+  if (player.buffs.bloodFrenzy > 0) frenzyDmgMult *= 3.0;
 
   // Muzzle flash particle
   const muzzleX = player.x + Math.cos(baseAngle) * (player.radius + 14);
@@ -2276,7 +2508,7 @@ function tryShoot() {
       hitTargets: (isFlame || isLaser || isTesla || isRailgun) ? [] : null,
       distTraveled: 0,
       // 吸血：子弹携带吸血标记（狂热期间额外+10%概率）
-      lifesteal: player.upgrades.lifesteal + (player.buffs.frenzy > 0 ? 2 : 0),
+      lifesteal: player.upgrades.lifesteal + (player.buffs.frenzy > 0 ? 2 : 0) + (player.buffs.bloodFrenzy > 0 ? 6 : 0),
       flameRange: w.flameRange || 0,
       flameFadeStart: w.flameFadeStart || 0,
       laserRange: w.laserRange || (isTesla ? w.laserRange || 0 : 0) || (isRailgun ? w.railRange || 0 : 0),
@@ -2626,6 +2858,109 @@ function placeMine() {
       explodeRadius: 110 * explosionMult, armed: true, triggered: false,
       triggerTimer: 0, explodeDamage: 120 * player.damageMult
     });
+  }
+  updateHUD();
+}
+
+// =====================================================================
+// ULTIMATE SKILL - 终极技能释放（X键，长CD）
+// =====================================================================
+function activateUltimateSkill() {
+  const ultId = player.ultimateSkill;
+  const ultDef = ULTIMATE_SKILLS[ultId];
+  if (!ultDef) return;
+  player.ultimateSkillCD = ultDef.cooldown;
+
+  switch (ultId) {
+    case 'orbital_strike': // 突击兵：轨道轰炸
+      for (const z of zombies) {
+        z.hp -= 500 * player.damageMult;
+        if (z.hp <= 0) onZombieKilled(z);
+        spawnBloodParticles(z.x, z.y, 8, '#ff4400');
+      }
+      if (boss) { boss.hp -= 800 * player.damageMult; spawnBloodParticles(boss.x, boss.y, 20, '#ff4400'); }
+      // 全屏闪光
+      for (let i = 0; i < 50; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const r = Math.random() * 400;
+        particles.push({ x: player.x + Math.cos(ang) * r, y: player.y + Math.sin(ang) * r, vx: 0, vy: 0, life: 20, maxLife: 20, size: 6, color: '#ff4400' });
+      }
+      addShake(15);
+      break;
+    case 'holy_revive': // 医护兵：圣光复活
+      player.hp = player.maxHp;
+      player.invuln = 300; // 5秒无敌
+      player.classShield = Math.max(player.classShield, 100);
+      // 清除负面效果
+      survival.hunger = Math.min(100, survival.hunger + 50);
+      survival.thirst = Math.min(100, survival.thirst + 50);
+      spawnBloodParticles(player.x, player.y, 30, '#ffdd44');
+      addShake(5);
+      break;
+    case 'mech_storm': // 工程兵：机械风暴
+      for (let i = 0; i < 4; i++) {
+        const ang = (Math.PI * 2 / 4) * i;
+        const tx = player.x + Math.cos(ang) * 60;
+        const ty = player.y + Math.sin(ang) * 60;
+        placeTurret('ap', tx, ty);
+        const t = turrets[turrets.length - 1];
+        t.lifetime = 1800; // 30秒
+        t.hp = 500; t.maxHp = 500;
+        t.def = Object.assign({}, t.def, { fireRate: 20, damage: 50, range: 400, pierce: 4, explodeRadius: 40, explodeDamage: 25 });
+      }
+      spawnBloodParticles(player.x, player.y, 20, '#44ddff');
+      addShake(6);
+      break;
+    case 'time_freeze': // 侦察兵：时间静止
+      for (const z of zombies) { z.empTimer = 300; }
+      if (boss) boss.empTimer = 200;
+      spawnBloodParticles(player.x, player.y, 25, '#88ddff');
+      addShake(4);
+      break;
+    case 'nuke': // 重装机兵：核弹发射
+      // 在鼠标位置发射核弹
+      var worldMX = mouseX * PIXEL_SCALE + camera.x;
+      var worldMY = mouseY * PIXEL_SCALE + camera.y;
+      // 全屏伤害
+      for (const z of zombies) {
+        const d = Math.hypot(z.x - worldMX, z.y - worldMY);
+        if (d < 300) {
+          z.hp -= 800 * player.damageMult;
+          if (z.hp <= 0) onZombieKilled(z);
+        }
+      }
+      if (boss) {
+        const bd = Math.hypot(boss.x - worldMX, boss.y - worldMY);
+        if (bd < 300) boss.hp -= 1200 * player.damageMult;
+      }
+      // 辐射区域
+      firePools.push({ x: worldMX, y: worldMY, radius: 120, life: 600, maxLife: 600, dps: 2.0, tickTimer: 0 });
+      // 爆炸特效
+      for (let i = 0; i < 60; i++) {
+        const ang = Math.random() * Math.PI * 2;
+        const r = Math.random() * 300;
+        particles.push({ x: worldMX + Math.cos(ang) * r, y: worldMY + Math.sin(ang) * r, vx: Math.cos(ang) * 5, vy: Math.sin(ang) * 5, life: 30, maxLife: 30, size: 8, color: i % 2 === 0 ? '#ff6600' : '#ffaa00' });
+      }
+      addShake(20);
+      break;
+    case 'death_mark': // 狙击手：死亡标记
+      for (const z of zombies) {
+        if (z.isElite || z.type === 'brute' || z.type === 'tank') {
+          z.hp -= 1000 * player.damageMult;
+        } else {
+          z.hp = 0;
+        }
+        if (z.hp <= 0) onZombieKilled(z);
+        addDamageNumber(z.x, z.y - z.radius, 'MARK', '#ff4444', true);
+      }
+      if (boss) { boss.hp -= 1500 * player.damageMult; addDamageNumber(boss.x, boss.y - boss.radius, 'MARK', '#ff4444', true); }
+      addShake(8);
+      break;
+    case 'blood_frenzy': // 狂战士：嗜血狂暴
+      player.buffs.bloodFrenzy = 600; // 10秒
+      spawnBloodParticles(player.x, player.y, 25, '#ff0033');
+      addShake(5);
+      break;
   }
   updateHUD();
 }
@@ -3540,6 +3875,9 @@ function updatePlayer(dt) {
   if (player.buffs.taunt > 0) player.buffs.taunt -= dt;
   if (player.buffs.focusShot > 0) player.buffs.focusShot -= dt;
   if (player.buffs.bloodRage > 0) player.buffs.bloodRage -= dt;
+  if (player.ultimateWeaponCD > 0) player.ultimateWeaponCD -= dt;
+  if (player.ultimateSkillCD > 0) player.ultimateSkillCD -= dt;
+  if (player.buffs.bloodFrenzy > 0) player.buffs.bloodFrenzy -= dt;
 
   // Dash timer
   if (player.dashTime > 0) {
@@ -3584,7 +3922,8 @@ function updatePlayer(dt) {
     const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
     const hasteMult = player.buffs.haste > 0 ? 1.5 : 1;
     const frenzyMult = player.buffs.frenzy > 0 ? 1.3 : 1;
-    const rageBurstSpdMult = player.buffs.rageBurst > 0 ? 1.2 : 1;
+    let rageBurstSpdMult = player.buffs.rageBurst > 0 ? 1.2 : 1;
+    if (player.buffs.bloodFrenzy > 0) rageBurstSpdMult *= 1.5;
     // 重武器移速惩罚
     const wDef = WEAPONS[player.weapon];
     const heavyMult = wDef.weaponClass === 'heavy' ? HEAVY_SPEED_PENALTY : 1.0;
@@ -5854,7 +6193,7 @@ function updatePickups(dt) {
     }
   }
   // Decay buffs (排除自定义处理的技能buff，它们在updatePlayer中处理)
-  const _customBuffs = ['rageBurst','bioShield','timeWarp','shieldWall','taunt','focusShot','bloodRage'];
+  const _customBuffs = ['rageBurst','bioShield','timeWarp','shieldWall','taunt','focusShot','bloodRage','bloodFrenzy'];
   for (const key in player.buffs) {
     if (_customBuffs.includes(key)) continue; // 跳过自定义处理的buff
     if (player.buffs[key] > 0) {
@@ -6063,6 +6402,24 @@ function applyClass(classId) {
   player.unlockedSkills = classSkills.filter(k => SKILL_DEFS[k].isDefault);
   player.equippedSkills = [...player.unlockedSkills]; // 初始装备默认技能
   player.currentSkillIdx = 0;
+  // 分配职业专属终极武器和终极技能
+  for (const wId in ULTIMATE_WEAPONS) {
+    if (ULTIMATE_WEAPONS[wId].classId === classId) {
+      player.ultimateWeapon = wId;
+      break;
+    }
+  }
+  for (const sId in ULTIMATE_SKILLS) {
+    if (ULTIMATE_SKILLS[sId].classId === classId) {
+      player.ultimateSkill = sId;
+      break;
+    }
+  }
+  player.ultimateWeaponActive = false;
+  player.ultimateWeaponCD = 0;
+  player.ultimateWeaponTimer = 0;
+  player.ultimateWeaponAmmo = 0;
+  player.ultimateSkillCD = 0;
 }
 
 // =====================================================================
@@ -9014,6 +9371,26 @@ function drawPlayer() {
     const cdText = player.abilityCD > 0 ? ' (' + Math.ceil(player.abilityCD / 60) + 's)' : '';
     const switchHint = player.equippedSkills && player.equippedSkills.length > 1 ? ' [F⇄]' : '';
     ctx.fillText(_skillIcon + '[SPACE] ' + _abilName + ' ' + player.mines + '/' + player.mineMax + cdText + switchHint, player.x, player.y - player.radius - 12);
+    // 终极武器和终极技能显示
+    const ultW = player.ultimateWeapon ? ULTIMATE_WEAPONS[player.ultimateWeapon] : null;
+    const ultS = player.ultimateSkill ? ULTIMATE_SKILLS[player.ultimateSkill] : null;
+    let ultLine = '';
+    if (ultW) {
+      const ultWName = lang === 'zh' ? ultW.nameZh : ultW.nameEn;
+      if (player.ultimateWeaponActive) ultLine += '[G] ' + ultWName + ' ' + player.ultimateWeaponAmmo + '\u53d1';
+      else if (player.ultimateWeaponCD > 0) ultLine += '[G] ' + ultWName + ' CD(' + Math.ceil(player.ultimateWeaponCD / 60) + 's)';
+      else ultLine += '[G] ' + ultWName + ' ' + (lang === 'zh' ? '\u5c31\u7eea' : 'READY');
+    }
+    if (ultS) {
+      const ultSName = lang === 'zh' ? ultS.nameZh : ultS.nameEn;
+      if (ultLine) ultLine += ' | ';
+      if (player.ultimateSkillCD > 0) ultLine += '[X] ' + ultSName + ' CD(' + Math.ceil(player.ultimateSkillCD / 60) + 's)';
+      else ultLine += '[X] ' + ultSName + ' ' + (lang === 'zh' ? '\u5c31\u7eea' : 'READY');
+    }
+    if (ultLine) {
+      ctx.fillStyle = player.ultimateWeaponActive ? 'rgba(255,100,100,0.9)' : 'rgba(255,200,100,0.8)';
+      ctx.fillText(ultLine, player.x, player.y - player.radius - 26);
+    }
   }
 }
 
@@ -9779,7 +10156,7 @@ function updateHUD() {
     const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
     const mineKey = lang === 'zh' ? '技能' : 'SKILL';
     if (hudCached.controlsHint) {
-      hudCached.controlsHint.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${lang === 'zh' ? '技能' : 'SKILL'}</span><span><span class="key">F</span>${lang === 'zh' ? '切换' : 'SWAP'}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+      hudCached.controlsHint.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${lang === 'zh' ? '技能' : 'SKILL'}</span><span><span class="key">F</span>${lang === 'zh' ? '切换' : 'SWAP'}</span><span><span class="key">G</span>${lang === 'zh' ? '终极武器' : 'ULT WPN'}</span><span><span class="key">X</span>${lang === 'zh' ? '终极技' : 'ULT SKILL'}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
     }
     hudDirty.hint = false;
   }
@@ -9877,6 +10254,15 @@ function startGame() {
   player.equippedSkills = []; // 装备的技能ID列表（最多2个）
   player.currentSkillIdx = 0; // 当前激活的技能索引
   player.unlockedSkills = []; // 已解锁的技能ID列表
+  player.ultimateWeapon = null; // 当前装备的终极武器ID
+  player.ultimateWeaponActive = false; // 是否正在使用终极武器
+  player.ultimateWeaponCD = 0; // 终极武器CD
+  player.ultimateWeaponTimer = 0; // 终极武器持续时间
+  player.ultimateWeaponAmmo = 0; // 终极武器剩余弹药
+  player.preUltimateWeapon = null; // 切换终极武器前的普通武器
+  player.ultimateSkill = null; // 终极技能ID
+  player.ultimateSkillCD = 0; // 终极技能CD
+  player.buffs.bloodFrenzy = 0; // 狂战士终极技能buff
   player.weapon = 'pistol';
   player.ownedWeapons = ['pistol'];
   player.invuln = 0;
