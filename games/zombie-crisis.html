@@ -2261,11 +2261,14 @@ function tryReload() {
   const w = WEAPONS[player.weapon];
   const wAmmo = ammo[player.weapon];
   if (wAmmo === Infinity) return;
+  // 防御性检查：弹药值为undefined/NaN时不执行换弹
+  if (!Number.isFinite(wAmmo)) return;
   // 满弹检查
   const ammoCap = SECONDARY_AMMO[player.weapon] || w.maxAmmo;
   if (wAmmo >= ammoCap) return;
   // 备弹检查：没有备弹就不能装弹
-  if (spareAmmo[player.weapon] !== Infinity && spareAmmo[player.weapon] <= 0) return;
+  const wSpare = spareAmmo[player.weapon];
+  if (wSpare !== Infinity && (!Number.isFinite(wSpare) || wSpare <= 0)) return;
   player.reloading = true;
   if (typeof hudDirty !== 'undefined') hudDirty.reload = true; // 装弹开始：刷新装弹指示
   // 装弹时长受职业 reloadMult + 升级 reloadBonus 影响
@@ -2379,15 +2382,17 @@ function tryShoot() {
   const w = WEAPONS[player.weapon];
   if (now - player.lastShot < w.fireRate * (player.buffs.frenzy > 0 ? 0.5 : 1) * (player.buffs.bloodFrenzy > 0 ? 0.5 : 1)) return;
 
-  // 副武器弹药检查
+  // 副武器弹药检查（防止NaN/undefined导致无限弹药）
   const wAmmo = ammo[player.weapon];
-  if (wAmmo !== Infinity && wAmmo <= 0) { tryReload(); return; }
+  if (wAmmo !== Infinity) {
+    if (!Number.isFinite(wAmmo) || wAmmo <= 0) { tryReload(); return; }
+  }
 
   player.lastShot = now;
 
   // 副武器弹药消耗
   if (wAmmo !== Infinity) {
-    ammo[player.weapon]--;
+    ammo[player.weapon] = Math.max(0, wAmmo - 1);
   }
 
   const worldMX = mouseX * PIXEL_SCALE + camera.x;
@@ -2718,12 +2723,18 @@ function placeMine() {
         const oldW = player.ownedWeapons[replaceIdx];
         player.ownedWeapons[replaceIdx] = newW;
         delete ammo[oldW]; delete spareAmmo[oldW];
+        // 必须更新 player.weapon 指向新武器，否则旧武器弹药已被删除会导致 NaN
+        player.weapon = newW;
+        player.reloading = false;
+        player.reloadTimer = 0;
+        hudDirty.weapon = true;
       } else {
         player.ownedWeapons.push(newW);
       }
       // 新武器只给一半备弹（不是满备弹）
       ammo[newW] = SECONDARY_AMMO[newW] || 12;
       spareAmmo[newW] = Math.floor((TOTAL_SPARE_AMMO[newW] || 0) * 0.5);
+      hudDirty.ammo = true;
     }
     spawnBloodParticles(player.x, player.y, 15, '#ffdd44');
   } else if (abilityType === 'bio_shield') {
@@ -3979,13 +3990,16 @@ function updatePlayer(dt) {
       player.reloading = false;
       player.reloadTimer = 0;
       const w = WEAPONS[player.weapon];
-      if (ammo[player.weapon] !== Infinity) {
+      const curAmmo = ammo[player.weapon];
+      // 防御性检查：弹药值为undefined/NaN时不执行换弹
+      if (curAmmo !== Infinity && Number.isFinite(curAmmo)) {
         // 从备弹中取子弹填入弹匣
         const cap = SECONDARY_AMMO[player.weapon] || w.maxAmmo;
-        const needed = cap - ammo[player.weapon];
-        const taken = Math.min(needed, spareAmmo[player.weapon]);
-        ammo[player.weapon] += taken;
-        if (spareAmmo[player.weapon] !== Infinity) spareAmmo[player.weapon] -= taken;
+        const needed = Math.max(0, cap - curAmmo);
+        const curSpare = spareAmmo[player.weapon];
+        const taken = Math.min(needed, Number.isFinite(curSpare) ? curSpare : 0);
+        ammo[player.weapon] = curAmmo + taken;
+        if (curSpare !== Infinity && Number.isFinite(curSpare)) spareAmmo[player.weapon] = Math.max(0, curSpare - taken);
       }
       updateHUD();
     }
@@ -10108,7 +10122,10 @@ function updateHUD() {
   // --- 弹药（仅在弹药字符串变化时写）---
   const ammoVal = ammo[player.weapon];
   const spareVal = spareAmmo[player.weapon];
-  const ammoStr = ammoVal === Infinity ? t('ammo') + t('ammoInfinite') : t('ammo') + ammoVal + ' / ' + spareVal;
+  // 防御性处理：undefined/NaN 显示为 0
+  const safeAmmo = Number.isFinite(ammoVal) ? ammoVal : (ammoVal === Infinity ? Infinity : 0);
+  const safeSpare = Number.isFinite(spareVal) ? spareVal : (spareVal === Infinity ? Infinity : 0);
+  const ammoStr = safeAmmo === Infinity ? t('ammo') + t('ammoInfinite') : t('ammo') + safeAmmo + ' / ' + safeSpare;
   if (hudDirty.ammo || hudCached._lastAmmoStr !== ammoStr) {
     if (hudCached.ammoText) hudCached.ammoText.textContent = ammoStr;
     hudCached._lastAmmoStr = ammoStr;
