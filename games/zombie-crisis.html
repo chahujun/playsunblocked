@@ -2107,7 +2107,7 @@ document.addEventListener('keydown', (e) => {
   }
   // G键：切换终极武器
   if (e.key.toLowerCase() === 'g') {
-    if (player.ultimateWeapon && player.ultimateWeaponCD <= 0) {
+    if (player.ultimateWeapon && player.ultimateWeaponUnlocked && player.ultimateWeaponCD <= 0) {
       if (player.ultimateWeaponActive) {
         // 切回普通武器
         player.ultimateWeaponActive = false;
@@ -2125,7 +2125,7 @@ document.addEventListener('keydown', (e) => {
   }
   // X键：释放终极技能
   if (e.key.toLowerCase() === 'x') {
-    if (player.ultimateSkill && player.ultimateSkillCD <= 0 && state === GameState.PLAYING) {
+    if (player.ultimateSkill && player.ultimateSkillUnlocked && player.ultimateSkillCD <= 0 && state === GameState.PLAYING) {
       activateUltimateSkill();
     }
   }
@@ -3528,6 +3528,24 @@ function startWave(w) {
       const swName = lang === 'zh' ? WEAPONS[cls.secondWeapon].nameZh : WEAPONS[cls.secondWeapon].name;
       waveBannerText = (lang === 'zh' ? '解锁副武器：' : 'UNLOCKED: ') + swName;
     }
+  }
+
+  // 第8波解锁终极武器
+  if (w >= 8 && !player.ultimateWeaponUnlocked && player.ultimateWeapon) {
+    player.ultimateWeaponUnlocked = true;
+    waveBannerTime = 200;
+    const uwDef = ULTIMATE_WEAPONS[player.ultimateWeapon];
+    const uwName = lang === 'zh' ? uwDef.nameZh : uwDef.nameEn;
+    waveBannerText = (lang === 'zh' ? '🔓 解锁终极武器 [G]：' : 'UNLOCKED ULT WEAPON [G]: ') + uwName;
+  }
+
+  // 第12波解锁终极技能
+  if (w >= 12 && !player.ultimateSkillUnlocked && player.ultimateSkill) {
+    player.ultimateSkillUnlocked = true;
+    waveBannerTime = 200;
+    const usDef = ULTIMATE_SKILLS[player.ultimateSkill];
+    const usName = lang === 'zh' ? usDef.nameZh : usDef.nameEn;
+    waveBannerText = (lang === 'zh' ? '🔓 解锁终极技能 [X]：' : 'UNLOCKED ULT SKILL [X]: ') + usName;
   }
 
   playWaveStart();
@@ -9377,18 +9395,30 @@ function drawPlayer() {
     let ultLine = '';
     if (ultW) {
       const ultWName = lang === 'zh' ? ultW.nameZh : ultW.nameEn;
-      if (player.ultimateWeaponActive) ultLine += '[G] ' + ultWName + ' ' + player.ultimateWeaponAmmo + '\u53d1';
-      else if (player.ultimateWeaponCD > 0) ultLine += '[G] ' + ultWName + ' CD(' + Math.ceil(player.ultimateWeaponCD / 60) + 's)';
-      else ultLine += '[G] ' + ultWName + ' ' + (lang === 'zh' ? '\u5c31\u7eea' : 'READY');
+      if (!player.ultimateWeaponUnlocked) {
+        ultLine += '[G] ' + ultWName + ' ' + (lang === 'zh' ? '🔒(W8)' : 'LOCK(W8)');
+      } else if (player.ultimateWeaponActive) {
+        ultLine += '[G] ' + ultWName + ' ' + player.ultimateWeaponAmmo + '\u53d1';
+      } else if (player.ultimateWeaponCD > 0) {
+        ultLine += '[G] ' + ultWName + ' CD(' + Math.ceil(player.ultimateWeaponCD / 60) + 's)';
+      } else {
+        ultLine += '[G] ' + ultWName + ' ' + (lang === 'zh' ? '\u5c31\u7eea' : 'READY');
+      }
     }
     if (ultS) {
       const ultSName = lang === 'zh' ? ultS.nameZh : ultS.nameEn;
       if (ultLine) ultLine += ' | ';
-      if (player.ultimateSkillCD > 0) ultLine += '[X] ' + ultSName + ' CD(' + Math.ceil(player.ultimateSkillCD / 60) + 's)';
-      else ultLine += '[X] ' + ultSName + ' ' + (lang === 'zh' ? '\u5c31\u7eea' : 'READY');
+      if (!player.ultimateSkillUnlocked) {
+        ultLine += '[X] ' + ultSName + ' ' + (lang === 'zh' ? '🔒(W12)' : 'LOCK(W12)');
+      } else if (player.ultimateSkillCD > 0) {
+        ultLine += '[X] ' + ultSName + ' CD(' + Math.ceil(player.ultimateSkillCD / 60) + 's)';
+      } else {
+        ultLine += '[X] ' + ultSName + ' ' + (lang === 'zh' ? '\u5c31\u7eea' : 'READY');
+      }
     }
     if (ultLine) {
-      ctx.fillStyle = player.ultimateWeaponActive ? 'rgba(255,100,100,0.9)' : 'rgba(255,200,100,0.8)';
+      const locked = (!player.ultimateWeaponUnlocked || !player.ultimateSkillUnlocked);
+      ctx.fillStyle = player.ultimateWeaponActive ? 'rgba(255,100,100,0.9)' : (locked ? 'rgba(120,120,120,0.7)' : 'rgba(255,200,100,0.8)');
       ctx.fillText(ultLine, player.x, player.y - player.radius - 26);
     }
   }
@@ -10260,8 +10290,10 @@ function startGame() {
   player.ultimateWeaponTimer = 0; // 终极武器持续时间
   player.ultimateWeaponAmmo = 0; // 终极武器剩余弹药
   player.preUltimateWeapon = null; // 切换终极武器前的普通武器
+  player.ultimateWeaponUnlocked = false; // 终极武器是否已解锁（第8波）
   player.ultimateSkill = null; // 终极技能ID
   player.ultimateSkillCD = 0; // 终极技能CD
+  player.ultimateSkillUnlocked = false; // 终极技能是否已解锁（第12波）
   player.buffs.bloodFrenzy = 0; // 狂战士终极技能buff
   player.weapon = 'pistol';
   player.ownedWeapons = ['pistol'];
