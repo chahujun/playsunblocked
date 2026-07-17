@@ -204,7 +204,7 @@
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
 
-  var observer = new MutationObserver(function(mutations) {
+  window._i18nObserver = new MutationObserver(function(mutations) {
     mutations.forEach(function(m) {
       if (m.type === 'childList') {
         m.addedNodes.forEach(function(node) {
@@ -221,12 +221,16 @@
       }
     });
   });
+  // 保存 observe 逻辑为可复用函数：游戏运行时 disconnect 暂停监听，结束/暂停时重新 observe
+  window._i18nObserve = function() {
+    if (!window._i18nObserver || !document.body) return;
+    window._i18nObserver.disconnect();
+    window._i18nObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+  };
   if (document.body) {
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    window._i18nObserve();
   } else {
-    document.addEventListener('DOMContentLoaded', function() {
-      observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-    });
+    document.addEventListener('DOMContentLoaded', window._i18nObserve);
   }
   setTimeout(init, 500);
   setTimeout(init, 2000);
@@ -902,7 +906,14 @@ const WORLD_W = 2400;
 const WORLD_H = 1600;
 const MAX_ZOMBIES = 100;
 const MAX_BLOOD_STAINS = 1000;
+const MAX_PARTICLES = 300;
 const FRICTION = 0.88;
+
+// 子弹/伤害颜色与尺寸映射（提取为全局常量，避免每次射击/命中重复创建对象）
+const DMG_COLOR_MAP = { flame:'#ff6622', laser:'#66ddff', tesla:'#aa66ff', acid:'#66ff44', railgun:'#ffeeaa', sniper:'#ffcc44', plasma:'#cc44ff', cryo:'#44ffff', flak:'#ff8844' };
+const NUM_COLOR_MAP = { flame:'#ff8833', laser:'#44ddff', tesla:'#aa66ff', acid:'#66ff44', railgun:'#ffeeaa', sniper:'#ffcc44', plasma:'#cc66ff', cryo:'#66eeff', flak:'#ffaa66' };
+const BULLET_SIZE_MAP = { rocket:6, flame:16, laser:5, homing:7, grenade:8, micro_rocket:4, tesla:4, acid:6, railgun:8, sniper:7, plasma:8, cryo:5, flak:4 };
+const BULLET_LIFE_MAP = { rocket:120, flame:40, laser:50, homing:200, grenade:100, tesla:60, acid:100, railgun:30, sniper:25, plasma:100, cryo:60, flak:35 };
 
 const GameState = { IDLE: 0, PLAYING: 1, CLASS_SELECT: 2, GAMEOVER: 3, UPGRADE: 4 };
 
@@ -1314,6 +1325,14 @@ const bloodCtx = bloodCanvas.getContext('2d');
 bloodCtx.imageSmoothingEnabled = false;
 let bloodStainCount = 0;
 
+// Static background offscreen buffer (cached - drawn once, blitted every frame)
+const bgCanvas = document.createElement('canvas');
+bgCanvas.width = WORLD_W;
+bgCanvas.height = WORLD_H;
+const bgCtx = bgCanvas.getContext('2d');
+bgCtx.imageSmoothingEnabled = false;
+let bgCached = false;
+
 let VIEW_W, VIEW_H;
 function resize() {
   canvas.width = Math.ceil(window.innerWidth / PIXEL_SCALE);
@@ -1344,6 +1363,9 @@ function pxCircle(cx, cy, r, color) {
 // GAME STATE
 // =====================================================================
 let state = GameState.IDLE;
+// HUD 脏标记 + DOM 引用缓存：updateHUD 每帧调用，但仅在值真正变化时才写 DOM
+let hudDirty = { hp:true, weapon:true, survival:true, score:true, wave:true, ammo:true, hint:true, reload:true, mines:true, classInfo:true };
+let hudCached = {};
 let score = 0;
 let zombiesKilled = 0;
 let wave = 0;
@@ -1996,6 +2018,7 @@ function switchWeapon(w) {
   player.reloadTimer = 0;
   // 切换武器时停止火柱
   if (player.flameStream) player.flameStream.active = false;
+  hudDirty.weapon = true; hudDirty.ammo = true; // 武器切换：重建武器槽 + 刷新弹药显示
   updateHUD();
 }
 
@@ -2013,6 +2036,7 @@ function dropCurrentWeapon() {
   player.weapon = 'pistol';
   player.reloading = false;
   player.reloadTimer = 0;
+  hudDirty.weapon = true; hudDirty.ammo = true; // 丢弃武器：重建武器槽 + 刷新弹药显示
   updateHUD();
 }
 
@@ -2064,6 +2088,7 @@ function tryReload() {
   // 备弹检查：没有备弹就不能装弹
   if (spareAmmo[player.weapon] !== Infinity && spareAmmo[player.weapon] <= 0) return;
   player.reloading = true;
+  if (typeof hudDirty !== 'undefined') hudDirty.reload = true; // 装弹开始：刷新装弹指示
   // 装弹时长受职业 reloadMult + 升级 reloadBonus 影响
   const reloadMult = (player.class ? CLASSES[player.class].reloadMult : 1.0) * (1 - player.upgrades.reloadBonus);
   player.reloadTimer = Math.max(15, w.reload * reloadMult);
@@ -2179,11 +2204,9 @@ function tryShoot() {
     const isSniper = w.type === 'sniper';
     const isChain = isTesla || isLaser; // 穿透型武器共用 hitTargets 机制
     // 子弹大小
-    const sizeMap = { rocket: 6, flame: 16, laser: 5, homing: 7, grenade: 8, micro_rocket: 4, tesla: 4, acid: 6, railgun: 8, sniper: 7, plasma: 8, cryo: 5, flak: 4 };
-    const bulletSize = sizeMap[w.type] || 3;
+    const bulletSize = BULLET_SIZE_MAP[w.type] || 3;
     // 子弹生命
-    const lifeMap = { rocket: 120, flame: 40, laser: 50, homing: 200, grenade: 100, tesla: 60, acid: 100, railgun: 30, sniper: 25, plasma: 100, cryo: 60, flak: 35 };
-    const bulletLife = lifeMap[w.type] || 80;
+    const bulletLife = BULLET_LIFE_MAP[w.type] || 80;
     bullets.push({
       x: muzzleX,
       y: muzzleY,
@@ -2255,7 +2278,7 @@ function tryShoot() {
   }
 
   playShot();
-  updateHUD();
+  if (typeof hudDirty !== 'undefined') hudDirty.ammo = true; // 弹药变化：由每帧 updateHUD 的脏检查刷新
 }
 
 function placeMine() {
@@ -2428,14 +2451,14 @@ function updateTurrets(dt) {
     if (t.hurtFlash > 0) t.hurtFlash -= dt;
 
     // 寻找最近僵尸
-    let nearest = null, nearestDist = t.def.range;
+    let nearest = null, nearestDistSq = t.def.range * t.def.range;
     for (const z of zombies) {
-      const d = Math.hypot(z.x - t.x, z.y - t.y);
-      if (d < nearestDist) { nearestDist = d; nearest = z; }
+      const dsq = (z.x - t.x) * (z.x - t.x) + (z.y - t.y) * (z.y - t.y);
+      if (dsq < nearestDistSq) { nearestDistSq = dsq; nearest = z; }
     }
     if (!nearest && boss) {
-      const d = Math.hypot(boss.x - t.x, boss.y - t.y);
-      if (d < nearestDist) { nearestDist = d; nearest = boss; }
+      const dsq = (boss.x - t.x) * (boss.x - t.x) + (boss.y - t.y) * (boss.y - t.y);
+      if (dsq < nearestDistSq) { nearestDistSq = dsq; nearest = boss; }
     }
     t.target = nearest;
 
@@ -2453,7 +2476,8 @@ function updateTurrets(dt) {
       explodeAt(t.x, t.y, 50, 30, true);
       spawnBloodParticles(t.x, t.y, 15, t.def.color);
       addShake(4);
-      turrets.splice(i, 1);
+      turrets[i] = turrets[turrets.length - 1];
+      turrets.pop();
       continue;
     }
     // 临时炮台生命周期（工程兵技能）
@@ -2461,7 +2485,8 @@ function updateTurrets(dt) {
       t.lifetime -= dt;
       if (t.lifetime <= 0) {
         spawnBloodParticles(t.x, t.y, 8, t.def.color);
-        turrets.splice(i, 1);
+        turrets[i] = turrets[turrets.length - 1];
+        turrets.pop();
         continue;
       }
     }
@@ -2941,7 +2966,7 @@ function spawnLightningEffect(x1, y1, x2, y2) {
 function updateLightningEffects(dt) {
   for (let i = lightningEffects.length - 1; i >= 0; i--) {
     lightningEffects[i].life -= dt;
-    if (lightningEffects[i].life <= 0) lightningEffects.splice(i, 1);
+    if (lightningEffects[i].life <= 0) { lightningEffects[i] = lightningEffects[lightningEffects.length - 1]; lightningEffects.pop(); }
   }
 }
 function drawLightningEffects() {
@@ -3103,7 +3128,7 @@ function updateDamageNumbers(dt) {
     const d = damageNumbers[i];
     d.y -= 0.8 * dt;
     d.life -= dt;
-    if (d.life <= 0) damageNumbers.splice(i, 1);
+    if (d.life <= 0) { damageNumbers[i] = damageNumbers[damageNumbers.length - 1]; damageNumbers.pop(); }
   }
 }
 
@@ -3113,7 +3138,8 @@ function updateSpawnTelegraphs(dt) {
     s.life -= dt;
     if (s.life <= 0) {
       spawnZombieAt(s.type, s.x, s.y);
-      spawnTelegraphs.splice(i, 1);
+      spawnTelegraphs[i] = spawnTelegraphs[spawnTelegraphs.length - 1];
+      spawnTelegraphs.pop();
     }
   }
 }
@@ -3183,7 +3209,7 @@ function updateFloatingHints(dt) {
     const h = floatingHints[i];
     h.y -= 0.35 * dt;
     h.life -= dt;
-    if (h.life <= 0) floatingHints.splice(i, 1);
+    if (h.life <= 0) { floatingHints[i] = floatingHints[floatingHints.length - 1]; floatingHints.pop(); }
   }
 }
 
@@ -3355,7 +3381,7 @@ function updatePlayer(dt) {
   // Update dash trail
   for (let i = player.dashTrail.length - 1; i >= 0; i--) {
     player.dashTrail[i].life -= dt;
-    if (player.dashTrail[i].life <= 0) player.dashTrail.splice(i, 1);
+    if (player.dashTrail[i].life <= 0) { player.dashTrail[i] = player.dashTrail[player.dashTrail.length - 1]; player.dashTrail.pop(); }
   }
 
   // Move
@@ -3470,27 +3496,50 @@ function updateCrates(dt) {
         // 弹药补给
         pickups.push({ x: c.x, y: c.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
       }
-      crates.splice(i, 1);
+      crates[i] = crates[crates.length - 1];
+      crates.pop();
     }
   }
 }
 
 function updateZombies(dt) {
+  // 空间网格优化僵尸排斥力（O(n²) -> 近似 O(n)）
+  const gridSize = 60;
+  const grid = {};
+  for (let g = 0; g < zombies.length; g++) {
+    const zg = zombies[g];
+    const gxg = Math.floor(zg.x / gridSize);
+    const gyg = Math.floor(zg.y / gridSize);
+    const key = gxg + ',' + gyg;
+    if (!grid[key]) grid[key] = [];
+    grid[key].push(g);
+  }
   // Repulsion vectors (prevent overlap)
   for (let i = 0; i < zombies.length; i++) {
     const z = zombies[i];
     let repX = 0, repY = 0;
-    for (let j = 0; j < zombies.length; j++) {
-      if (i === j) continue;
-      const z2 = zombies[j];
-      const dx = z.x - z2.x, dy = z.y - z2.y;
-      const minDist = z.radius + z2.radius;
-      const distSq = dx * dx + dy * dy;
-      if (distSq < minDist * minDist && distSq > 0.01) {
-        const d = Math.sqrt(distSq);
-        const force = (minDist - d) / minDist;
-        repX += (dx / d) * force * 0.8;
-        repY += (dy / d) * force * 0.8;
+    const gx = Math.floor(z.x / gridSize);
+    const gy = Math.floor(z.y / gridSize);
+    // 只检查相邻3x3网格
+    for (let dgx = -1; dgx <= 1; dgx++) {
+      for (let dgy = -1; dgy <= 1; dgy++) {
+        const key = (gx + dgx) + ',' + (gy + dgy);
+        const cell = grid[key];
+        if (!cell) continue;
+        for (let k = 0; k < cell.length; k++) {
+          const j = cell[k];
+          if (i === j) continue;
+          const z2 = zombies[j];
+          const dx = z.x - z2.x, dy = z.y - z2.y;
+          const minDist = z.radius + z2.radius;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < minDist * minDist && distSq > 0.01) {
+            const d = Math.sqrt(distSq);
+            const force = (minDist - d) / minDist;
+            repX += (dx / d) * force * 0.8;
+            repY += (dy / d) * force * 0.8;
+          }
+        }
       }
     }
     // Move toward player（按类型不同AI行为）
@@ -3660,7 +3709,8 @@ function updateZombies(dt) {
           const nw = newWeapons[Math.floor(Math.random() * newWeapons.length)];
           pickups.push({ x: z.x, y: z.y, type: 'weapon_' + nw, radius: 14, life: 900, bob: 0 });
         }
-        zombies.splice(i, 1);
+        zombies[i] = zombies[zombies.length - 1];
+        zombies.pop();
         updateHUD();
         continue;
       }
@@ -3679,7 +3729,7 @@ function updateZombies(dt) {
       if (z.healTimer <= 0) {
         z.healTimer = z.healInterval;
         for (const z2 of zombies) {
-          if (z2 !== z && Math.hypot(z2.x - z.x, z2.y - z.y) < z.healRange) {
+          if (z2 !== z && (z2.x - z.x) * (z2.x - z.x) + (z2.y - z.y) * (z2.y - z.y) < z.healRange * z.healRange) {
             z2.hp = Math.min(z2.maxHp, z2.hp + 20);
             // 治疗粒子
             particles.push({ x: z2.x, y: z2.y - z2.radius, vx: 0, vy: -1, life: 20, maxLife: 20, size: 3, color: '#44ff44' });
@@ -3816,14 +3866,16 @@ function updatePoisonProjectiles(dt) {
       if (player.hp <= 0) { player.hp = 0; gameOver(); }
       // 命中时也生成毒液池
       poisonPools.push({ x: p.x, y: p.y, radius: 35, life: 150, damage: 3, tickTimer: 0 });
-      poisonProjectiles.splice(i, 1);
+      poisonProjectiles[i] = poisonProjectiles[poisonProjectiles.length - 1];
+      poisonProjectiles.pop();
       continue;
     }
     // Land when close to player position or life expires
     if (distToPlayer < 30 || p.life <= 0) {
       // Create poison pool
       poisonPools.push({ x: p.x, y: p.y, radius: 40, life: 180, damage: 3, tickTimer: 0 });
-      poisonProjectiles.splice(i, 1);
+      poisonProjectiles[i] = poisonProjectiles[poisonProjectiles.length - 1];
+      poisonProjectiles.pop();
     }
   }
 }
@@ -3847,7 +3899,7 @@ function updatePoisonPools(dt) {
         if (player.hp <= 0) { player.hp = 0; gameOver(); }
       }
     }
-    if (pool.life <= 0) poisonPools.splice(i, 1);
+    if (pool.life <= 0) { poisonPools[i] = poisonPools[poisonPools.length - 1]; poisonPools.pop(); }
   }
 }
 
@@ -3902,11 +3954,11 @@ function updateFirePools(dt) {
         }
       }
     }
-    if (f.life <= 0) firePools.splice(i, 1);
+    if (f.life <= 0) { firePools[i] = firePools[firePools.length - 1]; firePools.pop(); }
   }
   // 清理被火焰烧死的僵尸
   for (let j = zombies.length - 1; j >= 0; j--) {
-    if (zombies[j]._fireKilled) zombies.splice(j, 1);
+    if (zombies[j]._fireKilled) { zombies[j] = zombies[zombies.length - 1]; zombies.pop(); }
   }
 }
 
@@ -3966,7 +4018,8 @@ function updateFlameStream(dt) {
             else if (roll < 0.24) pickups.push({ x: z.x, y: z.y, type: 'water', radius: 12, life: 600, bob: 0 });
             else if (roll < 0.42) pickups.push({ x: z.x, y: z.y, type: 'ammo', radius: 12, life: 600, bob: 0 });
           }
-          zombies.splice(j, 1);
+          zombies[j] = zombies[zombies.length - 1];
+          zombies.pop();
           updateHUD();
         }
       }
@@ -4386,14 +4439,14 @@ function updateBullets(dt) {
       b.homingTimer = (b.homingTimer || 0) + dt;
       if (b.homingTimer >= 2) {
         b.homingTimer = 0;
-        let nearest = null, nearestDist = b.homingRange;
+        let nearest = null, nearestDistSq = b.homingRange * b.homingRange;
         for (const z of zombies) {
-          const d = Math.hypot(z.x - b.x, z.y - b.y);
-          if (d < nearestDist) { nearestDist = d; nearest = z; }
+          const dsq = (z.x - b.x) * (z.x - b.x) + (z.y - b.y) * (z.y - b.y);
+          if (dsq < nearestDistSq) { nearestDistSq = dsq; nearest = z; }
         }
         if (!nearest && boss) {
-          const d = Math.hypot(boss.x - b.x, boss.y - b.y);
-          if (d < nearestDist) { nearestDist = d; nearest = boss; }
+          const dsq = (boss.x - b.x) * (boss.x - b.x) + (boss.y - b.y) * (boss.y - b.y);
+          if (dsq < nearestDistSq) { nearestDistSq = dsq; nearest = boss; }
         }
         if (nearest) {
           b.target = nearest; // 记录目标用于绘制锁定指示
@@ -4403,11 +4456,11 @@ function updateBullets(dt) {
           while (diff > Math.PI) diff -= Math.PI * 2;
           while (diff < -Math.PI) diff += Math.PI * 2;
           // 转向速率随距离动态调整：近距离更灵活
-          const turnRate = b.homingTurn * (nearestDist < 100 ? 1.8 : 1.0);
+          const turnRate = b.homingTurn * (nearestDistSq < 10000 ? 1.8 : 1.0);
           const newAng = curAng + Math.sign(diff) * Math.min(Math.abs(diff), turnRate);
           const speed = Math.hypot(b.vx, b.vy);
           // 追踪时略微加速，更有追逐感
-          const accel = nearestDist < 150 ? 1.02 : 1.0;
+          const accel = nearestDistSq < 22500 ? 1.02 : 1.0;
           b.vx = Math.cos(newAng) * speed * accel;
           b.vy = Math.sin(newAng) * speed * accel;
         } else {
@@ -4423,14 +4476,16 @@ function updateBullets(dt) {
       b.distTraveled += Math.hypot(b.vx, b.vy) * dt;
       const maxRange = b.flameRange > 0 ? b.flameRange : b.laserRange;
       if (b.distTraveled > maxRange) {
-        bullets.splice(i, 1);
+        bullets[i] = bullets[bullets.length - 1];
+        bullets.pop();
         continue;
       }
     }
 
     // World bounds
     if (b.x < 0 || b.x > WORLD_W || b.y < 0 || b.y > WORLD_H || b.life <= 0) {
-      bullets.splice(i, 1);
+      bullets[i] = bullets[bullets.length - 1];
+      bullets.pop();
       continue;
     }
 
@@ -4476,7 +4531,7 @@ function updateBullets(dt) {
       if (b.weaponType === 'flame' && b.firePoolRadius > 0) {
         firePools.push({ x: b.x, y: b.y, radius: b.firePoolRadius * 0.4, life: b.firePoolLife, maxLife: b.firePoolLife, dps: b.firePoolDps, tickTimer: 0 });
       }
-      bullets.splice(i, 1); continue;
+      bullets[i] = bullets[bullets.length - 1]; bullets.pop(); continue;
     }
 
     // Barrel collision (trigger explosion)
@@ -4489,7 +4544,8 @@ function updateBullets(dt) {
         if (b.weaponType === 'rocket' || b.weaponType === 'grenade' || b.weaponType === 'micro_rocket' || b.weaponType === 'plasma' || b.weaponType === 'flak') {
           explodeAt(b.x, b.y, b.explodeRadius, b.explodeDamage, true);
         }
-        bullets.splice(i, 1);
+        bullets[i] = bullets[bullets.length - 1];
+        bullets.pop();
         hit = true;
         break;
       }
@@ -4518,12 +4574,10 @@ function updateBullets(dt) {
           player.hp = Math.min(player.maxHp, player.hp + 1);
           player.lastLifesteal = performance.now();
         }
-      const _dmgColorMap = { flame: '#ff6622', laser: '#66ddff', tesla: '#aa66ff', acid: '#66ff44', railgun: '#ffeeaa', sniper: '#ffcc44', plasma: '#cc44ff', cryo: '#44ffff', flak: '#ff8844' };
-      const _dmgColor = _dmgColorMap[b.weaponType] || '#cc1122';
+      const _dmgColor = DMG_COLOR_MAP[b.weaponType] || '#cc1122';
       spawnBloodParticles(b.x, b.y, 5, _dmgColor);
       addBloodStain(z.x, z.y, z.radius * 0.5);
-      const _numColorMap = { flame: '#ff8833', laser: '#44ddff', tesla: '#aa66ff', acid: '#66ff44', railgun: '#ffeeaa', sniper: '#ffcc44', plasma: '#cc66ff', cryo: '#66eeff', flak: '#ffaa66' };
-      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (_numColorMap[b.weaponType] || '#ffdd44'), b.isCrit);
+      addDamageNumber(z.x, z.y - z.radius, Math.round(actualDmg), b.isCrit ? '#ff4422' : (NUM_COLOR_MAP[b.weaponType] || '#ffdd44'), b.isCrit);
       // 火焰枪：附加燃烧DOT + 命中点残留小火焰
       if (b.weaponType === 'flame' && b.burnDuration > 0) {
         z.burnTime = b.burnDuration;
@@ -4536,8 +4590,8 @@ function updateBullets(dt) {
       if (b.weaponType === 'tesla' && b.chainRange > 0 && b.chainCount < 3) {
         for (const z2 of zombies) {
           if (z2 === z || (b.hitTargets && b.hitTargets.includes(z2))) continue;
-          const cd = Math.hypot(z2.x - z.x, z2.y - z.y);
-          if (cd < b.chainRange) {
+          const cdSq = (z2.x - z.x) * (z2.x - z.x) + (z2.y - z.y) * (z2.y - z.y);
+          if (cdSq < b.chainRange * b.chainRange) {
             z2.hp -= b.damage * b.chainDamage;
             z2.hurtFlash = 6;
             spawnBloodParticles(z2.x, z2.y, 4, '#aa66ff');
@@ -4603,11 +4657,11 @@ function updateBullets(dt) {
       if (b.weaponType === 'flame' || b.weaponType === 'laser' || b.weaponType === 'tesla' || b.weaponType === 'railgun') {
         if (b.hitTargets) b.hitTargets.push(z);
         b.pierce--;
-        if (b.pierce < 0) { bullets.splice(i, 1); bulletDestroyed = true; }
+        if (b.pierce < 0) { bullets[i] = bullets[bullets.length - 1]; bullets.pop(); bulletDestroyed = true; }
       } else if (b.weaponType === 'rocket' && b.rocketPierce > 0) {
         // 火箭筒穿甲阶段：继续飞行，不消失
       } else {
-        bullets.splice(i, 1); bulletDestroyed = true;
+        bullets[i] = bullets[bullets.length - 1]; bullets.pop(); bulletDestroyed = true;
       }
 
       if (z.hp <= 0) {
@@ -4695,7 +4749,8 @@ function updateBullets(dt) {
             pickups.push({ x: z.x, y: z.y, type: 'water', radius: 12, life: 600, bob: 0 });
           }
         }
-        zombies.splice(j, 1);
+        zombies[j] = zombies[zombies.length - 1];
+        zombies.pop();
         updateHUD();
       }
       // 非穿透武器或穿透次数用完：结束本子弹的碰撞检测
@@ -4759,13 +4814,15 @@ function updateBullets(dt) {
         }
         // 非穿透武器命中BOSS消失，穿透武器继续（火焰枪/激光枪/火箭筒穿甲阶段）
         if (b.weaponType !== 'flame' && b.weaponType !== 'laser' && !(b.weaponType === 'rocket' && b.rocketPierce > 0)) {
-          bullets.splice(i, 1);
+          bullets[i] = bullets[bullets.length - 1];
+          bullets.pop();
           hit = true;
         } else {
           if (b.hitTargets) b.hitTargets.push(boss);
           b.pierce--;
           if (b.pierce < 0) {
-            bullets.splice(i, 1);
+            bullets[i] = bullets[bullets.length - 1];
+            bullets.pop();
             hit = true;
           }
         }
@@ -4792,7 +4849,8 @@ function updateMines(dt) {
       if (m.triggerTimer <= 0) {
         // Explode
         explodeMine(m);
-        mines.splice(i, 1);
+        mines[i] = mines[mines.length - 1];
+        mines.pop();
       }
     }
   }
@@ -4811,7 +4869,8 @@ function updateGrenades(dt) {
     g.life -= dt;
     if (g.life <= 0) {
       explodeAt(g.x, g.y, g.explodeRadius, g.damage, true);
-      grenades.splice(i, 1);
+      grenades[i] = grenades[grenades.length - 1];
+      grenades.pop();
     }
   }
 }
@@ -4824,7 +4883,8 @@ function updateBarricades(dt) {
     const b = barricades[i];
     if (b.hp <= 0) {
       spawnBloodParticles(b.x, b.y, 8, '#888888');
-      barricades.splice(i, 1);
+      barricades[i] = barricades[barricades.length - 1];
+      barricades.pop();
       continue;
     }
     // 僵尸碰撞减速
@@ -4845,7 +4905,7 @@ function updatePulseWaves(dt) {
   for (let i = pulseWaves.length - 1; i >= 0; i--) {
     const p = pulseWaves[i];
     p.life -= dt;
-    if (p.life <= 0) pulseWaves.splice(i, 1);
+    if (p.life <= 0) { pulseWaves[i] = pulseWaves[pulseWaves.length - 1]; pulseWaves.pop(); }
   }
 }
 
@@ -4872,7 +4932,8 @@ function updateAirstrikes(dt) {
           color: Math.random() < 0.5 ? '#ffaa44' : '#ffdd66'
         });
       }
-      airstrikes.splice(i, 1);
+      airstrikes[i] = airstrikes[airstrikes.length - 1];
+      airstrikes.pop();
     }
   }
 }
@@ -4886,7 +4947,8 @@ function updateDrones(dt) {
     d.lifetime -= dt;
     if (d.lifetime <= 0) {
       spawnBloodParticles(d.x, d.y, 8, '#44aaff');
-      drones.splice(i, 1);
+      drones[i] = drones[drones.length - 1];
+      drones.pop();
       continue;
     }
     // 跟随玩家（保持在玩家右上方）
@@ -4900,14 +4962,14 @@ function updateDrones(dt) {
       d.y += (dy / dist) * 4 * dt;
     }
     // 寻找最近僵尸
-    let nearest = null, nearestDist = d.range;
+    let nearest = null, nearestDistSq = d.range * d.range;
     for (const z of zombies) {
-      const zd = Math.hypot(z.x - d.x, z.y - d.y);
-      if (zd < nearestDist) { nearestDist = zd; nearest = z; }
+      const dsq = (z.x - d.x) * (z.x - d.x) + (z.y - d.y) * (z.y - d.y);
+      if (dsq < nearestDistSq) { nearestDistSq = dsq; nearest = z; }
     }
     if (!nearest && boss) {
-      const bd = Math.hypot(boss.x - d.x, boss.y - d.y);
-      if (bd < nearestDist) { nearestDist = bd; nearest = boss; }
+      const dsq = (boss.x - d.x) * (boss.x - d.x) + (boss.y - d.y) * (boss.y - d.y);
+      if (dsq < nearestDistSq) { nearestDistSq = dsq; nearest = boss; }
     }
     if (nearest) {
       d.angle = Math.atan2(nearest.y - d.y, nearest.x - d.x);
@@ -4982,7 +5044,7 @@ function explodeAt(x, y, radius, damage, isPlayerWeapon) {
   // 范围伤害僵尸
   for (let j = zombies.length - 1; j >= 0; j--) {
     const z = zombies[j];
-    if (Math.hypot(z.x - x, z.y - y) < radius + z.radius) {
+    if ((z.x - x) * (z.x - x) + (z.y - y) * (z.y - y) < (radius + z.radius) * (radius + z.radius)) {
       const actualDmg = damage * (1 - (z.damageReduction || 0));
       z.hp -= actualDmg;
       z.hurtFlash = 8;
@@ -4998,7 +5060,8 @@ function explodeAt(x, y, radius, damage, isPlayerWeapon) {
         spawnBloodParticles(z.x, z.y, 10, '#aa1122');
         addBloodStain(z.x, z.y, z.radius);
         addDamageNumber(z.x, z.y - z.radius - 10, '+' + gained, '#00ff88');
-        zombies.splice(j, 1);
+        zombies[j] = zombies[zombies.length - 1];
+        zombies.pop();
       }
     }
   }
@@ -5021,11 +5084,11 @@ function explodeAt(x, y, radius, damage, isPlayerWeapon) {
   }
   // 损坏木箱
   for (const c of crates) {
-    if (Math.hypot(c.x - x, c.y - y) < radius) c.hp -= 4;
+    if ((c.x - x) * (c.x - x) + (c.y - y) * (c.y - y) < radius * radius) c.hp -= 4;
   }
   // 触发附近油桶链反应
   for (const barrel of barrels) {
-    if (!barrel.triggered && Math.hypot(barrel.x - x, barrel.y - y) < radius) {
+    if (!barrel.triggered && (barrel.x - x) * (barrel.x - x) + (barrel.y - y) * (barrel.y - y) < radius * radius) {
       barrel.triggered = true;
       barrel.triggerTimer = 12;
     }
@@ -5084,7 +5147,8 @@ function explodeMine(m) {
         zombiesKilled++;
         spawnBloodParticles(z.x, z.y, 10, '#aa1122');
         addBloodStain(z.x, z.y, z.radius);
-        zombies.splice(j, 1);
+        zombies[j] = zombies[zombies.length - 1];
+        zombies.pop();
       }
     }
   }
@@ -5121,19 +5185,24 @@ function updateShockwaves(dt) {
     const s = shockwaves[i];
     s.life -= dt;
     s.radius = s.maxRadius * (1 - s.life / s.maxLife);
-    if (s.life <= 0) shockwaves.splice(i, 1);
+    if (s.life <= 0) { shockwaves[i] = shockwaves[shockwaves.length - 1]; shockwaves.pop(); }
   }
 }
 
 function updateParticles(dt) {
+  // Cap particle count - drop oldest if over limit (prevents perf degradation)
+  if (particles.length > MAX_PARTICLES) {
+    particles.splice(0, particles.length - MAX_PARTICLES);
+  }
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.x += p.vx * dt;
     p.y += p.vy * dt;
-    p.vx *= Math.pow(0.92, dt);
-    p.vy *= Math.pow(0.92, dt);
+    const decay = Math.pow(0.92, dt); // 只计算一次
+    p.vx *= decay;
+    p.vy *= decay;
     p.life -= dt;
-    if (p.life <= 0) particles.splice(i, 1);
+    if (p.life <= 0) { particles[i] = particles[particles.length - 1]; particles.pop(); }
   }
 }
 
@@ -5144,7 +5213,8 @@ function updateBarrels(dt) {
       b.triggerTimer -= dt;
       if (b.triggerTimer <= 0) {
         explodeBarrel(b);
-        barrels.splice(i, 1);
+        barrels[i] = barrels[barrels.length - 1];
+        barrels.pop();
       }
     }
   }
@@ -5197,7 +5267,8 @@ function explodeBarrel(b) {
         zombiesKilled++;
         spawnBloodParticles(z.x, z.y, 12, '#aa1122');
         addBloodStain(z.x, z.y, z.radius);
-        zombies.splice(j, 1);
+        zombies[j] = zombies[zombies.length - 1];
+        zombies.pop();
       }
     }
   }
@@ -5291,7 +5362,7 @@ function updatePickups(dt) {
     const p = pickups[i];
     p.bob += dt * 0.08;
     p.life -= dt;
-    if (p.life <= 0) { pickups.splice(i, 1); continue; }
+    if (p.life <= 0) { pickups[i] = pickups[pickups.length - 1]; pickups.pop(); continue; }
     if (Math.sqrt(distSq(p, player)) < p.radius + player.radius) {
       if (p.type === 'health') {
         player.hp = Math.min(player.maxHp, player.hp + 25);
@@ -5338,10 +5409,12 @@ function updatePickups(dt) {
           player.weapon = wId;
           player.reloading = false;
           player.reloadTimer = 0;
+          hudDirty.weapon = true; hudDirty.ammo = true; // 拾取新武器：重建武器槽 + 刷新弹药显示
           playBuff();
         } else if (WEAPONS[wId] && player.ownedWeapons.includes(wId)) {
           // 已拥有：补充备弹
           if (TOTAL_SPARE_AMMO[wId]) spareAmmo[wId] = Math.min(TOTAL_SPARE_AMMO[wId], spareAmmo[wId] + Math.ceil(TOTAL_SPARE_AMMO[wId] * 0.5));
+          hudDirty.ammo = true; // 备弹变化：刷新弹药显示
           playPickup();
         }
       } else if (p.type.startsWith('attachment_')) {
@@ -5369,7 +5442,8 @@ function updatePickups(dt) {
           }
         }
       }
-      pickups.splice(i, 1);
+      pickups[i] = pickups[pickups.length - 1];
+      pickups.pop();
       updateHUD();
     }
   }
@@ -5920,6 +5994,7 @@ const upgradeStacks = {};
 
 function showUpgradeSelect() {
   state = GameState.UPGRADE;
+  if (window._i18nObserve) window._i18nObserve(); // 退出 PLAYING（升级暂停），恢复 DOM 翻译监听
   const overlay = document.getElementById('upgradeOverlay');
   const titleEl = document.getElementById('upgradeTitle');
   const descEl = document.getElementById('upgradeDescText');
@@ -5974,6 +6049,7 @@ function applyUpgrade(u) {
 
   document.getElementById('upgradeOverlay').classList.add('hidden');
   state = GameState.PLAYING;
+  if (window._i18nObserver) window._i18nObserver.disconnect(); // 游戏运行时暂停 DOM 翻译监听
   waveCountdown = 3; // 选完3秒后开始下一波
     // 每4波额外给一个随机掉落物（弹药或生命）
   if (wave > 0 && wave % 4 === 0) {
@@ -6255,6 +6331,7 @@ function drawMission() {
 
 function showClassSelect() {
   state = GameState.CLASS_SELECT;
+  if (window._i18nObserve) window._i18nObserve(); // 退出 PLAYING，恢复 DOM 翻译监听
   const overlay = document.getElementById('classOverlay');
   const titleEl = document.getElementById('classTitle');
   const descEl = document.getElementById('classDescText');
@@ -6311,12 +6388,21 @@ function selectClass(classId) {
   applyClass(classId);
   document.getElementById('classOverlay').classList.add('hidden');
   state = GameState.PLAYING;
+  if (window._i18nObserver) window._i18nObserver.disconnect(); // 游戏运行时暂停 DOM 翻译监听
   startGame();
 }
 
 // =====================================================================
 // RENDER
 // =====================================================================
+// Viewport culling helper - checks if a world-space point is on screen.
+// Camera translates world by (-camera.x, -camera.y), so visible world range
+// is [camera.x, camera.x + VIEW_W] x [camera.y, camera.y + VIEW_H].
+function isVisible(x, y, margin) {
+  return x > camera.x - margin && x < camera.x + VIEW_W + margin &&
+         y > camera.y - margin && y < camera.y + VIEW_H + margin;
+}
+
 function render() {
   // Dark base
   ctx.fillStyle = '#080a0c';
@@ -6484,7 +6570,7 @@ function render() {
 
   // Zombies
   for (const z of zombies) {
-    drawZombie(z);
+    if (isVisible(z.x, z.y, 60)) drawZombie(z);
   }
 
   // BOSS
@@ -6492,7 +6578,7 @@ function render() {
 
   // Bullets
   for (const b of bullets) {
-    drawBullet(b);
+    if (isVisible(b.x, b.y, 30)) drawBullet(b);
   }
 
   // Player dash trail (drawn before player)
@@ -6503,7 +6589,7 @@ function render() {
 
   // Particles
   for (const p of particles) {
-    drawParticle(p);
+    if (isVisible(p.x, p.y, 30)) drawParticle(p);
   }
 
   // Damage numbers
@@ -6558,35 +6644,43 @@ function drawGrid(ox, oy) {
 }
 
 function drawWorldBackground() {
-  // Dark flat floor (pixel style - no gradient)
-  ctx.fillStyle = '#1a1a2e';
-  ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+  // Cache static background (floor, dirt patches, grid lines) once into bgCanvas
+  if (!bgCached) {
+    // Dark flat floor (pixel style - no gradient)
+    bgCtx.fillStyle = '#1a1a2e';
+    bgCtx.fillRect(0, 0, WORLD_W, WORLD_H);
 
-  // Subtle noise/dirt patches (deterministic positions) - square pixel blocks
-  ctx.fillStyle = 'rgba(40,50,40,0.15)';
-  for (let i = 0; i < 60; i++) {
-    const x = (i * 373) % WORLD_W;
-    const y = (i * 617) % WORLD_H;
-    const r = 30 + (i * 13) % 40;
-    ctx.fillRect(PX(x - r), PX(y - r), PX(r * 2), PX(r * 2));
+    // Subtle noise/dirt patches (deterministic positions) - square pixel blocks
+    bgCtx.fillStyle = 'rgba(40,50,40,0.15)';
+    for (let i = 0; i < 60; i++) {
+      const x = (i * 373) % WORLD_W;
+      const y = (i * 617) % WORLD_H;
+      const r = 30 + (i * 13) % 40;
+      bgCtx.fillRect(PX(x - r), PX(y - r), PX(r * 2), PX(r * 2));
+    }
+
+    // Grid lines - 2px thick, pixel color
+    bgCtx.strokeStyle = '#12121e';
+    bgCtx.lineWidth = 2;
+    const gridSize = 60;
+    for (let x = 0; x <= WORLD_W; x += gridSize) {
+      bgCtx.beginPath();
+      bgCtx.moveTo(x, 0); bgCtx.lineTo(x, WORLD_H);
+      bgCtx.stroke();
+    }
+    for (let y = 0; y <= WORLD_H; y += gridSize) {
+      bgCtx.beginPath();
+      bgCtx.moveTo(0, y); bgCtx.lineTo(WORLD_W, y);
+      bgCtx.stroke();
+    }
+    bgCached = true;
   }
 
-  // Grid lines - 2px thick, pixel color
-  ctx.strokeStyle = '#12121e';
-  ctx.lineWidth = 2;
+  // Blit cached static background (floor + dirt patches + grid lines) in one drawImage
+  ctx.drawImage(bgCanvas, 0, 0);
+
+  // Brighter grid intersections near player - small pixel squares (dynamic, redrawn each frame)
   const gridSize = 60;
-  for (let x = 0; x <= WORLD_W; x += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0); ctx.lineTo(x, WORLD_H);
-    ctx.stroke();
-  }
-  for (let y = 0; y <= WORLD_H; y += gridSize) {
-    ctx.beginPath();
-    ctx.moveTo(0, y); ctx.lineTo(WORLD_W, y);
-    ctx.stroke();
-  }
-
-  // Brighter grid intersections near player - small pixel squares
   const pgx = Math.floor(player.x / gridSize) * gridSize;
   const pgy = Math.floor(player.y / gridSize) * gridSize;
   for (let dx = -3; dx <= 3; dx++) {
@@ -6631,23 +6725,16 @@ function drawTerrainFeatures() {
       ctx.fillStyle = 'rgba(30,50,80,0.5)';
       ctx.fillRect(PX(f.x - f.radius), PX(f.y - f.radius), PX(f.radius * 2), PX(f.radius * 2));
       pxCircle(f.x, f.y, f.radius, 'rgba(40,70,110,0.5)');
-      // Ripples - pixel ring circles (thin ring only)
+      // Ripples - stroked circles (replaces per-pixel fillRect ring scan)
       const time = performance.now() * 0.001;
+      var rrx = PX(f.x), rry = PX(f.y);
       for (let i = 0; i < 2; i++) {
         const r = (time * 10 + i * 15) % f.radius;
-        const ringColor = `rgba(120,180,220,${0.2 + Math.sin(time) * 0.1})`;
-        ctx.fillStyle = ringColor;
-        var rrx = PX(f.x), rry = PX(f.y), rr = Math.ceil(r);
-        // Thin ring: only draw rows near the edge
-        for (var dy = -rr; dy <= rr; dy += 2) {
-          var dxOuter = Math.floor(Math.sqrt(rr * rr - dy * dy));
-          var innerR = rr - 2;
-          var dxInner = innerR > 0 ? Math.floor(Math.sqrt(innerR * innerR - dy * dy)) : 0;
-          if (dxOuter > dxInner) {
-            ctx.fillRect(rrx - dxOuter, rry + dy, dxOuter - dxInner, 2);
-            ctx.fillRect(rrx + dxInner, rry + dy, dxOuter - dxInner, 2);
-          }
-        }
+        ctx.strokeStyle = 'rgba(100,140,180,0.3)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(rrx, rry, r, 0, Math.PI * 2);
+        ctx.stroke();
       }
       // Highlight if player inside - pixel dashed square
       if (player.inWater && Math.hypot(player.x - f.x, player.y - f.y) < f.radius) {
@@ -8088,12 +8175,6 @@ function drawBullet(b) {
 function drawParticle(p) {
   const alpha = p.life / p.maxLife;
   ctx.globalAlpha = alpha;
-  // Glow
-  ctx.fillStyle = p.color;
-  ctx.beginPath();
-  ctx.arc(p.x, p.y, p.size * 2 * alpha, 0, Math.PI * 2);
-  ctx.fill();
-  // Core
   ctx.fillStyle = p.color;
   ctx.beginPath();
   ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
@@ -8120,16 +8201,13 @@ function drawLightingOverlay() {
   const radius = 400 - darkness * 200;
   ctx.fillStyle = `rgba(0,0,0,${0.4 + darkness * 0.35})`;
   ctx.fillRect(camera.x - 50, camera.y - 50, VIEW_W + 100, VIEW_H + 100);
-  // Carve vision circle with lighter overlay (no gradient — flat alpha rings)
-  const ringStep = 40;
-  for (let r = radius; r > 0; r -= ringStep) {
-    var a = (1 - r / radius) * (0.35 + darkness * 0.3);
-    ctx.fillStyle = `rgba(0,0,0,0)`;
-    ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.fill();
-  }
+  // Carve vision circle - single destination-out pass (replaces dead loop that
+  // filled with rgba(0,0,0,0) which removed nothing and recomputed unused var a)
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.fillStyle = 'rgba(0,0,0,0.8)';
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
   ctx.globalCompositeOperation = 'source-over';
 
   // Blue tint at night
@@ -8892,126 +8970,197 @@ function drawReloadBar() {
 // HUD UPDATE
 // =====================================================================
 function updateHUD() {
-  const hpBar = document.getElementById('hpBar');
-  const hpText = document.getElementById('hpText');
-  const hpRatio = player.hp / player.maxHp;
-  hpBar.style.width = (hpRatio * 100) + '%';
-  hpText.textContent = Math.ceil(player.hp) + ' / ' + player.maxHp;
-
-  // Low HP warning
-  const lowHpEl = document.getElementById('lowHpWarning');
-  if (hpRatio < 0.3 && state === GameState.PLAYING) {
-    if (!lowHpEl.classList.contains('active')) {
-      lowHpEl.classList.add('active');
-      startHeartbeat();
-    }
-  } else {
-    if (lowHpEl.classList.contains('active')) {
-      lowHpEl.classList.remove('active');
-      stopHeartbeat();
-    }
+  // 初始化 DOM 引用缓存（仅第一次调用时查询，后续复用）
+  if (!hudCached.hpBar) {
+    hudCached.hpBar = document.getElementById('hpBar');
+    hudCached.hpText = document.getElementById('hpText');
+    hudCached.lowHpWarning = document.getElementById('lowHpWarning');
+    hudCached.classBadgeText = document.getElementById('classBadgeText');
+    hudCached.shieldVal = document.getElementById('shieldVal');
+    hudCached.weaponName = document.getElementById('weaponName');
+    hudCached.ammoText = document.getElementById('ammoText');
+    hudCached.reloadIndicator = document.getElementById('reloadIndicator');
+    hudCached.minesText = document.getElementById('minesText');
+    hudCached.waveText = document.getElementById('waveText');
+    hudCached.weaponSlots = document.getElementById('weaponSlots');
+    hudCached.survivalPanel = document.getElementById('survivalPanel');
+    hudCached.controlsHint = document.getElementById('controlsHint');
+    hudCached.countdownText = document.getElementById('countdownText');
   }
 
-  // 职业徽章
+  // --- HP 血条（仅在 hp/maxHp 变化时写）---
+  const hpRatio = player.hp / player.maxHp;
+  const hpPct = hpRatio * 100;
+  if (hudDirty.hp || hudCached._lastHp !== player.hp || hudCached._lastMaxHp !== player.maxHp) {
+    if (hudCached.hpBar) hudCached.hpBar.style.width = hpPct + '%';
+    if (hudCached.hpText) hudCached.hpText.textContent = Math.ceil(player.hp) + ' / ' + player.maxHp;
+    hudCached._lastHp = player.hp;
+    hudCached._lastMaxHp = player.maxHp;
+    hudDirty.hp = false;
+  }
+
+  // Low HP warning（含心跳音效副作用，仅在激活状态切换时触发）
+  const lowHpActive = hpRatio < 0.3 && state === GameState.PLAYING;
+  if (hudDirty.hp || hudCached._lastLowHpActive !== lowHpActive) {
+    if (lowHpActive) {
+      if (hudCached.lowHpWarning && !hudCached.lowHpWarning.classList.contains('active')) {
+        hudCached.lowHpWarning.classList.add('active');
+        startHeartbeat();
+      }
+    } else {
+      if (hudCached.lowHpWarning && hudCached.lowHpWarning.classList.contains('active')) {
+        hudCached.lowHpWarning.classList.remove('active');
+        stopHeartbeat();
+      }
+    }
+    hudCached._lastLowHpActive = lowHpActive;
+  }
+
+  // --- 职业徽章（仅在职业/语言变化时写）---
   if (player.class) {
     const cls = CLASSES[player.class];
-    document.getElementById('classBadgeText').textContent = cls.icon + ' ' + (lang === 'zh' ? cls.nameZh : cls.name.toUpperCase());
-    const shieldEl = document.getElementById('shieldVal');
-    if (player.classShield > 0) {
-      shieldEl.textContent = '+' + Math.floor(player.classShield);
-    } else {
-      shieldEl.textContent = '';
+    if (hudDirty.classInfo || hudCached._lastBadgeLang !== lang) {
+      if (hudCached.classBadgeText) {
+        hudCached.classBadgeText.textContent = cls.icon + ' ' + (lang === 'zh' ? cls.nameZh : cls.name.toUpperCase());
+      }
+      hudCached._lastBadgeLang = lang;
+      hudDirty.classInfo = false;
+    }
+    // 护盾值（仅在 classShield 变化时写）
+    if (hudCached._lastShield !== player.classShield) {
+      if (hudCached.shieldVal) {
+        hudCached.shieldVal.textContent = player.classShield > 0 ? '+' + Math.floor(player.classShield) : '';
+      }
+      hudCached._lastShield = player.classShield;
     }
   }
 
+  // --- 武器名称（仅在武器/语言变化时写）---
   const w = WEAPONS[player.weapon];
   const wName = lang === 'zh' ? w.nameZh : w.name;
   const classTag = w.weaponClass === 'heavy' ? (lang === 'zh' ? ' [重]' : ' [HVY]') : '';
-  document.getElementById('weaponName').textContent = wName + classTag;
+  const weaponLabel = wName + classTag;
+  if (hudDirty.weapon || hudCached._lastWeaponLabel !== weaponLabel) {
+    if (hudCached.weaponName) hudCached.weaponName.textContent = weaponLabel;
+    hudCached._lastWeaponLabel = weaponLabel;
+  }
 
+  // --- 弹药（仅在弹药字符串变化时写）---
   const ammoVal = ammo[player.weapon];
   const spareVal = spareAmmo[player.weapon];
   const ammoStr = ammoVal === Infinity ? t('ammo') + t('ammoInfinite') : t('ammo') + ammoVal + ' / ' + spareVal;
-  document.getElementById('ammoText').textContent = ammoStr;
-  // 装弹状态指示
-  const reloadEl = document.getElementById('reloadIndicator');
-  if (reloadEl) {
-    reloadEl.textContent = player.reloading ? '! ' + t('reloading') + ' !' : '';
+  if (hudDirty.ammo || hudCached._lastAmmoStr !== ammoStr) {
+    if (hudCached.ammoText) hudCached.ammoText.textContent = ammoStr;
+    hudCached._lastAmmoStr = ammoStr;
+    hudDirty.ammo = false;
   }
-  document.getElementById('minesText').textContent = t('mines') + player.mines + '/' + player.mineMax;
 
-  document.getElementById('waveText').textContent = t('wave') + wave;
+  // --- 装弹状态指示（仅在装弹状态变化时写）---
+  const reloadStr = player.reloading ? '! ' + t('reloading') + ' !' : '';
+  if (hudDirty.reload || hudCached._lastReloadStr !== reloadStr) {
+    if (hudCached.reloadIndicator) hudCached.reloadIndicator.textContent = reloadStr;
+    hudCached._lastReloadStr = reloadStr;
+    hudDirty.reload = false;
+  }
 
-  // 武器槽位（右下角9个卡片）
-  const slotsEl = document.getElementById('weaponSlots');
-  let slotsHtml = '';
-  // 只显示已拥有的武器，键位1-9对应已拥有武器的顺序
-  const ownedWeaponKeys = WEAPON_KEYS.filter(wId => player.ownedWeapons.includes(wId));
-  for (let i = 0; i < ownedWeaponKeys.length; i++) {
-    const wId = ownedWeaponKeys[i];
-    const isCurrent = wId === player.weapon;
-    const wDef = WEAPONS[wId];
-    const wLabel = lang === 'zh' ? wDef.nameZh : wDef.name;
-    // 配件指示
-    const att = getAttachment(wId);
-    const attIcon = att ? att.icon : '';
-    const attColor = att ? att.color : '';
-    let cls = 'slot';
-    if (isCurrent) cls += ' active';
-    else cls += ' owned';
-    const color = isCurrent ? wDef.color : '#9aa0a6';
-    // 弹药显示（副武器显示剩余弹药）
-    let ammoLabel = '';
-    if (ammo[wId] !== Infinity) {
-      ammoLabel = `<span class="slot-ammo" style="color:${ammo[wId] > 0 ? '#88a8c8' : '#ff4444'};font-size:9px">${ammo[wId]}</span>`;
+  // --- 地雷（仅在数量变化时写）---
+  const minesStr = t('mines') + player.mines + '/' + player.mineMax;
+  if (hudDirty.mines || hudCached._lastMinesStr !== minesStr) {
+    if (hudCached.minesText) hudCached.minesText.textContent = minesStr;
+    hudCached._lastMinesStr = minesStr;
+    hudDirty.mines = false;
+  }
+
+  // --- 波次（仅在波次变化时写）---
+  const waveStr = t('wave') + wave;
+  if (hudDirty.wave || hudCached._lastWaveStr !== waveStr) {
+    if (hudCached.waveText) hudCached.waveText.textContent = waveStr;
+    hudCached._lastWaveStr = waveStr;
+    hudDirty.wave = false;
+  }
+
+  // --- 武器槽位（innerHTML 开销大：仅在武器切换/拾取/语言切换时重建）---
+  if (hudDirty.weapon) {
+    let slotsHtml = '';
+    // 只显示已拥有的武器，键位1-9对应已拥有武器的顺序
+    const ownedWeaponKeys = WEAPON_KEYS.filter(wId => player.ownedWeapons.includes(wId));
+    for (let i = 0; i < ownedWeaponKeys.length; i++) {
+      const wId = ownedWeaponKeys[i];
+      const isCurrent = wId === player.weapon;
+      const wDef = WEAPONS[wId];
+      const wLabel = lang === 'zh' ? wDef.nameZh : wDef.name;
+      // 配件指示
+      const att = getAttachment(wId);
+      const attIcon = att ? att.icon : '';
+      const attColor = att ? att.color : '';
+      let cls = 'slot';
+      if (isCurrent) cls += ' active';
+      else cls += ' owned';
+      const color = isCurrent ? wDef.color : '#9aa0a6';
+      // 弹药显示（副武器显示剩余弹药）
+      let ammoLabel = '';
+      if (ammo[wId] !== Infinity) {
+        ammoLabel = `<span class="slot-ammo" style="color:${ammo[wId] > 0 ? '#88a8c8' : '#ff4444'};font-size:9px">${ammo[wId]}</span>`;
+      }
+      const keyDisplay = i < 9 ? (i + 1) : '';
+      slotsHtml += `<div class="${cls}"><span class="key-num">${keyDisplay}</span><span class="slot-name" style="color:${color}">${wLabel}</span>${att ? `<span class="slot-att" style="color:${attColor}">${attIcon}</span>` : ''}${ammoLabel}</div>`;
     }
-    const keyDisplay = i < 9 ? (i + 1) : '';
-    slotsHtml += `<div class="${cls}"><span class="key-num">${keyDisplay}</span><span class="slot-name" style="color:${color}">${wLabel}</span>${att ? `<span class="slot-att" style="color:${attColor}">${attIcon}</span>` : ''}${ammoLabel}</div>`;
+    if (hudCached.weaponSlots) hudCached.weaponSlots.innerHTML = slotsHtml;
+    hudDirty.weapon = false;
   }
-  slotsEl.innerHTML = slotsHtml;
 
-  // 生存状态条（简化版：仅在异常时显示警告，避免干扰）
-  const survEl = document.getElementById('survivalPanel');
+  // --- 生存状态条（innerHTML：仅在警告集合变化时重建）---
   const warnings = [];
   if (survival.hunger < 25) warnings.push({ label: t('hunger'), color: '#d4a04a', pct: survival.hunger });
   if (survival.thirst < 25) warnings.push({ label: t('thirst'), color: '#4a8ad4', pct: survival.thirst });
   if (survival.temp < 33 || survival.temp > 40) warnings.push({ label: t('temp'), color: '#d44a4a', pct: 30 });
-  if (warnings.length > 0) {
-    survEl.innerHTML = warnings.map(w => `<div class="surv-row"><span class="lbl">${w.label}</span><div class="surv-bar"><div class="fill" style="width:${w.pct}%;background:${w.color};"></div></div></div>`).join('');
-  } else {
-    survEl.innerHTML = '';  // 正常时不显示，避免干扰
+  const survKey = warnings.map(w => w.label + w.pct).join('|');
+  if (hudDirty.survival || hudCached._lastSurvKey !== survKey) {
+    if (hudCached.survivalPanel) {
+      if (warnings.length > 0) {
+        hudCached.survivalPanel.innerHTML = warnings.map(w => `<div class="surv-row"><span class="lbl">${w.label}</span><div class="surv-bar"><div class="fill" style="width:${w.pct}%;background:${w.color};"></div></div></div>`).join('');
+      } else {
+        hudCached.survivalPanel.innerHTML = '';  // 正常时不显示，避免干扰
+      }
+    }
+    hudCached._lastSurvKey = survKey;
+    hudDirty.survival = false;
   }
 
-  // 操作提示（底部中央）
-  const hintEl = document.getElementById('controlsHint');
-  const moveKey = lang === 'zh' ? '移动' : 'MOVE';
-  const shootKey = lang === 'zh' ? '射击' : 'FIRE';
-  const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
-  const mineKey = lang === 'zh' ? '地雷' : 'MINE';
-  hintEl.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${lang === 'zh' ? '地雷' : 'MINE'}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+  // --- 操作提示（innerHTML：仅在语言切换时重建）---
+  if (hudDirty.hint) {
+    const moveKey = lang === 'zh' ? '移动' : 'MOVE';
+    const shootKey = lang === 'zh' ? '射击' : 'FIRE';
+    const dashKey = lang === 'zh' ? '冲刺' : 'DASH';
+    const mineKey = lang === 'zh' ? '地雷' : 'MINE';
+    if (hudCached.controlsHint) {
+      hudCached.controlsHint.innerHTML = `<span><span class="key">WASD</span>${moveKey}</span><span><span class="key">MOUSE</span>${shootKey}</span><span><span class="key">R</span>${lang === 'zh' ? '装弹' : 'RELOAD'}</span><span><span class="key">SHIFT</span>${dashKey}</span><span><span class="key">SPACE</span>${lang === 'zh' ? '地雷' : 'MINE'}</span><span><span class="key">1-9/Q/E/滚轮</span>${lang === 'zh' ? '武器' : 'WPN'}</span>`;
+    }
+    hudDirty.hint = false;
+  }
 
-  // Countdown text
-  const cdEl = document.getElementById('countdownText');
+  // --- 倒计时文本（仅在文本/颜色/动画变化时写）---
+  let cdText = '', cdColor = '', cdAnim = '';
   if (!waveActive && state === GameState.PLAYING) {
     const secs = Math.ceil(waveCountdown);
-    cdEl.textContent = t('nextWave') + secs + 's';
+    cdText = t('nextWave') + secs + 's';
     // Flash red when countdown ≤ 3s
-    if (secs <= 3) {
-      cdEl.style.color = '#ff4444';
-      cdEl.style.animation = 'flash-red 0.5s infinite';
-    } else {
-      cdEl.style.color = '';
-      cdEl.style.animation = '';
-    }
+    if (secs <= 3) { cdColor = '#ff4444'; cdAnim = 'flash-red 0.5s infinite'; }
   } else if (waveActive) {
     const remaining = zombies.length + spawnQueue.length + spawnTelegraphs.length;
-    cdEl.textContent = remaining + t('zombiesLeft');
-    cdEl.style.color = '';
-    cdEl.style.animation = '';
+    cdText = remaining + t('zombiesLeft');
   } else {
-    cdEl.textContent = '';
-    cdEl.style.color = '';
-    cdEl.style.animation = '';
+    cdText = '';
+  }
+  if (hudCached._lastCdText !== cdText || hudCached._lastCdColor !== cdColor || hudCached._lastCdAnim !== cdAnim) {
+    if (hudCached.countdownText) {
+      hudCached.countdownText.textContent = cdText;
+      hudCached.countdownText.style.color = cdColor;
+      hudCached.countdownText.style.animation = cdAnim;
+    }
+    hudCached._lastCdText = cdText;
+    hudCached._lastCdColor = cdColor;
+    hudCached._lastCdAnim = cdAnim;
   }
 }
 
@@ -9201,6 +9350,7 @@ function startGame() {
   if (player.class) applyClass(player.class);
 
   state = GameState.PLAYING;
+  if (window._i18nObserver) window._i18nObserver.disconnect(); // 游戏运行时暂停 DOM 翻译监听
   document.getElementById('menuOverlay').classList.add('hidden');
   document.getElementById('gameOverOverlay').classList.add('hidden');
   document.getElementById('hud').classList.remove('hidden');
@@ -9209,11 +9359,15 @@ function startGame() {
   showTutorial();
 
   startWave(1);
+  // 重置 HUD 脏标记并清除比较缓存，强制新游戏开始时完整刷新一次
+  hudDirty = { hp:true, weapon:true, survival:true, score:true, wave:true, ammo:true, hint:true, reload:true, mines:true, classInfo:true };
+  for (const _hk in hudCached) { if (_hk.indexOf('_last') === 0) delete hudCached[_hk]; }
   updateHUD();
 }
 
 function gameOver() {
   state = GameState.GAMEOVER;
+  if (window._i18nObserve) window._i18nObserve(); // 退出 PLAYING，恢复 DOM 翻译监听
   stopHeartbeat();
   document.getElementById('lowHpWarning').classList.remove('active');
   // Save best score
@@ -9237,6 +9391,8 @@ function gameOver() {
 // UI SETUP
 // =====================================================================
 function updateUILanguage() {
+  // 语言切换：标记 HUD 中依赖语言的 innerHTML 区块需要重建
+  if (typeof hudDirty !== 'undefined') { hudDirty.hint = true; hudDirty.weapon = true; hudDirty.classInfo = true; }
   document.getElementById('menuTitle').textContent = t('title');
   document.getElementById('menuSubtitle').textContent = t('subtitle');
   document.getElementById('audioTitle').textContent = t('title');
