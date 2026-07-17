@@ -866,6 +866,7 @@
     </main>
     <script>lucide.createIcons();</script>
     <script src="../assets/games-data.js"></script>
+    <script src="/assets/counter.js"></script>
     <script>
     (function() {
       if (!window.PLAYSUNBLOCKED_GAMES) return;
@@ -874,10 +875,10 @@
 
       var CAT_CN = { 'Action': '动作', 'Puzzle': '益智', 'Arcade': '街机', 'Strategy': '策略', 'Adventure': '冒险' };
 
-      function playsToCn(plays) {
-        if (plays.indexOf('M') > -1) return Math.round(parseFloat(plays) * 100) + '万次';
-        if (plays.indexOf('K') > -1) return Math.round(parseFloat(plays) / 10) + '万次';
-        return plays + '次';
+      function playsToCn(value) {
+        value = Number(value) || 0;
+        if (value >= 10000) return Math.round(value / 10000) + '万次';
+        return value + '次';
       }
 
       var allGames = PLAYSUNBLOCKED_GAMES.all;
@@ -908,16 +909,16 @@
           '</div>' +
           '<div class="flex flex-col gap-3 p-4 flex-1">' +
             '<h3 class="font-display truncate" style="font-weight: var(--weight-bold); font-size: var(--text-lg); color: var(--color-text);">' + esc(g.title.cn) + '</h3>' +
-            '<div class="flex items-center gap-2">' +
-              '<div class="flex items-center" style="gap: 2px;">' +
-                PLAYSUNBLOCKED_GAMES.starsHtml(g.rating) +
-              '</div>' +
-              '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-secondary);">' + g.rating + '</span>' +
-            '</div>' +
+            '<span class="rating-display flex items-center gap-2" data-slug="' + esc(g.slug) + '">' +
+              '<span class="flex items-center" style="gap: 2px;">' +
+                PLAYSUNBLOCKED_GAMES.starsHtml(0) +
+              '</span>' +
+              '<span class="font-mono rating-display-text" style="font-size: var(--text-xs); color: var(--color-text-secondary);">-</span>' +
+            '</span>' +
             '<span class="duration-tag">⚡ ' + esc(g.duration.cn) + '</span>' +
             '<div class="flex items-center justify-between gap-2 mt-auto pt-2">' +
-              '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">' + playsToCn(g.plays) + '</span>' +
-              '<a href="../games/' + esc(g.slug) + '.html?lang=zh" class="play-btn" aria-label="开始游戏 ' + esc(g.title.cn) + '">' +
+              '<span class="play-count font-mono" data-slug="' + esc(g.slug) + '" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">...</span>' +
+              '<a href="../games/' + esc(g.slug) + '.html?lang=zh" class="play-btn" aria-label="开始游戏 ' + esc(g.title.cn) + '" onclick="PLAYSUNBLOCKED_COUNTER.recordPlay(\'' + g.slug + '\')">' +
                 '<i data-lucide="play" style="width:12px;height:12px;" aria-hidden="true"></i>开始' +
               '</a>' +
             '</div>' +
@@ -941,7 +942,7 @@
         // Sort
         filtered.sort(function(a, b) {
           if (currentSort === 'newest') return b.addedOrder - a.addedOrder;   // higher addedOrder = newer
-          if (currentSort === 'topRated') return b.rating - a.rating;          // rating descending
+          if (currentSort === 'topRated') return PLAYSUNBLOCKED_COUNTER.getRating(b.slug) - PLAYSUNBLOCKED_COUNTER.getRating(a.slug);          // local rating descending
           // 'popular' and 'mostPlayed' both sort by playsNum descending
           return b.playsNum - a.playsNum;
         });
@@ -1061,6 +1062,30 @@
 })();
 </script>
 <script>document.getElementById('mobileNav')&&document.getElementById('mobileNav').addEventListener('click',function(e){if(e.target.closest('a'))this.classList.remove('show')})</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (!window.PLAYSUNBLOCKED_COUNTER) return;
+  // Show user's local ratings
+  document.querySelectorAll('.rating-display[data-slug]').forEach(function(el) {
+    var slug = el.getAttribute('data-slug');
+    var rating = PLAYSUNBLOCKED_COUNTER.getRating(slug);
+    el.innerHTML = PLAYSUNBLOCKED_COUNTER.starsHtml(rating, 'sm') + '<span class="font-mono" style="font-size:var(--text-xs);color:var(--color-text-secondary);">' + (rating > 0 ? rating : '-') + '</span>';
+  });
+  // Fetch global play counts
+  var slugs = [];
+  document.querySelectorAll('.play-count[data-slug]').forEach(function(el) {
+    slugs.push(el.getAttribute('data-slug'));
+  });
+  PLAYSUNBLOCKED_COUNTER.fetchPlayCounts(slugs, function(results) {
+    document.querySelectorAll('.play-count[data-slug]').forEach(function(el) {
+      var slug = el.getAttribute('data-slug');
+      var res = results[slug];
+      if (res) el.textContent = PLAYSUNBLOCKED_COUNTER.formatPlaysShort(res.value, 'zh');
+    });
+  });
+});
+</script>
 
 </body>
 </html>

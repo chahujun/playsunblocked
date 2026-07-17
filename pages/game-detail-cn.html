@@ -347,7 +347,7 @@
                 </button>
               </div>
               <span class="absolute left-3 bottom-3 inline-flex items-center gap-1.5 px-2.5 py-1 font-mono" style="font-size:var(--text-xs);background:rgba(26,26,26,0.65);color:var(--color-bg);border:1px solid rgba(255,248,240,0.22);border-radius:var(--brand-radius-sm);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
-                <i data-lucide="eye" style="width:12px;height:12px;" aria-hidden="true"></i>240万次游玩
+                <i data-lucide="eye" style="width:12px;height:12px;" aria-hidden="true"></i>...
               </span>
               <button type="button" class="absolute right-3 bottom-3 flex items-center justify-center" style="width:36px;height:36px;background:rgba(26,26,26,0.65);border:1px solid rgba(255,248,240,0.22);border-radius:var(--brand-radius-sm);color:var(--color-bg);cursor:pointer;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);" aria-label="全屏">
                 <i data-lucide="maximize" style="width:16px;height:16px;" aria-hidden="true"></i>
@@ -364,15 +364,7 @@
                 </div>
               </div>
               <div class="flex items-center gap-2 shrink-0 self-start sm:self-center">
-                <div class="flex items-center" data-role="stars-container" style="gap:1px;">
-                  <i data-lucide="star" class="rating-star-filled" style="width:18px;height:18px;" aria-hidden="true"></i>
-                  <i data-lucide="star" class="rating-star-filled" style="width:18px;height:18px;" aria-hidden="true"></i>
-                  <i data-lucide="star" class="rating-star-filled" style="width:18px;height:18px;" aria-hidden="true"></i>
-                  <i data-lucide="star" class="rating-star-filled" style="width:18px;height:18px;" aria-hidden="true"></i>
-                  <i data-lucide="star" class="rating-star-filled" style="width:18px;height:18px;" aria-hidden="true"></i>
-                </div>
-                <span class="font-mono" data-role="rating-number" style="font-size:var(--text-base);font-weight:var(--weight-bold);color:var(--color-text);">4.8</span>
-                <span class="font-sans" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">/ 5</span>
+                <span id="ratingDisplay" class="font-mono" style="font-size:var(--text-sm);color:var(--color-text-tertiary);">...</span>
               </div>
             </div>
 
@@ -427,8 +419,14 @@
               </div>
             </div>
 
-            <!-- Comments -->
-            <div class="flex flex-col gap-5">
+            <!-- Rating widget (real, via counter.js) -->
+            <div id="ratingWidget" style="margin:24px 0;padding:16px;border:1.6px solid var(--color-border);border-radius:6px;"></div>
+
+            <!-- Comments section (real, via counter.js) -->
+            <div id="commentsSection" style="margin:24px 0;"></div>
+
+            <!-- Old comments section (hidden, replaced by real comments above) -->
+            <div class="flex flex-col gap-5" style="display:none;">
               <div class="flex items-end justify-between gap-4">
                 <h2 class="section-heading">评论区</h2>
                 <span class="font-mono" style="font-size:var(--text-sm);color:var(--color-text-secondary);white-space:nowrap;">3 条评论</span>
@@ -488,7 +486,7 @@
               <div class="flex flex-col">
                 <div class="stat-row"><span class="stat-label">开发者</span><span class="stat-value">PixelForge Studios</span></div>
                 <div class="stat-row"><span class="stat-label">发布时间</span><span class="stat-value">2026年1月</span></div>
-                <div class="stat-row"><span class="stat-label">游玩次数</span><span class="stat-value">240万</span></div>
+                <div class="stat-row"><span class="stat-label">游玩次数</span><span class="stat-value">...</span></div>
                 <div class="stat-row"><span class="stat-label">大小</span><span class="stat-value">8 MB</span></div>
                 <div class="stat-row"><span class="stat-label">更新时间</span><span class="stat-value">3天前</span></div>
               </div>
@@ -576,72 +574,8 @@
           <h2 class="section-heading">相关游戏</h2>
           <a href="games-cn.html" class="view-all-link">查看全部 <i data-lucide="arrow-right" style="width:16px;height:16px;" aria-hidden="true"></i></a>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-          <article class="brutalist-card flex flex-col" style="border-radius: var(--radius-lg); overflow: hidden;">
-            <div class="relative" style="aspect-ratio: 4/3; border-bottom: 2px solid var(--color-border); overflow: hidden;">
-              <img src="../assets/game-puzzle.jpg" alt="水晶消除游戏封面" class="w-full h-full" style="object-fit: cover;" loading="lazy">
-              <span class="card-tag absolute left-2 top-2">益智</span>
-            </div>
-            <div class="flex flex-col gap-2 p-4">
-              <h3 class="font-display truncate" style="font-weight:var(--weight-bold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;">水晶消除</h3>
-              <div class="flex items-center gap-1.5">
-                <i data-lucide="star" class="rating-star-filled" style="width:14px;height:14px;" aria-hidden="true"></i>
-                <span class="font-mono" style="font-size:var(--text-xs);font-weight:var(--weight-bold);color:var(--color-text);">4.7</span>
-                <span class="font-sans" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">· 150万</span>
-              </div>
-              <button type="button" class="play-btn mt-1 self-start"><i data-lucide="play" style="width:13px;height:13px;fill:currentColor;" aria-hidden="true"></i>开始</button>
-            </div>
-          </article>
-
-          <article class="brutalist-card flex flex-col" style="border-radius: var(--radius-lg); overflow: hidden;">
-            <div class="relative" style="aspect-ratio: 4/3; border-bottom: 2px solid var(--color-border); overflow: hidden;">
-              <img src="../assets/game-action.jpg" alt="泡泡龙游戏封面" class="w-full h-full" style="object-fit: cover;" loading="lazy">
-              <span class="card-tag absolute left-2 top-2">休闲</span>
-            </div>
-            <div class="flex flex-col gap-2 p-4">
-              <h3 class="font-display truncate" style="font-weight:var(--weight-bold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;">泡泡龙</h3>
-              <div class="flex items-center gap-1.5">
-                <i data-lucide="star" class="rating-star-filled" style="width:14px;height:14px;" aria-hidden="true"></i>
-                <span class="font-mono" style="font-size:var(--text-xs);font-weight:var(--weight-bold);color:var(--color-text);">4.5</span>
-                <span class="font-sans" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">· 210万</span>
-              </div>
-              <button type="button" class="play-btn mt-1 self-start"><i data-lucide="play" style="width:13px;height:13px;fill:currentColor;" aria-hidden="true"></i>开始</button>
-            </div>
-          </article>
-
-          <article class="brutalist-card flex flex-col" style="border-radius: var(--radius-lg); overflow: hidden;">
-            <div class="relative" style="aspect-ratio: 4/3; border-bottom: 2px solid var(--color-border); overflow: hidden;">
-              <img src="../assets/game-racing.jpg" alt="迷宫探险游戏封面" class="w-full h-full" style="object-fit: cover;" loading="lazy">
-              <span class="card-tag absolute left-2 top-2">冒险</span>
-            </div>
-            <div class="flex flex-col gap-2 p-4">
-              <h3 class="font-display truncate" style="font-weight:var(--weight-bold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;">迷宫探险</h3>
-              <div class="flex items-center gap-1.5">
-                <i data-lucide="star" class="rating-star-filled" style="width:14px;height:14px;" aria-hidden="true"></i>
-                <span class="font-mono" style="font-size:var(--text-xs);font-weight:var(--weight-bold);color:var(--color-text);">4.6</span>
-                <span class="font-sans" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">· 98万</span>
-              </div>
-              <button type="button" class="play-btn mt-1 self-start"><i data-lucide="play" style="width:13px;height:13px;fill:currentColor;" aria-hidden="true"></i>开始</button>
-            </div>
-          </article>
-
-          <article class="brutalist-card flex flex-col" style="border-radius: var(--radius-lg); overflow: hidden;">
-            <div class="relative" style="aspect-ratio: 4/3; border-bottom: 2px solid var(--color-border); overflow: hidden;">
-              <img src="../assets/game-arcade.jpg" alt="塔防大师游戏封面" class="w-full h-full" style="object-fit: cover;" loading="lazy">
-              <span class="card-tag absolute left-2 top-2">策略</span>
-            </div>
-            <div class="flex flex-col gap-2 p-4">
-              <h3 class="font-display truncate" style="font-weight:var(--weight-bold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;">塔防大师</h3>
-              <div class="flex items-center gap-1.5">
-                <i data-lucide="star" class="rating-star-filled" style="width:14px;height:14px;" aria-hidden="true"></i>
-                <span class="font-mono" style="font-size:var(--text-xs);font-weight:var(--weight-bold);color:var(--color-text);">4.8</span>
-                <span class="font-sans" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">· 170万</span>
-              </div>
-              <button type="button" class="play-btn mt-1 self-start"><i data-lucide="play" style="width:13px;height:13px;fill:currentColor;" aria-hidden="true"></i>开始</button>
-            </div>
-          </article>
-
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="related-grid">
+          <!-- 相关游戏由 JavaScript 从真实游戏数据动态生成 -->
         </div>
       </div>
     </section>
@@ -788,6 +722,7 @@
     </main>
     <script>lucide.createIcons();</script>
     <script src="../assets/games-data.js"></script>
+    <script src="/assets/counter.js"></script>
     <script>
     (function() {
       var params = new URLSearchParams(window.location.search);
@@ -865,9 +800,9 @@
         "operatingSystem": "Web Browser",
         "aggregateRating": {
           "@type": "AggregateRating",
-          "ratingValue": game.rating,
+          "ratingValue": 0,
           "bestRating": 5,
-          "ratingCount": Math.floor(game.rating * 100)
+          "ratingCount": 0
         }
       });
       document.head.appendChild(script);
@@ -883,15 +818,9 @@
       var pill = document.querySelector('[data-role="category-pill"]');
       if (pill) pill.textContent = catCn;
 
-      var starsContainer = document.querySelector('[data-role="stars-container"]');
-      if (starsContainer) starsContainer.innerHTML = PLAYSUNBLOCKED_GAMES.starsHtml(game.rating);
-
-      var ratingNum = document.querySelector('[data-role="rating-number"]');
-      if (ratingNum) ratingNum.textContent = game.rating;
-
       var playsSpan = document.querySelector('.absolute.left-3.bottom-3');
       if (playsSpan) {
-        playsSpan.innerHTML = '<i data-lucide="eye" style="width:12px;height:12px;" aria-hidden="true"></i>' + playsToCn(game.plays) + '次游玩';
+        playsSpan.innerHTML = '<i data-lucide="eye" style="width:12px;height:12px;" aria-hidden="true"></i><span id="playCount">...</span>';
       }
 
       var diffSpan = document.querySelector('[data-role="difficulty"]');
@@ -916,7 +845,7 @@
       statRows.forEach(function(row) {
         var label = row.querySelector('.stat-label');
         var value = row.querySelector('.stat-value');
-        if (label && value && label.textContent.indexOf('游玩次数') > -1) value.textContent = playsToCn(game.plays);
+        if (label && value && label.textContent.indexOf('游玩次数') > -1) value.innerHTML = '<span id="sidebarPlayCount">...</span>';
       });
 
       var controlsPanel = document.querySelector('[data-role="controls-panel"]');
@@ -943,7 +872,7 @@
           '</div>' +
           '<iframe id="game-iframe" class="player-iframe" style="display:none;position:absolute;inset:0;width:100%;height:100%;border:0;" allow="autoplay;fullscreen;gamepad" allowfullscreen></iframe>' +
           '<span class="absolute left-3 bottom-3 inline-flex items-center gap-1.5 px-2.5 py-1 font-mono" style="font-size:var(--text-xs);background:rgba(26,26,26,0.65);color:var(--color-bg);border:1px solid rgba(255,248,240,0.22);border-radius:var(--brand-radius-sm);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:2;">' +
-            '<i data-lucide="eye" style="width:12px;height:12px;" aria-hidden="true"></i>' + playsToCn(game.plays) + '次游玩' +
+            '<i data-lucide="eye" style="width:12px;height:12px;" aria-hidden="true"></i><span id="playCount">...</span>' +
           '</span>' +
           '<button type="button" class="absolute right-3 bottom-3 flex items-center justify-center" style="width:36px;height:36px;background:rgba(26,26,26,0.65);border:1px solid rgba(255,248,240,0.22);border-radius:var(--brand-radius-sm);color:var(--color-bg);cursor:pointer;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:2;" aria-label="全屏">' +
             '<i data-lucide="maximize" style="width:16px;height:16px;" aria-hidden="true"></i>' +
@@ -953,6 +882,7 @@
         var iframe = document.getElementById('game-iframe');
         if (overlay && iframe) {
           overlay.addEventListener('click', function() {
+            if (window.PLAYSUNBLOCKED_COUNTER) PLAYSUNBLOCKED_COUNTER.recordPlay(slug);
             iframe.src = '../games/' + slug + '.html?lang=zh';
             iframe.style.display = 'block';
             overlay.style.display = 'none';
@@ -970,7 +900,7 @@
         }
       }
 
-      var relGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4');
+      var relGrid = document.getElementById('related-grid');
       if (relGrid) {
         var related = PLAYSUNBLOCKED_GAMES.all.filter(function(g) {
           return g.category === game.category && g.slug !== slug;
@@ -999,11 +929,11 @@
             '<div class="flex flex-col gap-2 p-4">' +
               '<h3 class="font-display truncate" style="font-weight:var(--weight-bold);font-size:var(--text-lg);color:var(--color-text);letter-spacing:-0.01em;">' + esc(g.title.cn) + '</h3>' +
               '<div class="flex items-center gap-1.5">' +
-                PLAYSUNBLOCKED_GAMES.starsHtml(g.rating) +
-                '<span class="font-mono" style="font-size:var(--text-xs);font-weight:var(--weight-bold);color:var(--color-text);">' + g.rating + '</span>' +
-                '<span class="font-sans" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">· ' + playsToCn(g.plays) + '</span>' +
+                PLAYSUNBLOCKED_GAMES.starsHtml(0) +
+                '<span class="font-mono rating-display" data-slug="' + esc(g.slug) + '" style="font-size:var(--text-xs);font-weight:var(--weight-bold);color:var(--color-text);">-</span>' +
+                '<span class="font-sans play-count" data-slug="' + esc(g.slug) + '" style="font-size:var(--text-xs);color:var(--color-text-tertiary);">· ...</span>' +
               '</div>' +
-              '<a href="../games/' + esc(g.slug) + '.html?lang=zh" class="play-btn mt-1 self-start" style="text-decoration:none;">' +
+              '<a href="../games/' + esc(g.slug) + '.html?lang=zh" class="play-btn mt-1 self-start" style="text-decoration:none;" onclick="if(window.PLAYSUNBLOCKED_COUNTER)PLAYSUNBLOCKED_COUNTER.recordPlay(\'' + esc(g.slug) + '\')">' +
                 '<i data-lucide="play" style="width:13px;height:13px;fill:currentColor;" aria-hidden="true"></i>开始' +
               '</a>' +
             '</div>' +
@@ -1067,6 +997,70 @@
     });
   });
 })();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (!window.PLAYSUNBLOCKED_COUNTER) return;
+  var slug = new URLSearchParams(window.location.search).get('slug') || '';
+  var lang = 'zh';
+
+  // Show user's local rating
+  var ratingEl = document.getElementById('ratingDisplay');
+  if (ratingEl) {
+    var rating = PLAYSUNBLOCKED_COUNTER.getRating(slug);
+    ratingEl.innerHTML = PLAYSUNBLOCKED_COUNTER.starsHtml(rating) + '<span style="font-weight:var(--weight-bold);font-size:var(--text-sm);color:var(--color-text);margin-left:4px;">' + (rating > 0 ? rating + '/5' : '暂无评分') + '</span>';
+  }
+
+  // Fetch global play count
+  var playsEl = document.getElementById('playCount');
+  if (playsEl) {
+    PLAYSUNBLOCKED_COUNTER.fetchPlayCount(slug, function(err, res) {
+      playsEl.textContent = PLAYSUNBLOCKED_COUNTER.formatPlays(res ? res.value : 0, lang);
+    });
+  }
+
+  // Render interactive rating widget
+  var ratingWidgetEl = document.getElementById('ratingWidget');
+  if (ratingWidgetEl) {
+    PLAYSUNBLOCKED_COUNTER.renderRatingWidget(slug, ratingWidgetEl, lang);
+  }
+
+  // Render comments section
+  var commentsEl = document.getElementById('commentsSection');
+  if (commentsEl) {
+    PLAYSUNBLOCKED_COUNTER.renderComments(slug, commentsEl, lang);
+  }
+
+  // Sidebar play count
+  var sidebarPlays = document.getElementById('sidebarPlayCount');
+  if (sidebarPlays) {
+    PLAYSUNBLOCKED_COUNTER.fetchPlayCount(slug, function(err, res) {
+      sidebarPlays.textContent = PLAYSUNBLOCKED_COUNTER.formatPlays(res ? res.value : 0, lang);
+    });
+  }
+
+  // Related games: show local ratings + fetch play counts
+  document.querySelectorAll('.rating-display[data-slug]').forEach(function(el) {
+    var s = el.getAttribute('data-slug');
+    var r = PLAYSUNBLOCKED_COUNTER.getRating(s);
+    el.textContent = r > 0 ? r : '-';
+  });
+  var relSlugs = [];
+  document.querySelectorAll('.play-count[data-slug]').forEach(function(el) {
+    var s = el.getAttribute('data-slug');
+    if (relSlugs.indexOf(s) === -1) relSlugs.push(s);
+  });
+  if (relSlugs.length > 0) {
+    PLAYSUNBLOCKED_COUNTER.fetchPlayCounts(relSlugs, function(results) {
+      document.querySelectorAll('.play-count[data-slug]').forEach(function(el) {
+        var s = el.getAttribute('data-slug');
+        var res = results[s];
+        if (res) el.textContent = '· ' + PLAYSUNBLOCKED_COUNTER.formatPlaysShort(res.value, lang);
+      });
+    });
+  }
+});
 </script>
 
 </body>

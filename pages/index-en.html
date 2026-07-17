@@ -898,6 +898,7 @@
       })();
     </script>
     <script src="../assets/games-data.js"></script>
+    <script src="/assets/counter.js"></script>
     <script>
     (function() {
       if (!window.PLAYSUNBLOCKED_GAMES) return;
@@ -915,17 +916,17 @@
           '</div>' +
           '<div class="flex flex-col gap-3 p-4 flex-1">' +
             '<h3 class="font-display truncate" style="font-weight: var(--weight-bold); font-size: var(--text-lg); color: var(--color-text);">' + esc(g.title.en) + '</h3>' +
-            '<div class="flex items-center gap-2">' +
-              '<div class="flex items-center" style="gap: 2px;">' +
-                PLAYSUNBLOCKED_GAMES.starsHtml(g.rating) +
-              '</div>' +
-              '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-secondary);">' + g.rating + '</span>' +
-            '</div>' +
+            '<span class="rating-display" data-slug="' + g.slug + '" style="display:inline-flex;align-items:center;gap:8px;">' +
+              '<span style="display:inline-flex;align-items:center;gap:2px;">' +
+                PLAYSUNBLOCKED_GAMES.starsHtml(0) +
+              '</span>' +
+              '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-secondary);">-</span>' +
+            '</span>' +
           '</div>' +
           '</a>' +
           '<div class="flex items-center justify-between gap-2 px-4 pb-4 pt-0">' +
-            '<span class="font-mono" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">' + g.plays + ' plays</span>' +
-            '<a href="../games/' + esc(g.slug) + '.html?lang=en" class="play-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:6px 16px;">' +
+            '<span class="play-count font-mono" data-slug="' + g.slug + '" style="font-size: var(--text-xs); color: var(--color-text-tertiary);">...</span>' +
+            '<a href="../games/' + esc(g.slug) + '.html?lang=en" class="play-btn" onclick="PLAYSUNBLOCKED_COUNTER.recordPlay(\'' + g.slug + '\')" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;padding:6px 16px;">' +
               '<i data-lucide="play" style="width:12px;height:12px;" aria-hidden="true"></i>PLAY' +
             '</a>' +
           '</div>' +
@@ -1038,5 +1039,29 @@
 </script>
 <script>document.getElementById('mobileNav')&&document.getElementById('mobileNav').addEventListener('click',function(e){if(e.target.closest('a'))this.classList.remove('show')})</script>
 
+<script>
+// Fetch real play counts for all games on this page
+document.addEventListener('DOMContentLoaded', function() {
+  if (!window.PLAYSUNBLOCKED_COUNTER) return;
+  var slugs = [];
+  document.querySelectorAll('.play-count[data-slug]').forEach(function(el) {
+    slugs.push(el.getAttribute('data-slug'));
+  });
+  // Also show user's local ratings
+  document.querySelectorAll('.rating-display[data-slug]').forEach(function(el) {
+    var slug = el.getAttribute('data-slug');
+    var rating = PLAYSUNBLOCKED_COUNTER.getRating(slug);
+    el.innerHTML = PLAYSUNBLOCKED_COUNTER.starsHtml(rating, 'sm') + '<span class="font-mono" style="font-size:var(--text-xs);color:var(--color-text-secondary);">' + (rating > 0 ? rating : '-') + '</span>';
+  });
+  // Fetch global play counts
+  PLAYSUNBLOCKED_COUNTER.fetchPlayCounts(slugs, function(results) {
+    document.querySelectorAll('.play-count[data-slug]').forEach(function(el) {
+      var slug = el.getAttribute('data-slug');
+      var res = results[slug];
+      if (res) el.textContent = PLAYSUNBLOCKED_COUNTER.formatPlaysShort(res.value, 'en') + ' plays';
+    });
+  });
+});
+</script>
 </body>
 </html>
