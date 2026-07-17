@@ -1874,7 +1874,7 @@ const SKILL_DEFS = {
   // 突击兵
   grenade:   { classId: 'assault', nameZh: '手雷', nameEn: 'GRENADE', icon: '💥', descZh: '投掷手雷，140范围180伤害', descEn: 'Throw grenade, 140 radius 180 dmg' },
   rage_burst:{ classId: 'assault', nameZh: '狂暴爆发', nameEn: 'RAGE BURST', icon: '🔥', descZh: '5秒内伤害+80%，移速+20%', descEn: '5s: dmg+80%, speed+20%' },
-  supply_drop:{ classId: 'assault', nameZh: '补给空投', nameEn: 'SUPPLY', icon: '📦', descZh: '空投弹药+生命+随机武器', descEn: 'Airdrop: ammo+health+weapon' },
+  supply_drop:{ classId: 'assault', nameZh: '补给空投', nameEn: 'SUPPLY', icon: '📦', descZh: '回血30+补弹匣+随机武器(半备弹)', descEn: 'Heal 30 + reload mag + random weapon (half ammo)' },
   // 医护兵
   medkit:    { classId: 'medic', nameZh: '医疗包', nameEn: 'MEDKIT', icon: '✚', descZh: '瞬间回血50HP', descEn: 'Instant heal 50HP' },
   bio_shield:{ classId: 'medic', nameZh: '生物护盾', nameEn: 'BIO SHIELD', icon: '🛡', descZh: '获得80点护盾，持续15秒', descEn: 'Gain 80 shield, 15s' },
@@ -2695,9 +2695,12 @@ function placeMine() {
     player.mines--;
     player.abilityCD = 300;
     player.hp = Math.min(player.maxHp, player.hp + 30);
-    // 补满当前武器弹药
+    // 补充当前武器弹药（只补弹匣，不补备弹，避免无限弹药bug）
     const cw = player.weapon;
-    if (ammo[cw] !== Infinity) { ammo[cw] = SECONDARY_AMMO[cw] || 12; spareAmmo[cw] = TOTAL_SPARE_AMMO[cw] || 0; }
+    if (cw !== 'pistol' && ammo[cw] !== Infinity && SECONDARY_AMMO[cw]) {
+      // 只填满弹匣，不给备弹
+      ammo[cw] = SECONDARY_AMMO[cw];
+    }
     // 随机给一把新武器（检查副武器上限）
     const ownedSet = new Set(player.ownedWeapons);
     const allWeapons = WEAPON_KEYS.filter(w => !ownedSet.has(w));
@@ -2714,8 +2717,9 @@ function placeMine() {
       } else {
         player.ownedWeapons.push(newW);
       }
+      // 新武器只给一半备弹（不是满备弹）
       ammo[newW] = SECONDARY_AMMO[newW] || 12;
-      spareAmmo[newW] = TOTAL_SPARE_AMMO[newW] || 0;
+      spareAmmo[newW] = Math.floor((TOTAL_SPARE_AMMO[newW] || 0) * 0.5);
     }
     spawnBloodParticles(player.x, player.y, 15, '#ffdd44');
   } else if (abilityType === 'bio_shield') {
