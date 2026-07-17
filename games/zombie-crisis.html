@@ -2700,6 +2700,10 @@ function placeMine() {
     if (cw !== 'pistol' && ammo[cw] !== Infinity && SECONDARY_AMMO[cw]) {
       // 只填满弹匣，不给备弹
       ammo[cw] = SECONDARY_AMMO[cw];
+      // 取消换弹状态，防止换弹完成后重复加弹
+      player.reloading = false;
+      player.reloadTimer = 0;
+      hudDirty.ammo = true;
     }
     // 随机给一把新武器（检查副武器上限）
     const ownedSet = new Set(player.ownedWeapons);
@@ -10383,6 +10387,7 @@ function startGame() {
   survivalHints.hunger = false;
   survivalHints.thirst = false;
   survivalHints.stamina = false;
+  boss = null; // 重置BOSS实体，防止重开游戏后旧BOSS残留
 
   // 重置天气系统
   weather.type = 'clear';
