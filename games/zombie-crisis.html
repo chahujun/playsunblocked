@@ -8201,14 +8201,6 @@ function drawLightingOverlay() {
   const radius = 400 - darkness * 200;
   ctx.fillStyle = `rgba(0,0,0,${0.4 + darkness * 0.35})`;
   ctx.fillRect(camera.x - 50, camera.y - 50, VIEW_W + 100, VIEW_H + 100);
-  // Carve vision circle - single destination-out pass (replaces dead loop that
-  // filled with rgba(0,0,0,0) which removed nothing and recomputed unused var a)
-  ctx.globalCompositeOperation = 'destination-out';
-  ctx.fillStyle = 'rgba(0,0,0,0.8)';
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalCompositeOperation = 'source-over';
 
   // Blue tint at night
   if (darkness > 0.2) {
