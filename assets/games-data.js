@@ -12,7 +12,8 @@
     'Puzzle':    ['#4A90C0', '#2A5A80'],
     'Arcade':    ['#FFCE4D', '#C77E00'],
     'Strategy':  ['#7AB040', '#3A5A40'],
-    'Adventure': ['#A060A0', '#4A2448']
+    'Adventure': ['#A060A0', '#4A2448'],
+    'Board':     ['#B18A45', '#743C38']
   };
 
   var GAMES = [
@@ -373,6 +374,132 @@
       },
       featured: true,
       trending: true
+    },
+    {
+      slug: 'game-2048',
+      title: { en: '2048', cn: '2048' },
+      subtitle: { en: 'Number Merge Puzzle', cn: '数字合并' },
+      category: 'Puzzle',
+      rating: 0,
+      plays: null,
+      duration: { en: '2-10 min', cn: '2-10 分钟' },
+      controls: { en: 'Arrow Keys / Swipe', cn: '方向键 / 滑动' },
+      difficulty: { en: 'Easy→Hard', cn: '由易到难' },
+      description: {
+        en: 'The classic 2048 puzzle. Combine matching number tiles by sliding them in four directions. Reach the 2048 tile to win, then keep going for higher scores.',
+        cn: '经典 2048 数字谜题。向四个方向滑动合并相同数字，达成 2048 方块获胜，之后继续挑战更高分数。'
+      },
+      howToPlay: {
+        en: ['Use arrow keys or swipe to move all tiles', 'Two tiles with the same number merge into one', 'Each move spawns a new 2 or 4 tile', 'Reach the 2048 tile to win'],
+        cn: ['方向键或滑动移动所有方块', '两个相同数字方块合并为一个', '每次移动生成新的 2 或 4', '达成 2048 方块获胜']
+      },
+      featured: true,
+      trending: true
+    },
+    {
+      slug: 'snake',
+      title: { en: 'Snake', cn: '贪吃蛇' },
+      subtitle: { en: 'Classic Arcade', cn: '经典街机' },
+      category: 'Arcade',
+      rating: 0,
+      plays: null,
+      duration: { en: '1-5 min', cn: '1-5 分钟' },
+      controls: { en: 'Arrow Keys / WASD / Swipe', cn: '方向键 / WASD / 滑动' },
+      difficulty: { en: 'Easy→Hard', cn: '由易到难' },
+      description: {
+        en: 'The timeless Snake arcade game. Guide the snake to eat food and grow longer. Avoid hitting walls or your own tail. Speed increases as you score.',
+        cn: '永恒经典的贪吃蛇街机游戏。引导蛇吃食物变长，避开墙壁和自己的尾巴。分数越高速度越快。'
+      },
+      howToPlay: {
+        en: ['Use arrow keys, WASD, or swipe to steer', 'Eat food to grow and score points', 'Avoid walls and your own tail', 'Speed increases as you grow'],
+        cn: ['方向键、WASD 或滑动控制方向', '吃食物变长并得分', '避免撞墙和自己的尾巴', '越长速度越快']
+      },
+      featured: true,
+      trending: true
+    },
+    {
+      slug: 'minesweeper',
+      title: { en: 'Minesweeper', cn: '扫雷' },
+      subtitle: { en: 'Logic Puzzle', cn: '逻辑推理' },
+      category: 'Puzzle',
+      rating: 0,
+      plays: null,
+      duration: { en: '3-15 min', cn: '3-15 分钟' },
+      controls: { en: 'Mouse', cn: '鼠标' },
+      difficulty: { en: '3 Levels', cn: '三种难度' },
+      description: {
+        en: 'The classic Minesweeper puzzle. Reveal squares, read the numbers, and flag hidden mines. Choose from Beginner, Intermediate, and Expert difficulties.',
+        cn: '经典扫雷推理游戏。翻开方块，根据数字提示标记隐藏的地雷。可选初级、中级、专家三种难度。'
+      },
+      howToPlay: {
+        en: ['Left-click to reveal a square', 'Right-click or long-press to flag a mine', 'Numbers show how many mines are adjacent', 'First click is always safe'],
+        cn: ['左键翻开方块', '右键或长按标记地雷', '数字显示周围地雷数量', '首次点击保证安全']
+      },
+      featured: true,
+      trending: false
+    },
+    {
+      slug: 'gomoku',
+      title: { en: 'Gomoku', cn: '五子棋' },
+      subtitle: { en: 'Five in a Row', cn: '连五子' },
+      category: 'Board',
+      rating: 0,
+      plays: null,
+      duration: { en: '3-15 min', cn: '3-15 分钟' },
+      controls: { en: 'Mouse', cn: '鼠标' },
+      difficulty: { en: 'Medium', cn: '中等' },
+      description: {
+        en: 'Classic Gomoku (Five in a Row) on a 15×15 board. Play against a friend locally or challenge the AI. Connect five stones horizontally, vertically, or diagonally to win.',
+        cn: '经典五子棋，15×15 棋盘。本地双人对战或挑战 AI。横、竖、斜任意方向连成五子即胜。'
+      },
+      howToPlay: {
+        en: ['Click to place your stone on the board', 'Black goes first, then players alternate', 'Connect 5 stones in a row to win', 'Use undo to take back your last move'],
+        cn: ['点击棋盘落子', '黑方先行，双方轮流', '任意方向连成五子获胜', '可悔棋撤回上一步']
+      },
+      featured: true,
+      trending: false
+    },
+    {
+      slug: 'sokoban',
+      title: { en: 'Sokoban', cn: '推箱子' },
+      subtitle: { en: 'Box Pushing Puzzle', cn: '推箱子解谜' },
+      category: 'Puzzle',
+      rating: 0,
+      plays: null,
+      duration: { en: '5-30 min', cn: '5-30 分钟' },
+      controls: { en: 'Arrow Keys / WASD / Swipe', cn: '方向键 / WASD / 滑动' },
+      difficulty: { en: 'Easy→Hard', cn: '由易到难' },
+      description: {
+        en: 'Classic Sokoban puzzle game. Push every box onto its target spot. Boxes can only be pushed, never pulled. 25 handcrafted levels from easy to challenging.',
+        cn: '经典推箱子解谜游戏。将所有箱子推到目标位置。箱子只能推不能拉。25 个手工设计关卡，由易到难。'
+      },
+      howToPlay: {
+        en: ['Use arrow keys or WASD to move', 'Push boxes by walking into them', 'Boxes can only be pushed, not pulled', 'Get every box onto a target spot'],
+        cn: ['方向键或 WASD 移动', '走向箱子即可推动', '箱子只能推不能拉', '将所有箱子推到目标点']
+      },
+      featured: true,
+      trending: false
+    },
+    {
+      slug: 'ludo',
+      title: { en: 'Ludo', cn: '飞行棋' },
+      subtitle: { en: 'Classic Board Game', cn: '经典棋盘' },
+      category: 'Board',
+      rating: 0,
+      plays: null,
+      duration: { en: '10-30 min', cn: '10-30 分钟' },
+      controls: { en: 'Mouse', cn: '鼠标' },
+      difficulty: { en: 'Easy', cn: '简单' },
+      description: {
+        en: 'The classic Ludo board game for 2-4 players. Roll the dice, move your tokens around the board, capture opponents, and be the first to bring all tokens home.',
+        cn: '经典飞行棋，支持 2-4 人对战。掷骰子、移动棋子、吃掉对手，率先将所有棋子送达终点者获胜。'
+      },
+      howToPlay: {
+        en: ['Click to roll the dice', 'Roll a 6 to move a token onto the board', 'Land on an opponent to send them home', 'Get all 4 tokens to the center to win'],
+        cn: ['点击掷骰子', '掷出 6 才能将棋子送上棋盘', '踩到对手棋子将其送回起点', '4 颗棋子全部到达中心获胜']
+      },
+      featured: true,
+      trending: false
     }
   ];
 
@@ -405,7 +532,7 @@
     },
     featured: GAMES.filter(function (g) { return g.featured; }),
     trending: GAMES.filter(function (g) { return g.trending; }),
-    categories: ['All', 'Action', 'Puzzle', 'Arcade', 'Strategy', 'Adventure'],
+    categories: ['All', 'Action', 'Puzzle', 'Arcade', 'Strategy', 'Adventure', 'Board'],
     categoryGradients: CATEGORY_GRADIENTS,
     // Escape HTML special characters to prevent XSS when interpolating into innerHTML
     escapeHtml: function (s) {

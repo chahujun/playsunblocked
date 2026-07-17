@@ -159,6 +159,48 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=crownfall"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=crownfall"/>
   </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-en.html?slug=game-2048</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=game-2048"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=game-2048"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-en.html?slug=snake</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=snake"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=snake"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-en.html?slug=minesweeper</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=minesweeper"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=minesweeper"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-en.html?slug=gomoku</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=gomoku"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=gomoku"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-en.html?slug=sokoban</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=sokoban"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=sokoban"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-en.html?slug=ludo</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=ludo"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=ludo"/>
+  </url>
 
   <!-- Game detail pages (CN) -->
   <url>
@@ -287,6 +329,48 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=crownfall"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=crownfall"/>
   </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-cn.html?slug=game-2048</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=game-2048"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=game-2048"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-cn.html?slug=snake</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=snake"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=snake"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-cn.html?slug=minesweeper</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=minesweeper"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=minesweeper"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-cn.html?slug=gomoku</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=gomoku"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=gomoku"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-cn.html?slug=sokoban</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=sokoban"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=sokoban"/>
+  </url>
+  <url>
+    <loc>https://www.playsunblocked.net/pages/game-detail-cn.html?slug=ludo</loc>
+    <priority>0.7</priority>
+    <changefreq>monthly</changefreq>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.playsunblocked.net/pages/game-detail-en.html?slug=ludo"/>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://www.playsunblocked.net/pages/game-detail-cn.html?slug=ludo"/>
+  </url>
 
   <!-- Direct game pages (playable HTML files) -->
   <url><loc>https://www.playsunblocked.net/games/alchemic-pegs.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
@@ -306,4 +390,10 @@
   <url><loc>https://www.playsunblocked.net/games/alchemical-leak.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
   <url><loc>https://www.playsunblocked.net/games/bytebreak.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>
   <url><loc>https://www.playsunblocked.net/games/crownfall.html</loc><priority>0.9</priority><changefreq>daily</changefreq></url>
+  <url><loc>https://www.playsunblocked.net/games/game-2048.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.playsunblocked.net/games/snake.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.playsunblocked.net/games/minesweeper.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.playsunblocked.net/games/gomoku.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.playsunblocked.net/games/sokoban.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
+  <url><loc>https://www.playsunblocked.net/games/ludo.html</loc><priority>0.9</priority><changefreq>monthly</changefreq></url>
 </urlset>

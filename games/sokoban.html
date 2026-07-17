@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Sokoban</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#17202B;
+    --floor:#242321;
+    --gold:#B18A45;
+    --parch:#D6C29A;
+    --iron:#5B5C57;
+    --red:#743C38;
+    --panel:#1E2A36;
+    --border:#3A4A5A;
+    --muted:#8A8678;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--parch);
+    font-family:"Space Grotesk","Noto Sans SC",sans-serif;overflow:hidden;}
+  #app{
+    width:100%;height:100%;display:flex;flex-direction:column;align-items:center;
+    justify-content:flex-start;padding:0.6rem 0.6rem 0.4rem;gap:0.5rem;
+  }
+  header{
+    width:100%;max-width:920px;display:flex;align-items:center;justify-content:space-between;
+    gap:0.6rem;flex-wrap:wrap;
+  }
+  .title-block{display:flex;align-items:baseline;gap:0.6rem;}
+  .title{
+    font-weight:700;font-size:1.5rem;letter-spacing:0.06em;color:var(--parch);
+    font-family:"Space Grotesk","Noto Sans SC",sans-serif;
+  }
+  .subtitle{
+    font-family:"JetBrains Mono",monospace;font-size:0.72rem;color:var(--gold);
+    letter-spacing:0.12em;text-transform:uppercase;
+  }
+  .info{
+    font-family:"JetBrains Mono",monospace;font-size:0.8rem;color:var(--muted);
+    display:flex;gap:1rem;align-items:center;
+  }
+  .info b{color:var(--parch);font-weight:700;}
+  #stage{
+    flex:1 1 auto;width:100%;max-width:920px;display:flex;align-items:center;justify-content:center;
+    min-height:0;
+  }
+  canvas{
+    image-rendering:pixelated;image-rendering:crisp-edges;
+    background:var(--floor);touch-action:none;
+    box-shadow:0 4px 14px rgba(0,0,0,0.45);
+  }
+  #controls{
+    display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center;width:100%;max-width:920px;
+  }
+  .btn{
+    font-family:"Space Grotesk","Noto Sans SC",sans-serif;font-weight:500;
+    background:var(--iron);color:var(--parch);border:1.5px solid var(--border);
+    padding:0.45rem 0.9rem;font-size:0.85rem;cursor:pointer;border-radius:3px;
+    box-shadow:0 2px 4px rgba(0,0,0,0.35);transition:transform 0.08s ease,background 0.15s;
+    min-width:64px;letter-spacing:0.02em;
+  }
+  .btn:hover{background:#6a6b66;}
+  .btn:active{transform:translateY(1px);box-shadow:0 1px 2px rgba(0,0,0,0.35);}
+  .btn:disabled{opacity:0.35;cursor:not-allowed;}
+  .btn.primary{background:var(--gold);color:#1A1410;border-color:#7a5e30;}
+  .btn.primary:hover{background:#c89a52;}
+  .btn.accent{background:var(--red);color:var(--parch);border-color:#5a2c28;}
+  .btn.accent:hover{background:#8a4843;}
+  #levelbar{
+    width:100%;max-width:920px;display:flex;flex-wrap:wrap;gap:0.25rem;justify-content:center;
+    max-height:62px;overflow-y:auto;padding:0.2rem;
+  }
+  .lv{
+    font-family:"JetBrains Mono",monospace;font-size:0.7rem;
+    width:28px;height:26px;display:flex;align-items:center;justify-content:center;
+    background:var(--panel);color:var(--muted);border:1.5px solid var(--border);
+    border-radius:3px;cursor:pointer;padding:0;
+  }
+  .lv:hover{color:var(--parch);}
+  .lv.done{background:var(--gold);color:#1A1410;border-color:#7a5e30;}
+  .lv.cur{background:var(--red);color:var(--parch);border-color:#5a2c28;box-shadow:0 0 0 2px rgba(116,60,56,0.4);}
+  #hint{
+    font-family:"JetBrains Mono",monospace;font-size:0.72rem;color:var(--muted);
+    text-align:center;width:100%;max-width:920px;line-height:1.4;
+  }
+  #overlay{
+    position:absolute;inset:0;background:rgba(23,32,43,0.82);
+    display:flex;align-items:center;justify-content:center;z-index:50;
+    opacity:0;pointer-events:none;transition:opacity 0.25s ease;
+  }
+  #overlay.show{opacity:1;pointer-events:auto;}
+  #overlayBox{
+    text-align:center;padding:1.4rem 2rem;border:1.5px solid var(--border);
+    background:var(--panel);border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,0.5);
+  }
+  #overlayTitle{font-weight:700;font-size:1.6rem;color:var(--gold);letter-spacing:0.06em;margin-bottom:0.4rem;}
+  #overlaySub{font-family:"JetBrains Mono",monospace;font-size:0.8rem;color:var(--parch);}
+  .hidden{display:none !important;}
+  /* scrollbar */
+  #levelbar::-webkit-scrollbar{height:6px;}
+  #levelbar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  @media (max-width:560px){
+    .title{font-size:1.2rem;}
+    .info{font-size:0.72rem;gap:0.6rem;}
+    .btn{padding:0.4rem 0.7rem;font-size:0.78rem;min-width:54px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="title-block">
+      <div class="title" id="titleText">Sokoban</div>
+      <div class="subtitle" id="subtitleText">PUSH &amp; SOLVE</div>
+    </div>
+    <div class="info">
+      <span id="levelLabel">Level 1 / 25</span>
+      <span id="progressLabel">Cleared 0 / 25</span>
+    </div>
+  </header>
+  <div id="stage"><canvas id="game" width="10" height="10"></canvas></div>
+  <div id="controls">
+    <button class="btn" id="btnPrev">&laquo; Prev</button>
+    <button class="btn accent" id="btnRestart">Restart</button>
+    <button class="btn" id="btnUndo">Undo</button>
+    <button class="btn primary" id="btnNext">Next &raquo;</button>
+  </div>
+  <div id="levelbar"></div>
+  <div id="hint">Arrow keys / WASD to move. Swipe on touch screens.</div>
+</div>
+<div id="overlay"><div id="overlayBox"><div id="overlayTitle"></div><div id="overlaySub"></div></div></div>
+
+<script>
+/* ============================================================
+   Adaptive scaling IIFE (supports iframe embedding).
+   Scales root font based on the actual viewport (iframe size)
+   and exposes a global hook for the game to trigger re-fit.
+   ============================================================ */
+(function(){
+  function scaleApp(){
+    var vw = window.innerWidth  || document.documentElement.clientWidth  || 320;
+    var vh = window.innerHeight || document.documentElement.clientHeight || 240;
+    var fs = Math.min(vw / 34, vh / 26, 17);
+    if (fs < 10.5) fs = 10.5;
+    document.documentElement.style.fontSize = fs + 'px';
+  }
+  scaleApp();
+  window.addEventListener('resize', scaleApp);
+  window.addEventListener('orientationchange', function(){ setTimeout(scaleApp, 200); });
+  window.SOKOBAN_REFIT = scaleApp;
+})();
+</script>
+
+<script>
+/* ============================================================
+   Bilingual strings
+   ============================================================ */
+const I18N = {
+  cn: {
+    title:"推箱子", subtitle:"推动 · 解谜",
+    level:"关卡", prev:"上一关", next:"下一关", restart:"重置", undo:"撤销",
+    cleared:"已通关", win:"通关！", nextLevel:"进入下一关…",
+    allDone:"全部通关！", allDoneSub:"你完成了所有 25 个关卡",
+    help:"方向键 / WASD 移动，移动端滑动屏幕控制方向。Z 撤销，R 重置。",
+    select:"选择关卡"
+  },
+  en: {
+    title:"Sokoban", subtitle:"PUSH & SOLVE",
+    level:"Level", prev:"Prev", next:"Next", restart:"Restart", undo:"Undo",
+    cleared:"Cleared", win:"Level Clear!", nextLevel:"Loading next…",
+    allDone:"All Cleared!", allDoneSub:"You finished all 25 levels",
+    help:"Arrow keys / WASD to move. Swipe on touch. Z = Undo, R = Restart.",
+    select:"Select"
+  }
+};
+
+/* ============================================================
+   Level data
+   # wall | . target | $ box | * box-on-target | @ player | + player-on-target | space floor
+   ============================================================ */
+const LEVELS = [
+  // 1 - intro: push right
+  [
+    "#######",
+    "#     #",
+    "#@$.  #",
+    "#     #",
+    "#######"
+  ],
+  // 2 - push up
+  [
+    "#######",
+    "#  .  #",
+    "#  $  #",
+    "#  @  #",
+    "#     #",
+    "#######"
+  ],
+  // 3 - two boxes to sides
+  [
+    "#######",
+    "#.   .#",
+    "# $ $ #",
+    "#  @  #",
+    "#     #",
+    "#######"
+  ],
+  // 4 - go around a wall
+  [
+    "##########",
+    "#        #",
+    "#  .     #",
+    "#  ###   #",
+    "#  $ @   #",
+    "#        #",
+    "##########"
+  ],
+  // 5 - two boxes up
+  [
+    "#########",
+    "#       #",
+    "# .   . #",
+    "#       #",
+    "# $ @ $ #",
+    "#       #",
+    "#########"
+  ],
+  // 6 - three boxes
+  [
+    "#########",
+    "#       #",
+    "# . . . #",
+    "#       #",
+    "# $ $ $ #",
+    "#   @   #",
+    "#       #",
+    "#########"
+  ],
+  // 7 - pillar in the middle
+  [
+    "##########",
+    "#        #",
+    "# .    . #",
+    "#        #",
+    "# $  # $ #",
+    "#        #",
+    "#   @    #",
+    "#        #",
+    "##########"
+  ],
+  // 8 - four corners
+  [
+    "##########",
+    "# .    . #",
+    "#        #",
+    "# $    $ #",
+    "#        #",
+    "# $    $ #",
+    "#        #",
+    "# .  @ . #",
+    "##########"
+  ],
+  // 9 - two boxes around a wall block
+  [
+    "##########",
+    "#        #",
+    "# .    . #",
+    "#  ####  #",
+    "# $    $ #",
+    "#        #",
+    "#   @    #",
+    "#        #",
+    "##########"
+  ],
+  // 10 - four boxes
+  [
+    "###########",
+    "#         #",
+    "# . . . . #",
+    "#         #",
+    "# $ $ $ $ #",
+    "#         #",
+    "#    @    #",
+    "#         #",
+    "###########"
+  ],
+  // 11 - five boxes
+  [
+    "############",
+    "#          #",
+    "# . . . . .#",
+    "#          #",
+    "# $ $ $ $ $#",
+    "#          #",
+    "#     @    #",
+    "#          #",
+    "############"
+  ],
+  // 12 - four boxes with side walls
+  [
+    "###########",
+    "#         #",
+    "# .     . #",
+    "#  #   #  #",
+    "# $     $ #",
+    "#         #",
+    "# $  @  $ #",
+    "#         #",
+    "# .     . #",
+    "###########"
+  ],
+  // 13 - four boxes, central wall row
+  [
+    "############",
+    "#          #",
+    "# .      . #",
+    "#   ####   #",
+    "# $      $ #",
+    "#    @     #",
+    "# $      $ #",
+    "#          #",
+    "# .      . #",
+    "############"
+  ],
+  // 14 - six boxes (5 up + 1 down)
+  [
+    "#############",
+    "#           #",
+    "# . . . . . #",
+    "#           #",
+    "# $ $ $ $ $ #",
+    "#     $     #",
+    "#     .     #",
+    "#     @     #",
+    "#############"
+  ],
+  // 15 - four boxes around a thick wall
+  [
+    "###########",
+    "#         #",
+    "# .     . #",
+    "#  #####  #",
+    "# $     $ #",
+    "#         #",
+    "# $  @  $ #",
+    "#         #",
+    "# .     . #",
+    "###########"
+  ],
+  // 16 - eight boxes, two bands
+  [
+    "############",
+    "#          #",
+    "# . .  . . #",
+    "#          #",
+    "# $ $  $ $ #",
+    "#          #",
+    "# . .  . . #",
+    "#          #",
+    "# $ $  $ $ #",
+    "#          #",
+    "#    @     #",
+    "############"
+  ],
+  // 17 - seven boxes (6 up + 1 down)
+  [
+    "##############",
+    "#            #",
+    "# . . . . . .#",
+    "#            #",
+    "# $ $ $ $ $ $#",
+    "#      $     #",
+    "#      .     #",
+    "#      @     #",
+    "##############"
+  ],
+  // 18 - six boxes in a corridor
+  [
+    "##########",
+    "#        #",
+    "#......  #",
+    "#        #",
+    "#$$$$$$  #",
+    "#        #",
+    "#   @    #",
+    "##########"
+  ],
+  // 19 - eight boxes, two groups
+  [
+    "##############",
+    "#            #",
+    "# . . . . . .#",
+    "#            #",
+    "# $ $ $ $ $ $#",
+    "#            #",
+    "# . .        #",
+    "#            #",
+    "# $ $        #",
+    "#            #",
+    "#     @      #",
+    "##############"
+  ],
+  // 20 - seven boxes with side walls
+  [
+    "#############",
+    "#           #",
+    "# . . . . . #",
+    "#  #     #  #",
+    "# $ $ $ $ $ #",
+    "#           #",
+    "#     @     #",
+    "#     $     #",
+    "#     .     #",
+    "#     $     #",
+    "#     .     #",
+    "#############"
+  ],
+  // 21 - eight boxes (6 up + 2 down)
+  [
+    "##############",
+    "#            #",
+    "# . . . . . .#",
+    "#            #",
+    "# $ $ $ $ $ $#",
+    "#      $     #",
+    "#      .     #",
+    "#      $     #",
+    "#      .     #",
+    "#      @     #",
+    "##############"
+  ],
+  // 22 - nine boxes (6 up + 3 down)
+  [
+    "###############",
+    "#             #",
+    "# . . . . . . #",
+    "#             #",
+    "# $ $ $ $ $ $ #",
+    "#     $ $ $   #",
+    "#     . . .   #",
+    "#      @      #",
+    "###############"
+  ],
+  // 23 - eight boxes with interior pillars
+  [
+    "###############",
+    "#             #",
+    "# . . . . . . #",
+    "#  #       #  #",
+    "# $ $ $ $ $ $ #",
+    "#             #",
+    "#     $ $     #",
+    "#     . .     #",
+    "#      @      #",
+    "###############"
+  ],
+  // 24 - ten boxes (7 up + 3 down)
+  [
+    "################",
+    "#              #",
+    "# . . . . . . .#",
+    "#              #",
+    "# $ $ $ $ $ $ $#",
+    "#      $ $ $   #",
+    "#      . . .   #",
+    "#       @      #",
+    "################"
+  ],
+  // 25 - final: ten boxes (7 up + 2 down + 1 down)
+  [
+    "################",
+    "#              #",
+    "# . . . . . . .#",
+    "#              #",
+    "# $ $ $ $ $ $ $#",
+    "#      $ $     #",
+    "#      . .     #",
+    "#      $       #",
+    "#      .       #",
+    "#      @       #",
+    "################"
+  ]
+];
+
+/* ============================================================
+   Game core
+   ============================================================ */
+const STORAGE_KEY = 'sokoban_progress';
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+
+const STATE = { PLAYING:'playing', WIN:'win' };
+let levelIndex = 0;
+let grid = [];          // 2D array of {wall,target}
+let W = 0, H = 0;
+let player = {x:0,y:0};
+let boxes = [];          // [{x,y}]
+let history = [];        // stack of {player, boxes}
+let gameState = STATE.PLAYING;
+let tileSize = 40;
+let moves = 0;
+let winTimer = null;
+
+// language
+const urlParams = new URLSearchParams(location.search);
+const lang = (urlParams.get('lang') === 'en') ? 'en' : 'cn';
+const T = I18N[lang];
+
+// progress
+let completed = loadProgress();
+
+function loadProgress(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function saveProgress(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(completed)); } catch(e){}
+}
+
+/* ---------- Level parsing ---------- */
+function parseLevel(rows){
+  grid = []; boxes = [];
+  H = rows.length;
+  W = 0;
+  for (let r of rows) W = Math.max(W, r.length);
+  for (let y=0; y<H; y++){
+    grid[y] = [];
+    const row = rows[y].padEnd(W, ' ');
+    for (let x=0; x<W; x++){
+      const c = row[x];
+      const cell = { wall:false, target:false };
+      if (c === '#') cell.wall = true;
+      if (c === '.' || c === '*' || c === '+') cell.target = true;
+      grid[y][x] = cell;
+      if (c === '$' || c === '*') boxes.push({x,y});
+      if (c === '@' || c === '+') player = {x,y};
+    }
+  }
+  history = [];
+  gameState = STATE.PLAYING;
+  moves = 0;
+}
+
+function boxAt(x,y){
+  for (let b of boxes) if (b.x===x && b.y===y) return b;
+  return null;
+}
+
+/* ---------- Movement ---------- */
+function tryMove(dx,dy){
+  if (gameState !== STATE.PLAYING) return;
+  const nx = player.x + dx, ny = player.y + dy;
+  if (nx<0 || ny<0 || nx>=W || ny>=H) return;
+  const cell = grid[ny][nx];
+  if (cell.wall) return;
+  const b = boxAt(nx,ny);
+  if (b){
+    const bx = nx + dx, by = ny + dy;
+    if (bx<0 || by<0 || bx>=W || by>=H) return;
+    if (grid[by][bx].wall) return;
+    if (boxAt(bx,by)) return;
+    pushHistory();
+    b.x = bx; b.y = by;
+    player.x = nx; player.y = ny;
+  } else {
+    pushHistory();
+    player.x = nx; player.y = ny;
+  }
+  moves++;
+  render();
+  if (checkWin()){
+    gameState = STATE.WIN;
+    onWin();
+  }
+}
+
+function pushHistory(){
+  history.push({
+    player: {x:player.x, y:player.y},
+    boxes: boxes.map(b => ({x:b.x, y:b.y}))
+  });
+}
+
+function undo(){
+  if (history.length === 0) return;
+  const s = history.pop();
+  player = s.player;
+  boxes = s.boxes;
+  if (gameState === STATE.WIN){
+    // cancel pending auto-advance when reverting a winning move
+    clearTimeout(winTimer);
+    gameState = STATE.PLAYING;
+    hideOverlay();
+  }
+  render();
+  updateButtons();
+}
+
+function checkWin(){
+  for (let b of boxes) if (!grid[b.y][b.x].target) return false;
+  return true;
+}
+
+/* ---------- Win / flow ---------- */
+function onWin(){
+  if (!completed.includes(levelIndex)){
+    completed.push(levelIndex);
+    saveProgress();
+  }
+  updateUI();
+  render();
+  if (levelIndex < LEVELS.length - 1){
+    showOverlay(T.win, T.nextLevel);
+    clearTimeout(winTimer);
+    winTimer = setTimeout(()=>{ loadLevel(levelIndex + 1); }, 1500);
+  } else {
+    showOverlay(T.allDone, T.allDoneSub);
+  }
+}
+
+function showOverlay(title, sub){
+  document.getElementById('overlayTitle').textContent = title;
+  document.getElementById('overlaySub').textContent = sub;
+  document.getElementById('overlay').classList.add('show');
+}
+function hideOverlay(){
+  document.getElementById('overlay').classList.remove('show');
+}
+
+/* ---------- Level management ---------- */
+function loadLevel(i){
+  if (i < 0 || i >= LEVELS.length) return;
+  clearTimeout(winTimer);
+  hideOverlay();
+  levelIndex = i;
+  parseLevel(LEVELS[i]);
+  resize();
+  render();
+  updateUI();
+}
+
+function restart(){ loadLevel(levelIndex); }
+function nextLevel(){ if (levelIndex < LEVELS.length-1) loadLevel(levelIndex+1); }
+function prevLevel(){ if (levelIndex > 0) loadLevel(levelIndex-1); }
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+function resize(){
+  const stage = document.getElementById('stage');
+  const availW = stage.clientWidth - 4;
+  const availH = stage.clientHeight - 4;
+  const maxTile = 66;
+  let t = Math.floor(Math.min(availW / W, availH / H, maxTile));
+  if (t < 14) t = 14;
+  tileSize = t;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(1, W * tileSize) * dpr;
+  canvas.height = Math.max(1, H * tileSize) * dpr;
+  canvas.style.width = (W * tileSize) + 'px';
+  canvas.style.height = (H * tileSize) + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  if (window.SOKOBAN_REFIT) window.SOKOBAN_REFIT();
+}
+
+function render(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // background fill (floor base)
+  ctx.fillStyle = '#242321';
+  ctx.fillRect(0,0,W*tileSize,H*tileSize);
+  for (let y=0; y<H; y++){
+    for (let x=0; x<W; x++){
+      drawTile(x,y);
+    }
+  }
+  // targets drawn under boxes for clarity
+  for (let b of boxes) drawBox(b);
+  drawPlayer();
+  if (gameState === STATE.WIN) drawWinGlow();
+}
+
+function drawTile(x,y){
+  const px = x*tileSize, py = y*tileSize;
+  const cell = grid[y][x];
+  if (cell.wall){
+    ctx.fillStyle = '#5B5C57';
+    ctx.fillRect(px,py,tileSize,tileSize);
+    // top highlight
+    ctx.fillStyle = 'rgba(255,255,255,0.07)';
+    ctx.fillRect(px,py,tileSize,Math.max(2,tileSize*0.06));
+    // bottom shade
+    ctx.fillStyle = 'rgba(0,0,0,0.30)';
+    ctx.fillRect(px,py+tileSize-Math.max(2,tileSize*0.06),tileSize,Math.max(2,tileSize*0.06));
+    // inner border
+    ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px+0.5,py+0.5,tileSize-1,tileSize-1);
+  } else {
+    // floor subtle grid
+    ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(px+0.5,py+0.5,tileSize-1,tileSize-1);
+  }
+  if (cell.target){
+    const cx = px + tileSize/2, cy = py + tileSize/2;
+    const r = tileSize * 0.26;
+    ctx.strokeStyle = '#B18A45';
+    ctx.lineWidth = Math.max(1.5, tileSize*0.05);
+    ctx.beginPath();
+    ctx.arc(cx,cy,r,0,Math.PI*2);
+    ctx.stroke();
+    ctx.fillStyle = '#B18A45';
+    ctx.beginPath();
+    ctx.arc(cx,cy,Math.max(1.5,tileSize*0.07),0,Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function drawBox(b){
+  const onTarget = grid[b.y][b.x].target;
+  const px = b.x*tileSize, py = b.y*tileSize;
+  const pad = tileSize*0.10;
+  const s = tileSize - 2*pad;
+  ctx.fillStyle = onTarget ? '#D6C29A' : '#B18A45';
+  ctx.fillRect(px+pad, py+pad, s, s);
+  // border
+  ctx.strokeStyle = onTarget ? '#8a6f3a' : '#6e5328';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(px+pad+0.75, py+pad+0.75, s-1.5, s-1.5);
+  // crate diagonals
+  ctx.strokeStyle = onTarget ? 'rgba(60,40,15,0.30)' : 'rgba(20,12,0,0.30)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(px+pad, py+pad);
+  ctx.lineTo(px+pad+s, py+pad+s);
+  ctx.moveTo(px+pad+s, py+pad);
+  ctx.lineTo(px+pad, py+pad+s);
+  ctx.stroke();
+  // inner square
+  ctx.strokeRect(px+pad+3, py+pad+3, s-6, s-6);
+}
+
+function drawPlayer(){
+  const px = player.x*tileSize, py = player.y*tileSize;
+  const pad = tileSize*0.14;
+  const s = tileSize - 2*pad;
+  // body
+  ctx.fillStyle = '#743C38';
+  ctx.fillRect(px+pad, py+pad, s, s);
+  ctx.strokeStyle = '#4a2521';
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(px+pad+0.75, py+pad+0.75, s-1.5, s-1.5);
+  // face highlight
+  ctx.fillStyle = 'rgba(214,194,154,0.85)';
+  const ew = Math.max(2, tileSize*0.08);
+  const ey = py + tileSize*0.42;
+  ctx.fillRect(px + tileSize*0.34, ey, ew, ew);
+  ctx.fillRect(px + tileSize*0.58, ey, ew, ew);
+}
+
+function drawWinGlow(){
+  // simple subtle frame (no glow effects per spec; use border accent)
+  ctx.strokeStyle = 'rgba(177,138,69,0.55)';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(1.5,1.5,W*tileSize-3,H*tileSize-3);
+}
+
+/* ============================================================
+   UI
+   ============================================================ */
+function updateUI(){
+  document.getElementById('titleText').textContent = T.title;
+  document.getElementById('subtitleText').textContent = T.subtitle;
+  document.getElementById('levelLabel').textContent =
+    T.level + ' ' + (levelIndex+1) + ' / ' + LEVELS.length;
+  document.getElementById('progressLabel').textContent =
+    T.cleared + ' ' + completed.length + ' / ' + LEVELS.length;
+  document.getElementById('btnPrev').textContent = '\u00AB ' + T.prev;
+  document.getElementById('btnNext').textContent = T.next + ' \u00BB';
+  document.getElementById('btnRestart').textContent = T.restart;
+  document.getElementById('btnUndo').textContent = T.undo;
+  document.getElementById('hint').textContent = T.help;
+  updateButtons();
+  buildLevelBar();
+}
+
+function updateButtons(){
+  document.getElementById('btnPrev').disabled = (levelIndex <= 0);
+  document.getElementById('btnNext').disabled = (levelIndex >= LEVELS.length-1);
+  document.getElementById('btnUndo').disabled = (history.length === 0 && gameState !== STATE.WIN);
+}
+
+function buildLevelBar(){
+  const bar = document.getElementById('levelbar');
+  bar.innerHTML = '';
+  for (let i=0; i<LEVELS.length; i++){
+    const el = document.createElement('button');
+    el.className = 'lv';
+    if (completed.includes(i)) el.classList.add('done');
+    if (i === levelIndex) el.classList.add('cur');
+    el.textContent = (i+1);
+    el.title = T.level + ' ' + (i+1);
+    el.addEventListener('click', ()=> loadLevel(i));
+    bar.appendChild(el);
+  }
+}
+
+/* ============================================================
+   Input
+   ============================================================ */
+window.addEventListener('keydown', (e)=>{
+  const k = e.key.toLowerCase();
+  if (k === 'arrowup' || k === 'w'){ e.preventDefault(); tryMove(0,-1); }
+  else if (k === 'arrowdown' || k === 's'){ e.preventDefault(); tryMove(0,1); }
+  else if (k === 'arrowleft' || k === 'a'){ e.preventDefault(); tryMove(-1,0); }
+  else if (k === 'arrowright' || k === 'd'){ e.preventDefault(); tryMove(1,0); }
+  else if (k === 'z' || k === 'u'){ e.preventDefault(); undo(); }
+  else if (k === 'r'){ e.preventDefault(); restart(); }
+  else if (k === 'n'){ e.preventDefault(); nextLevel(); }
+  else if (k === 'p'){ e.preventDefault(); prevLevel(); }
+}, {passive:false});
+
+// touch swipe
+let touchStart = null;
+canvas.addEventListener('touchstart', (e)=>{
+  const t = e.touches[0];
+  touchStart = {x:t.clientX, y:t.clientY};
+}, {passive:true});
+canvas.addEventListener('touchmove', (e)=>{ e.preventDefault(); }, {passive:false});
+canvas.addEventListener('touchend', (e)=>{
+  if (!touchStart) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStart.x;
+  const dy = t.clientY - touchStart.y;
+  const threshold = 22;
+  if (Math.abs(dx) < threshold && Math.abs(dy) < threshold){ touchStart=null; return; }
+  if (Math.abs(dx) > Math.abs(dy)) tryMove(dx>0?1:-1, 0);
+  else tryMove(0, dy>0?1:-1);
+  touchStart = null;
+}, {passive:true});
+
+// buttons
+document.getElementById('btnPrev').addEventListener('click', prevLevel);
+document.getElementById('btnNext').addEventListener('click', nextLevel);
+document.getElementById('btnRestart').addEventListener('click', restart);
+document.getElementById('btnUndo').addEventListener('click', undo);
+
+// resize
+window.addEventListener('resize', ()=>{ resize(); render(); });
+window.addEventListener('orientationchange', ()=>{ setTimeout(()=>{ resize(); render(); }, 250); });
+
+/* ============================================================
+   Boot
+   ============================================================ */
+(function boot(){
+  // pick starting level: last completed + 1 if available, else 0
+  let start = 0;
+  if (completed.length){
+    const maxDone = Math.max.apply(null, completed);
+    start = Math.min(maxDone + 1, LEVELS.length - 1);
+  }
+  loadLevel(start);
+})();
+</script>
+</body>
+</html>

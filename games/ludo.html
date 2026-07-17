@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>飞行棋 Ludo</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { width:100%; height:100%; overflow:hidden; background:#17202B; font-family:'Space Grotesk','Noto Sans SC',sans-serif; color:#D6C29A; }
+#scaler { transform-origin:top left; }
+#app { width:720px; height:780px; position:relative; margin:0 auto; display:flex; flex-direction:column; align-items:center; }
+canvas { display:block; }
+#hud { width:720px; display:flex; justify-content:space-between; align-items:center; padding:10px 16px; gap:12px; }
+.hud-left, .hud-right { display:flex; align-items:center; gap:10px; }
+.player-indicator { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:600; }
+.player-dot { width:14px; height:14px; border-radius:50%; border:2px solid #D6C29A; }
+#turn-name { font-size:16px; font-weight:700; }
+#msg { font-size:13px; color:#B18A45; min-height:18px; text-align:center; flex:1; }
+.btn { font-family:inherit; font-size:14px; font-weight:600; padding:8px 18px; border:1.5px solid #5B5C57; border-radius:6px; background:#242321; color:#D6C29A; cursor:pointer; box-shadow:0 2px 0 #1a1a1a; transition:transform .1s, box-shadow .1s; }
+.btn:hover { transform:translateY(-1px); box-shadow:0 3px 0 #1a1a1a; }
+.btn:active { transform:translateY(1px); box-shadow:0 1px 0 #1a1a1a; }
+.btn-primary { background:#B18A45; color:#17202B; border-color:#B18A45; }
+.btn-primary:hover { background:#c89a55; }
+#dice-btn { width:64px; height:64px; border-radius:10px; font-size:28px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+#dice-btn:disabled { opacity:.4; cursor:not-allowed; }
+#board { cursor:pointer; }
+#overlay { position:absolute; inset:0; background:rgba(10,15,22,0.92); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; z-index:10; }
+#overlay h1 { font-size:36px; font-weight:800; color:#D6C29A; letter-spacing:-0.02em; }
+#overlay p { font-size:15px; color:#B18A45; text-align:center; max-width:400px; line-height:1.5; }
+.mode-btns { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+.mode-btn { padding:10px 22px; font-size:15px; }
+.win-text { font-size:28px; font-weight:800; }
+</style>
+</head>
+<body>
+<div id="scaler"><div id="app">
+  <div id="hud">
+    <div class="hud-left">
+      <div class="player-indicator"><div class="player-dot" id="p-dot"></div><span id="turn-name">—</span></div>
+    </div>
+    <div id="msg"></div>
+    <div class="hud-right">
+      <button class="btn btn-primary" id="dice-btn" disabled>?</button>
+      <button class="btn" id="restart-btn" style="display:none">↻</button>
+    </div>
+  </div>
+  <canvas id="board" width="720" height="720"></canvas>
+  <div id="overlay">
+    <h1 id="ov-title">飞行棋</h1>
+    <p id="ov-desc">选择游戏模式开始对战。掷出 6 点可将棋子送入棋盘，率先将全部 4 颗棋子送达中心者获胜。</p>
+    <div class="mode-btns" id="mode-btns">
+      <button class="btn btn-primary mode-btn" data-mode="2p">2 人对战</button>
+      <button class="btn btn-primary mode-btn" data-mode="3p">3 人对战</button>
+      <button class="btn btn-primary mode-btn" data-mode="4p">4 人对战</button>
+      <button class="btn mode-btn" data-mode="1ai">1 人 vs 电脑</button>
+      <button class="btn mode-btn" data-mode="2ai">2 人 vs 电脑</button>
+    </div>
+  </div>
+</div></div>
+<script>
+// === 自适应缩放 ===
+(function(){
+  var scaler=document.getElementById('scaler');
+  var app=document.getElementById('app');
+  function refit(){
+    var nw=app.offsetWidth, nh=app.offsetHeight;
+    var aw=window.innerWidth, ah=window.innerHeight;
+    var s=Math.min(aw/nw, ah/nh, 1.2);
+    scaler.style.transform='scale('+s+')';
+    scaler.style.position='absolute';
+    scaler.style.left=(aw-nw*s)/2+'px';
+    scaler.style.top=(ah-nh*s)/2+'px';
+  }
+  window.addEventListener('resize',refit);
+  window.addEventListener('orientationchange',refit);
+  setTimeout(refit,50);
+  window.LUDO_REFIT=refit;
+})();
+</script>
+<script>
+(function(){
+'use strict';
+
+// === i18n ===
+var LANG='cn';
+var T={
+  cn:{
+    title:'飞行棋', desc:'选择游戏模式开始对战。掷出 6 点可将棋子送入棋盘，率先将全部 4 颗棋子送达中心者获胜。',
+    yourTurn:'回合', rollDice:'掷骰', rolling:'掷骰中…', roll6:'掷出6！可出家或再掷',
+    need6:'需要6点才能出家', noMove:'无棋可走', captured:'吃子！再掷一次',
+    extra:'再掷一次', triple6:'连续三个6，跳过',
+    winPrefix:'获胜！', restart:'重新开始', newGame:'新游戏',
+    mode2p:'2 人对战', mode3p:'3 人对战', mode4p:'4 人对战',
+    mode1ai:'1 人 vs 电脑', mode2ai:'2 人 vs 电脑',
+    redPlayer:'红方', greenPlayer:'绿方', yellowPlayer:'黄方', bluePlayer:'蓝方',
+    clickPiece:'点击要移动的棋子', chooseMode:'选择游戏模式',
+    finished:'已到达终点', home:'家', selectPiece:'选择棋子'
+  },
+  en:{
+    title:'Ludo', desc:'Choose a game mode to start. Roll a 6 to move a token onto the board. First player to bring all 4 tokens home wins.',
+    yourTurn:'Turn', rollDice:'Roll', rolling:'Rolling…', roll6:'Rolled 6! Move out or roll again',
+    need6:'Need a 6 to move out', noMove:'No moves available', captured:'Capture! Roll again',
+    extra:'Roll again', triple6:'Three 6s in a row, skip',
+    winPrefix:'Wins!', restart:'Restart', newGame:'New Game',
+    mode2p:'2 Players', mode3p:'3 Players', mode4p:'4 Players',
+    mode1ai:'1P vs CPU', mode2ai:'2P vs CPU',
+    redPlayer:'Red', greenPlayer:'Green', yellowPlayer:'Yellow', bluePlayer:'Blue',
+    clickPiece:'Click a token to move', chooseMode:'Choose a mode',
+    finished:'Home', home:'Home', selectPiece:'Select token'
+  }
+};
+function t(k){ return (T[LANG]||T.cn)[k]||k; }
+function detectLang(){
+  var p=new URLSearchParams(location.search);
+  LANG=(p.get('lang')==='en')?'en':'cn';
+}
+detectLang();
+
+// === Colors ===
+var COLORS=[
+  {name:'red', hex:'#743C38', light:'#8a4d48', star:0, homeEntry:0, homeStretchStart:50 },
+  {name:'green', hex:'#30483A', light:'#3e5d49', star:13, homeEntry:13, homeStretchStart:11 },
+  {name:'yellow', hex:'#B18A45', light:'#c89a55', star:26, homeEntry:26, homeStretchStart:24 },
+  {name:'blue', hex:'#2A5A80', light:'#3570a0', star:39, homeEntry:39, homeStretchStart:37 }
+];
+var PLAYER_NAMES={red:'redPlayer', green:'greenPlayer', yellow:'yellowPlayer', blue:'bluePlayer'};
+
+// === Board geometry: 15x15 grid, cell=44px, offset=30px ===
+var CELL=44, OFFX=30, OFFY=30;
+var BOARD_SIZE=15;
+
+// Standard Ludo path: 52 cells around the cross + 6 home stretch per color
+// The path is defined as grid coordinates [col,row] on the 15x15 board
+// Red starts at bottom-left area, goes clockwise
+var PATH=[];
+(function buildPath(){
+  // The main track has 52 cells. Starting from red's entry point going clockwise.
+  // Red enters at position 0 (grid [1,6]), travels up, right, down, left back
+  // Standard Ludo path coordinates:
+  var p=[
+    [1,6],[2,6],[3,6],[4,6],[5,6],    // 0-4: red entry row going right
+    [6,5],[6,4],[6,3],[6,2],[6,1],[6,0],  // 5-10: up the left arm
+    [7,0],                              // 11: top center
+    [8,0],[8,1],[8,2],[8,3],[8,4],[8,5],  // 12-17: down right side of top arm
+    [9,6],[10,6],[11,6],[12,6],[13,6],[14,6], // 18-23: right row
+    [14,7],                             // 24: right center
+    [14,8],[13,8],[12,8],[11,8],[10,8],[9,8], // 25-30: right row going left
+    [8,9],[8,10],[8,11],[8,12],[8,13],[8,14], // 31-36: down right side of bottom arm
+    [7,14],                             // 37: bottom center
+    [6,14],[6,13],[6,12],[6,11],[6,10],[6,9], // 38-43: up left side of bottom arm
+    [5,8],[4,8],[3,8],[2,8],[1,8],[0,8],      // 44-49: left row going left
+    [0,7],                               // 50: left center
+    [0,6]                                // 51: back to start area (red entry)
+  ];
+  PATH=p;
+})();
+
+// Home stretch paths (6 cells each, leading to center)
+var HOME_STRETCHES={
+  red:   [[1,7],[2,7],[3,7],[4,7],[5,7],[6,7]],
+  green: [[7,1],[7,2],[7,3],[7,4],[7,5],[7,6]],
+  yellow:[[13,7],[12,7],[11,7],[10,7],[9,7],[8,7]],
+  blue:  [[7,13],[7,12],[7,11],[7,10],[7,9],[7,8]]
+};
+
+// Home yard positions (where tokens sit before entering board) - 4 per color
+var HOME_YARDS={
+  red:    [[1.5,1.5],[3.5,1.5],[1.5,3.5],[3.5,3.5]],
+  green:  [[10.5,1.5],[12.5,1.5],[10.5,3.5],[12.5,3.5]],
+  yellow: [[10.5,10.5],[12.5,10.5],[10.5,12.5],[12.5,12.5]],
+  blue:   [[1.5,10.5],[3.5,10.5],[1.5,12.5],[3.5,12.5]]
+};
+
+// === Game State ===
+var state='IDLE'; // IDLE, PLAYING, GAMEOVER
+var players=[];
+var currentPlayer=0;
+var diceValue=0;
+var diceRolled=false;
+var canRollAgain=false;
+var consecutive6s=0;
+var movablePieces=[];
+var aiMode=false;
+var aiCount=0;
+var animating=false;
+var winner=-1;
+
+function initGame(mode){
+  var playerConfigs;
+  aiMode=false;
+  aiCount=0;
+  if(mode==='2p'){ playerConfigs=[0,2]; } // red, yellow
+  else if(mode==='3p'){ playerConfigs=[0,1,2]; } // red, green, yellow
+  else if(mode==='4p'){ playerConfigs=[0,1,2,3]; }
+  else if(mode==='1ai'){ playerConfigs=[0,1,2,3]; aiMode=true; aiCount=3; } // human=red, rest AI
+  else if(mode==='2ai'){ playerConfigs=[0,1]; aiMode=true; aiCount=1; } // human=red, green=AI
+
+  players=[];
+  for(var i=0;i<playerConfigs.length;i++){
+    var ci=playerConfigs[i];
+    var isAI = aiMode && i>0 && aiCount>0;
+    if(isAI) aiCount--;
+    var pieces=[];
+    for(var j=0;j<4;j++){
+      pieces.push({ id:j, state:'home', pathPos:-1, homePos:j });
+    }
+    players.push({
+      colorIdx: ci,
+      color: COLORS[ci],
+      pieces: pieces,
+      isAI: isAI
+    });
+  }
+  currentPlayer=0;
+  diceValue=0;
+  diceRolled=false;
+  canRollAgain=false;
+  consecutive6s=0;
+  movablePieces=[];
+  state='PLAYING';
+  winner=-1;
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('restart-btn').style.display='inline-block';
+  document.getElementById('dice-btn').disabled=false;
+  document.getElementById('dice-btn').textContent='?';
+  updateHUD();
+  setMessage('');
+  draw();
+  if(players[currentPlayer].isAI) setTimeout(aiTurn,800);
+}
+
+// === Coordinate helpers ===
+function gridToPixel(col,row){
+  return [OFFX+col*CELL+CELL/2, OFFY+row*CELL+CELL/2];
+}
+
+function getPiecePixelPos(player, piece){
+  if(piece.state==='home'){
+    var yard=HOME_YARDS[player.color.name][piece.homePos];
+    return gridToPixel(yard[0],yard[1]);
+  } else if(piece.state==='path'){
+    var pos=PATH[piece.pathPos];
+    return gridToPixel(pos[0],pos[1]);
+  } else if(piece.state==='stretch'){
+    var stretch=HOME_STRETCHES[player.color.name][piece.pathPos];
+    return gridToPixel(stretch[0],stretch[1]);
+  } else { // finished
+    var center=[7,7];
+    var offsets=[[0.3,0.3],[-0.3,0.3],[0.3,-0.3],[-0.3,-0.3]];
+    var off=offsets[piece.homePos];
+    return gridToPixel(center[0]+off[0],center[1]+off[1]);
+  }
+}
+
+// === Movement logic ===
+function getMovablePieces(player, dice){
+  var movable=[];
+  for(var i=0;i<player.pieces.length;i++){
+    var p=player.pieces[i];
+    if(p.state==='finished') continue;
+    if(p.state==='home'){
+      if(dice===6) movable.push(i);
+    } else {
+      // Check if can move without overshooting
+      var dest=calcDest(player,p,dice);
+      if(dest!==null) movable.push(i);
+    }
+  }
+  return movable;
+}
+
+function calcDest(player, piece, dice){
+  // Returns {state, pathPos} or null if can't move
+  var color=player.color;
+  if(piece.state==='home'){
+    if(dice!==6) return null;
+    return {state:'path', pathPos:color.star};
+  }
+  if(piece.state==='path'){
+    var pos=piece.pathPos;
+    var remaining=dice;
+    // Check if we reach home entry
+    var entryPos=color.homeStretchStart; // position on path just before turning into home stretch
+    // Actually: the star is where they enter. They travel 51 cells from star to get back to entry.
+    // Home entry: after passing position (star+50)%52, they enter home stretch
+    var homeEntry=(color.star+50)%52; // last path cell before turning into stretch
+    
+    for(var step=1; step<=dice; step++){
+      var nextPos=(pos+step)%52;
+      if(pos+step > 52 && nextPos === color.star){
+        // wrapped around past start - this shouldn't happen with proper math
+      }
+      // Check if we've passed the home entry
+      // Simple approach: count how many steps from star
+      var stepsFromStar = ((pos + step) - color.star + 52) % 52;
+      if(stepsFromStar === 51){
+        // This step reaches the cell just before home entry
+        if(step === dice){
+          return {state:'path', pathPos: nextPos};
+        }
+      } else if(stepsFromStar > 51){
+        // Entering home stretch
+        var stretchIdx = stepsFromStar - 52; // 0-5
+        if(stretchIdx < 6){
+          if(step === dice){
+            return {state:'stretch', pathPos: stretchIdx};
+          }
+        } else if(stretchIdx === 6){
+          if(step === dice){
+            return {state:'finished', pathPos:0};
+          }
+        } else {
+          return null; // overshoot
+        }
+      }
+    }
+    // If we didn't enter home stretch
+    var finalStepsFromStar = ((pos + dice) - color.star + 52) % 52;
+    if(finalStepsFromStar <= 51){
+      return {state:'path', pathPos: (pos + dice) % 52};
+    }
+    return null;
+  }
+  if(piece.state==='stretch'){
+    var newPos=piece.pathPos+dice;
+    if(newPos<6) return {state:'stretch', pathPos:newPos};
+    if(newPos===6) return {state:'finished', pathPos:0};
+    return null; // overshoot
+  }
+  return null;
+}
+
+function movePiece(playerIdx, pieceIdx){
+  var player=players[playerIdx];
+  var piece=player.pieces[pieceIdx];
+  var dest=calcDest(player, piece, diceValue);
+  if(!dest) return false;
+  
+  // Check for captures
+  var captured=false;
+  if(dest.state==='path'){
+    for(var pi=0; pi<players.length; pi++){
+      if(pi===playerIdx) continue;
+      for(var pj=0; pj<players[pi].pieces.length; pj++){
+        var op=players[pi].pieces[pj];
+        if(op.state==='path' && op.pathPos===dest.pathPos){
+          // Check if it's a safe square (star squares)
+          var safeSquares=[0,8,13,21,26,34,39,47];
+          if(safeSquares.indexOf(dest.pathPos)===-1){
+            op.state='home';
+            op.pathPos=-1;
+            // Find empty home slot
+            for(var s=0;s<4;s++){
+              var occupied=false;
+              for(var pp=0;pp<players[pi].pieces.length;pp++){
+                if(players[pi].pieces[pp].state==='home' && players[pi].pieces[pp].homePos===s){ occupied=true; break; }
+              }
+              if(!occupied){ op.homePos=s; break; }
+            }
+            captured=true;
+          }
+        }
+      }
+    }
+  }
+  
+  // Move the piece
+  piece.state=dest.state;
+  piece.pathPos=dest.pathPos;
+  if(dest.state==='finished'){
+    piece.homePos=pieceIdx; // use piece index for center positioning
+  }
+  
+  // Check win
+  var allHome=true;
+  for(var i=0;i<player.pieces.length;i++){
+    if(player.pieces[i].state!=='finished'){ allHome=false; break; }
+  }
+  if(allHome){
+    state='GAMEOVER';
+    winner=playerIdx;
+    showWin();
+    return true;
+  }
+  
+  // Determine if can roll again
+  if(captured){
+    canRollAgain=true;
+    setMessage(t('captured'));
+  } else if(diceValue===6){
+    consecutive6s++;
+    if(consecutive6s>=3){
+      consecutive6s=0;
+      canRollAgain=false;
+      setMessage(t('triple6'));
+      nextTurn();
+    } else {
+      canRollAgain=true;
+      setMessage(t('extra'));
+    }
+  } else {
+    canRollAgain=false;
+    nextTurn();
+  }
+  
+  diceRolled=false;
+  movablePieces=[];
+  document.getElementById('dice-btn').disabled=false;
+  updateHUD();
+  draw();
+  
+  if(state==='PLAYING' && players[currentPlayer].isAI){
+    setTimeout(aiTurn,800);
+  }
+  return true;
+}
+
+function nextTurn(){
+  consecutive6s=0;
+  currentPlayer=(currentPlayer+1)%players.length;
+}
+
+// === Dice ===
+function rollDice(){
+  if(state!=='PLAYING' || diceRolled || animating) return;
+  if(players[currentPlayer].isAI) return; // AI rolls itself
+  
+  doRoll();
+}
+
+function doRoll(){
+  diceRolled=true;
+  animating=true;
+  document.getElementById('dice-btn').disabled=true;
+  setMessage(t('rolling'));
+  
+  var rolls=0;
+  var maxRolls=10;
+  var interval=setInterval(function(){
+    diceValue=1+Math.floor(Math.random()*6);
+    document.getElementById('dice-btn').textContent=diceValue;
+    draw();
+    rolls++;
+    if(rolls>=maxRolls){
+      clearInterval(interval);
+      animating=false;
+      afterRoll();
+    }
+  },60);
+}
+
+function afterRoll(){
+  var player=players[currentPlayer];
+  movablePieces=getMovablePieces(player, diceValue);
+  
+  if(movablePieces.length===0){
+    setMessage(t('noMove'));
+    setTimeout(function(){
+      if(diceValue===6){
+        consecutive6s++;
+        if(consecutive6s>=3){
+          consecutive6s=0;
+          setMessage(t('triple6'));
+          diceRolled=false;
+          document.getElementById('dice-btn').disabled=false;
+          nextTurn();
+          updateHUD();
+          if(state==='PLAYING' && players[currentPlayer].isAI) setTimeout(aiTurn,800);
+        } else {
+          diceRolled=false;
+          document.getElementById('dice-btn').disabled=false;
+          setMessage(t('extra'));
+        }
+      } else {
+        diceRolled=false;
+        document.getElementById('dice-btn').disabled=false;
+        nextTurn();
+        updateHUD();
+        if(state==='PLAYING' && players[currentPlayer].isAI) setTimeout(aiTurn,800);
+      }
+    },800);
+    return;
+  }
+  
+  if(diceValue===6) setMessage(t('roll6'));
+  else setMessage(t('clickPiece'));
+  
+  // Auto-move if only one option
+  if(movablePieces.length===1){
+    setTimeout(function(){
+      movePiece(currentPlayer, movablePieces[0]);
+    },400);
+  }
+  
+  draw();
+}
+
+// === AI ===
+function aiTurn(){
+  if(state!=='PLAYING') return;
+  if(!players[currentPlayer].isAI) return;
+  if(diceRolled) return;
+  
+  doRoll();
+  setTimeout(function checkAI(){
+    if(animating){ setTimeout(checkAI,200); return; }
+    if(movablePieces.length===0) return;
+    
+    // AI strategy: prioritize captures, then getting out of home, then furthest piece
+    var player=players[currentPlayer];
+    var bestIdx=movablePieces[0];
+    var bestScore=-1;
+    
+    for(var i=0;i<movablePieces.length;i++){
+      var pi=movablePieces[i];
+      var piece=player.pieces[pi];
+      var dest=calcDest(player, piece, diceValue);
+      var score=0;
+      
+      // Check capture
+      if(dest && dest.state==='path'){
+        for(var p2=0;p2<players.length;p2++){
+          if(p2===currentPlayer) continue;
+          for(var p3=0;p3<players[p2].pieces.length;p3++){
+            var op=players[p2].pieces[p3];
+            if(op.state==='path' && op.pathPos===dest.pathPos){
+              score+=100;
+            }
+          }
+        }
+      }
+      
+      // Getting out of home
+      if(piece.state==='home') score+=50;
+      
+      // Finishing
+      if(dest && dest.state==='finished') score+=80;
+      
+      // Entering home stretch
+      if(dest && dest.state==='stretch') score+=40;
+      
+      // Further along = better
+      if(piece.state==='path') score+=piece.pathPos*0.1;
+      
+      if(score>bestScore){ bestScore=score; bestIdx=pi; }
+    }
+    
+    movePiece(currentPlayer, bestIdx);
+  },800);
+}
+
+// === Canvas rendering ===
+var canvas=document.getElementById('board');
+var ctx=canvas.getContext('2d');
+
+function draw(){
+  ctx.fillStyle='#17202B';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  
+  // Draw board background
+  ctx.fillStyle='#242321';
+  ctx.fillRect(OFFX-CELL/2, OFFY-CELL/2, BOARD_SIZE*CELL, BOARD_SIZE*CELL);
+  
+  // Draw home areas (4 corners)
+  var homeAreas=[
+    {c:0,r:0,w:6,h:6,color:COLORS[0]},   // red top-left
+    {c:9,r:0,w:6,h:6,color:COLORS[1]},   // green top-right
+    {c:9,r:9,w:6,h:6,color:COLORS[2]},   // yellow bottom-right
+    {c:0,r:9,w:6,h:6,color:COLORS[3]}    // blue bottom-left
+  ];
+  
+  for(var i=0;i<homeAreas.length;i++){
+    var ha=homeAreas[i];
+    var x=OFFX+ha.c*CELL;
+    var y=OFFY+ha.r*CELL;
+    // Fill home area with color
+    ctx.fillStyle=ha.color.hex;
+    ctx.fillRect(x,y,ha.w*CELL,ha.h*CELL);
+    // Inner area
+    ctx.fillStyle='#242321';
+    var pad=CELL*0.3;
+    ctx.fillRect(x+pad,y+pad,ha.w*CELL-pad*2,ha.h*CELL-pad*2);
+    // Draw home circles
+    for(var j=0;j<4;j++){
+      var hy=HOME_YARDS[ha.color.name][j];
+      var hx=OFFX+hy[0]*CELL+CELL/2;
+      var hy2=OFFY+hy[1]*CELL+CELL/2;
+      ctx.fillStyle=ha.color.hex;
+      ctx.beginPath();
+      ctx.arc(hx,hy2,CELL*0.32,0,Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle='#D6C29A';
+      ctx.lineWidth=1.5;
+      ctx.stroke();
+    }
+  }
+  
+  // Draw path cells
+  for(var p=0;p<PATH.length;p++){
+    var pos=PATH[p];
+    var px=OFFX+pos[0]*CELL;
+    var py=OFFY+pos[1]*CELL;
+    
+    // Check if it's a colored start cell
+    var startColor=null;
+    for(var ci=0;ci<4;ci++){
+      if(COLORS[ci].star===p){ startColor=COLORS[ci]; break; }
+    }
+    
+    if(startColor){
+      ctx.fillStyle=startColor.hex;
+    } else {
+      ctx.fillStyle='#2d2a26';
+    }
+    ctx.fillRect(px+2,py+2,CELL-4,CELL-4);
+    ctx.strokeStyle='#5B5C57';
+    ctx.lineWidth=1;
+    ctx.strokeRect(px+2,py+2,CELL-4,CELL-4);
+    
+    // Draw star on safe squares
+    var safeSquares=[0,8,13,21,26,34,39,47];
+    if(safeSquares.indexOf(p)!==-1){
+      ctx.fillStyle='#B18A45';
+      ctx.font='16px serif';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText('★', px+CELL/2, py+CELL/2);
+    }
+  }
+  
+  // Draw home stretches
+  var colorNames=['red','green','yellow','blue'];
+  for(var ci2=0;ci2<4;ci2++){
+    var cn=colorNames[ci2];
+    var stretch=HOME_STRETCHES[cn];
+    for(var s=0;s<6;s++){
+      var sp=stretch[s];
+      var sx=OFFX+sp[0]*CELL;
+      var sy=OFFY+sp[1]*CELL;
+      ctx.fillStyle=COLORS[ci2].hex;
+      ctx.fillRect(sx+2,sy+2,CELL-4,CELL-4);
+      ctx.strokeStyle='#5B5C57';
+      ctx.lineWidth=1;
+      ctx.strokeRect(sx+2,sy+2,CELL-4,CELL-4);
+    }
+  }
+  
+  // Draw center
+  var cx=OFFX+7*CELL;
+  var cy=OFFY+7*CELL;
+  ctx.fillStyle='#B18A45';
+  ctx.beginPath();
+  ctx.moveTo(cx,cy-CELL);
+  ctx.lineTo(cx+CELL,cy);
+  ctx.lineTo(cx,cy+CELL);
+  ctx.lineTo(cx-CELL,cy);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle='#D6C29A';
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+  
+  // Draw pieces
+  for(var pi=0;pi<players.length;pi++){
+    var player=players[pi];
+    for(var pj=0;pj<player.pieces.length;pj++){
+      var piece=player.pieces[pj];
+      var pos2=getPiecePixelPos(player,piece);
+      var r=CELL*0.3;
+      
+      // Shadow
+      ctx.fillStyle='rgba(0,0,0,0.3)';
+      ctx.beginPath();
+      ctx.arc(pos2[0]+2,pos2[1]+2,r,0,Math.PI*2);
+      ctx.fill();
+      
+      // Piece body
+      ctx.fillStyle=player.color.hex;
+      ctx.beginPath();
+      ctx.arc(pos2[0],pos2[1],r,0,Math.PI*2);
+      ctx.fill();
+      
+      // Highlight if movable
+      var isMovable=movablePieces.indexOf(pj)!==-1 && pi===currentPlayer && diceRolled;
+      if(isMovable){
+        ctx.strokeStyle='#D6C29A';
+        ctx.lineWidth=3;
+        ctx.beginPath();
+        ctx.arc(pos2[0],pos2[1],r+3,0,Math.PI*2);
+        ctx.stroke();
+      } else {
+        ctx.strokeStyle='#D6C29A';
+        ctx.lineWidth=1.5;
+        ctx.beginPath();
+        ctx.arc(pos2[0],pos2[1],r,0,Math.PI*2);
+        ctx.stroke();
+      }
+      
+      // Inner circle
+      ctx.fillStyle=player.color.light;
+      ctx.beginPath();
+      ctx.arc(pos2[0],pos2[1],r*0.5,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+  
+  // Draw dice value area on center if rolled
+  if(diceRolled && diceValue>0){
+    drawDice(cx, cy, diceValue);
+  }
+}
+
+function drawDice(cx, cy, val){
+  var size=CELL*0.8;
+  var x=cx-size/2;
+  var y=cy-size/2;
+  
+  // Dice background
+  ctx.fillStyle='#D6C29A';
+  ctx.fillRect(x,y,size,size);
+  ctx.strokeStyle='#242321';
+  ctx.lineWidth=2;
+  ctx.strokeRect(x,y,size,size);
+  
+  // Draw dots
+  ctx.fillStyle='#242321';
+  var dotR=size*0.08;
+  var positions={
+    1:[[0.5,0.5]],
+    2:[[0.25,0.25],[0.75,0.75]],
+    3:[[0.25,0.25],[0.5,0.5],[0.75,0.75]],
+    4:[[0.25,0.25],[0.75,0.25],[0.25,0.75],[0.75,0.75]],
+    5:[[0.25,0.25],[0.75,0.25],[0.5,0.5],[0.25,0.75],[0.75,0.75]],
+    6:[[0.25,0.3],[0.75,0.3],[0.25,0.5],[0.75,0.5],[0.25,0.7],[0.75,0.7]]
+  };
+  var dots=positions[val]||[];
+  for(var i=0;i<dots.length;i++){
+    ctx.beginPath();
+    ctx.arc(x+dots[i][0]*size, y+dots[i][1]*size, dotR, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+// === Input handling ===
+canvas.addEventListener('click', function(e){
+  if(state!=='PLAYING' || !diceRolled || animating) return;
+  if(players[currentPlayer].isAI) return;
+  if(movablePieces.length===0) return;
+  
+  var rect=canvas.getBoundingClientRect();
+  var scale=canvas.width/rect.width;
+  var mx=(e.clientX-rect.left)*scale;
+  var my=(e.clientY-rect.top)*scale;
+  
+  var player=players[currentPlayer];
+  var clickedPiece=-1;
+  var minDist=CELL*0.5;
+  
+  for(var i=0;i<player.pieces.length;i++){
+    var piece=player.pieces[i];
+    if(movablePieces.indexOf(i)===-1) continue;
+    var pos=getPiecePixelPos(player,piece);
+    var dx=mx-pos[0];
+    var dy=my-pos[1];
+    var dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<minDist){
+      minDist=dist;
+      clickedPiece=i;
+    }
+  }
+  
+  if(clickedPiece>=0){
+    movePiece(currentPlayer, clickedPiece);
+  }
+});
+
+document.getElementById('dice-btn').addEventListener('click', rollDice);
+document.getElementById('restart-btn').addEventListener('click', function(){
+  state='IDLE';
+  document.getElementById('overlay').style.display='flex';
+  document.getElementById('ov-title').textContent=t('title');
+  document.getElementById('ov-desc').textContent=t('desc');
+  document.getElementById('mode-btns').style.display='flex';
+  document.getElementById('restart-btn').style.display='none';
+  document.getElementById('dice-btn').disabled=true;
+  document.getElementById('dice-btn').textContent='?';
+});
+
+// Mode buttons
+var modeBtns=document.querySelectorAll('.mode-btn');
+for(var i=0;i<modeBtns.length;i++){
+  modeBtns[i].addEventListener('click', function(){
+    initGame(this.getAttribute('data-mode'));
+  });
+}
+
+// === HUD ===
+function updateHUD(){
+  if(state!=='PLAYING') return;
+  var player=players[currentPlayer];
+  var dot=document.getElementById('p-dot');
+  dot.style.background=player.color.hex;
+  document.getElementById('turn-name').textContent=t(PLAYER_NAMES[player.color.name]);
+  document.getElementById('dice-btn').disabled=diceRolled || player.isAI;
+}
+
+function setMessage(msg){
+  document.getElementById('msg').textContent=msg;
+}
+
+function showWin(){
+  var overlay=document.getElementById('overlay');
+  overlay.style.display='flex';
+  document.getElementById('ov-title').textContent=players[winner].color.name==='red'?t('redPlayer'):
+    players[winner].color.name==='green'?t('greenPlayer'):
+    players[winner].color.name==='yellow'?t('yellowPlayer'):t('bluePlayer');
+  document.getElementById('ov-title').textContent+=' '+t('winPrefix');
+  document.getElementById('ov-desc').textContent='';
+  document.getElementById('mode-btns').style.display='flex';
+  document.getElementById('restart-btn').style.display='none';
+}
+
+// Apply language
+function applyLang(){
+  document.getElementById('ov-title').textContent=t('title');
+  document.getElementById('ov-desc').textContent=t('desc');
+  var btns=document.querySelectorAll('.mode-btn');
+  var modes={'2p':'mode2p','3p':'mode3p','4p':'mode4p','1ai':'mode1ai','2ai':'mode2ai'};
+  for(var i=0;i<btns.length;i++){
+    btns[i].textContent=t(modes[btns[i].getAttribute('data-mode')]);
+  }
+  updateHUD();
+}
+
+applyLang();
+draw();
+
+})();
+</script>
+</body>
+</html>
