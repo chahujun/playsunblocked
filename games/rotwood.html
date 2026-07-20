@@ -326,13 +326,11 @@ const WEAPONS={
   shotgun2:  {melee:0,dmg:20,rate:0.7,ammo:'shell',mag:8,reload:2.0,spread:0.09,pellets:8,range:24,noise:28,n:['自动霰弹枪','Auto Shotgun']}
 };
 const CLASSES={
-  assault:{nameZh:'突击兵',nameEn:'Assault',hp:120,speed:4.2,dmgMult:1.1,startW:'pistol',startItems:{'ammo9':30,'can':2,'water':2,'bandage':2},skill:{nameZh:'手雷',nameEn:'Grenade',cd:8,descZh:'投掷手雷，范围爆炸',descEn:'Throw grenade, AoE explosion'},color:0xDD4422},
-  medic:{nameZh:'医护兵',nameEn:'Medic',hp:100,speed:4.0,dmgMult:1.0,startW:'pistol',startItems:{'ammo9':20,'medkit':2,'bandage':3,'water':2},skill:{nameZh:'治疗',nameEn:'Heal',cd:12,descZh:'瞬间恢复40HP',descEn:'Instant heal 40HP'},color:0x44FF66},
-  engineer:{nameZh:'工程兵',nameEn:'Engineer',hp:110,speed:3.8,dmgMult:1.0,startW:'smg',startItems:{'ammo9':40,'wood':10,'nails':10,'barricade':3},skill:{nameZh:'炮台',nameEn:'Turret',cd:15,descZh:'部署自动炮台30秒',descEn:'Deploy auto-turret 30s'},color:0x44AAFF},
-  scout:{nameZh:'侦察兵',nameEn:'Scout',hp:90,speed:5.0,dmgMult:1.15,startW:'pistol',startItems:{'ammo9':20,'cloth':3,'bottle':2,'water':1},skill:{nameZh:'隐身',nameEn:'Cloak',cd:10,descZh:'隐身4秒',descEn:'Invisible 4s'},color:0xAA88FF},
-  heavy:{nameZh:'重装机兵',nameEn:'Heavy',hp:150,speed:3.2,dmgMult:0.9,startW:'shotgun',startItems:{'shell':12,'fuel':2,'can':2,'bandage':1},skill:{nameZh:'护盾',nameEn:'Shield',cd:14,descZh:'获得80护盾',descEn:'Gain 80 shield'},color:0xFFAA44},
-  sniper:{nameZh:'狙击手',nameEn:'Sniper',hp:85,speed:4.0,dmgMult:1.3,startW:'rifle',startItems:{'ammo762':10,'water':1,'bandage':1,'cloth':2},skill:{nameZh:'空袭',nameEn:'Airstrike',cd:20,descZh:'呼叫空中打击',descEn:'Call airstrike'},color:0xFFFFAA},
-  berserker:{nameZh:'狂战士',nameEn:'Berserker',hp:130,speed:4.5,dmgMult:1.2,startW:'axe',startItems:{'can':2,'water':2,'bandage':2,'wood':5},skill:{nameZh:'狂暴',nameEn:'Frenzy',cd:12,descZh:'8秒伤害+50%攻速+50%',descEn:'8s dmg+50% AS+50%'},color:0xFF0044}
+  doctor:{nameZh:'医生',nameEn:'Doctor',hp:90,speed:4.0,dmgMult:0.9,startW:'pistol',startItems:{'ammo9':20,'medkit':3,'bandage':4,'water':2,'can':1},skill:{nameZh:'紧急治疗',nameEn:'Emergency Heal',cd:10,descZh:'瞬间恢复60HP+清除感染',descEn:'Instant heal 60HP + cure infection'},color:0x44FF66},
+  police:{nameZh:'警察',nameEn:'Police',hp:110,speed:4.2,dmgMult:1.1,startW:'pistol',startItems:{'ammo9':40,'bandage':2,'water':1,'barricade':1,'can':1},skill:{nameZh:'呼叫支援',nameEn:'Call Backup',cd:15,descZh:'呼叫空投补给',descEn:'Call supply airdrop'},color:0x4488FF},
+  firefighter:{nameZh:'消防员',nameEn:'Firefighter',hp:140,speed:3.6,dmgMult:0.95,startW:'axe',startItems:{'bandage':3,'water':3,'can':2,'barricade':2,'cloth':2},skill:{nameZh:'火焰冲锋',nameEn:'Fire Charge',cd:12,descZh:'向前冲刺+范围火焰伤害',descEn:'Dash forward + fire damage'},color:0xFF6600},
+  clerk:{nameZh:'职员',nameEn:'Clerk',hp:80,speed:4.5,dmgMult:1.0,startW:'pistol',startItems:{'ammo9':16,'water':2,'can':2,'cloth':2,'nails':5},skill:{nameZh:'背包整理',nameEn:'Pack Mule',cd:8,descZh:'瞬间补满当前武器弹药',descEn:'Instant reload all ammo'},color:0x88DDAA},
+  civilian:{nameZh:'普通人',nameEn:'Civilian',hp:100,speed:4.0,dmgMult:1.0,startW:'bat',startItems:{'can':3,'water':2,'bandage':2,'cloth':1,'wood':3},skill:{nameZh:'求生本能',nameEn:'Survival Instinct',cd:14,descZh:'5秒内移速+50%伤害+30%',descEn:'5s speed+50% dmg+30%'},color:0xDDDDDD}
 };
 const ITEMS={
  can:      {n:['罐头','Canned Food'],use:'food',v:38,stack:5,tip:['恢复 38 点饱食。','Restores 38 food.']},
@@ -1891,6 +1889,13 @@ function playerAnim(dt){
   }
   else if(P.moving){ pa.rArm.rotation.x=-Math.sin(ph)*0.55; pa.lArm.rotation.x=Math.sin(ph)*0.55; }
   else { pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,0,dt*8); pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,0,dt*8); }
+  // 装备切换动画：快速下垂再抬起
+  if(P.equipT>0){
+    const f=P.equipT/0.25;
+    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-1.8,f);
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-1.8,f);
+    P.equipT-=dt;
+  }
   // 武器持握动画细节：持枪时双臂略微内收，提升观感
   if(!swinging&&P.rollT<=0){
     if(w&&!w.melee){
@@ -1907,6 +1912,16 @@ function playerAnim(dt){
   if(!P.moving&&P.rollT<=0&&!swinging){
     b.rotation.y=lerp(b.rotation.y,0,dt*6);
   }
+  // 头部微转动（看向瞄准方向）
+  if(pa.head){
+    if(!P.moving&&P.rollT<=0){
+      pa.head.rotation.y=lerp(pa.head.rotation.y||0,Math.sin(P.dir)*0.15,dt*4);
+    }
+  }
+  // 呼吸效果
+  if(!P.moving&&P.rollT<=0&&!swinging){
+    b.position.y=bobY-crouch+Math.sin(G.time*1.8)*0.015;
+  }
 }
 function meleeAnim(kind){
   const f=1-P.swingT/P.swingMax, pa=P.parts, b=pa.body;
@@ -1916,6 +1931,8 @@ function meleeAnim(kind){
     else if(f<0.6){ const t=(f-0.35)/0.25; a.x=-1.6; b.rotation.y=lerp(-0.7,0.9,t); }
     else { const t=(f-0.6)/0.4; a.x=lerp(-1.6,-0.4,t); b.rotation.y=lerp(0.9,0,t); }
     pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.6,0.3);
+    // 蓄力时身体微蹲（b.position.y 已由 playerAnim 设为 bobY-crouch）
+    if(f<0.35){ b.position.y=b.position.y*0.7-0.05; }
   } else if(kind==='chop'){
     if(f<0.35){ a.x=lerp(-0.4,-2.7,f/0.35); }
     else if(f<0.6){ a.x=lerp(-2.7,-0.7,(f-0.35)/0.25); }
@@ -2031,20 +2048,32 @@ function spawnInitialLoot(){
 let tipX=0, tipY=0;
 $('scaler').addEventListener('mousemove',e=>{
   const r=$('scaler').getBoundingClientRect();
-  tipX=(e.clientX-r.left)/r.width*1280;
-  tipY=(e.clientY-r.top)/r.height*720;
+  // 使用scaler的实际显示尺寸计算tooltip位置
+  tipX=e.clientX-r.left;
+  tipY=e.clientY-r.top;
   const tip=$('tip');
   if(!tip.classList.contains('hidden')){
-    tip.style.left=Math.min(tipX+16,1280-250)+'px';
-    tip.style.top=Math.min(tipY+14,720-90)+'px';
+    // 智能定位：避免超出右边界和下边界
+    const tw=tip.offsetWidth||200, th=tip.offsetHeight||60;
+    let tx=tipX+16, ty=tipY+14;
+    if(tx+tw>r.width) tx=tipX-tw-8;
+    if(ty+th>r.height) ty=tipY-th-8;
+    tip.style.left=Math.max(4,tx)+'px';
+    tip.style.top=Math.max(4,ty)+'px';
   }
 });
 function showTip(id){
   const tip=$('tip');
   tip.innerHTML='<span class="tn">'+itemName(id)+'</span>'+itemTip(id);
-  tip.style.left=Math.min(tipX+16,1280-250)+'px';
-  tip.style.top=Math.min(tipY+14,720-90)+'px';
+  // 先显示再定位（确保offsetWidth正确）
   tip.classList.remove('hidden');
+  const r=$('scaler').getBoundingClientRect();
+  const tw=tip.offsetWidth||200, th=tip.offsetHeight||60;
+  let tx=tipX+16, ty=tipY+14;
+  if(tx+tw>r.width) tx=tipX-tw-8;
+  if(ty+th>r.height) ty=tipY-th-8;
+  tip.style.left=Math.max(4,tx)+'px';
+  tip.style.top=Math.max(4,ty)+'px';
 }
 function hideTip(){ $('tip').classList.add('hidden'); }
 function bindTip(el,id){ el.addEventListener('mouseenter',()=>showTip(id)); el.addEventListener('mouseleave',hideTip); }
@@ -2483,6 +2512,8 @@ function attackOnce(){
 }
 function equipHot(i){
   const s=P.hot[i]; if(!s) { P.hsel=i; refreshHud(); return; }
+  // 切换动画：短暂的下垂
+  if(P.hsel!==i){ P.equipT=0.25; }
   P.hsel=i;
   const it=ITEMS[s.id];
   if(it.weapon){
@@ -2596,7 +2627,7 @@ const IC={
 function icon(k){ return '<svg class="ico" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#242321" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(IC[k]||IC.can)+'</svg>'; }
 
 /* ================= game flow ================= */
-let selectedClass='assault';
+let selectedClass='civilian';
 function buildClassSelect(){
   const cs=$('classSelect'); if(!cs) return;
   cs.innerHTML='';
@@ -2604,7 +2635,7 @@ function buildClassSelect(){
     const c=CLASSES[id];
     const el=document.createElement('div');
     el.style.cssText='padding:8px 12px;border:2px solid #555;border-radius:8px;cursor:pointer;background:#222;color:#eee;font-size:12px;min-width:80px;text-align:center;transition:all .2s';
-    const emoji=(c.hp>120?'🛡':(c.speed>4.5?'🏃':(c.dmgMult>1.2?'⚔':'📦')));
+    const emoji=id==='doctor'?'⚕️':(id==='police'?'👮':(id==='firefighter'?'🚒':(id==='clerk'?'💼':'👤')));
     el.innerHTML='<div style="font-size:18px">'+emoji+'</div><div>'+(T(c.nameZh,c.nameEn))+'</div>';
     el.onclick=()=>{ selectedClass=id; buildClassSelect(); AU.ui(); };
     if(selectedClass===id){ el.style.borderColor='#FFD700'; el.style.background='#333'; }
@@ -2619,49 +2650,50 @@ function useClassSkill(){
   const cls=CLASSES[P.classId]; if(!cls) return;
   P.skillCd=cls.skill.cd;
   switch(P.classId){
-    case 'assault':
-      // 手雷：在瞄准方向投掷爆炸
-      { const tx=P.x+P.aimX*8, tz=P.z+P.aimZ*8;
-        for(const z of zombies){ if(z.dead) continue;
-          const d=Math.hypot(z.x-tx,z.z-tz);
-          if(d<4){ hitZombie(z,80,tx,tz,0.8); } }
-        showRing(tx,tz,4,0xFF6600,0.4,null);
-        bloodBurst(tx,1,tz,15,0xFF6600);
-        G.shake=0.4; AU.explode(); }
-      break;
-    case 'medic':
-      P.hp=Math.min(P.maxHp||100,P.hp+40);
-      bloodBurst(P.x,1,P.z,12,0x44FF66);
+    case 'doctor':
+      // 紧急治疗：回60HP+清除感染
+      P.hp=Math.min(P.maxHp||100,P.hp+60);
+      P.inf=Math.max(0,P.inf-50);
+      bloodBurst(P.x,1,P.z,15,0x44FF66);
       AU.eat();
       break;
-    case 'engineer':
-      // 部署临时炮台
-      { const tx2=P.x+P.aimX*3, tz2=P.z+P.aimZ*3;
-        if(!P.turrets) P.turrets=[];
-        const tmesh=bx(0.6,0.8,0.6,0x44AAFF,tx2,0.4,tz2,scene);
-        P.turrets.push({x:tx2,z:tz2,life:30,cd:0,dmg:15,mesh:tmesh});
-        showRing(tx2,tz2,1.5,0x44AAFF,0.3,null); }
+    case 'police':
+      // 呼叫支援：在玩家附近空投补给
+      { const dx=R(-3,3), dz=R(-3,3);
+        G.supply={x:P.x+dx,z:P.z+dz,t:8};
+        showRing(P.x+dx,P.z+dz,3,0x4488FF,0.5,null);
+        bloodBurst(P.x+dx,1,P.z+dz,10,0x4488FF);
+        AU.ui(); }
       break;
-    case 'scout':
-      P.cloakT=4; P.invulnT=4;
-      bloodBurst(P.x,1,P.z,8,0xAA88FF);
+    case 'firefighter':
+      // 火焰冲锋：向前冲刺+范围火焰伤害
+      { const tx=P.x+P.aimX*6, tz=P.z+P.aimZ*6;
+        P.x=tx; P.z=tz; P.invulnT=0.5;
+        for(const z of zombies){ if(z.dead) continue;
+          const d=Math.hypot(z.x-tx,z.z-tz);
+          if(d<4){ hitZombie(z,60,tx,tz,1.0);
+            // 点燃
+            z.burnT=4; z.burnDmg=8; } }
+        showRing(tx,tz,4,0xFF6600,0.4,null);
+        bloodBurst(tx,1,tz,20,0xFF6600);
+        G.shake=0.5; AU.explode();
+        resolveCollision(P,0.35); }
       break;
-    case 'heavy':
-      P.shield=80;
-      bloodBurst(P.x,1,P.z,10,0xFFAA44);
+    case 'clerk':
+      // 背包整理：补满当前武器弹药
+      { const w=WEAPONS[P.weapon];
+        if(w&&!w.melee&&w.ammo){
+          P.mags[P.weapon]=w.mag;
+          // 也给一些备弹
+          addInv(w.ammo,20);
+        }
+        bloodBurst(P.x,1,P.z,8,0x88DDAA);
+        AU.ui(); }
       break;
-    case 'sniper':
-      // 空袭：在玩家周围范围伤害
-      for(const z of zombies){ if(z.dead) continue;
-        const d=Math.hypot(z.x-P.x,z.z-P.z);
-        if(d<12){ hitZombie(z,100,P.x,P.z,0.5); } }
-      showRing(P.x,P.z,12,0xFFFFAA,0.6,null);
-      bloodBurst(P.x,1,P.z,20,0xFFFFAA);
-      G.shake=0.6; AU.explode();
-      break;
-    case 'berserker':
-      P.frenzyT=8;
-      bloodBurst(P.x,1,P.z,10,0xFF0044);
+    case 'civilian':
+      // 求生本能：5秒移速+50%伤害+30%
+      P.frenzyT=5;
+      bloodBurst(P.x,1,P.z,10,0xDDDDDD);
       break;
   }
   refreshHud();
@@ -2696,7 +2728,7 @@ function newGame(from){
   $('banner').style.opacity=0;
   Object.assign(P,{x:0,z:6,hp:100,hunger:100,thirst:100,stam:100,inf:0,dir:0,grabT:0,
     atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
-    rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,weapon:'fists',lastWpn:null,deadAnim:0,
+    rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,weapon:'fists',lastWpn:null,deadAnim:0,equipT:0,
     mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},hsel:0});
   P.inv=new Array(8).fill(null);
   P.hot=[{id:'fists',q:1},null,null,null];
