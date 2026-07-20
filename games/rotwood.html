@@ -741,7 +741,7 @@ const P={ x:0,z:6, hp:100,maxHp:100,hunger:100,thirst:100,stam:100,inf:0,
   reloadT:0, reloadMax:1, stepT:0, hurtT:0, crouchT:0, recoilT:0, mzT:0,
   rollT:0, rollCd:0, invulnT:0, rollDx:0, rollDz:1, kbx:0, kbz:0,
   weapon:'fists', lastWpn:null, mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},
-  inv:new Array(8).fill(null), hot:[null,null,null,{id:'fists',q:1}], hsel:3,
+  inv:new Array(12).fill(null), hot:[null,null,null,{id:'fists',q:1}], hsel:3,
   aimX:0, aimZ:1, mesh:null, parts:{}, wmesh:null, deadAnim:0,
   dmgMult:1, classId:'civilian', classColor:0xDDDDDD, skillCd:0, skillName:null,
   cloakT:0, frenzyT:0, shield:0, turrets:null };
@@ -966,13 +966,14 @@ function hitZombie(zb,dmg,fx,fz,kb,crit){
 
 function enterChase(zb){
   zb.state='chase'; zb.loseT=0;
-  // pack aggro share
+  // pack aggro share（扩大群体追击范围）
   for(const o of zombies){ if(o===zb||o.dead) continue;
     if(o.state==='idle'||o.state==='investigate'){
-      if(Math.hypot(o.x-zb.x,o.z-zb.z)<3){ o.state='chase'; o.loseT=0; o.lastX=P.x; o.lastZ=P.z; }
-    } }
+      if(Math.hypot(o.x-zb.x,o.z-zb.z)<8){ o.state='chase'; o.loseT=0; o.lastX=P.x; o.lastZ=P.z; }
+    }
+  }
   if(zb.c.scream&&!zb.screamed){ zb.screamed=1; AU.groan(2);
-    for(const o of zombies){ if(!o.dead&&(o.state==='idle'||o.state==='investigate')&&Math.hypot(o.x-zb.x,o.z-zb.z)<24){ o.state='chase'; o.loseT=0; } }
+    for(const o of zombies){ if(!o.dead&&(o.state==='idle'||o.state==='investigate')&&Math.hypot(o.x-zb.x,o.z-zb.z)<30){ o.state='chase'; o.loseT=0; } }
   }
 }
 
@@ -1047,15 +1048,18 @@ function zombieAI(zb,dt,idx){
   const dist=Math.hypot(dx,dz);
 
   /* ---- senses ---- */
-  const baseR=zb.c.scream?20:16;
+  // 全图追击：僵尸一旦发现玩家就永远追击，感知范围大幅增加
+  const baseR=zb.c.scream?28:22;
   let see=false;
   if(P.hp>0){
     if(night){ see=dist<baseR*1.5; }
-    else if(dist<4) see=true;
+    else if(dist<6) see=true;
     else if(dist<baseR){
       const fx=Math.sin(zb.dir), fz=Math.cos(zb.dir);
-      see=((dx*fx+dz*fz)/(dist||1))>0.5; // 120 deg cone
+      see=((dx*fx+dz*fz)/(dist||1))>0.3; // 150 deg cone（更宽视野）
     }
+    // 远距离也能听到枪声/脚步（只要不太远就有感知）
+    if(!see&&dist<40&&(P.moving||P.atkCd>0.3)) see=true;
   }
   // 侦察兵隐身：僵尸看不到玩家
   if(P.cloakT>0) see=false;
@@ -1063,13 +1067,11 @@ function zombieAI(zb,dt,idx){
     if(zb.state!=='chase'&&zb.state!=='attack') enterChase(zb);
     zb.lastX=P.x; zb.lastZ=P.z; zb.loseT=0;
   } else if(zb.state==='chase'||zb.state==='attack'){
+    // 僵尸永不放弃追击，持续向玩家最后已知位置移动
     zb.loseT+=dt;
-    if(zb.loseT>4){
-      // 不回到idle，继续追击玩家的最后已知位置
-      zb.tx=P.x; zb.tz=P.z;
-      // 如果距离太远，直接朝玩家方向移动
-      if(dist>30){ const sp=zb.spd*(night?1.28:1); zb.x+=dx/dist*sp*dt*0.5; zb.z+=dz/dist*sp*dt*0.5; }
-    }
+    zb.tx=P.x; zb.tz=P.z; // 持续更新目标为玩家当前位置
+    // 远距离加速冲刺追击
+    if(dist>25){ const sp=zb.spd*(night?1.4:1.2); zb.x+=dx/dist*sp*dt*0.7; zb.z+=dz/dist*sp*dt*0.7; }
   }
   // hearing
   if(zb.state==='idle'||zb.state==='investigate'){
@@ -2069,20 +2071,27 @@ function addInv(id,q){
   const stack=it.stack||10; q=q||1;
   if(WEAPONS[id]&&WEAPONS[id].dur!==undefined&&WEAPONS[id].dur!==Infinity){
     // weapon: add with full durability, never stack
-    for(let i=0;i<8;i++) if(!P.inv[i]){ P.inv[i]={id,q:1,dur:WEAPONS[id].dur}; refreshHud(); return true; }
+    for(let i=0;i<12;i++) if(!P.inv[i]){ P.inv[i]={id,q:1,dur:WEAPONS[id].dur}; refreshHud(); return true; }
     return false;
   }
-  for(let i=0;i<8;i++){
+  for(let i=0;i<12;i++){
     const s=P.inv[i];
     if(s&&s.id===id&&s.q<stack){ const take=Math.min(q,stack-s.q); s.q+=take; q-=take;
       if(q<=0){ refreshHud(); return true; } }
   }
-  for(let i=0;i<8;i++) if(!P.inv[i]){ P.inv[i]={id,q}; refreshHud(); return true; }
+  for(let i=0;i<12;i++) if(!P.inv[i]){ P.inv[i]={id,q}; refreshHud(); return true; }
+  // 背包满：自动丢弃最低优先级的杂物腾出空间
+  const priority={water:1,food:1,can:1,bottle:1,bandage:2,medkit:3,scrap:4,nails:4,wood:4,cloth:4,fuel:4};
+  let lowestPri=99, lowestIdx=-1;
+  for(let i=0;i<12;i++){ const s=P.inv[i]; if(!s) continue;
+    const pri=priority[s.id]||5;
+    if(pri<lowestPri){ lowestPri=pri; lowestIdx=i; } }
+  if(lowestIdx>=0){ showMsg(T('丢弃 '+itemName(P.inv[lowestIdx].id)+' 腾出空间','Dropped '+itemName(P.inv[lowestIdx].id)+' to make room')); P.inv[lowestIdx]={id,q}; refreshHud(); return true; }
   return q<=0;
 }
 function invCount(id){ let n=0; for(const s of P.inv) if(s&&s.id===id) n+=s.q; return n; }
 function removeItem(id,n){
-  for(let i=0;i<8;i++){ const s=P.inv[i];
+  for(let i=0;i<12;i++){ const s=P.inv[i];
     if(s&&s.id===id){ const t=Math.min(n,s.q); s.q-=t; n-=t; if(s.q<=0) P.inv[i]=null; if(n<=0) break; } }
   refreshHud();
 }
@@ -2832,7 +2841,7 @@ function newGame(from){
     atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,weapon:'fists',lastWpn:null,deadAnim:0,equipT:0,
     mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},hsel:3});
-  P.inv=new Array(8).fill(null);
+  P.inv=new Array(12).fill(null);
   P.hot=[null,null,null,{id:'fists',q:1}];
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
   // 应用职业属性
@@ -2913,7 +2922,7 @@ function continueGame(){
   $('banner').style.opacity=0;
   Object.assign(P,{x:s.p.x,z:s.p.z,hp:s.p.hp,hunger:s.p.hu,thirst:s.p.th,stam:s.p.st,inf:s.p.inf,
     weapon:s.p.weapon||'fists',hsel:s.p.hsel||0,mags:Object.assign({pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},s.p.mags||{}),
-    inv:s.p.inv||new Array(8).fill(null),hot:s.p.hot||[null,null,null,{id:'fists',q:1}],
+    inv:s.p.inv||new Array(12).fill(null),hot:s.p.hot||[null,null,null,{id:'fists',q:1}],
     dir:0,grabT:0,atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,lastWpn:null,deadAnim:0});
   // 恢复职业属性
