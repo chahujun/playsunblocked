@@ -1802,7 +1802,7 @@ function doRoll(){
   if(P.stam<25){ showMsg(T('体力不足，无法翻滚！','Too tired to roll!')); return; }
   let dx=0,dz=0;
   if(keys.a||keys.ArrowLeft) dx-=1; if(keys.d||keys.ArrowRight) dx+=1;
-  if(keys.w||keys.ArrowUp) dz-=1; if(keys.s||keys.ArrowDown) dz+=1;
+  if(keys.w||keys.ArrowUp) dz+=1; if(keys.s||keys.ArrowDown) dz-=1;
   if(touchActive){ dx=touchDx; dz=touchDy; }
   let len=Math.hypot(dx,dz);
   if(len<0.2){ dx=P.aimX; dz=P.aimZ; len=Math.hypot(dx,dz)||1; }
@@ -1872,7 +1872,7 @@ function updatePlayer(dt){
   } else {
     let ix=0, iz=0;
     if(keys.a||keys.ArrowLeft) ix-=1; if(keys.d||keys.ArrowRight) ix+=1;
-    if(keys.w||keys.ArrowUp) iz-=1; if(keys.s||keys.ArrowDown) iz+=1;
+    if(keys.w||keys.ArrowUp) iz+=1; if(keys.s||keys.ArrowDown) iz-=1;
     if(touchActive){ ix=touchDx; iz=touchDy; }
     const len=Math.hypot(ix,iz);
     if(len>0.2){
@@ -1934,25 +1934,52 @@ function playerAnim(dt){
   else if(P.moving){ pa.lLeg.rotation.x=Math.sin(ph)*0.75; pa.rLeg.rotation.x=-Math.sin(ph)*0.75; }
   else { pa.lLeg.rotation.x=lerp(pa.lLeg.rotation.x,0,dt*8); pa.rLeg.rotation.x=lerp(pa.rLeg.rotation.x,0,dt*8); }
   // arms
-  if(P.rollT>0){ pa.rArm.rotation.x=1.0; pa.lArm.rotation.x=1.0; }
+  const aimDir = P.dir;
+  if(P.rollT>0){
+    // 翻滚时双臂前伸
+    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,1.2,dt*15);
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,1.2,dt*15);
+  }
   else if(swinging){ meleeAnim(w.anim); }
   else if(w&&!w.melee){
-    const rec=P.recoilT>0?0.3:0;
+    // 持枪姿势：双臂前伸略向下，模拟双手握枪
+    const rec=P.recoilT>0?0.4:0;
+    const aimNoise=Math.sin(G.time*3)*0.02; // 微小晃动模拟呼吸
     if(P.reloadT>0){
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.25+Math.sin(G.time*8)*0.12,dt*10);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.25+Math.sin(G.time*8+1)*0.12,dt*10);
+      // 换弹：双手下沉+左右摆动
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.4+Math.sin(G.time*10)*0.15,dt*12);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.5+Math.sin(G.time*10+0.5)*0.15,dt*12);
+      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0.2,dt*10);
+      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,-0.2,dt*10);
     } else {
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-1.5+rec,dt*14);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-1.35+rec,dt*14);
+      // 持枪瞄准：右臂前伸略低，左臂托枪身
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.9+rec+aimNoise,dt*18);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.75+rec*0.6+aimNoise,dt*18);
+      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,-0.12,dt*10);
+      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0.18,dt*10);
     }
   }
-  else if(P.moving){ pa.rArm.rotation.x=-Math.sin(ph)*0.55; pa.lArm.rotation.x=Math.sin(ph)*0.55; }
-  else { pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,0,dt*8); pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,0,dt*8); }
-  // 装备切换动画：快速下垂再抬起
+  else if(P.moving){
+    // 徒手移动：手臂自然摆动
+    const swingAmt=P.sprint?0.7:0.45;
+    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-Math.sin(ph)*swingAmt,dt*15);
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,Math.sin(ph)*swingAmt,dt*15);
+    pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0,dt*8);
+    pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0,dt*8);
+  }
+  else {
+    // 站立：手臂自然下垂
+    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.05,dt*8);
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.05,dt*8);
+    pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0,dt*8);
+    pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0,dt*8);
+  }
+  // 装备切换动画：手臂快速下垂再抬起
   if(P.equipT>0){
     const f=P.equipT/0.25;
-    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-1.8,f);
-    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-1.8,f);
+    const dropAmt=-1.2*f;
+    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,dropAmt,dt*20);
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,dropAmt,dt*20);
     P.equipT-=dt;
   }
   // 武器持握动画细节：持枪时双臂略微内收，提升观感
@@ -1986,25 +2013,24 @@ function meleeAnim(kind){
   const f=1-P.swingT/P.swingMax, pa=P.parts, b=pa.body;
   const a=pa.rArm.rotation;
   if(kind==='sweep'){
-    if(f<0.35){ const t=f/0.35; a.x=lerp(-0.4,-1.6,t); b.rotation.y=lerp(0,-0.7,t); }
-    else if(f<0.6){ const t=(f-0.35)/0.25; a.x=-1.6; b.rotation.y=lerp(-0.7,0.9,t); }
-    else { const t=(f-0.6)/0.4; a.x=lerp(-1.6,-0.4,t); b.rotation.y=lerp(0.9,0,t); }
-    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.6,0.3);
+    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.3,-1.4,t*Math.PI/2); b.rotation.y=lerp(0,-0.5,t); pa.lArm.rotation.x=lerp(-0.3,-0.8,t); }
+    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(-1.4,-1.8,t*Math.PI/2); b.rotation.y=lerp(-0.5,0.8,t); pa.lArm.rotation.x=lerp(-0.8,-0.5,t); }
+    else { const t=(f-0.55)/0.45; a.x=lerp(-1.8,-0.3,t*t); b.rotation.y=lerp(0.8,0,t); pa.lArm.rotation.x=lerp(-0.5,-0.2,t); }
     // 蓄力时身体微蹲（b.position.y 已由 playerAnim 设为 bobY-crouch）
-    if(f<0.35){ b.position.y=b.position.y*0.7-0.05; }
+    if(f<0.3){ b.position.y=b.position.y*0.7-0.05; }
   } else if(kind==='chop'){
-    if(f<0.35){ a.x=lerp(-0.4,-2.7,f/0.35); }
-    else if(f<0.6){ a.x=lerp(-2.7,-0.7,(f-0.35)/0.25); }
-    else { a.x=lerp(-0.7,-0.3,(f-0.6)/0.4); }
-    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.5,0.3);
+    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.3,-2.5,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.3,-0.7,t); }
+    else if(f<0.5){ const t=(f-0.3)/0.2; a.x=lerp(-2.5,-2.7,t); pa.lArm.rotation.x=lerp(-0.7,-0.6,t); }
+    else { const t=(f-0.5)/0.5; a.x=lerp(-2.7,-0.3,t*t); pa.lArm.rotation.x=lerp(-0.6,-0.2,t); }
   } else if(kind==='bigswing'){
-    if(f<0.35){ const t=f/0.35; a.x=lerp(-0.4,-2.9,t); pa.lArm.rotation.x=lerp(-0.4,-2.9,t); b.rotation.y=lerp(0,-0.4,t); }
-    else if(f<0.65){ const t=(f-0.35)/0.3; a.x=lerp(-2.9,-0.5,t); pa.lArm.rotation.x=lerp(-2.9,-0.5,t); b.rotation.y=lerp(-0.4,0.5,t); }
-    else { const t=(f-0.65)/0.35; a.x=lerp(-0.5,-0.3,t); pa.lArm.rotation.x=lerp(-0.5,-0.3,t); b.rotation.y=lerp(0.5,0,t); }
+    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.3,-2.7,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.3,-2.7,t*Math.PI/2); b.rotation.y=lerp(0,-0.4,t); }
+    else if(f<0.6){ const t=(f-0.3)/0.3; a.x=lerp(-2.7,-0.5,t*Math.PI/2); pa.lArm.rotation.x=lerp(-2.7,-0.5,t*Math.PI/2); b.rotation.y=lerp(-0.4,0.5,t); }
+    else { const t=(f-0.6)/0.4; a.x=lerp(-0.5,-0.3,t*t); pa.lArm.rotation.x=lerp(-0.5,-0.3,t*t); b.rotation.y=lerp(0.5,0,t); }
   } else {
-    if(f<0.3) a.x=lerp(-0.3,-0.6,f/0.3);
-    else if(f<0.55) a.x=lerp(-0.6,-1.7,(f-0.3)/0.25);
-    else a.x=lerp(-1.7,-0.3,(f-0.55)/0.45);
+    if(f<0.3) { const t=f/0.3; a.x=lerp(-0.2,-0.5,t*Math.PI/2); }
+    else if(f<0.55) { const t=(f-0.3)/0.25; a.x=lerp(-0.5,-1.6,t*Math.PI/2); }
+    else { const t=(f-0.55)/0.45; a.x=lerp(-1.6,-0.2,t*t); }
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.3,0.2);
   }
 }
 
@@ -2803,10 +2829,6 @@ function newGame(from){
   P.skillName=cls.skill;
   P.cloakT=0; P.frenzyT=0; P.shield=0; P.turrets=null;
   // 初始武器加入快捷栏
-  P.hot[1]={id:cls.startW,q:1};
-  if(WEAPONS[cls.startW].dur!==undefined&&WEAPONS[cls.startW].dur!==Infinity){
-    P.hot[1].dur=WEAPONS[cls.startW].dur;
-  }
   P.weapon=cls.startW;
   P.hsel=0;
   P.hot[0]={id:cls.startW,q:1};
