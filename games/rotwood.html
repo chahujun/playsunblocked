@@ -169,6 +169,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
       <div id="relBar" class="hidden"><div id="relFill"></div></div>
     </div>
     <div id="hotbar"></div>
+    <div id="skillHud" style="position:absolute;bottom:80px;left:50%;transform:translateX(-50%);display:flex;gap:8px;"></div>
     <div id="msgTxt"></div>
     <div id="sideBtns">
       <div class="sbtn" id="btnInv" title="I"></div>
@@ -196,6 +197,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
       <div id="title">ROTWOOD</div>
       <div id="subtitle"></div>
       <div class="mrow" id="diffRow"></div>
+      <div id="classSelect" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0;"></div>
       <div class="mrow">
         <span class="btn gold" id="btnNew" style="margin-right:10px"></span>
         <span class="btn iron hidden" id="btnCont"></span>
@@ -323,6 +325,15 @@ const WEAPONS={
   railgun:    {melee:0,dmg:120,rate:1.8,ammo:'ammo762',mag:5,reload:2.5,spread:0,range:50,noise:30,type:'rail',pierce:99,n:['轨道炮','Railgun']},
   shotgun2:  {melee:0,dmg:20,rate:0.7,ammo:'shell',mag:8,reload:2.0,spread:0.09,pellets:8,range:24,noise:28,n:['自动霰弹枪','Auto Shotgun']}
 };
+const CLASSES={
+  assault:{nameZh:'突击兵',nameEn:'Assault',hp:120,speed:4.2,dmgMult:1.1,startW:'pistol',startItems:{'ammo9':30,'can':2,'water':2,'bandage':2},skill:{nameZh:'手雷',nameEn:'Grenade',cd:8,descZh:'投掷手雷，范围爆炸',descEn:'Throw grenade, AoE explosion'},color:0xDD4422},
+  medic:{nameZh:'医护兵',nameEn:'Medic',hp:100,speed:4.0,dmgMult:1.0,startW:'pistol',startItems:{'ammo9':20,'medkit':2,'bandage':3,'water':2},skill:{nameZh:'治疗',nameEn:'Heal',cd:12,descZh:'瞬间恢复40HP',descEn:'Instant heal 40HP'},color:0x44FF66},
+  engineer:{nameZh:'工程兵',nameEn:'Engineer',hp:110,speed:3.8,dmgMult:1.0,startW:'smg',startItems:{'ammo9':40,'wood':10,'nails':10,'barricade':3},skill:{nameZh:'炮台',nameEn:'Turret',cd:15,descZh:'部署自动炮台30秒',descEn:'Deploy auto-turret 30s'},color:0x44AAFF},
+  scout:{nameZh:'侦察兵',nameEn:'Scout',hp:90,speed:5.0,dmgMult:1.15,startW:'pistol',startItems:{'ammo9':20,'cloth':3,'bottle':2,'water':1},skill:{nameZh:'隐身',nameEn:'Cloak',cd:10,descZh:'隐身4秒',descEn:'Invisible 4s'},color:0xAA88FF},
+  heavy:{nameZh:'重装机兵',nameEn:'Heavy',hp:150,speed:3.2,dmgMult:0.9,startW:'shotgun',startItems:{'shell':12,'fuel':2,'can':2,'bandage':1},skill:{nameZh:'护盾',nameEn:'Shield',cd:14,descZh:'获得80护盾',descEn:'Gain 80 shield'},color:0xFFAA44},
+  sniper:{nameZh:'狙击手',nameEn:'Sniper',hp:85,speed:4.0,dmgMult:1.3,startW:'rifle',startItems:{'ammo762':10,'water':1,'bandage':1,'cloth':2},skill:{nameZh:'空袭',nameEn:'Airstrike',cd:20,descZh:'呼叫空中打击',descEn:'Call airstrike'},color:0xFFFFAA},
+  berserker:{nameZh:'狂战士',nameEn:'Berserker',hp:130,speed:4.5,dmgMult:1.2,startW:'axe',startItems:{'can':2,'water':2,'bandage':2,'wood':5},skill:{nameZh:'狂暴',nameEn:'Frenzy',cd:12,descZh:'8秒伤害+50%攻速+50%',descEn:'8s dmg+50% AS+50%'},color:0xFF0044}
+};
 const ITEMS={
  can:      {n:['罐头','Canned Food'],use:'food',v:38,stack:5,tip:['恢复 38 点饱食。','Restores 38 food.']},
  water:    {n:['净水','Water'],use:'thirst',v:42,stack:5,tip:['恢复 42 点饮水。','Restores 42 thirst.']},
@@ -359,9 +370,9 @@ const ITEMS={
 const RECIPES=[
  {cat:'med', out:'bandage', qty:1, req:{cloth:2}, t:1.2},
  {cat:'med', out:'medkit',  qty:1, req:{bandage:2,bottle:1}, t:2.2},
- {cat:'ammo',out:'ammo9',   qty:10,req:{nails:2,fuel:1}, t:1.6},
- {cat:'ammo',out:'shell',   qty:6, req:{nails:3,fuel:1}, t:1.8},
- {cat:'ammo',out:'ammo762', qty:10,req:{scrap:2,fuel:1}, t:1.8},
+ {cat:'ammo',out:'ammo9',   qty:20,req:{nails:1,fuel:1}, t:1.2},
+ {cat:'ammo',out:'shell',   qty:12,req:{nails:2,fuel:1}, t:1.4},
+ {cat:'ammo',out:'ammo762', qty:15,req:{scrap:1,fuel:1}, t:1.5},
  {cat:'def', out:'barricade', qty:1,req:{wood:3}, t:1.5},
  {cat:'def', out:'rbarricade',qty:1,req:{wood:2,nails:2}, t:2.0},
  {cat:'def', out:'spikes',  qty:1, req:{wood:2,nails:3}, t:2.0},
@@ -725,14 +736,16 @@ function buildWorld(){
 }
 
 /* ================= player ================= */
-const P={ x:0,z:6, hp:100,hunger:100,thirst:100,stam:100,inf:0,
+const P={ x:0,z:6, hp:100,maxHp:100,hunger:100,thirst:100,stam:100,inf:0,
   spd:5.2, dir:0, moving:false, sprint:false, grabT:0,
   atkCd:0, swingT:0, swingMax:0.45, meleeHitT:0, meleeHitW:null,
   reloadT:0, reloadMax:1, stepT:0, hurtT:0, crouchT:0, recoilT:0, mzT:0,
   rollT:0, rollCd:0, invulnT:0, rollDx:0, rollDz:1, kbx:0, kbz:0,
   weapon:'fists', lastWpn:null, mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},
   inv:new Array(8).fill(null), hot:[{id:'fists',q:1},null,null,null], hsel:0,
-  aimX:0, aimZ:1, mesh:null, parts:{}, wmesh:null, deadAnim:0 };
+  aimX:0, aimZ:1, mesh:null, parts:{}, wmesh:null, deadAnim:0,
+  dmgMult:1, classId:'assault', classColor:0x743C38, skillCd:0, skillName:null,
+  cloakT:0, frenzyT:0, shield:0, turrets:null };
 
 function buildPlayer(){
   const g=new THREE.Group();
@@ -932,7 +945,7 @@ function killZombie(zb){
     dropLoot(zb.x-0.8,zb.z,pick(['rifle','smg','sledge']),1);
   }
   else if(roll<0.30) dropLoot(zb.x,zb.z,pick(['can','water','bandage','cloth','wood']),1);
-  else if(roll<0.45) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(3,8));
+  else if(roll<0.60) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(8,16));
   else if(zb.type==='survivor'&&Math.random()<0.55) dropLoot(zb.x,zb.z,pick(['crowbar','axe','pistol','machete','smg']),1);
   else if(zb.type==='tank') dropLoot(zb.x,zb.z,pick(['medkit','rifle','ammo762']),RI(2,6));
   else if(zb.type==='spitter'&&Math.random()<0.4) dropLoot(zb.x,zb.z,pick(['fuel','flamethrower','shell','molotov']),1);
@@ -972,11 +985,15 @@ function blockedAt(x,z,rad){
 function steer(zb,mvx,mvz){
   const rad=0.42*zb.c.scale;
   if(!blockedAt(zb.x+mvx*1.4,zb.z+mvz*1.4,rad)) return [mvx,mvz];
-  for(const a of [Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2]){
+  // 尝试更多角度
+  for(const a of [Math.PI/6,-Math.PI/6,Math.PI/4,-Math.PI/4,Math.PI/3,-Math.PI/3,Math.PI/2,-Math.PI/2,Math.PI*2/3,-Math.PI*2/3]){
     const c=Math.cos(a), s=Math.sin(a);
     const rx=mvx*c-mvz*s, rz=mvx*s+mvz*c;
     if(!blockedAt(zb.x+rx*1.4,zb.z+rz*1.4,rad)) return [rx,rz];
   }
+  // 最后尝试纯X或纯Z
+  if(!blockedAt(zb.x+mvx*1.4,zb.z,rad)) return [mvx,0];
+  if(!blockedAt(zb.x,zb.z+mvz*1.4,rad)) return [0,mvz];
   return [mvx,mvz];
 }
 
@@ -1031,7 +1048,7 @@ function zombieAI(zb,dt,idx){
   const dist=Math.hypot(dx,dz);
 
   /* ---- senses ---- */
-  const baseR=zb.c.scream?16:12;
+  const baseR=zb.c.scream?20:16;
   let see=false;
   if(P.hp>0){
     if(night){ see=dist<baseR*1.5; }
@@ -1041,12 +1058,19 @@ function zombieAI(zb,dt,idx){
       see=((dx*fx+dz*fz)/(dist||1))>0.5; // 120 deg cone
     }
   }
+  // 侦察兵隐身：僵尸看不到玩家
+  if(P.cloakT>0) see=false;
   if(see){
     if(zb.state!=='chase'&&zb.state!=='attack') enterChase(zb);
     zb.lastX=P.x; zb.lastZ=P.z; zb.loseT=0;
   } else if(zb.state==='chase'||zb.state==='attack'){
     zb.loseT+=dt;
-    if(zb.loseT>2.5){ zb.state='investigate'; zb.tx=zb.lastX; zb.tz=zb.lastZ; zb.invT=3; }
+    if(zb.loseT>4){
+      // 不回到idle，继续追击玩家的最后已知位置
+      zb.tx=P.x; zb.tz=P.z;
+      // 如果距离太远，直接朝玩家方向移动
+      if(dist>30){ const sp=zb.spd*(night?1.28:1); zb.x+=dx/dist*sp*dt*0.5; zb.z+=dz/dist*sp*dt*0.5; }
+    }
   }
   // hearing
   if(zb.state==='idle'||zb.state==='investigate'){
@@ -1111,12 +1135,18 @@ function zombieAI(zb,dt,idx){
       zb.idleT-=dt;
       if(zb.idleT<=0){ zb.dir=R(0,Math.PI*2); zb.idleT=R(0.8,1.6); }
       mvx=Math.sin(zb.dir)*0.35; mvz=Math.cos(zb.dir)*0.35;
-      if(zb.invT<=0) zb.state='idle';
+      if(zb.invT<=0){ zb.state='chase'; zb.tx=P.x; zb.tz=P.z; } // 改为回到chase
     }
   }
   else if(zb.state==='chase'){
     if(dist<reach) zb.state='attack';
-    else { const d=dist||1; mvx=dx/d; mvz=dz/d; zb.dir=Math.atan2(dx,dz); }
+    else {
+      const d=dist||1;
+      // 预判玩家移动位置（基于玩家速度方向）
+      const leadX=P.x+P.kbx*0.3, leadZ=P.z+P.kbz*0.3;
+      const ldx=leadX-zb.x, ldz=leadZ-zb.z, ld=Math.hypot(ldx,ldz)||1;
+      mvx=ldx/ld; mvz=ldz/ld; zb.dir=Math.atan2(ldx,ldz);
+    }
   }
   else if(zb.state==='attack'){
     zb.dir=Math.atan2(dx,dz);
@@ -1339,7 +1369,8 @@ function shoot(){
   if(P.reloadT>0) return;
   if(P.mags[wk]<=0){ reload(); return; }
   P.mags[wk]--;
-  P.atkCd=w.rate;
+  const dmgMult=(P.dmgMult||1)*(P.frenzyT>0?1.5:1);
+  P.atkCd=w.rate*(P.frenzyT>0?0.65:1);
   P.recoilT=0.09;
   AU.shoot(wk);
   addNoise(P.x,P.z,w.noise||18);
@@ -1352,7 +1383,7 @@ function shoot(){
       const spread=0.12;
       const sx=(Math.random()-0.5)*spread, sz=(Math.random()-0.5)*spread;
       const dir=new V3(P.aimX,0,P.aimZ).normalize().add(new V3(sx,0,sz)).normalize();
-      fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg,0,0,0,0,1);
+      fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg*dmgMult,0,0,0,0,1);
     }
     P.kbx-=P.aimX*0.05; P.kbz-=P.aimZ*0.05;
     if(P.mags[wk]<=0) reload();
@@ -1361,7 +1392,7 @@ function shoot(){
   if(w.type==='rocket'){
     // 火箭筒：单发爆炸弹
     const dir=new V3(P.aimX,0,P.aimZ).normalize();
-    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg,w.explode,w.explodeDmg,w.explodeR,0);
+    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg*dmgMult,w.explode,w.explodeDmg,w.explodeR,0);
     P.kbx-=P.aimX*0.5; P.kbz-=P.aimZ*0.5;
     G.shake=Math.max(G.shake,0.2);
     if(P.mags[wk]<=0) reload();
@@ -1370,7 +1401,7 @@ function shoot(){
   if(w.type==='rail'){
     // 轨道炮：穿透弹
     const dir=new V3(P.aimX,0,P.aimZ).normalize();
-    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg,0,0,0,w.pierce||99);
+    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg*dmgMult,0,0,0,w.pierce||99);
     P.kbx-=P.aimX*0.3; P.kbz-=P.aimZ*0.3;
     G.shake=Math.max(G.shake,0.15);
     if(P.mags[wk]<=0) reload();
@@ -1381,13 +1412,13 @@ function shoot(){
     const spread=w.spread*(P.moving?2.2:1);
     const sx=(Math.random()-0.5)*spread, sz=(Math.random()-0.5)*spread;
     const dir=new V3(P.aimX,0,P.aimZ).normalize().add(new V3(sx,0,sz)).normalize();
-    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg);
+    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg*dmgMult);
   }
   P.kbx-=P.aimX*0.12; P.kbz-=P.aimZ*0.12;
   if(P.mags[wk]<=0) reload();
 }
 function meleeAtk(wk,w){
-  P.atkCd=w.rate;
+  P.atkCd=w.rate*(P.frenzyT>0?0.65:1);
   P.swingMax=Math.min(0.5,Math.max(0.32,w.rate*0.85));
   P.swingT=P.swingMax;
   P.meleeHitT=P.swingMax*0.36;
@@ -1405,6 +1436,7 @@ function meleeAtk(wk,w){
 }
 function doMeleeDamage(wk){
   const w=WEAPONS[wk]; if(!w) return;
+  const dmgMult=(P.dmgMult||1)*(P.frenzyT>0?1.5:1);
   let hitAny=false;
   for(const z of zombies){
     if(z.dead||z.rise>0) continue;
@@ -1412,7 +1444,7 @@ function doMeleeDamage(wk){
     const d=Math.hypot(dx,dz);
     if(d<w.range){
       const ang=Math.acos(clamp((dx*P.aimX+dz*P.aimZ)/(d||1),-1,1));
-      if(ang<w.arc/2){ hitZombie(z,w.dmg,P.x,P.z,w.kb||0.6); hitAny=true; }
+      if(ang<w.arc/2){ hitZombie(z,w.dmg*dmgMult,P.x,P.z,w.kb||0.6); hitAny=true; }
     }
   }
   for(let i=barricades.length-1;i>=0;i--){ const b=barricades[i];
@@ -1675,13 +1707,15 @@ function aliveZ(){ let n=0; for(const z of zombies) if(!z.dead) n++; return n; }
 function resolveCollision(ent,rad){
   const mapLimit=HALF-1.0;
   ent.x=clamp(ent.x,-mapLimit,mapLimit); ent.z=clamp(ent.z,-mapLimit,mapLimit);
-  // 矩形障碍物：分别处理X和Z轴，避免滑动
+  // 矩形障碍物：基于穿透深度的分轴碰撞解决
   for(const o of obstacles){
     const dx=ent.x-o.x, dz=ent.z-o.z;
     const ox=Math.abs(dx)-o.hw, oz=Math.abs(dz)-o.hd;
     if(ox<rad&&oz<rad){
-      // 分别处理每个轴的穿透
-      if(ox<oz){
+      // 计算穿透深度
+      const penX=rad-ox, penZ=rad-oz;
+      // 只推穿透更深的那个轴，避免滑动
+      if(penX<penZ){
         ent.x=o.x+Math.sign(dx||1)*(o.hw+rad);
       } else {
         ent.z=o.z+Math.sign(dz||1)*(o.hd+rad);
@@ -1694,7 +1728,8 @@ function resolveCollision(ent,rad){
     const dx=ent.x-b.x, dz=ent.z-b.z;
     const ox=Math.abs(dx)-b.hw, oz=Math.abs(dz)-b.hd;
     if(ox<rad&&oz<rad){
-      if(ox<oz){
+      const penX=rad-ox, penZ=rad-oz;
+      if(penX<penZ){
         ent.x=b.x+Math.sign(dx||1)*(b.hw+rad);
       } else {
         ent.z=b.z+Math.sign(dz||1)*(b.hd+rad);
@@ -1714,7 +1749,11 @@ function doRoll(){
   if(touchActive){ dx=touchDx; dz=touchDy; }
   let len=Math.hypot(dx,dz);
   if(len<0.2){ dx=P.aimX; dz=P.aimZ; len=Math.hypot(dx,dz)||1; }
-  P.rollDx=dx/len; P.rollDz=dz/len;
+  // 相机角度旋转
+  const ca=Math.cos(camAngle), sa=Math.sin(camAngle);
+  const rdx=dx*ca-dz*sa, rdz=dx*sa+dz*ca;
+  dx=rdx/len; dz=rdz/len;
+  P.rollDx=dx; P.rollDz=dz;
   P.rollT=0.35; P.rollCd=1.2; P.invulnT=0.4;
   P.stam-=25;
   P.dir=Math.atan2(P.rollDx,P.rollDz);
@@ -1728,13 +1767,40 @@ function updatePlayer(dt){
   P.hunger-=0.018*dt*drain; P.thirst-=0.024*dt*drain;
   if(P.hunger<15||P.thirst<15) P.hp-=0.25*dt;
   if(P.inf>=100) P.hp-=0.6*dt;
-  P.hp=clamp(P.hp,0,100); P.hunger=clamp(P.hunger,0,100); P.thirst=clamp(P.thirst,0,100);
+  P.hp=clamp(P.hp,0,P.maxHp||100); P.hunger=clamp(P.hunger,0,100); P.thirst=clamp(P.thirst,0,100);
   P.stam+=8*dt; P.stam=clamp(P.stam,0,100);
   P.inf=clamp(P.inf,0,100);
   P.rollCd=Math.max(0,P.rollCd-dt);
   P.invulnT=Math.max(0,P.invulnT-dt);
   P.crouchT=Math.max(0,P.crouchT-dt);
   P.recoilT=Math.max(0,P.recoilT-dt);
+  // 职业技能计时器
+  P.skillCd=Math.max(0,(P.skillCd||0)-dt);
+  P.cloakT=Math.max(0,(P.cloakT||0)-dt);
+  P.frenzyT=Math.max(0,(P.frenzyT||0)-dt);
+  // 工程师炮台处理
+  if(P.turrets){
+    for(let i=P.turrets.length-1;i>=0;i--){
+      const t=P.turrets[i];
+      t.life-=dt; t.cd-=dt;
+      if(t.life<=0){
+        if(t.mesh) scene.remove(t.mesh);
+        P.turrets.splice(i,1); continue;
+      }
+      if(t.cd<=0){
+        // 找最近僵尸
+        let best=null,bd=15;
+        for(const z of zombies){ if(z.dead) continue;
+          const d=Math.hypot(z.x-t.x,z.z-t.z);
+          if(d<bd){ bd=d; best=z; } }
+        if(best){
+          const dx=best.x-t.x, dz=best.z-t.z, d=Math.hypot(dx,dz)||1;
+          fireBullet(t.x,1.2,t.z,dx/d,dz/d,20,15);
+          t.cd=0.3;
+        }
+      }
+    }
+  }
 
   if(P.hp<=0){ dieGame(); return; }
 
@@ -1755,6 +1821,10 @@ function updatePlayer(dt){
     if(len>0.2){
       const spd=P.spd*(P.sprint&&P.stam>3?1.55:1);
       ix/=len; iz/=len;
+      // 根据相机角度旋转移动方向（W始终远离相机）
+      const ca=Math.cos(camAngle), sa=Math.sin(camAngle);
+      const rx=ix*ca-iz*sa, rz=ix*sa+iz*ca;
+      ix=rx; iz=rz;
       if(P.sprint&&P.stam>3) P.stam-=18*dt;
       if(P.grabT>0){ ix*=0.55; iz*=0.55; }
       P.x+=ix*spd*dt; P.z+=iz*spd*dt;
@@ -1783,7 +1853,7 @@ function updatePlayer(dt){
         P.crouchT=0.45; showMsg(itemName(lo.id)+' x'+lo.qty); }
     } }
   // safe house regen
-  if(Math.hypot(P.x,P.z)<7){ P.hp=Math.min(100,P.hp+0.8*dt); P.inf=Math.max(0,P.inf-0.35*dt); }
+  if(Math.hypot(P.x,P.z)<7){ P.hp=Math.min(P.maxHp||100,P.hp+0.8*dt); P.inf=Math.max(0,P.inf-0.35*dt); }
 }
 
 function playerAnim(dt){
@@ -1864,8 +1934,15 @@ function meleeAnim(kind){
 
 function damagePlayer(dmg,inf){
   if(dmg<=0&&inf<=0) return;
-  if(P.invulnT>0) return;
+  if(P.invulnT>0||P.cloakT>0) return;
   if(G.state!=='play') return;
+  // 护盾吸收伤害
+  if(P.shield>0){
+    const absorbed=Math.min(P.shield,dmg);
+    P.shield-=absorbed; dmg-=absorbed;
+    if(P.shield<=0) showMsg(T('护盾损坏！','Shield broken!'));
+  }
+  if(dmg<=0) return;
   P.hp-=dmg; P.hurtT=0.2; P.inf+=inf;
   $('hurtFx').style.opacity='1';
   setTimeout(()=>$('hurtFx').style.opacity='0',180);
@@ -1929,17 +2006,23 @@ function updateLootEnts(dt){
 }
 function spawnInitialLoot(){
   const L=[['can',3],['water',3],['bandage',3],['cloth',3],['wood',4],['nails',3],['fuel',2],['bottle',3],
-    ['ammo9',2],['shell',2],['ammo762',2],['bat',1],['crowbar',1],['molotov',1],['barricade',2],['scrap',2],
+    ['ammo9',6],['ammo9',6],['shell',4],['shell',4],['ammo762',5],['ammo762',5],
+    ['bat',1],['crowbar',1],['molotov',1],['barricade',2],['scrap',2],
     ['axe',1],['medkit',1],['machete',1],['hotmeal',1],
     ['flamethrower',1],['rocket',1],['railgun',1],['shotgun2',1]];
   for(let i=0;i<lootSpots.length;i++){
     const s=lootSpots[i];
     // 外围loot点有更高概率和更好品质
     const dist=Math.hypot(s.x,s.z);
-    const chance=dist>30?0.9:0.75;
+    const chance=dist>30?0.92:0.8;
     if(Math.random()<chance){
       const e=pick(L);
       dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),e[0],e[1]?RI(1,e[1]):1);
+    }
+    // 额外弹药拾取点：每个loot点有概率再额外生成一份弹药
+    if(Math.random()<0.35){
+      const am=pick(['ammo9','shell','ammo762']);
+      dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),am,RI(4,10));
     }
   }
 }
@@ -2071,7 +2154,7 @@ function updatePanelsPos(){}
 
 /* ================= HUD ================= */
 function refreshHud(){
-  $('fHp').style.width=P.hp+'%'; $('tHp').textContent='HP '+Math.ceil(P.hp);
+  $('fHp').style.width=(P.hp/(P.maxHp||100)*100)+'%'; $('tHp').textContent='HP '+Math.ceil(P.hp)+(P.shield>0?' (+'+Math.ceil(P.shield)+')':'');
   $('fHu').style.width=P.hunger+'%'; $('tHu').textContent=T('饱食 ','Food ')+Math.ceil(P.hunger);
   $('fTh').style.width=P.thirst+'%'; $('tTh').textContent=T('饮水 ','Water ')+Math.ceil(P.thirst);
   $('fSt').style.width=P.stam+'%'; $('tSt').textContent=T('体力 ','Stam ')+Math.ceil(P.stam);
@@ -2117,6 +2200,21 @@ function refreshHud(){
     d.onclick=()=>equipHot(i);
     if(s) bindTip(d,s.id);
     elHot.appendChild(d);
+  }
+  // 技能HUD
+  const sh=$('skillHud');
+  if(sh){
+    const cls=CLASSES[P.classId];
+    if(cls){
+      const cd=Math.ceil(P.skillCd||0);
+      const ready=cd<=0;
+      const fren=(P.frenzyT||0)>0;
+      const clk=(P.cloakT||0)>0;
+      sh.innerHTML='<div style="padding:6px 14px;border:2px solid '+(ready?'#FFD700':'#555')+';border-radius:8px;background:'+(ready?'#332':'#222')+';color:'+(ready?'#FFD700':'#888')+';font-size:13px;text-align:center;min-width:100px;'+(fren?'box-shadow:0 0 10px #FF0044;':'')+(clk?'box-shadow:0 0 10px #AA88FF;':'')+'">'+
+        '<div style="font-size:11px;opacity:.7">[V] '+T(cls.skill.nameZh,cls.skill.nameEn)+'</div>'+
+        '<div style="font-size:14px;font-weight:bold">'+(ready?T('就绪','READY'):(cd+'s'))+'</div>'+
+        '</div>';
+    } else { sh.innerHTML=''; }
   }
 }
 
@@ -2255,7 +2353,8 @@ function saveGame(){
     v:2, diff:G.diff, wave:G.wave, kills:G.kills, score:G.score, time:G.time, day:G.dayCount, cyc:G.cycleT,
     waveState:G.waveState, restT:G.restT, spawnQ:G.spawnQ, spawned:G.spawned,
     p:{x:P.x,z:P.z,hp:P.hp,hu:P.hunger,th:P.thirst,st:P.stam,inf:P.inf,weapon:P.weapon,hsel:P.hsel,
-       mags:P.mags,inv:P.inv,hot:P.hot}
+       mags:P.mags,inv:P.inv,hot:P.hot,
+       classId:P.classId||'assault',skillCd:P.skillCd||0,shield:P.shield||0}
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); }catch(e){}
 }
@@ -2288,8 +2387,10 @@ addEventListener('keydown',e=>{
     if(k==='i'){ $('invP').classList.contains('hidden')?openInv():closePanels(); AU.ui(); }
     if(k==='c'){ $('craftP').classList.contains('hidden')?openCraft():closePanels(); AU.ui(); }
     if(k==='r') reload();
-    if(k==='q') quickSwap();
+    if(k==='Tab'){ e.preventDefault(); quickSwap(); }
+    // Q/E 持续旋转相机（在update中处理）
     if(k==='b') quickBuild();
+    if(k==='v'){ useClassSkill(); }
     if(k>='1'&&k<='4') equipHot(+k-1);
     if(k==='f'){ const s=P.hot[P.hsel]; if(s&&ITEMS[s.id]&&ITEMS[s.id].use==='food') useHotFood(); }
     if(k==='Escape'||k==='p'){
@@ -2495,6 +2596,76 @@ const IC={
 function icon(k){ return '<svg class="ico" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#242321" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+(IC[k]||IC.can)+'</svg>'; }
 
 /* ================= game flow ================= */
+let selectedClass='assault';
+function buildClassSelect(){
+  const cs=$('classSelect'); if(!cs) return;
+  cs.innerHTML='';
+  for(const id in CLASSES){
+    const c=CLASSES[id];
+    const el=document.createElement('div');
+    el.style.cssText='padding:8px 12px;border:2px solid #555;border-radius:8px;cursor:pointer;background:#222;color:#eee;font-size:12px;min-width:80px;text-align:center;transition:all .2s';
+    const emoji=(c.hp>120?'🛡':(c.speed>4.5?'🏃':(c.dmgMult>1.2?'⚔':'📦')));
+    el.innerHTML='<div style="font-size:18px">'+emoji+'</div><div>'+(T(c.nameZh,c.nameEn))+'</div>';
+    el.onclick=()=>{ selectedClass=id; buildClassSelect(); AU.ui(); };
+    if(selectedClass===id){ el.style.borderColor='#FFD700'; el.style.background='#333'; }
+    // tooltip
+    el.title=T(c.skill.descZh,c.skill.descEn)+' (CD:'+c.skill.cd+'s)';
+    cs.appendChild(el);
+  }
+}
+function useClassSkill(){
+  if(G.state!=='play'||G.paused) return;
+  if(P.skillCd>0){ showMsg(T('技能冷却中：'+Math.ceil(P.skillCd)+'秒','Skill CD: '+Math.ceil(P.skillCd)+'s')); return; }
+  const cls=CLASSES[P.classId]; if(!cls) return;
+  P.skillCd=cls.skill.cd;
+  switch(P.classId){
+    case 'assault':
+      // 手雷：在瞄准方向投掷爆炸
+      { const tx=P.x+P.aimX*8, tz=P.z+P.aimZ*8;
+        for(const z of zombies){ if(z.dead) continue;
+          const d=Math.hypot(z.x-tx,z.z-tz);
+          if(d<4){ hitZombie(z,80,tx,tz,0.8); } }
+        showRing(tx,tz,4,0xFF6600,0.4,null);
+        bloodBurst(tx,1,tz,15,0xFF6600);
+        G.shake=0.4; AU.explode(); }
+      break;
+    case 'medic':
+      P.hp=Math.min(P.maxHp||100,P.hp+40);
+      bloodBurst(P.x,1,P.z,12,0x44FF66);
+      AU.eat();
+      break;
+    case 'engineer':
+      // 部署临时炮台
+      { const tx2=P.x+P.aimX*3, tz2=P.z+P.aimZ*3;
+        if(!P.turrets) P.turrets=[];
+        const tmesh=bx(0.6,0.8,0.6,0x44AAFF,tx2,0.4,tz2,scene);
+        P.turrets.push({x:tx2,z:tz2,life:30,cd:0,dmg:15,mesh:tmesh});
+        showRing(tx2,tz2,1.5,0x44AAFF,0.3,null); }
+      break;
+    case 'scout':
+      P.cloakT=4; P.invulnT=4;
+      bloodBurst(P.x,1,P.z,8,0xAA88FF);
+      break;
+    case 'heavy':
+      P.shield=80;
+      bloodBurst(P.x,1,P.z,10,0xFFAA44);
+      break;
+    case 'sniper':
+      // 空袭：在玩家周围范围伤害
+      for(const z of zombies){ if(z.dead) continue;
+        const d=Math.hypot(z.x-P.x,z.z-P.z);
+        if(d<12){ hitZombie(z,100,P.x,P.z,0.5); } }
+      showRing(P.x,P.z,12,0xFFFFAA,0.6,null);
+      bloodBurst(P.x,1,P.z,20,0xFFFFAA);
+      G.shake=0.6; AU.explode();
+      break;
+    case 'berserker':
+      P.frenzyT=8;
+      bloodBurst(P.x,1,P.z,10,0xFF0044);
+      break;
+  }
+  refreshHud();
+}
 function resetWorldState(){
   for(const z of zombies) scene.remove(z.mesh);
   zombies.length=0;
@@ -2508,6 +2679,8 @@ function resetWorldState(){
   bullets.length=0;
   noises.length=0;
   if(G.supply){ scene.remove(G.supply.mesh); G.supply=null; }
+  // 清理工程师炮台
+  if(P.turrets){ for(const t of P.turrets){ if(t.mesh) scene.remove(t.mesh); } P.turrets=null; }
   for(const p of PPOOL){ p.on=false; p.m.visible=false; }
   for(const f of RPOOL){ f.on=false; f.m.visible=false; }
   for(const d of dmgPool){ d.life=0; d.el.style.display='none'; }
@@ -2528,9 +2701,32 @@ function newGame(from){
   P.inv=new Array(8).fill(null);
   P.hot=[{id:'fists',q:1},null,null,null];
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
-  P.inv[0]={id:'bat',q:1,dur:WEAPONS.bat.dur};
-  P.inv[1]={id:'can',q:2}; P.inv[2]={id:'water',q:2}; P.inv[3]={id:'bandage',q:1};
-  P.inv[4]={id:'wood',q:4};
+  // 应用职业属性
+  const cls=CLASSES[selectedClass];
+  P.maxHp=cls.hp; P.hp=cls.hp;
+  P.spd=cls.speed;
+  P.dmgMult=cls.dmgMult;
+  P.classId=selectedClass;
+  P.classColor=cls.color;
+  P.skillCd=0;
+  P.skillName=cls.skill;
+  P.cloakT=0; P.frenzyT=0; P.shield=0; P.turrets=null;
+  // 初始武器加入快捷栏
+  P.hot[1]={id:cls.startW,q:1};
+  if(WEAPONS[cls.startW].dur!==undefined&&WEAPONS[cls.startW].dur!==Infinity){
+    P.hot[1].dur=WEAPONS[cls.startW].dur;
+  }
+  P.weapon=cls.startW;
+  P.hsel=1;
+  P.mags[cls.startW]=WEAPONS[cls.startW].mag;
+  // 初始物品
+  for(const id in cls.startItems){
+    addInv(id, cls.startItems[id]);
+  }
+  // 设置玩家mesh颜色
+  if(P.parts && P.parts.torso){
+    P.parts.torso.material=mat(cls.color);
+  }
   setWeaponMesh();
   spawnInitialLoot();
   for(let i=0;i<4;i++){ const a=R(0,Math.PI*2),r=R(18,26);
@@ -2586,6 +2782,13 @@ function continueGame(){
     inv:s.p.inv||new Array(8).fill(null),hot:s.p.hot||[{id:'fists',q:1},null,null,null],
     dir:0,grabT:0,atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,lastWpn:null,deadAnim:0});
+  // 恢复职业属性
+  const cid=s.p.classId||'assault';
+  const cls=CLASSES[cid]||CLASSES.assault;
+  P.classId=cid; P.maxHp=cls.hp; P.spd=cls.speed; P.dmgMult=cls.dmgMult;
+  P.classColor=cls.color; P.skillName=cls.skill;
+  P.skillCd=s.p.skillCd||0; P.cloakT=0; P.frenzyT=0; P.shield=s.p.shield||0; P.turrets=null;
+  if(P.parts && P.parts.torso){ P.parts.torso.material=mat(cls.color); }
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
   setWeaponMesh();
   spawnInitialLoot();
@@ -2625,6 +2828,9 @@ function loop(){
       updateDayNight(dt);
       if(G.time%25<dt) saveGame();
     }
+    // Q/E 持续旋转相机视角（类似饥荒）
+    if(keys.q) camAngle-=1.2*dt;
+    if(keys.e) camAngle+=1.2*dt;
     updateAim();
     if(mouseDown){
       const w=WEAPONS[P.weapon];
@@ -2672,15 +2878,16 @@ function setupMenu(){
     b.onclick=()=>{ G.diff=k; setupMenu(); AU.ui(); };
     dr.appendChild(b);
   }
+  buildClassSelect();
   $('tut').innerHTML=T(
     '<b>WASD</b> 移动 · <b>Shift</b> 冲刺 · <b>Space</b> 翻滚闪避 · <b>鼠标</b> 瞄准/攻击<br>'+
-    '<b>R</b> 装填 · <b>Q</b> 快速切换武器 · <b>滚轮</b> 切换快捷栏 · <b>1-4</b> 快捷栏<br>'+
-    '<b>I</b> 背包 · <b>C</b> 合成 · <b>B</b> 快速建造 · <b>Esc/P</b> 暂停<br>'+
+    '<b>R</b> 装填 · <b>Tab</b> 快速切换武器 · <b>Q/E</b> 旋转视角 · <b>滚轮</b> 切换快捷栏 · <b>1-4</b> 快捷栏<br>'+
+    '<b>I</b> 背包 · <b>C</b> 合成 · <b>B</b> 快速建造 · <b>V</b> 职业技能 · <b>Esc/P</b> 暂停<br>'+
     '白天搜刮物资，夜晚抵御尸潮。枪械噪音会吸引僵尸！<br>'+
     '每第 3 夜为<b style="color:#743C38">血月</b>，每第 5 波出现<b style="color:#743C38">蛮兽</b>。每天清晨有补给空投。',
     '<b>WASD</b> move · <b>Shift</b> sprint · <b>Space</b> dodge roll · <b>Mouse</b> aim/attack<br>'+
-    '<b>R</b> reload · <b>Q</b> quick-swap weapon · <b>Wheel</b> cycle hotbar · <b>1-4</b> hotbar<br>'+
-    '<b>I</b> inventory · <b>C</b> crafting · <b>B</b> quick build · <b>Esc/P</b> pause<br>'+
+    '<b>R</b> reload · <b>Tab</b> quick-swap weapon · <b>Q/E</b> rotate camera · <b>Wheel</b> cycle hotbar · <b>1-4</b> hotbar<br>'+
+    '<b>I</b> inventory · <b>C</b> crafting · <b>B</b> quick build · <b>V</b> class skill · <b>Esc/P</b> pause<br>'+
     'Scavenge by day, hold the line by night. Gunfire noise attracts zombies!<br>'+
     'Every 3rd night is a <b style="color:#743C38">Blood Moon</b>; a <b style="color:#743C38">Brute</b> comes every 5th wave. Supply drops land each dawn.');
   const b=getBest();
