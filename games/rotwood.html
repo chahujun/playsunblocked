@@ -1468,9 +1468,11 @@ function breakWeapon(slot){
   P.hot[slot]=null;
   AU.breakW();
   showMsg(T('你的 '+(id?itemName(id):'')+' 损坏了！','Your '+(id?itemName(id):'')+' broke!'));
+  // 确保 fists 始终存在于 hot[3]
+  if(!P.hot[3]||P.hot[3].id!=='fists'){ P.hot[3]={id:'fists',q:1}; }
   if(P.weapon===id){
     P.weapon='fists';
-    for(let i=0;i<4;i++) if(P.hot[i]&&P.hot[i].id==='fists'){ P.hsel=i; break; }
+    P.hsel=3;
   }
   setWeaponMesh(); refreshHud();
 }
@@ -2186,14 +2188,16 @@ function useInv(i){
   const it=ITEMS[s.id];
   if(it.weapon){
     if(s.dur===undefined&&WEAPONS[s.id].dur!==undefined&&WEAPONS[s.id].dur!==Infinity) s.dur=WEAPONS[s.id].dur;
-    for(let h=0;h<4;h++){ if(!P.hot[h]){ P.hot[h]={id:s.id,q:1,dur:s.dur}; P.inv[i]=null; equipHot(h); openInv(); return; } }
+    // 武器只放入hot[0-2]，保留hot[3]给fists
+    for(let h=0;h<3;h++){ if(!P.hot[h]){ P.hot[h]={id:s.id,q:1,dur:s.dur}; P.inv[i]=null; equipHot(h); openInv(); return; } }
     showMsg(T('快捷栏已满。','Hotbar full.')); return;
   }
   if(it.use==='food'){ P.hunger=clamp(P.hunger+it.v,0,100); if(it.hp) P.hp=clamp(P.hp+it.hp,0,100); AU.eat(); }
   else if(it.use==='thirst'){ P.thirst=clamp(P.thirst+it.v,0,100); AU.eat(); }
   else if(it.use==='heal'){ P.hp=clamp(P.hp+it.v,0,100); P.inf=clamp(P.inf-it.inf,0,100); AU.eat(); }
   else if(it.use==='molotov'||it.use==='build'||it.use==='build2'||it.use==='spikes'){
-    for(let h=0;h<4;h++){ if(!P.hot[h]){ P.hot[h]={id:s.id,q:s.q}; P.inv[i]=null; equipHot(h); openInv(); return; } }
+    // 道具也只放入hot[0-2]，保留hot[3]给fists
+    for(let h=0;h<3;h++){ if(!P.hot[h]){ P.hot[h]={id:s.id,q:s.q}; P.inv[i]=null; equipHot(h); openInv(); return; } }
     showMsg(T('快捷栏已满。','Hotbar full.')); return;
   }
   else return;
@@ -2634,7 +2638,8 @@ function quickBuild(){
   else showMsg(T('背包里没有木栅栏。','No barricade in inventory.'));
 }
 function addInvHot(id,q){
-  for(let h=0;h<4;h++){ if(!P.hot[h]){ removeItem(id,q); P.hot[h]={id,q}; equipHot(h); return; } }
+  // 只放入hot[0-2]，保留hot[3]给fists
+  for(let h=0;h<3;h++){ if(!P.hot[h]){ removeItem(id,q); P.hot[h]={id,q}; equipHot(h); return; } }
   showMsg(T('快捷栏已满。','Hotbar full.'));
 }
 
@@ -2906,6 +2911,8 @@ function continueGame(){
   P.classColor=cls.color; P.skillName=cls.skill;
   P.skillCd=s.p.skillCd||0; P.cloakT=0; P.frenzyT=0; P.shield=s.p.shield||0; P.turrets=null;
   if(P.parts && P.parts.torso){ P.parts.torso.material=mat(cls.color); }
+  // 确保 fists 始终在 hot[3]
+  if(!P.hot[3]||P.hot[3].id!=='fists'){ P.hot[3]={id:'fists',q:1}; }
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
   setWeaponMesh();
   spawnInitialLoot();
@@ -2947,8 +2954,10 @@ function loop(){
       if(G.time%25<dt) saveGame();
     }
     // Q/E 持续旋转相机视角（类似饥荒）
-    if(keys.q) camAngle-=1.2*dt;
-    if(keys.e) camAngle+=1.2*dt;
+    // Q/E 持续旋转相机视角（类似饥荒），移动时减速以避免方向感错乱
+    const camRotSpd = (keys.w||keys.a||keys.s||keys.d) ? 0.4 : 0.8;
+    if(keys.q) camAngle-=camRotSpd*dt;
+    if(keys.e) camAngle+=camRotSpd*dt;
     updateAim();
     if(mouseDown){
       const w=WEAPONS[P.weapon];
