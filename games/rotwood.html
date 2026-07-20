@@ -333,6 +333,7 @@ const CLASSES={
   civilian:{nameZh:'普通人',nameEn:'Civilian',hp:100,speed:4.0,dmgMult:1.0,startW:'bat',startItems:{'can':3,'water':2,'bandage':2,'cloth':1,'wood':3},skill:{nameZh:'求生本能',nameEn:'Survival Instinct',cd:14,descZh:'5秒内移速+50%伤害+30%',descEn:'5s speed+50% dmg+30%'},color:0xDDDDDD}
 };
 const ITEMS={
+ fists:    {n:['拳头','Fists'],weapon:1,stack:1,tip:['徒手攻击。','Unarmed attack.']},
  can:      {n:['罐头','Canned Food'],use:'food',v:38,stack:5,tip:['恢复 38 点饱食。','Restores 38 food.']},
  water:    {n:['净水','Water'],use:'thirst',v:42,stack:5,tip:['恢复 42 点饮水。','Restores 42 thirst.']},
  bandage:  {n:['绷带','Bandage'],use:'heal',v:22,inf:6,stack:5,tip:['恢复 22 HP，降低感染。','Heals 22 HP, reduces infection.']},
@@ -1804,14 +1805,11 @@ function doRoll(){
   if(P.stam<25){ showMsg(T('体力不足，无法翻滚！','Too tired to roll!')); return; }
   let dx=0,dz=0;
   if(keys.a||keys.ArrowLeft) dx-=1; if(keys.d||keys.ArrowRight) dx+=1;
-  if(keys.w||keys.ArrowUp) dz+=1; if(keys.s||keys.ArrowDown) dz-=1;
+  if(keys.w||keys.ArrowUp) dz-=1; if(keys.s||keys.ArrowDown) dz+=1;
   if(touchActive){ dx=touchDx; dz=touchDy; }
   let len=Math.hypot(dx,dz);
   if(len<0.2){ dx=P.aimX; dz=P.aimZ; len=Math.hypot(dx,dz)||1; }
-  // 相机角度旋转
-  const ca=Math.cos(camAngle), sa=Math.sin(camAngle);
-  const rdx=dx*ca-dz*sa, rdz=dx*sa+dz*ca;
-  dx=rdx/len; dz=rdz/len;
+  dx=dx/len; dz=dz/len;
   P.rollDx=dx; P.rollDz=dz;
   P.rollT=0.35; P.rollCd=1.2; P.invulnT=0.4;
   P.stam-=25;
@@ -1873,17 +1871,14 @@ function updatePlayer(dt){
     P.moving=true;
   } else {
     let ix=0, iz=0;
+    // WASD使用世界坐标方向（不随相机旋转），W=向北(-Z)，S=向南(+Z)
     if(keys.a||keys.ArrowLeft) ix-=1; if(keys.d||keys.ArrowRight) ix+=1;
-    if(keys.w||keys.ArrowUp) iz+=1; if(keys.s||keys.ArrowDown) iz-=1;
+    if(keys.w||keys.ArrowUp) iz-=1; if(keys.s||keys.ArrowDown) iz+=1;
     if(touchActive){ ix=touchDx; iz=touchDy; }
     const len=Math.hypot(ix,iz);
     if(len>0.2){
       const spd=P.spd*(P.sprint&&P.stam>3?1.55:1);
       ix/=len; iz/=len;
-      // 根据相机角度旋转移动方向（W始终远离相机）
-      const ca=Math.cos(camAngle), sa=Math.sin(camAngle);
-      const rx=ix*ca-iz*sa, rz=ix*sa+iz*ca;
-      ix=rx; iz=rz;
       if(P.sprint&&P.stam>3) P.stam-=18*dt;
       if(P.grabT>0){ ix*=0.55; iz*=0.55; }
       P.x+=ix*spd*dt; P.z+=iz*spd*dt;
