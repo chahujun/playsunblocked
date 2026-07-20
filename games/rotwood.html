@@ -1803,13 +1803,17 @@ function doRoll(){
   if(G.state!=='play'||G.paused) return;
   if(P.rollCd>0||P.rollT>0) return;
   if(P.stam<25){ showMsg(T('体力不足，无法翻滚！','Too tired to roll!')); return; }
-  let dx=0,dz=0;
-  if(keys.a||keys.ArrowLeft) dx-=1; if(keys.d||keys.ArrowRight) dx+=1;
-  if(keys.w||keys.ArrowUp) dz-=1; if(keys.s||keys.ArrowDown) dz+=1;
-  if(touchActive){ dx=touchDx; dz=touchDy; }
-  let len=Math.hypot(dx,dz);
-  if(len<0.2){ dx=P.aimX; dz=P.aimZ; len=Math.hypot(dx,dz)||1; }
-  dx=dx/len; dz=dz/len;
+  // 基于角色朝向的翻滚方向：W=前滚，S=后滚，A=左滚，D=右滚
+  let fwd=0, strafe=0;
+  if(keys.w||keys.ArrowUp) fwd+=1; if(keys.s||keys.ArrowDown) fwd-=1;
+  if(keys.a||keys.ArrowLeft) strafe-=1; if(keys.d||keys.ArrowRight) strafe+=1;
+  if(touchActive){ fwd=touchDy; strafe=touchDx; }
+  let len=Math.hypot(fwd,strafe);
+  if(len<0.2){ fwd=1; strafe=0; len=1; } // 默认前滚
+  fwd/=len; strafe/=len;
+  const cosD=Math.cos(P.dir), sinD=Math.sin(P.dir);
+  const dx=sinD*fwd+cosD*strafe;
+  const dz=cosD*fwd-sinD*strafe;
   P.rollDx=dx; P.rollDz=dz;
   P.rollT=0.35; P.rollCd=1.2; P.invulnT=0.4;
   P.stam-=25;
@@ -1870,20 +1874,24 @@ function updatePlayer(dt){
     P.x+=P.rollDx*9.2*dt; P.z+=P.rollDz*9.2*dt;
     P.moving=true;
   } else {
-    let ix=0, iz=0;
-    // WASD使用世界坐标方向（不随相机旋转），W=向北(-Z)，S=向南(+Z)
-    if(keys.a||keys.ArrowLeft) ix-=1; if(keys.d||keys.ArrowRight) ix+=1;
-    if(keys.w||keys.ArrowUp) iz-=1; if(keys.s||keys.ArrowDown) iz+=1;
-    if(touchActive){ ix=touchDx; iz=touchDy; }
-    const len=Math.hypot(ix,iz);
+    // WASD基于角色朝向（鼠标控制方向）：W=前进，S=后退，A=左移，D=右移
+    let fwd=0, strafe=0;
+    if(keys.w||keys.ArrowUp) fwd+=1; if(keys.s||keys.ArrowDown) fwd-=1;
+    if(keys.a||keys.ArrowLeft) strafe-=1; if(keys.d||keys.ArrowRight) strafe+=1;
+    if(touchActive){ fwd=touchDy; strafe=touchDx; }
+    const len=Math.hypot(fwd,strafe);
     if(len>0.2){
       const spd=P.spd*(P.sprint&&P.stam>3?1.55:1);
-      ix/=len; iz/=len;
+      fwd/=len; strafe/=len;
+      // 基于角色朝向计算移动方向（P.dir由鼠标updateAim控制）
+      const cosD=Math.cos(P.dir), sinD=Math.sin(P.dir);
+      // 前进方向 = (sin(dir), cos(dir))，左移方向 = (cos(dir), -sin(dir))
+      const mx=sinD*fwd+cosD*strafe;
+      const mz=cosD*fwd-sinD*strafe;
       if(P.sprint&&P.stam>3) P.stam-=18*dt;
-      if(P.grabT>0){ ix*=0.55; iz*=0.55; }
-      P.x+=ix*spd*dt; P.z+=iz*spd*dt;
+      if(P.grabT>0){ mx*=0.55; mz*=0.55; }
+      P.x+=mx*spd*dt; P.z+=mz*spd*dt;
       P.moving=true;
-      if(P.reloadT<=0){ P.dir=Math.atan2(ix,iz); }
       P.stepT-=dt;
       if(P.stepT<=0){ P.stepT=P.sprint?0.26:0.42; AU.step(); }
     } else { P.moving=false; }
