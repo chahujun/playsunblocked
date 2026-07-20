@@ -94,6 +94,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
 .islot:hover{filter:brightness(1.06)}
 .islot .qty{position:absolute;right:3px;bottom:1px;font-size:11px}
 .islot .nm{position:absolute;left:0;right:0;bottom:-18px;font-size:10px;text-align:center;white-space:nowrap}
+.islot .drop{position:absolute;top:2px;right:2px;width:14px;height:14px;line-height:12px;text-align:center;font-size:10px;background:rgba(180,40,40,.7);color:#fff;border-radius:7px;cursor:pointer;opacity:0;transition:opacity .15s}
+.islot:hover .drop{opacity:1}
+.islot[draggable=true]:hover{border-color:#FFD700;cursor:grab}
 #invHint{font-size:12px;color:var(--iron);margin-top:24px;line-height:1.6}
 #craftTabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 .ctab{padding:4px 12px;font-size:14px;background:var(--paper);border:1.5px solid var(--iron);cursor:pointer}
@@ -326,10 +329,10 @@ const WEAPONS={
   shotgun2:  {melee:0,dmg:20,rate:0.7,ammo:'shell',mag:8,reload:2.0,spread:0.09,pellets:8,range:24,noise:28,n:['自动霰弹枪','Auto Shotgun']}
 };
 const CLASSES={
-  doctor:{nameZh:'医生',nameEn:'Doctor',hp:90,speed:4.0,dmgMult:0.9,startW:'pistol',startItems:{'ammo9':20,'medkit':3,'bandage':4,'water':2,'can':1},skill:{nameZh:'紧急治疗',nameEn:'Emergency Heal',cd:10,descZh:'瞬间恢复60HP+清除感染',descEn:'Instant heal 60HP + cure infection'},color:0x44FF66},
+  doctor:{nameZh:'医生',nameEn:'Doctor',hp:90,speed:4.0,dmgMult:0.9,startW:'machete',startItems:{'medkit':3,'bandage':4,'water':2,'can':1,'cloth':2},skill:{nameZh:'紧急治疗',nameEn:'Emergency Heal',cd:10,descZh:'瞬间恢复60HP+清除感染',descEn:'Instant heal 60HP + cure infection'},color:0x44FF66},
   police:{nameZh:'警察',nameEn:'Police',hp:110,speed:4.2,dmgMult:1.1,startW:'pistol',startItems:{'ammo9':40,'bandage':2,'water':1,'barricade':1,'can':1},skill:{nameZh:'呼叫支援',nameEn:'Call Backup',cd:15,descZh:'呼叫空投补给',descEn:'Call supply airdrop'},color:0x4488FF},
   firefighter:{nameZh:'消防员',nameEn:'Firefighter',hp:140,speed:3.6,dmgMult:0.95,startW:'axe',startItems:{'bandage':3,'water':3,'can':2,'barricade':2,'cloth':2},skill:{nameZh:'火焰冲锋',nameEn:'Fire Charge',cd:12,descZh:'向前冲刺+范围火焰伤害',descEn:'Dash forward + fire damage'},color:0xFF6600},
-  clerk:{nameZh:'职员',nameEn:'Clerk',hp:80,speed:4.5,dmgMult:1.0,startW:'pistol',startItems:{'ammo9':16,'water':2,'can':2,'cloth':2,'nails':5},skill:{nameZh:'背包整理',nameEn:'Pack Mule',cd:8,descZh:'瞬间补满当前武器弹药',descEn:'Instant reload all ammo'},color:0x88DDAA},
+  clerk:{nameZh:'职员',nameEn:'Clerk',hp:80,speed:4.5,dmgMult:1.0,startW:'bat',startItems:{'water':2,'can':2,'cloth':2,'nails':5,'wood':3},skill:{nameZh:'背包整理',nameEn:'Pack Mule',cd:8,descZh:'瞬间补满当前武器弹药',descEn:'Instant reload all ammo'},color:0x88DDAA},
   civilian:{nameZh:'普通人',nameEn:'Civilian',hp:100,speed:4.0,dmgMult:1.0,startW:'bat',startItems:{'can':3,'water':2,'bandage':2,'cloth':1,'wood':3},skill:{nameZh:'求生本能',nameEn:'Survival Instinct',cd:14,descZh:'5秒内移速+50%伤害+30%',descEn:'5s speed+50% dmg+30%'},color:0xDDDDDD}
 };
 const ITEMS={
@@ -338,6 +341,7 @@ const ITEMS={
  water:    {n:['净水','Water'],use:'thirst',v:42,stack:5,tip:['恢复 42 点饮水。','Restores 42 thirst.']},
  bandage:  {n:['绷带','Bandage'],use:'heal',v:22,inf:6,stack:5,tip:['恢复 22 HP，降低感染。','Heals 22 HP, reduces infection.']},
  medkit:   {n:['医疗包','Medkit'],use:'heal',v:55,inf:30,stack:3,tip:['恢复 55 HP，大幅降低感染。','Heals 55 HP, greatly reduces infection.']},
+ antibio:   {n:['抗生素','Antibiotics'],use:'heal',v:0,inf:-60,stack:3,tip:['强力清除感染。','Strongly cures infection.']},
  hotmeal:  {n:['热食','Hot Meal'],use:'food',v:60,hp:12,stack:3,tip:['恢复 60 饱食与 12 HP。','Restores 60 food and 12 HP.']},
  cloth:    {n:['布料','Cloth'],stack:10,tip:['合成材料：绷带等。','Crafting material: bandages.']},
  bottle:   {n:['空瓶','Bottle'],stack:5,tip:['合成材料：净水/燃烧瓶等。','Material: water / molotov.']},
@@ -369,6 +373,7 @@ const ITEMS={
 const RECIPES=[
  {cat:'med', out:'bandage', qty:1, req:{cloth:2}, t:1.2},
  {cat:'med', out:'medkit',  qty:1, req:{bandage:2,bottle:1}, t:2.2},
+ {cat:'med', out:'antibio', qty:1, req:{cloth:1,water:1}, t:2.0},
  {cat:'ammo',out:'ammo9',   qty:20,req:{nails:1,fuel:1}, t:1.2},
  {cat:'ammo',out:'shell',   qty:12,req:{nails:2,fuel:1}, t:1.4},
  {cat:'ammo',out:'ammo762', qty:15,req:{scrap:1,fuel:1}, t:1.5},
@@ -377,9 +382,18 @@ const RECIPES=[
  {cat:'def', out:'spikes',  qty:1, req:{wood:2,nails:3}, t:2.0},
  {cat:'def', out:'molotov', qty:1, req:{bottle:1,fuel:1}, t:1.6},
  {cat:'food',out:'hotmeal', qty:1, req:{can:1,fuel:1}, t:1.5},
- {cat:'food',out:'water',   qty:1, req:{bottle:1,fuel:1}, t:1.4}
+ {cat:'food',out:'water',   qty:1, req:{bottle:1,fuel:1}, t:1.4},
+ // 工具合成（基础）
+ {cat:'tool',out:'bat',     qty:1, req:{wood:3,nails:1}, t:2.0},
+ {cat:'tool',out:'machete', qty:1, req:{scrap:3,wood:1}, t:3.0},
+ {cat:'tool',out:'axe',     qty:1, req:{wood:2,scrap:2}, t:2.5},
+ // 枪械合成（需要蓝图解锁）
+ {cat:'wpn', out:'pistol',  qty:1, req:{scrap:5,nails:3,fuel:1}, t:5.0, bp:'bp_pistol'},
+ {cat:'wpn', out:'smg',     qty:1, req:{scrap:8,nails:5,fuel:2}, t:7.0, bp:'bp_smg'},
+ {cat:'wpn', out:'shotgun', qty:1, req:{scrap:10,nails:6,wood:2}, t:8.0, bp:'bp_shotgun'},
+ {cat:'wpn', out:'rifle',   qty:1, req:{scrap:12,nails:8,fuel:3}, t:10.0, bp:'bp_rifle'}
 ];
-const CRAFT_CATS=[['med','医疗','Medical'],['ammo','弹药','Ammo'],['def','防御','Defense'],['food','食物','Food']];
+const CRAFT_CATS=[['med','医疗','Medical'],['ammo','弹药','Ammo'],['def','防御','Defense'],['food','食物','Food'],['tool','工具','Tools'],['wpn','武器','Weapons']];
 
 /* ================= DOM ================= */
 const $=id=>document.getElementById(id);
@@ -426,7 +440,7 @@ function bx(w,h,d,c,x,y,z,parent,shadow){ const m=new THREE.Mesh(BOX,mat(c)); m.
 const G={ state:'menu', diff:'normal', wave:0, kills:0, score:0, time:0, dayCount:1,
   cycleT:0.28, waveState:'rest', restT:6, spawnQ:0, spawned:0, spawnTick:0,
   shake:0, paused:false, bloodMoon:false, wasNight:false, boss:null,
-  combo:0, comboT:0, craftJob:null, supply:null, bannerT:0 };
+  combo:0, comboT:0, craftJob:null, supply:null, bannerT:0, blueprints:[] };
 
 /* ================= world ================= */
 const obstacles=[];   // {x,z,hw,hd} AABB
@@ -662,8 +676,13 @@ function buildWorld(){
     tree(x,z,Math.random()<0.3);
   }
   // 外围战利品点
-  for(let i=0;i<10;i++){
+  for(let i=0;i<20;i++){
     const a=R(0,Math.PI*2), r=R(35,HALF-4);
+    lootSpots.push({x:Math.cos(a)*r, z:Math.sin(a)*r});
+  }
+  // 中距离资源点：增加末日生存感
+  for(let i=0;i<12;i++){
+    const a=R(0,Math.PI*2), r=R(18,32);
     lootSpots.push({x:Math.cos(a)*r, z:Math.sin(a)*r});
   }
   // 外围装饰： barrels 和 trash cans
@@ -945,10 +964,26 @@ function killZombie(zb){
   }
   else if(roll<0.30) dropLoot(zb.x,zb.z,pick(['can','water','bandage','cloth','wood']),1);
   else if(roll<0.60) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(8,16));
+  else if(roll<0.75) dropLoot(zb.x,zb.z,pick(['wood','cloth','nails','scrap']),RI(2,5));
   else if(zb.type==='survivor'&&Math.random()<0.55) dropLoot(zb.x,zb.z,pick(['crowbar','axe','pistol','machete','smg']),1);
   else if(zb.type==='tank') dropLoot(zb.x,zb.z,pick(['medkit','rifle','ammo762']),RI(2,6));
   else if(zb.type==='spitter'&&Math.random()<0.4) dropLoot(zb.x,zb.z,pick(['fuel','flamethrower','shell','molotov']),1);
   else if(zb.type==='brute2') dropLoot(zb.x,zb.z,pick(['railgun','rocket','shotgun2','ammo762','medkit']),RI(1,3));
+  // 蓝图掉落（低概率）
+  if(Math.random()<0.05){
+    const bps=['bp_pistol','bp_smg','bp_shotgun','bp_rifle'];
+    const bp=pick(bps);
+    if(!(G.blueprints||[]).includes(bp)){
+      G.blueprints=G.blueprints||[];
+      G.blueprints.push(bp);
+      showMsg(T('发现蓝图：','Found blueprint: ')+bpName(bp));
+      AU.ui();
+    }
+  }
+}
+function bpName(bp){
+  const m={bp_pistol:['手枪蓝图','Pistol BP'],bp_smg:['冲锋枪蓝图','SMG BP'],bp_shotgun:['霰弹枪蓝图','Shotgun BP'],bp_rifle:['步枪蓝图','Rifle BP']};
+  return T((m[bp]||['蓝图','Blueprint'])[0],(m[bp]||['Blueprint','Blueprint'])[1]);
 }
 
 function hitZombie(zb,dmg,fx,fz,kb,crit){
@@ -2140,6 +2175,11 @@ function spawnInitialLoot(){
       const am=pick(['ammo9','shell','ammo762']);
       dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),am,RI(4,10));
     }
+    // 额外生存资源：增加末日生存感，每个loot点有概率生成生存材料
+    if(Math.random()<0.45){
+      const res=pick(['wood','cloth','nails','scrap','bottle','fuel']);
+      dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),res,RI(2,6));
+    }
   }
 }
 
@@ -2178,22 +2218,44 @@ function hideTip(){ $('tip').classList.add('hidden'); }
 function bindTip(el,id){ el.addEventListener('mouseenter',()=>showTip(id)); el.addEventListener('mouseleave',hideTip); }
 
 /* ================= inventory & craft UI ================= */
+let dragSrc=-1;
 function openInv(){
   const g=$('invGrid'); g.innerHTML='';
   P.inv.forEach((s,i)=>{
     const d=document.createElement('div'); d.className='islot';
     if(s){
-      d.innerHTML=icon(s.id)+'<span class="qty">'+s.q+'</span>'+'<span class="nm">'+itemName(s.id)+'</span>';
+      d.innerHTML=icon(s.id)+'<span class="qty">'+s.q+'</span>'+'<span class="nm">'+itemName(s.id)+'</span><span class="drop">✕</span>';
       d.onclick=()=>useInv(i);
+      // 右键丢弃
+      d.oncontextmenu=(e)=>{ e.preventDefault(); dropInvItem(i); };
+      // 拖拽交换
+      d.draggable=true;
+      d.ondragstart=(e)=>{ dragSrc=i; e.dataTransfer.effectAllowed='move'; };
+      d.ondragover=(e)=>{ e.preventDefault(); };
+      d.ondrop=(e)=>{ e.preventDefault(); if(dragSrc>=0&&dragSrc!==i){ swapInv(dragSrc,i); dragSrc=-1; } };
+      // 丢弃按钮
+      const dropBtn=d.querySelector('.drop');
+      if(dropBtn){ dropBtn.onclick=(e)=>{ e.stopPropagation(); dropInvItem(i); }; }
       bindTip(d,s.id);
-    } else d.style.opacity='0.35';
+    } else { d.style.opacity='0.35'; }
     g.appendChild(d);
   });
   $('invHint').innerHTML=T(
-    '双击快捷键：食物/水/绷带直接使用；武器与建造物进入快捷栏；燃烧瓶装备后点击投掷。',
-    'Food / water / bandages are used instantly; weapons & buildables go to the hotbar; equip a molotov and click to throw.');
+    '左键使用/装备；右键或✕丢弃；拖拽交换位置',
+    'Left-click to use/equip; right-click or ✕ to drop; drag to swap');
   $('invP').classList.remove('hidden');
   updatePanelsPos();
+}
+function swapInv(a,b){
+  const tmp=P.inv[a]; P.inv[a]=P.inv[b]; P.inv[b]=tmp;
+  openInv();
+}
+function dropInvItem(i){
+  const s=P.inv[i]; if(!s) return;
+  dropLoot(P.x+P.aimX*1.5, P.z+P.aimZ*1.5, s.id, s.q);
+  showMsg(T('丢弃 '+itemName(s.id)+'×'+s.q,'Dropped '+itemName(s.id)+'×'+s.q));
+  P.inv[i]=null;
+  openInv(); refreshHud();
 }
 function useInv(i){
   const s=P.inv[i]; if(!s) return;
@@ -2229,6 +2291,13 @@ function openCraft(){
   const job=G.craftJob;
   for(const rc of RECIPES){
     if(rc.cat!==craftCat) continue;
+    // 检查蓝图是否已解锁
+    if(rc.bp && !(G.blueprints||[]).includes(rc.bp)){
+      const row=document.createElement('div'); row.className='crow locked';
+      row.innerHTML='<div class="cname">🔒 '+T('未解锁蓝图','Locked Blueprint')+'</div><div class="creq">'+T('需要发现蓝图','Need to find blueprint')+'</div>';
+      list.appendChild(row);
+      continue;
+    }
     const row=document.createElement('div'); row.className='crow';
     const reqTxt=Object.entries(rc.req).map(([k,v])=>{
       const have=invCount(k);
@@ -2482,6 +2551,7 @@ function saveGame(){
   const data={
     v:2, diff:G.diff, wave:G.wave, kills:G.kills, score:G.score, time:G.time, day:G.dayCount, cyc:G.cycleT,
     waveState:G.waveState, restT:G.restT, spawnQ:G.spawnQ, spawned:G.spawned,
+    blueprints:G.blueprints,
     p:{x:P.x,z:P.z,hp:P.hp,hu:P.hunger,th:P.thirst,st:P.stam,inf:P.inf,weapon:P.weapon,hsel:P.hsel,
        mags:P.mags,inv:P.inv,hot:P.hot,
        classId:P.classId||'assault',skillCd:P.skillCd||0,shield:P.shield||0}
@@ -2836,6 +2906,7 @@ function newGame(from){
   G.cycleT=0.28; G.waveState='rest'; G.restT=8; G.spawnQ=0; G.spawned=0;
   G.paused=false; G.bloodMoon=false; G.wasNight=false; G.boss=null;
   G.combo=0; G.comboT=0; G.craftJob=null; G.bannerT=0;
+  G.blueprints=[];
   $('banner').style.opacity=0;
   Object.assign(P,{x:0,z:6,hp:100,hunger:100,thirst:100,stam:100,inf:0,dir:0,grabT:0,
     atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
@@ -2919,6 +2990,7 @@ function continueGame(){
   G.waveState=s.waveState||'rest'; G.restT=s.restT||8; G.spawnQ=s.spawnQ||0; G.spawned=s.spawned||0;
   G.paused=false; G.bloodMoon=false; G.wasNight=false; G.boss=null;
   G.combo=0; G.comboT=0; G.craftJob=null; G.bannerT=0;
+  G.blueprints=s.blueprints||[];
   $('banner').style.opacity=0;
   Object.assign(P,{x:s.p.x,z:s.p.z,hp:s.p.hp,hunger:s.p.hu,thirst:s.p.th,stam:s.p.st,inf:s.p.inf,
     weapon:s.p.weapon||'fists',hsel:s.p.hsel||0,mags:Object.assign({pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},s.p.mags||{}),
