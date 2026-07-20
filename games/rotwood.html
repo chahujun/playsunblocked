@@ -2739,55 +2739,64 @@ function buildClassSelect(){
 }
 function useClassSkill(){
   if(G.state!=='play'||G.paused) return;
-  if(P.skillCd>0){ showMsg(T('技能冷却中：'+Math.ceil(P.skillCd)+'秒','Skill CD: '+Math.ceil(P.skillCd)+'s')); return; }
-  const cls=CLASSES[P.classId]; if(!cls) return;
-  P.skillCd=cls.skill.cd;
-  switch(P.classId){
-    case 'doctor':
-      // 紧急治疗：回60HP+清除感染
-      P.hp=Math.min(P.maxHp||100,P.hp+60);
-      P.inf=Math.max(0,P.inf-50);
-      bloodBurst(P.x,1,P.z,15,0x44FF66);
-      AU.eat();
-      break;
-    case 'police':
-      // 呼叫支援：在玩家附近空投补给
-      { const dx=R(-3,3), dz=R(-3,3);
-        G.supply={x:P.x+dx,z:P.z+dz,t:8};
-        showRing(P.x+dx,P.z+dz,3,0x4488FF,0.5,null);
-        bloodBurst(P.x+dx,1,P.z+dz,10,0x4488FF);
-        AU.ui(); }
-      break;
-    case 'firefighter':
-      // 火焰冲锋：向前冲刺+范围火焰伤害
-      { const tx=P.x+P.aimX*6, tz=P.z+P.aimZ*6;
-        P.x=tx; P.z=tz; P.invulnT=0.5;
-        for(const z of zombies){ if(z.dead) continue;
-          const d=Math.hypot(z.x-tx,z.z-tz);
-          if(d<4){ hitZombie(z,60,tx,tz,1.0);
-            // 点燃
-            z.burnT=4; z.burnDmg=8; } }
-        showRing(tx,tz,4,0xFF6600,0.4,null);
-        bloodBurst(tx,1,tz,20,0xFF6600);
-        G.shake=0.5; AU.explode();
-        resolveCollision(P,0.35); }
-      break;
-    case 'clerk':
-      // 背包整理：补满当前武器弹药
-      { const w=WEAPONS[P.weapon];
-        if(w&&!w.melee&&w.ammo){
-          P.mags[P.weapon]=w.mag;
-          // 也给一些备弹
-          addInv(w.ammo,20);
+  if((P.skillCd||0)>0){ showMsg(T('技能冷却中：'+Math.ceil(P.skillCd)+'秒','Skill CD: '+Math.ceil(P.skillCd)+'s')); return; }
+  const cls=CLASSES[P.classId]; if(!cls||!cls.skill){ return; }
+  P.skillCd=cls.skill.cd||10;
+  try {
+    switch(P.classId){
+      case 'doctor':
+        // 紧急治疗：回60HP+清除感染
+        P.hp=Math.min(P.maxHp||100,P.hp+60);
+        P.inf=Math.max(0,P.inf-50);
+        bloodBurst(P.x,1,P.z,15,0x44FF66);
+        AU.eat();
+        break;
+      case 'police':
+        // 呼叫支援：直接触发补给空投
+        spawnSupply();
+        showRing(P.x,P.z,3,0x4488FF,0.5,null);
+        bloodBurst(P.x,1,P.z,10,0x4488FF);
+        AU.ui();
+        break;
+      case 'firefighter':
+        // 火焰冲锋：向前冲刺+范围火焰伤害
+        {
+          const tx=P.x+P.aimX*6, tz=P.z+P.aimZ*6;
+          // 安全检查：确保目标位置不在障碍物中
+          let fx=tx, fz=tz;
+          if(blockedAt(tx,tz,0.4)){ fx=P.x+P.aimX*3; fz=P.z+P.aimZ*3; }
+          if(blockedAt(fx,fz,0.4)){ fx=P.x; fz=P.z; }
+          P.x=fx; P.z=fz; P.invulnT=0.5;
+          for(const z of zombies){ if(z.dead) continue;
+            const d=Math.hypot(z.x-fx,z.z-fz);
+            if(d<4){ hitZombie(z,60,fx,fz,1.0);
+              z.burnT=4; z.burnDmg=8; } }
+          showRing(fx,fz,4,0xFF6600,0.4,null);
+          bloodBurst(fx,1,fz,20,0xFF6600);
+          G.shake=0.5; AU.explode();
+          resolveCollision(P,0.35);
         }
-        bloodBurst(P.x,1,P.z,8,0x88DDAA);
-        AU.ui(); }
-      break;
-    case 'civilian':
-      // 求生本能：5秒移速+50%伤害+30%
-      P.frenzyT=5;
-      bloodBurst(P.x,1,P.z,10,0xDDDDDD);
-      break;
+        break;
+      case 'clerk':
+        // 背包整理：补满当前武器弹药
+        {
+          const w=WEAPONS[P.weapon];
+          if(w&&!w.melee&&w.ammo){
+            P.mags[P.weapon]=w.mag;
+            addInv(w.ammo,20);
+          }
+          bloodBurst(P.x,1,P.z,8,0x88DDAA);
+          AU.ui();
+        }
+        break;
+      case 'civilian':
+        // 求生本能：5秒移速+50%伤害+30%
+        P.frenzyT=5;
+        bloodBurst(P.x,1,P.z,10,0xDDDDDD);
+        break;
+    }
+  } catch(err){
+    console.warn('Skill error:',err);
   }
   refreshHud();
 }
