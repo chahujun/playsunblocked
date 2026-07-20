@@ -2232,7 +2232,10 @@ function openInv(){
       d.draggable=true;
       d.ondragstart=(e)=>{ dragSrc=i; e.dataTransfer.effectAllowed='move'; };
       d.ondragover=(e)=>{ e.preventDefault(); };
-      d.ondrop=(e)=>{ e.preventDefault(); if(dragSrc>=0&&dragSrc!==i){ swapInv(dragSrc,i); dragSrc=-1; } };
+      d.ondrop=(e)=>{ e.preventDefault(); if(dragSrc>=0&&dragSrc!==i){ swapInv(dragSrc,i); dragSrc=-1; }
+        // 接收来自hotbar的拖拽
+        const data=e.dataTransfer.getData('text/plain');
+        if(data&&data.startsWith('hot:')){ const hi=parseInt(data.substring(4)); if(!isNaN(hi)&&P.hot[hi]){ const hs=P.hot[hi]; if(addInv(hs.id,hs.q)){ P.hot[hi]=null; if(P.hsel===hi){ P.weapon='fists'; P.hsel=3; setWeaponMesh(); } refreshHud(); openInv(); } } } };
       // 丢弃按钮
       const dropBtn=d.querySelector('.drop');
       if(dropBtn){ dropBtn.onclick=(e)=>{ e.stopPropagation(); dropInvItem(i); }; }
@@ -2397,6 +2400,29 @@ function refreshHud(){
       d.innerHTML+='<div class="dwrap"><div class="dfill" style="width:'+Math.max(0,cur/max*100)+'%"></div></div>';
     }
     d.onclick=()=>equipHot(i);
+    // 右键：放回背包或丢弃（fists除外）
+    if(s&&s.id!=='fists'){
+      d.oncontextmenu=(e)=>{
+        e.preventDefault();
+        // 优先放回背包
+        if(addInv(s.id,s.q)){
+          P.hot[i]=null;
+          if(P.hsel===i){ P.weapon='fists'; P.hsel=3; setWeaponMesh(); }
+          refreshHud();
+          showMsg(T('已放回背包','Returned to inventory'));
+        } else {
+          // 背包满了则丢弃
+          dropLoot(P.x+P.aimX*1.5,P.z+P.aimZ*1.5,s.id,s.q);
+          P.hot[i]=null;
+          if(P.hsel===i){ P.weapon='fists'; P.hsel=3; setWeaponMesh(); }
+          refreshHud();
+          showMsg(T('背包已满，已丢弃','Bag full, dropped'));
+        }
+      };
+      // 拖拽到背包
+      d.draggable=true;
+      d.ondragstart=(e)=>{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain','hot:'+i); };
+    }
     if(s) bindTip(d,s.id);
     elHot.appendChild(d);
   }
