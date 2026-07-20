@@ -301,7 +301,7 @@ const DIFF={
  normal:{hp:1.0, dmg:1.0,spd:1.0, count:1.0,  drain:1.0, label:['普通','Normal']},
  hard:  {hp:1.35,dmg:1.4,spd:1.1,count:1.3,  drain:1.25,label:['困难','Hard']}
 };
-const MAP=80, HALF=MAP/2;
+const MAP=120, HALF=MAP/2;
 const DAY_LEN=300;
 const MAX_Z=24;
 const REST_T=30;
@@ -317,7 +317,11 @@ const WEAPONS={
  pistol: {melee:0,dmg:24,rate:0.34,ammo:'ammo9', mag:12,reload:1.2,spread:0.035,range:34,noise:20,n:['手枪','Pistol']},
  shotgun:{melee:0,dmg:13,rate:0.95,ammo:'shell',mag:6, reload:2.1,spread:0.13, pellets:6,range:20,noise:30,n:['霰弹枪','Shotgun']},
  rifle:  {melee:0,dmg:32,rate:0.15,ammo:'ammo762',mag:20,reload:1.7,spread:0.025,auto:1,range:40,noise:26,n:['步枪','Rifle']},
- smg:    {melee:0,dmg:14,rate:0.085,ammo:'ammo9',mag:30,reload:1.6,spread:0.075,auto:1,range:26,noise:22,n:['冲锋枪','SMG']}
+ smg:    {melee:0,dmg:14,rate:0.085,ammo:'ammo9',mag:30,reload:1.6,spread:0.075,auto:1,range:26,noise:22,n:['冲锋枪','SMG']},
+  flamethrower:{melee:0,dmg:8,rate:0.06,ammo:'fuel',mag:50,reload:2.5,spread:0.15,auto:1,range:12,noise:15,type:'flame',n:['火焰喷射器','Flamethrower']},
+  rocket:     {melee:0,dmg:80,rate:1.5,ammo:'shell',mag:1,reload:3.0,spread:0,range:35,noise:40,type:'rocket',explode:1,explodeDmg:50,explodeR:4,n:['火箭筒','Rocket Launcher']},
+  railgun:    {melee:0,dmg:120,rate:1.8,ammo:'ammo762',mag:5,reload:2.5,spread:0,range:50,noise:30,type:'rail',pierce:99,n:['轨道炮','Railgun']},
+  shotgun2:  {melee:0,dmg:20,rate:0.7,ammo:'shell',mag:8,reload:2.0,spread:0.09,pellets:8,range:24,noise:28,n:['自动霰弹枪','Auto Shotgun']}
 };
 const ITEMS={
  can:      {n:['罐头','Canned Food'],use:'food',v:38,stack:5,tip:['恢复 38 点饱食。','Restores 38 food.']},
@@ -346,7 +350,11 @@ const ITEMS={
  pistol:{n:['手枪','Pistol'],weapon:1,stack:1,tip:['枪械：中距单发。','Firearm: mid-range semi-auto.']},
  shotgun:{n:['霰弹枪','Shotgun'],weapon:1,stack:1,tip:['枪械：近距散射。','Firearm: close-range spread.']},
  rifle:{n:['步枪','Rifle'],weapon:1,stack:1,tip:['枪械：远距全自动。','Firearm: long-range auto.']},
- smg:{n:['冲锋枪','SMG'],weapon:1,stack:1,tip:['枪械：近距高速扫射。','Firearm: rapid close spray.']}
+  smg:{n:['冲锋枪','SMG'],weapon:1,stack:1,tip:['枪械：近距高速扫射。','Firearm: rapid close spray.']},
+  flamethrower:{n:['火焰喷射器','Flamethrower'],weapon:1,stack:1,tip:['近距持续火焰。','Close-range sustained fire.']},
+  rocket:{n:['火箭筒','Rocket Launcher'],weapon:1,stack:1,tip:['范围爆炸杀伤。','Explosive area damage.']},
+  railgun:{n:['轨道炮','Railgun'],weapon:1,stack:1,tip:['穿透型高伤远程。','Piercing high-damage sniper.']},
+  shotgun2:{n:['自动霰弹枪','Auto Shotgun'],weapon:1,stack:1,tip:['近距高速散射。','Rapid close-range spread.']}
 };
 const RECIPES=[
  {cat:'med', out:'bandage', qty:1, req:{cloth:2}, t:1.2},
@@ -370,8 +378,8 @@ const elHud=$('hud'), elMsg=$('msgTxt'), elHot=$('hotbar');
 /* ================= three base ================= */
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0xBFC7CE);
-scene.fog=new THREE.Fog(0xBFC7CE,45,120);
-const camera=new THREE.PerspectiveCamera(46,1280/720,0.1,300);
+scene.fog=new THREE.Fog(0xBFC7CE,55,180);
+const camera=new THREE.PerspectiveCamera(46,1280/720,0.1,400);
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(1280,720);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
@@ -383,9 +391,9 @@ const hemi=new THREE.HemisphereLight(0xd8dce2,0x4a4a42,0.75); scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff2dd,1.15);
 sun.castShadow=true;
 sun.shadow.mapSize.set(1024,1024);
-sun.shadow.camera.left=-55; sun.shadow.camera.right=55;
-sun.shadow.camera.top=55; sun.shadow.camera.bottom=-55;
-sun.shadow.camera.far=160; sun.shadow.bias=-0.002;
+sun.shadow.camera.left=-75; sun.shadow.camera.right=75;
+sun.shadow.camera.top=75; sun.shadow.camera.bottom=-75;
+sun.shadow.camera.far=220; sun.shadow.bias=-0.002;
 scene.add(sun); scene.add(sun.target);
 const amb=new THREE.AmbientLight(0xffffff,0.12); scene.add(amb);
 
@@ -612,7 +620,7 @@ function buildWorld(){
   lootSpots.push({x:-8,z:28}); lootSpots.push({x:-24,z:27});
 
   // scattered trees elsewhere
-  for(let i=0;i<16;i++){
+  for(let i=0;i<28;i++){
     const x=R(-HALF+3,HALF-3), z=R(-HALF+3,HALF-3);
     if(z>22&&x<6) continue; // park handled
     if(Math.abs(Math.abs(x)-20)<4.5||Math.abs(Math.abs(z)-20)<4.5) continue;
@@ -621,6 +629,38 @@ function buildWorld(){
     for(const o of obstacles){ if(Math.abs(x-o.x)<o.hw+1.4&&Math.abs(z-o.z)<o.hd+1.4){bad=true;break;} }
     if(bad) continue;
     tree(x,z,false);
+  }
+
+  // 拓展地图：在外围区域增加更多建筑和掩体
+  const expandBuildings=[
+    [44,-44,7,7],[-44,44,7,7],[44,44,6,7],[-44,-44,6,7],
+    [50,-12,6,6],[-50,12,6,6],[12,50,7,6],[-12,-50,7,6],
+    [38,38,6,6],[-38,-38,6,6],[38,-38,7,6],[-38,38,7,6]
+  ];
+  for(const [bx,bz,bw,bd] of expandBuildings){
+    if(Math.random()<0.6) shop(bx,bz,bw,bd);
+    else house(bx,bz,bw,bd);
+  }
+  // 外围散落树木和灌木
+  for(let i=0;i<20;i++){
+    const x=R(-HALF+4,HALF-4), z=R(-HALF+4,HALF-4);
+    if(Math.hypot(x,z)<30) continue; // 仅外围
+    if(Math.abs(Math.abs(x)-20)<4.5||Math.abs(Math.abs(z)-20)<4.5) continue;
+    let bad=false;
+    for(const o of obstacles){ if(Math.abs(x-o.x)<o.hw+1.4&&Math.abs(z-o.z)<o.hd+1.4){bad=true;break;} }
+    if(bad) continue;
+    tree(x,z,Math.random()<0.3);
+  }
+  // 外围战利品点
+  for(let i=0;i<10;i++){
+    const a=R(0,Math.PI*2), r=R(35,HALF-4);
+    lootSpots.push({x:Math.cos(a)*r, z:Math.sin(a)*r});
+  }
+  // 外围装饰： barrels 和 trash cans
+  for(let i=0;i<8;i++){
+    const a=R(0,Math.PI*2), r=R(30,HALF-5);
+    const x=Math.cos(a)*r, z=Math.sin(a)*r;
+    if(Math.random()<0.5) barrel(x,z); else trashCan(x,z);
   }
 
   // fences (park borders)
@@ -690,7 +730,7 @@ const P={ x:0,z:6, hp:100,hunger:100,thirst:100,stam:100,inf:0,
   atkCd:0, swingT:0, swingMax:0.45, meleeHitT:0, meleeHitW:null,
   reloadT:0, reloadMax:1, stepT:0, hurtT:0, crouchT:0, recoilT:0, mzT:0,
   rollT:0, rollCd:0, invulnT:0, rollDx:0, rollDz:1, kbx:0, kbz:0,
-  weapon:'fists', lastWpn:null, mags:{pistol:0,shotgun:0,rifle:0,smg:0},
+  weapon:'fists', lastWpn:null, mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},
   inv:new Array(8).fill(null), hot:[{id:'fists',q:1},null,null,null], hsel:0,
   aimX:0, aimZ:1, mesh:null, parts:{}, wmesh:null, deadAnim:0 };
 
@@ -716,29 +756,75 @@ function buildPlayer(){
   P.mesh=g; P.parts={body,lArm,rArm,lLeg,rLeg,torso,head};
 }
 function setWeaponMesh(){
-  if(P.wmesh){ P.parts.rArm.remove(P.wmesh); P.wmesh=null; }
-  const w=P.weapon; let m=null;
-  if(w==='bat'){ m=bx(0.09,0.85,0.09,0x8A6A42,0,-0.75,-0.3); }
-  else if(w==='crowbar'){ m=bx(0.07,0.7,0.07,0x5B5C57,0,-0.72,-0.3); }
-  else if(w==='axe'){ m=new THREE.Group();
-    m.add(bx(0.07,0.8,0.07,0x6B5B40,0,-0.75,-0.3));
-    m.add(bx(0.26,0.18,0.06,0x5B5C57,0.1,-1.05,-0.3)); }
-  else if(w==='machete'){ m=new THREE.Group();
-    m.add(bx(0.05,0.55,0.1,0xB9C0B8,0,-0.85,-0.32));
-    m.add(bx(0.07,0.18,0.08,0x242321,0,-0.58,-0.3)); }
-  else if(w==='sledge'){ m=new THREE.Group();
-    m.add(bx(0.08,0.95,0.08,0x6B5B40,0,-0.8,-0.3));
-    m.add(bx(0.3,0.2,0.2,0x5B5C57,0,-1.2,-0.3)); }
-  else if(w==='pistol'){ m=new THREE.Group();
-    m.add(bx(0.07,0.16,0.3,0x33322F,0,-0.62,-0.42)); }
-  else if(w==='smg'){ m=new THREE.Group();
-    m.add(bx(0.08,0.14,0.55,0x33322F,0,-0.62,-0.45));
-    m.add(bx(0.06,0.2,0.08,0x242321,0,-0.74,-0.3)); }
-  else if(w==='shotgun'||w==='rifle'){ m=new THREE.Group();
-    m.add(bx(0.08,0.12,0.85,0x33322F,0,-0.6,-0.55));
-    m.add(bx(0.07,0.14,0.25,0x6B5B40,0,-0.62,-0.15)); }
-  else if(w==='molotov'){ m=bx(0.14,0.24,0.14,0x7A5A2E,0,-0.66,-0.28); }
-  else if(w==='barricade'||w==='rbarricade'){ m=bx(0.5,0.08,0.3,0x8A6A42,0,-0.62,-0.35); }
+  if(P.wmesh){ P.parts.rArm.remove(P.wmesh); P.wmesh.traverse(o=>{if(o.isMesh){o.geometry.dispose&&o.geometry.dispose();}}); P.wmesh=null; }
+  const wk=P.weapon||'fists';
+  const w=WEAPONS[wk];
+  let m=null;
+  if(!w){
+    // 非武器物品（molotov/barricade/spikes等）
+    if(wk==='molotov'){ m=bx(0.14,0.24,0.14,0x7A5A2E,0,-0.66,-0.28); }
+    else if(wk==='barricade'||wk==='rbarricade'){ m=bx(0.5,0.08,0.3,0x8A6A42,0,-0.62,-0.35); }
+  } else if(w.melee){
+    // 近战武器
+    if(wk==='bat'){
+      m=new THREE.Group();
+      m.add(bx(0.09,0.85,0.09,0x8A6A42,0,-0.75,-0.3));
+      m.add(bx(0.13,0.15,0.13,0x6B5B40,0,-0.4,-0.3)); // 握把
+    } else if(wk==='crowbar'){
+      m=new THREE.Group();
+      m.add(bx(0.07,0.7,0.07,0x5B5C57,0,-0.72,-0.3));
+      m.add(bx(0.15,0.06,0.07,0x5B5C57,0,-1.0,-0.3)); // 端头
+    } else if(wk==='axe'){
+      m=new THREE.Group();
+      m.add(bx(0.07,0.8,0.07,0x6B5B40,0,-0.75,-0.3));
+      m.add(bx(0.26,0.18,0.06,0x5B5C57,0.1,-1.05,-0.3));
+    } else if(wk==='machete'){
+      m=new THREE.Group();
+      m.add(bx(0.05,0.55,0.1,0xB9C0B8,0,-0.85,-0.32));
+      m.add(bx(0.07,0.18,0.08,0x242321,0,-0.58,-0.3));
+    } else if(wk==='sledge'){
+      m=new THREE.Group();
+      m.add(bx(0.08,0.95,0.08,0x6B5B40,0,-0.8,-0.3));
+      m.add(bx(0.3,0.2,0.2,0x5B5C57,0,-1.2,-0.3));
+    }
+  } else {
+    // 枪械
+    if(wk==='pistol'){
+      m=new THREE.Group();
+      m.add(bx(0.07,0.16,0.3,0x33322F,0,-0.62,-0.42));
+      m.add(bx(0.06,0.18,0.08,0x242321,0,-0.56,-0.32)); // 握把
+    } else if(wk==='smg'){
+      m=new THREE.Group();
+      m.add(bx(0.08,0.14,0.55,0x33322F,0,-0.62,-0.45));
+      m.add(bx(0.06,0.2,0.08,0x242321,0,-0.74,-0.3));
+    } else if(wk==='shotgun'||wk==='shotgun2'){
+      m=new THREE.Group();
+      m.add(bx(0.08,0.12,0.85,0x33322F,0,-0.6,-0.55));
+      m.add(bx(0.07,0.14,0.25,0x6B5B40,0,-0.62,-0.15));
+      if(wk==='shotgun2'){ m.add(bx(0.05,0.05,0.2,0x242321,0,-0.62,-0.8)); } // 枪管扩展
+    } else if(wk==='rifle'){
+      m=new THREE.Group();
+      m.add(bx(0.06,0.1,0.9,0x332211,0,-0.6,-0.55));
+      m.add(bx(0.05,0.12,0.2,0x6B5B40,0,-0.62,-0.15));
+      m.add(bx(0.04,0.04,0.15,0x242321,0,-0.62,-0.9)); // 瞄准镜
+    } else if(wk==='railgun'){
+      m=new THREE.Group();
+      m.add(bx(0.06,0.1,0.9,0xFFFF44,0,-0.6,-0.55));
+      m.add(bx(0.08,0.08,0.3,0x242321,0,-0.6,-0.7)); // 线圈
+      m.add(bx(0.04,0.04,0.2,0x666666,0,-0.62,-0.15)); // 能量核心
+    } else if(wk==='rocket'){
+      m=new THREE.Group();
+      const tube=new THREE.Mesh(CYL,mat(0x554433)); tube.scale.set(0.16,0.6,0.16);
+      tube.rotation.x=Math.PI/2; tube.position.set(0,-0.7,-0.45); m.add(tube);
+      m.add(bx(0.06,0.12,0.1,0x242321,0,-0.6,-0.2)); // 握把
+      m.add(bx(0.1,0.04,0.1,0x666666,0,-0.65,-0.75)); // 瞄准器
+    } else if(wk==='flamethrower'){
+      m=new THREE.Group();
+      m.add(bx(0.12,0.12,0.5,0x884422,0,-0.62,-0.45));
+      m.add(bx(0.1,0.2,0.1,0x444444,0,-0.6,-0.2)); // 罐体
+      m.add(bx(0.04,0.04,0.25,0x242321,0,-0.62,-0.75)); // 喷嘴
+    }
+  }
   if(m){ m.traverse(o=>{if(o.isMesh)o.castShadow=true;});
     P.parts.rArm.add(m); P.wmesh=m; }
 }
@@ -752,7 +838,9 @@ const ZT={
  screamer:{hp:38, spd:2.1,dmg:7, scale:1.0,skin:0x9A8A7A,shirt:0x743C38,pants:0x3E3E3A,scream:1,score:15,n:['尖啸尸','Screamer']},
  tank:    {hp:230,spd:0.95,dmg:26,scale:1.45,skin:0x6A7260,shirt:0x4A4A42,pants:0x2E2D2A,stomp:1,score:60,n:['巨坦尸','Tank']},
  survivor:{hp:65, spd:2.3,dmg:15,scale:1.0,skin:0x8A7A68,shirt:0x30483A,pants:0x33322F,armed:1,score:30,n:['感染幸存者','Inf. Survivor']},
- brute:   {hp:620,spd:1.0,dmg:34,scale:1.7,skin:0x5E6656,shirt:0x3E3E3A,pants:0x2E2D2A,stomp:1,boss:1,score:300,n:['蛮兽','Brute']}
+ brute:   {hp:620,spd:1.0,dmg:34,scale:1.7,skin:0x5E6656,shirt:0x3E3E3A,pants:0x2E2D2A,stomp:1,boss:1,score:300,n:['蛮兽','Brute']},
+  spitter: {hp:60, spd:1.5,dmg:12,scale:1.0,skin:0x6B8A4A,shirt:0x44AA44,pants:0x2E3E2A,ranged:1,score:35,n:['喷吐者','Spitter']},
+  brute2:  {hp:220,spd:1.3,dmg:28,scale:1.3,skin:0x664422,shirt:0x4A3A22,pants:0x2E2D2A,kb:0.2,score:60,n:['蛮兵','Brute Soldier']}
 };
 const zombies=[];
 let zid=0;
@@ -801,7 +889,8 @@ function spawnZombie(type,x,z){
     tx:0, tz:0, invT:0, lastX:0, lastZ:0, loseT:0,
     flash:0, dead:0, deadT:0, ph:R(0,6), groanT:R(2,9), screamed:0,
     stomping:0, stompCd:R(1,3), lungeT:0, lungeCd:0, lungeHit:0, ldx:0, ldz:0,
-    rise:1.0, kbx:0, kbz:0, spkCd:0 };
+    rise:1.0, kbx:0, kbz:0, spkCd:0,
+    spitCd:R(2,4), spitting:0, spitHit:0 };
   zombies.push(zb);
   return zb;
 }
@@ -846,6 +935,8 @@ function killZombie(zb){
   else if(roll<0.45) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(3,8));
   else if(zb.type==='survivor'&&Math.random()<0.55) dropLoot(zb.x,zb.z,pick(['crowbar','axe','pistol','machete','smg']),1);
   else if(zb.type==='tank') dropLoot(zb.x,zb.z,pick(['medkit','rifle','ammo762']),RI(2,6));
+  else if(zb.type==='spitter'&&Math.random()<0.4) dropLoot(zb.x,zb.z,pick(['fuel','flamethrower','shell','molotov']),1);
+  else if(zb.type==='brute2') dropLoot(zb.x,zb.z,pick(['railgun','rocket','shotgun2','ammo762','medkit']),RI(1,3));
 }
 
 function hitZombie(zb,dmg,fx,fz,kb,crit){
@@ -981,6 +1072,25 @@ function zombieAI(zb,dt,idx){
     zb.ldx=dx/(dist||1); zb.ldz=dz/(dist||1);
   }
 
+  /* ---- spitter ranged spit ---- */
+  zb.spitCd=Math.max(0,zb.spitCd-dt);
+  if(zb.spitting>0){
+    zb.spitting-=dt;
+    if(zb.spitting<=0){
+      // 发射酸液弹（敌方子弹）
+      const tx=P.x-zb.x, tz=P.z-zb.z, td=Math.hypot(tx,tz)||1;
+      const svx=tx/td, svz=tz/td;
+      fireBullet(zb.x,1.2,zb.z,svx,svz,14,zb.dmg,0,0,0,0,1);
+      // 标记为敌方子弹，用绿色
+      const lb=bullets[bullets.length-1];
+      if(lb){ lb.enemy=1; lb.m.material=mat(0x66DD44); lb.m.scale.set(0.15,0.15,0.15); }
+      AU.groan(dist);
+    }
+  } else if(zb.c.ranged&&dist>4&&dist<14&&zb.spitCd<=0&&(zb.state==='chase'||zb.state==='attack')){
+    zb.spitting=0.6; zb.spitCd=R(2.5,4);
+    showRing(zb.x,zb.z,1.0,0x66DD44,0.5,null);
+  }
+
   /* ---- state behaviors ---- */
   let mvx=0, mvz=0;
   let spd=zb.spd*(night?1.28:1)*(bmNight?1.15:1);
@@ -1069,6 +1179,8 @@ function zombieAI(zb,dt,idx){
     pa.lArm.rotation.x=-2.2; pa.rArm.rotation.x=-2.2;   // lunge swipe
   } else if(zb.stomping>0){
     pa.lArm.rotation.x=-2.9; pa.rArm.rotation.x=-2.9;   // raise for stomp
+  } else if(zb.spitting>0){
+    pa.lArm.rotation.x=-1.8; pa.rArm.rotation.x=-1.8;   // spit pose
   } else {
     pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,zb.c.crawl?-0.4:-1.25,dt*6);
     pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,zb.c.crawl?-0.5:-1.25,dt*6);
@@ -1218,7 +1330,8 @@ function updateNoises(dt){ for(let i=noises.length-1;i>=0;i--){ noises[i].ttl-=d
 const bullets=[];
 let bPool=[];
 function shoot(){
-  const wk=P.weapon;
+  const wk=P.weapon||'fists';
+  if(!WEAPONS[wk]){ P.weapon='fists'; return; }
   if(P.atkCd>0||P.rollT>0) return;
   if(wk==='molotov'){ throwMolotov(); return; }
   const w=WEAPONS[wk]; if(!w) return;
@@ -1232,6 +1345,37 @@ function shoot(){
   addNoise(P.x,P.z,w.noise||18);
   muzzleFlash();
   ejectShell(P.x,1.35,P.z,P.aimX,P.aimZ);
+  // 特殊武器类型
+  if(w.type==='flame'){
+    // 火焰喷射器：短距离多发
+    for(let p=0;p<3;p++){
+      const spread=0.12;
+      const sx=(Math.random()-0.5)*spread, sz=(Math.random()-0.5)*spread;
+      const dir=new V3(P.aimX,0,P.aimZ).normalize().add(new V3(sx,0,sz)).normalize();
+      fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg,0,0,0,0,1);
+    }
+    P.kbx-=P.aimX*0.05; P.kbz-=P.aimZ*0.05;
+    if(P.mags[wk]<=0) reload();
+    return;
+  }
+  if(w.type==='rocket'){
+    // 火箭筒：单发爆炸弹
+    const dir=new V3(P.aimX,0,P.aimZ).normalize();
+    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg,w.explode,w.explodeDmg,w.explodeR,0);
+    P.kbx-=P.aimX*0.5; P.kbz-=P.aimZ*0.5;
+    G.shake=Math.max(G.shake,0.2);
+    if(P.mags[wk]<=0) reload();
+    return;
+  }
+  if(w.type==='rail'){
+    // 轨道炮：穿透弹
+    const dir=new V3(P.aimX,0,P.aimZ).normalize();
+    fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range,w.dmg,0,0,0,w.pierce||99);
+    P.kbx-=P.aimX*0.3; P.kbz-=P.aimZ*0.3;
+    G.shake=Math.max(G.shake,0.15);
+    if(P.mags[wk]<=0) reload();
+    return;
+  }
   const pellets=w.pellets||1;
   for(let p=0;p<pellets;p++){
     const spread=w.spread*(P.moving?2.2:1);
@@ -1296,34 +1440,110 @@ function breakWeapon(slot){
   }
   setWeaponMesh(); refreshHud();
 }
-function fireBullet(x,y,z,vx,vz,range,dmg){
+function fireBullet(x,y,z,vx,vz,range,dmg,explode,explodeDmg,explodeR,pierce,isFlame){
   let m=bPool.pop();
   if(!m){ m=new THREE.Mesh(BOX,mat(0xD6C29A)); m.scale.set(0.06,0.06,0.18); scene.add(m); }
   m.visible=true; m.position.set(x,y,z);
   m.rotation.y=Math.atan2(vx,vz);
-  bullets.push({m,x,y,z,vx,vz,rng:range,dmg,dist:0});
+  if(explode){ m.material=mat(0xFF6600); m.scale.set(0.12,0.12,0.3); }
+  else if(pierce>0){ m.material=mat(0xFFFF44); m.scale.set(0.04,0.04,0.25); }
+  else if(isFlame){ m.material=mat(0xFF8822); m.scale.set(0.1,0.1,0.1); }
+  bullets.push({m,x,y,z,vx,vz,rng:range,dmg,dist:0,explode:explode||0,explodeDmg:explodeDmg||0,explodeR:explodeR||0,pierce:pierce||0,hitZ:[],isFlame:isFlame||0});
 }
 function updateBullets(dt){
   for(let i=bullets.length-1;i>=0;i--){
-    const b=bullets[i]; const spd=28;
+    const b=bullets[i]; const spd=b.isFlame?18:28;
     const dx=b.vx*spd*dt, dz=b.vz*spd*dt; b.dist+=Math.hypot(dx,dz);
     b.x+=dx; b.z+=dz;
     b.m.position.set(b.x,b.y,b.z);
-    if(b.dist>b.rng){ killBullet(i); continue; }
+    if(b.dist>b.rng){
+      // 火焰弹飞行结束时产生小爆裂特效
+      if(b.isFlame){
+        for(let p=0;p<4;p++){
+          const ang=Math.PI*2*p/4;
+          spawnP(b.x,1.4,b.z,Math.cos(ang)*2,Math.sin(ang)*2,0.3,12,0.06,0xFF8822);
+        }
+      }
+      // 火箭弹飞行结束时爆炸
+      if(b.explode){ explodeBullet(b); }
+      killBullet(i); continue;
+    }
+    // 敌方子弹：检测命中玩家
+    if(b.enemy){
+      if(Math.abs(b.x-P.x)<0.5&&Math.abs(b.z-P.z)<0.5){
+        damagePlayer(b.dmg,3);
+        for(let p=0;p<6;p++){
+          spawnP(b.x,1.4,b.z,R(-1,1),R(0,2),R(-1,1),0.4,12,0.06,0x66DD44);
+        }
+        killBullet(i); continue;
+      }
+      // 敌方子弹不检测僵尸命中，只检测障碍物
+      let hitObs=false;
+      for(let bi=barricades.length-1;bi>=0;bi--){
+        const bb=barricades[bi]; if(Math.abs(b.x-bb.x)<bb.hw&&Math.abs(b.z-bb.z)<bb.hd){
+          damageBarricade(bb,b.dmg*0.6,bi); hitObs=true; break; } }
+      if(hitObs) killBullet(i);
+      continue;
+    }
     let hit=false;
     for(const z of zombies){ if(z.dead||z.rise>0) continue;
       const rr=0.5*z.c.scale;
       if(Math.abs(b.x-z.x)<rr&&Math.abs(b.z-z.z)<rr){
         let dmg=b.dmg, crit=false;
         if(Math.random()<0.15){ dmg*=2; crit=true; AU.headshot(); }
-        hitZombie(z,dmg,b.x,b.z,0.25,crit); hit=true; break;
+        // 穿透：可击中多个目标
+        if(b.pierce>0){
+          if(!b.hitZ)b.hitZ=[];
+          if(b.hitZ.includes(z)) continue;
+          b.hitZ.push(z);
+          hitZombie(z,dmg,b.x,b.z,0.25,crit);
+          // 火焰弹命中产生小火花
+          if(b.isFlame){
+            for(let p=0;p<3;p++){
+              spawnP(b.x,1.4,b.z,R(-1,1),R(0,2),R(-1,1),0.3,12,0.05,0xFF8822);
+            }
+          }
+          if(b.hitZ.length>=b.pierce){
+            if(b.explode){ explodeBullet(b); }
+            hit=true; break;
+          }
+          continue;
+        }
+        hitZombie(z,dmg,b.x,b.z,0.25,crit);
+        if(b.isFlame){
+          for(let p=0;p<3;p++){
+            spawnP(b.x,1.4,b.z,R(-1,1),R(0,2),R(-1,1),0.3,12,0.05,0xFF8822);
+          }
+        }
+        if(b.explode){ explodeBullet(b); }
+        hit=true; break;
       }
     }
     if(!hit){ for(let bi=barricades.length-1;bi>=0;bi--){
       const bb=barricades[bi]; if(Math.abs(b.x-bb.x)<bb.hw&&Math.abs(b.z-bb.z)<bb.hd){
-        damageBarricade(bb,b.dmg*0.6,bi); hit=true; break; } } }
+        damageBarricade(bb,b.dmg*0.6,bi);
+        if(b.explode){ explodeBullet(b); }
+        hit=true; break; } } }
     if(hit) killBullet(i);
   }
+}
+function explodeBullet(b){
+  // 爆炸：范围内所有僵尸受伤
+  for(const z2 of zombies){
+    if(z2.dead||z2.rise>0) continue;
+    const ed=Math.hypot(z2.x-b.x,z2.z-b.z);
+    if(ed<b.explodeR){
+      const edmg=b.explodeDmg*(1-ed/b.explodeR);
+      hitZombie(z2,edmg,b.x,b.z,0.5);
+    }
+  }
+  // 爆炸特效
+  for(let p=0;p<12;p++){
+    const ang=Math.PI*2*p/12;
+    spawnP(b.x,1.4,b.z,Math.cos(ang)*4,Math.sin(ang)*4,0.5,12,0.08,0xFF6600);
+  }
+  showRing(b.x,b.z,b.explodeR,0xFF6600,0.3,null);
+  G.shake=Math.max(G.shake,0.3);
 }
 function killBullet(i){
   const b=bullets[i]; b.m.visible=false; bPool.push(b.m); bullets.splice(i,1);
@@ -1404,10 +1624,10 @@ function waveTypes(n){
   if(n>=2) t.push('runner','runner');
   if(n>=3) t.push('crawler');
   if(n>=4) t.push('screamer');
-  if(n>=5) t.push('bloater','bloater');
-  if(n>=6) t.push('survivor','survivor');
-  if(n>=7) t.push('tank');
-  if(n>=9) t.push('tank','runner','screamer');
+  if(n>=5) t.push('bloater','bloater','spitter');
+  if(n>=6) t.push('survivor','survivor','spitter');
+  if(n>=7) t.push('tank','brute2');
+  if(n>=9) t.push('tank','runner','screamer','brute2','spitter');
   return t;
 }
 function startWave(n){
@@ -1455,14 +1675,32 @@ function aliveZ(){ let n=0; for(const z of zombies) if(!z.dead) n++; return n; }
 function resolveCollision(ent,rad){
   const mapLimit=HALF-1.0;
   ent.x=clamp(ent.x,-mapLimit,mapLimit); ent.z=clamp(ent.z,-mapLimit,mapLimit);
-  for(const o of obstacles){ const dx=Math.abs(ent.x-o.x)-o.hw, dz=Math.abs(ent.z-o.z)-o.hd;
-    if(dx<rad&&dz<rad){ if(dx<dz){ ent.x=ent.x>o.x?o.x+o.hw+rad:o.x-o.hw-rad; }
-      else { ent.z=ent.z>o.z?o.z+o.hd+rad:o.z-o.hd-rad; } } }
+  // 矩形障碍物：分别处理X和Z轴，避免滑动
+  for(const o of obstacles){
+    const dx=ent.x-o.x, dz=ent.z-o.z;
+    const ox=Math.abs(dx)-o.hw, oz=Math.abs(dz)-o.hd;
+    if(ox<rad&&oz<rad){
+      // 分别处理每个轴的穿透
+      if(ox<oz){
+        ent.x=o.x+Math.sign(dx||1)*(o.hw+rad);
+      } else {
+        ent.z=o.z+Math.sign(dz||1)*(o.hd+rad);
+      }
+    }
+  }
   for(const o of circles){ const dx=ent.x-o.x, dz=ent.z-o.z, d=Math.hypot(dx,dz);
     if(d<rad+o.r&&d>0.001){ const p=(rad+o.r)/d; ent.x=o.x+dx*p; ent.z=o.z+dz*p; } }
-  for(const b of barricades){ const dx=Math.abs(ent.x-b.x)-b.hw, dz=Math.abs(ent.z-b.z)-b.hd;
-    if(dx<rad&&dz<rad){ if(dx<dz){ ent.x=ent.x>b.x?b.x+b.hw+rad:b.x-b.hw-rad; }
-      else { ent.z=ent.z>b.z?b.z+b.hd+rad:b.z-b.hd-rad; } } }
+  for(const b of barricades){
+    const dx=ent.x-b.x, dz=ent.z-b.z;
+    const ox=Math.abs(dx)-b.hw, oz=Math.abs(dz)-b.hd;
+    if(ox<rad&&oz<rad){
+      if(ox<oz){
+        ent.x=b.x+Math.sign(dx||1)*(b.hw+rad);
+      } else {
+        ent.z=b.z+Math.sign(dz||1)*(b.hd+rad);
+      }
+    }
+  }
 }
 
 /* ================= player update ================= */
@@ -1583,6 +1821,22 @@ function playerAnim(dt){
   }
   else if(P.moving){ pa.rArm.rotation.x=-Math.sin(ph)*0.55; pa.lArm.rotation.x=Math.sin(ph)*0.55; }
   else { pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,0,dt*8); pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,0,dt*8); }
+  // 武器持握动画细节：持枪时双臂略微内收，提升观感
+  if(!swinging&&P.rollT<=0){
+    if(w&&!w.melee){
+      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,-0.15,dt*8);
+      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0.15,dt*8);
+      // 后坐力时身体微后仰
+      if(P.recoilT>0){ b.rotation.x=lerp(b.rotation.x,lean-0.05,dt*12); }
+    } else {
+      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0,dt*8);
+      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0,dt*8);
+    }
+  }
+  // 站定时身体朝向瞄准方向微调
+  if(!P.moving&&P.rollT<=0&&!swinging){
+    b.rotation.y=lerp(b.rotation.y,0,dt*6);
+  }
 }
 function meleeAnim(kind){
   const f=1-P.swingT/P.swingMax, pa=P.parts, b=pa.body;
@@ -1676,10 +1930,14 @@ function updateLootEnts(dt){
 function spawnInitialLoot(){
   const L=[['can',3],['water',3],['bandage',3],['cloth',3],['wood',4],['nails',3],['fuel',2],['bottle',3],
     ['ammo9',2],['shell',2],['ammo762',2],['bat',1],['crowbar',1],['molotov',1],['barricade',2],['scrap',2],
-    ['axe',1],['medkit',1],['machete',1],['hotmeal',1]];
+    ['axe',1],['medkit',1],['machete',1],['hotmeal',1],
+    ['flamethrower',1],['rocket',1],['railgun',1],['shotgun2',1]];
   for(let i=0;i<lootSpots.length;i++){
     const s=lootSpots[i];
-    if(Math.random()<0.75){
+    // 外围loot点有更高概率和更好品质
+    const dist=Math.hypot(s.x,s.z);
+    const chance=dist>30?0.9:0.75;
+    if(Math.random()<chance){
       const e=pick(L);
       dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),e[0],e[1]?RI(1,e[1]):1);
     }
@@ -1878,8 +2136,8 @@ function drawMinimap(){
   c.strokeRect((-7.9+HALF)*sc,(-7.9+HALF)*sc,15.8*sc,15.8*sc);
   for(const z of zombies){
     if(z.dead) continue;
-    c.fillStyle=z.c.boss?'#C05848':(z.c.explode?'#8A9A6A':'#A4382E');
-    const s=z.c.boss?4:2.5;
+    c.fillStyle=z.c.boss?'#C05848':(z.c.explode?'#8A9A6A':(z.c.ranged?'#66DD44':(z.type==='brute2'?'#886633':'#A4382E')));
+    const s=z.c.boss?4:(z.type==='brute2'||z.type==='tank'?3.5:2.5);
     c.fillRect((z.x+HALF)*sc-s/2,(z.z+HALF)*sc-s/2,s,s);
   }
   for(const lo of lootEnts){ c.fillStyle='#D6C29A';
@@ -2022,6 +2280,9 @@ addEventListener('keydown',e=>{
   const k=e.key.length===1?e.key.toLowerCase():e.key;
   keys[k]=true;
   if(k===' ') e.preventDefault();
+  // 相机旋转（[ ] 键）和缩放
+  if(e.code==='BracketLeft'){ camAngle-=0.15; }
+  if(e.code==='BracketRight'){ camAngle+=0.15; }
   if(G.state==='play'){
     if(k===' ') doRoll();
     if(k==='i'){ $('invP').classList.contains('hidden')?openInv():closePanels(); AU.ui(); }
@@ -2039,6 +2300,11 @@ addEventListener('keydown',e=>{
 });
 addEventListener('keyup',e=>{ const k=e.key.length===1?e.key.toLowerCase():e.key; keys[k]=false; });
 addEventListener('wheel',e=>{
+  if(G.state==='play'&&!G.paused){
+    if(!$('invP').classList.contains('hidden')||!$('craftP').classList.contains('hidden')) return;
+    // 滚轮缩放相机（按住Shift时），否则切换武器
+    if(e.shiftKey){ camDist=clamp(camDist+e.deltaY*0.02,10,35); camHeight=camDist*1.4; return; }
+  }
   if(G.state!=='play'||G.paused) return;
   if(!$('invP').classList.contains('hidden')||!$('craftP').classList.contains('hidden')) return;
   const dir=e.deltaY>0?1:-1;
@@ -2119,14 +2385,14 @@ function equipHot(i){
   P.hsel=i;
   const it=ITEMS[s.id];
   if(it.weapon){
-    if(P.weapon!==s.id) P.lastWpn=P.weapon;
+    if(P.weapon!==s.id){ P.lastWpn=P.weapon; P.atkCd=0; P.reloadT=0; P.swingT=0; }
     P.weapon=s.id;
     P.meleeHitT=0; P.swingT=0;
     setWeaponMesh(); AU.ui();
-  } else if(it.use==='molotov'){ P.weapon='molotov'; setWeaponMesh(); AU.ui(); }
-  else if(it.use==='build'){ P.weapon='barricade'; setWeaponMesh(); AU.ui(); }
-  else if(it.use==='build2'){ P.weapon='rbarricade'; setWeaponMesh(); AU.ui(); }
-  else if(it.use==='spikes'){ P.weapon='spikes'; setWeaponMesh(); AU.ui(); }
+  } else if(it.use==='molotov'){ P.weapon='molotov'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
+  else if(it.use==='build'){ P.weapon='barricade'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
+  else if(it.use==='build2'){ P.weapon='rbarricade'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
+  else if(it.use==='spikes'){ P.weapon='spikes'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
   else if(it.use==='food'||it.use==='thirst'||it.use==='heal'){ useHotSlot(i); }
   refreshHud();
 }
@@ -2157,11 +2423,15 @@ function addInvHot(id,q){
 
 /* ================= camera & aim ================= */
 const camTarget=new V3(0,0,0), camPos=new V3(0,40,0);
+let camAngle=0.785; // 相机角度（弧度），默认45度
+let camDist=18; // 相机距离
+let camHeight=26; // 相机高度
 function updateCamera(dt){
   camTarget.lerp(new V3(P.x,0,P.z),1-Math.pow(0.001,dt));
-  const off=new V3(11,26,11);
+  // 使用可旋转的相机偏移
+  const off=new V3(Math.sin(camAngle)*camDist, camHeight, Math.cos(camAngle)*camDist);
   camPos.copy(camTarget).add(off);
-  if(G.shake>0){ G.shake-=dt*2; camPos.x+=R(-1,1)*G.shake; camPos.z+=R(-1,1)*G.shake; }
+  if(G.shake>0){ G.shake-=dt*2; camPos.x+=R(-1,1)*G.shake; camPos.z+=R(-1,1)*G.shake; camPos.y+=R(-1,1)*G.shake*0.5; }
   camera.position.copy(camPos);
   camera.lookAt(camTarget.x,0,camTarget.z);
   sun.target.position.set(P.x,0,P.z);
@@ -2170,7 +2440,8 @@ function updateCamera(dt){
 const ray=new THREE.Raycaster(), planeY=new THREE.Plane(new V3(0,1,0),-1.0);
 const ndc=new THREE.Vector2(), hitP=new V3();
 function updateAim(){
-  ndc.set(mouseX/1280*2-1,-(mouseY/720)*2+1);
+  const cw=renderer.domElement.clientWidth||1280, ch=renderer.domElement.clientHeight||720;
+  ndc.set(mouseX/cw*2-1,-(mouseY/ch)*2+1);
   ray.setFromCamera(ndc,camera);
   ray.ray.intersectPlane(planeY,hitP);
   const dx=hitP.x-P.x, dz=hitP.z-P.z, d=Math.hypot(dx,dz)||1;
@@ -2190,6 +2461,10 @@ const IC={
  shotgun:'<path d="M3 13l9-8M12 5h7M12 13h5M7 17l4-4"/>',
  rifle:'<path d="M3 15l10-9M10 7h11M11 15h8M6 20l4-5M14 11v6"/>',
  smg:'<path d="M3 10h13M12 8l7-1v6l-7-1M9 10v7M15 10l1 5"/>',
+  flamethrower:'<path d="M4 12h10M8 8h6v8H8zM14 12c3-1 5-3 6-5M14 12c3 1 5 3 6 5M14 12h4"/>',
+  rocket:'<path d="M4 16V8l4-3 4 3v8M4 16h8M6 16v3M10 16v3M14 10h6v4h-6"/>',
+  railgun:'<path d="M3 12h18M6 9v6M18 9v6M9 12h6M12 6v3M12 15v3"/>',
+  shotgun2:'<path d="M3 13l9-8M12 5h7M12 13h5M7 17l4-4M16 5l4 1M16 9l4-1"/>',
  molotov:'<path d="M10 3h4M11 3v4l-3 4v7a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-7l-3-4V3M9 13h6"/>',
  barricade:'<path d="M4 18V8M12 18V8M20 18V8M3 10h18M3 15h18"/>',
  rbarricade:'<path d="M4 18V6M12 18V6M20 18V6M3 9h18M3 14h18M7 6v12M17 6v12"/>',
@@ -2249,7 +2524,7 @@ function newGame(from){
   Object.assign(P,{x:0,z:6,hp:100,hunger:100,thirst:100,stam:100,inf:0,dir:0,grabT:0,
     atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,weapon:'fists',lastWpn:null,deadAnim:0,
-    mags:{pistol:0,shotgun:0,rifle:0,smg:0},hsel:0});
+    mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},hsel:0});
   P.inv=new Array(8).fill(null);
   P.hot=[{id:'fists',q:1},null,null,null];
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
@@ -2307,7 +2582,7 @@ function continueGame(){
   G.combo=0; G.comboT=0; G.craftJob=null; G.bannerT=0;
   $('banner').style.opacity=0;
   Object.assign(P,{x:s.p.x,z:s.p.z,hp:s.p.hp,hunger:s.p.hu,thirst:s.p.th,stam:s.p.st,inf:s.p.inf,
-    weapon:s.p.weapon||'fists',hsel:s.p.hsel||0,mags:Object.assign({pistol:0,shotgun:0,rifle:0,smg:0},s.p.mags||{}),
+    weapon:s.p.weapon||'fists',hsel:s.p.hsel||0,mags:Object.assign({pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},s.p.mags||{}),
     inv:s.p.inv||new Array(8).fill(null),hot:s.p.hot||[{id:'fists',q:1},null,null,null],
     dir:0,grabT:0,atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,lastWpn:null,deadAnim:0});
