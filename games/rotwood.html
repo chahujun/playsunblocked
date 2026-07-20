@@ -740,9 +740,9 @@ const P={ x:0,z:6, hp:100,maxHp:100,hunger:100,thirst:100,stam:100,inf:0,
   reloadT:0, reloadMax:1, stepT:0, hurtT:0, crouchT:0, recoilT:0, mzT:0,
   rollT:0, rollCd:0, invulnT:0, rollDx:0, rollDz:1, kbx:0, kbz:0,
   weapon:'fists', lastWpn:null, mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},
-  inv:new Array(8).fill(null), hot:[{id:'fists',q:1},null,null,null], hsel:0,
+  inv:new Array(8).fill(null), hot:[null,null,null,{id:'fists',q:1}], hsel:3,
   aimX:0, aimZ:1, mesh:null, parts:{}, wmesh:null, deadAnim:0,
-  dmgMult:1, classId:'assault', classColor:0x743C38, skillCd:0, skillName:null,
+  dmgMult:1, classId:'civilian', classColor:0xDDDDDD, skillCd:0, skillName:null,
   cloakT:0, frenzyT:0, shield:0, turrets:null };
 
 function buildPlayer(){
@@ -1359,9 +1359,13 @@ const bullets=[];
 let bPool=[];
 function shoot(){
   const wk=P.weapon||'fists';
-  if(!WEAPONS[wk]){ P.weapon='fists'; return; }
   if(P.atkCd>0||P.rollT>0) return;
+  // molotov和barricade等非WEAPONS道具优先处理
   if(wk==='molotov'){ throwMolotov(); return; }
+  if(wk==='barricade'){ buildBarricade('barricade'); return; }
+  if(wk==='rbarricade'){ buildRBarricade(); return; }
+  if(wk==='spikes'){ placeSpikes(); return; }
+  if(!WEAPONS[wk]){ P.weapon='fists'; return; }
   const w=WEAPONS[wk]; if(!w) return;
   if(w.melee){ meleeAtk(wk,w); return; }
   if(P.reloadT>0) return;
@@ -1596,13 +1600,68 @@ function throwMolotov(){
   AU.shoot('pistol');
   addNoise(P.x,P.z,10);
   const dir=new V3(P.aimX,0,P.aimZ).normalize();
-  for(let i=0;i<16;i++){
-    const a=R(0,Math.PI*2), r=R(0,3.5);
-    fireBullet(P.x,1.5,P.z,Math.cos(a)*r*0.3,Math.sin(a)*r*0.3,6,15);
+  const tx=P.x+dir.x*7, tz=P.z+dir.z*7;
+  // 创建投掷物实体（飞行瓶子）
+  const bottleMesh=new THREE.Group();
+  const bottle=new THREE.Mesh(new THREE.SphereGeometry(0.18,8,6),mat(0x7A5A2E));
+  bottle.position.y=0.1;
+  const neck=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.08,0.15,6),mat(0x5A3A1E));
+  neck.position.y=0.25;
+  bottleMesh.add(bottle); bottleMesh.add(neck);
+  bottleMesh.position.set(P.x,1.5,P.z);
+  bottleMesh.castShadow=true;
+  scene.add(bottleMesh);
+  projectiles.push({
+    mesh:bottleMesh,
+    x:P.x,y:1.5,z:P.z,
+    vx:dir.x*12,vy:5,vz:dir.z*12,
+    tx:tx,tz:tz,
+    life:1.2,dist:0,
+    type:'molotov'
+  });
+  // 投掷动画：手臂上扬
+  P.equipT=0.15;
+}
+
+let projectiles=[];
+function updateProjectiles(dt){
+  for(let i=projectiles.length-1;i>=0;i--){
+    const p=projectiles[i];
+    p.life-=dt;
+    // 抛物线运动
+    p.x+=p.vx*dt;
+    p.y+=p.vy*dt;
+    p.vy-=9.8*dt;
+    p.z+=p.vz*dt;
+    p.mesh.position.set(p.x,p.y,p.z);
+    p.mesh.rotation.x+=dt*8;
+    p.mesh.rotation.z+=dt*6;
+    // 到达目标或落地
+    const landY=p.y<=0.3;
+    const reached=Math.hypot(p.x-p.tx,p.z-p.tz)<0.8;
+    if(landY||reached||p.life<=0){
+      // 爆炸效果
+      molotovExplode(p.x,p.z);
+      scene.remove(p.mesh);
+      projectiles.splice(i,1);
+    }
   }
-  showRing(P.x+dir.x*5,P.z+dir.z*5,3.5,0xC04038,0.3,null);
-  for(const z of zombies){ if(z.dead) continue;
-    if(Math.hypot(z.x-(P.x+dir.x*5),z.z-(P.z+dir.z*5))<3.5) hitZombie(z,35,z.x,z.z,0.3); }
+}
+
+function molotovExplode(x,z){
+  // 火焰范围伤害
+  showRing(x,z,3.5,0xC04038,0.4,null);
+  for(let i=0;i<20;i++){
+    const a=R(0,Math.PI*2),r=R(0,4);
+    spawnParticle(x,1,z,Math.cos(a)*r*0.5,R(1,3),Math.sin(a)*r*0.5,0xFF6600,0.8);
+  }
+  for(const z2 of zombies){ if(z2.dead) continue;
+    const d=Math.hypot(z2.x-x,z2.z-z);
+    if(d<3.5){ hitZombie(z2,40,x,z,0.4); z2.burnT=3; z2.burnDmg=6; } }
+  // 留下燃烧区域
+  firePools.push({x:x,z:z,r:3.5,life:5,dmg:8,tickT:0});
+  G.shake=0.3;
+  AU.explode();
 }
 
 /* ================= building ================= */
@@ -2729,9 +2788,9 @@ function newGame(from){
   Object.assign(P,{x:0,z:6,hp:100,hunger:100,thirst:100,stam:100,inf:0,dir:0,grabT:0,
     atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,weapon:'fists',lastWpn:null,deadAnim:0,equipT:0,
-    mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},hsel:0});
+    mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},hsel:3});
   P.inv=new Array(8).fill(null);
-  P.hot=[{id:'fists',q:1},null,null,null];
+  P.hot=[null,null,null,{id:'fists',q:1}];
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
   // 应用职业属性
   const cls=CLASSES[selectedClass];
@@ -2749,7 +2808,11 @@ function newGame(from){
     P.hot[1].dur=WEAPONS[cls.startW].dur;
   }
   P.weapon=cls.startW;
-  P.hsel=1;
+  P.hsel=0;
+  P.hot[0]={id:cls.startW,q:1};
+  if(WEAPONS[cls.startW]&&WEAPONS[cls.startW].dur!==undefined&&WEAPONS[cls.startW].dur!==Infinity){
+    P.hot[0].dur=WEAPONS[cls.startW].dur;
+  }
   P.mags[cls.startW]=WEAPONS[cls.startW].mag;
   // 初始物品
   for(const id in cls.startItems){
@@ -2811,12 +2874,12 @@ function continueGame(){
   $('banner').style.opacity=0;
   Object.assign(P,{x:s.p.x,z:s.p.z,hp:s.p.hp,hunger:s.p.hu,thirst:s.p.th,stam:s.p.st,inf:s.p.inf,
     weapon:s.p.weapon||'fists',hsel:s.p.hsel||0,mags:Object.assign({pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},s.p.mags||{}),
-    inv:s.p.inv||new Array(8).fill(null),hot:s.p.hot||[{id:'fists',q:1},null,null,null],
+    inv:s.p.inv||new Array(8).fill(null),hot:s.p.hot||[null,null,null,{id:'fists',q:1}],
     dir:0,grabT:0,atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,lastWpn:null,deadAnim:0});
   // 恢复职业属性
-  const cid=s.p.classId||'assault';
-  const cls=CLASSES[cid]||CLASSES.assault;
+  const cid=s.p.classId||'civilian';
+  const cls=CLASSES[cid]||CLASSES.civilian;
   P.classId=cid; P.maxHp=cls.hp; P.spd=cls.speed; P.dmgMult=cls.dmgMult;
   P.classColor=cls.color; P.skillName=cls.skill;
   P.skillCd=s.p.skillCd||0; P.cloakT=0; P.frenzyT=0; P.shield=s.p.shield||0; P.turrets=null;
@@ -2849,6 +2912,7 @@ function loop(){
       for(let i=zombies.length-1;i>=0;i--) zombieAI(zombies[i],dt,i);
       updateWaves(dt);
       updateBullets(dt);
+      updateProjectiles(dt);
       updateParticles(dt);
       updateRings(dt);
       updateLootEnts(dt);
