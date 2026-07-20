@@ -521,6 +521,27 @@
       },
       featured: true,
       trending: true
+    },
+    {
+      slug: 'rotwood',
+      title: { en: 'Rotwood', cn: '腐木镇' },
+      subtitle: { en: '3D Zombie Survival', cn: '3D僵尸生存' },
+      category: 'Action',
+      rating: 0,
+      plays: null,
+      duration: { en: '20-60 min', cn: '20-60 分钟' },
+      controls: { en: 'WASD + Mouse', cn: 'WASD + 鼠标' },
+      difficulty: { en: 'Hard', cn: '困难' },
+      description: {
+        en: 'A low-poly 3D zombie survival game. Scavenge a deserted town, manage hunger, thirst and infection, fight 7 zombie types, craft barricades, and survive escalating waves through day and night. How many days can you last?',
+        cn: '低多边形 3D 僵尸生存游戏。在废弃小镇中搜刮物资，管理饥饿、口渴与感染值，对抗 7 种僵尸，建造路障，在昼夜交替中抵御一波波尸潮。你能活过几天？'
+      },
+      howToPlay: {
+        en: ['WASD to move, mouse to aim, click to attack', 'Press E to scavenge buildings for food, water and ammo', 'Press C to craft bandages, molotovs and barricades', 'Manage hunger, thirst and infection — visit the safe house to recover', 'Survive the night: zombies get faster and more aggressive'],
+        cn: ['WASD 移动，鼠标瞄准，点击攻击', '按 E 搜刮建筑获取食物、水和弹药', '按 C 合成绷带、燃烧瓶和路障', '管理饥饿、口渴和感染值——前往安全屋恢复', '小心夜晚：僵尸会更快、更凶猛']
+      },
+      featured: true,
+      trending: true
     }
   ];
 
@@ -533,7 +554,7 @@
     return Math.round(n);
   }
   // Mark recent games as New — use slug-based check for stability
-  var NEW_GAME_SLUGS = ['crownfall', 'bytebreak', 'pixel-guardians'];
+  var NEW_GAME_SLUGS = ['crownfall', 'bytebreak', 'pixel-guardians', 'rotwood'];
   GAMES.forEach(function (g, i) {
     g.gradient = CATEGORY_GRADIENTS[g.category] || ['#FF5C28', '#B8350A'];
     g.playsNum = parsePlays(g.plays);
