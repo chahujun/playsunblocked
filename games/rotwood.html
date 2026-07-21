@@ -1427,6 +1427,89 @@ function buildWorld(){
     s.position.set(R(-HALF+4,HALF-4),0.018,R(-HALF+4,HALF-4)); scene.add(s);
   }
 
+  // 新增：废弃医院（东南方）
+  (function(){
+    const hx=55, hz=-30;
+    const hm=bx(14,4,10,0x8A8A8A,hx,1.5,hz); addObstacle(hx,hz,7,5);
+    // 医院内有特殊战利品
+    lootSpots.push({x:hx-4,z:hz-2});
+    lootSpots.push({x:hx+3,z:hz+2});
+    // 医院周围围栏
+    for(let i=-6;i<=6;i+=3){
+      const p1=bx(0.3,1.5,0.3,0x555555,hx+i,0.75,hz-5.5);
+      const p2=bx(0.3,1.5,0.3,0x555555,hx+i,0.75,hz+5.5);
+    }
+  })();
+
+  // 新增：废弃学校（西北方）
+  (function(){
+    const sx=-55, sz=55;
+    const sm=bx(16,3.5,12,0x7A6A5A,sx,1.25,sz); addObstacle(sx,sz,8,6);
+    lootSpots.push({x:sx-3,z:sz-2});
+    lootSpots.push({x:sx+4,z:sz+3});
+    // 操场设施
+    for(let i=0;i<4;i++){
+      const a=R(0,Math.PI*2), r=R(3,8);
+      const px=sx+Math.cos(a)*r, pz=sz+Math.sin(a)*r;
+      const m=bx(1,0.6,1,0x6B5B4B,px,0.3,pz);
+    }
+  })();
+
+  // 新增：地下停车场入口（中心偏东）
+  (function(){
+    const px=35, pz=0;
+    const ramp=bx(6,0.1,8,0x2A2A2A,px,0.05,pz);
+    // 停放车辆
+    for(let i=0;i<3;i++){
+      const cx=px+R(-2,2), cz=pz+i*2.5-2.5;
+      const car=bx(1.8,0.8,3.5,[0x8B4513,0x2F4F4F,0x8B0000][i%3],cx,0.4,cz);
+      car.rotation.y=R(-0.2,0.2);
+    }
+    lootSpots.push({x:px,z:pz+3});
+  })();
+
+  // 新增：建筑工地（西南方）
+  (function(){
+    const cx=-35, cz=35;
+    // 脚手架
+    for(let i=0;i<6;i++){
+      const a=R(0,Math.PI*2), r=R(2,8);
+      const sx2=cx+Math.cos(a)*r, sz2=cz+Math.sin(a)*r;
+      const scaff=bx(0.3,3,0.3,0xAAAA44,sx2,1.5,sz2);
+    }
+    // 水泥管
+    for(let i=0;i<3;i++){
+      const tx=cx+R(-5,5), tz=cz+R(-5,5);
+      const tube=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.2,2.5,8),mat(0x888888));
+      tube.rotation.z=Math.PI/2; tube.position.set(tx,1.2,tz); tube.castShadow=true; scene.add(tube);
+      addObstacle(tx,tz,1.5,1.3);
+    }
+    lootSpots.push({x:cx+3,z:cz-3});
+  })();
+
+  // 新增：直升机坠毁点（北方）
+  (function(){
+    const hx=0, hz=-75;
+    const wreck=bx(8,2,12,0x554444,hx,1,hz); wreck.rotation.y=0.6; addObstacle(hx,hz,4.5,6.5);
+    // 旋翼
+    const rotor=bx(0.5,0.3,8,0x333333,hx,2.5,hz); rotor.rotation.y=0.6;
+    // 特殊战利品（高级武器/弹药）
+    lootSpots.push({x:hx+2,z:hz+3});
+    lootSpots.push({x:hx-3,z:hz-2});
+    lootSpots.push({x:hx,z:hz+5});
+  })();
+
+  // 新增：更多散布的车辆和路障
+  for(let i=0;i<8;i++){
+    const x=R(-HALF+10,HALF-10), z=R(-HALF+10,HALF-10);
+    let bad=false;
+    for(const o of obstacles){ if(Math.abs(x-o.x)<o.hw+2&&Math.abs(z-o.z)<o.hd+2){bad=true;break;} }
+    if(bad) continue;
+    const car=bx(1.8,0.8,3.5,[0x8B4513,0x2F4F4F,0x8B0000,0x4A4A4A][RI(0,3)],x,0.4,z);
+    car.rotation.y=R(0,Math.PI*2);
+    addObstacle(x,z,1.2,2);
+  }
+
   // 地图边界围栏 + 碎墙
   function buildBoundary(){
     const fenceCol=0x4A4842, postCol=0x5A5650;
@@ -1800,7 +1883,7 @@ function enterChase(zb){
   // pack aggro share（扩大群体追击范围）
   for(const o of zombies){ if(o===zb||o.dead) continue;
     if(o.state==='idle'||o.state==='investigate'){
-      if(Math.hypot(o.x-zb.x,o.z-zb.z)<8){ o.state='chase'; o.loseT=0; o.lastX=P.x; o.lastZ=P.z; }
+      if(Math.hypot(o.x-zb.x,o.z-zb.z)<12){ o.state='chase'; o.loseT=0; o.lastX=P.x; o.lastZ=P.z; }
     }
   }
   if(zb.c.scream&&!zb.screamed){ zb.screamed=1; AU.groan(2);
@@ -1958,7 +2041,7 @@ function zombieAI(zb,dt,idx){
 
   /* ---- senses ---- */
   // 全图追击：僵尸一旦发现玩家就永远追击，感知范围大幅增加
-  const baseR=zb.c.scream?28:22;
+  const baseR=zb.c.scream?35:28;
   let see=false;
   if(P.hp>0){
     if(night){ see=dist<baseR*1.5; }
@@ -1968,7 +2051,7 @@ function zombieAI(zb,dt,idx){
       see=((dx*fx+dz*fz)/(dist||1))>0.3; // 150 deg cone（更宽视野）
     }
     // 远距离也能听到枪声/脚步（只要不太远就有感知）
-    if(!see&&dist<40&&(P.moving||P.atkCd>0.3)) see=true;
+    if(!see&&dist<55&&(P.moving||P.atkCd>0.2)) see=true;
   }
   // 侦察兵隐身：僵尸看不到玩家
   if(P.cloakT>0) see=false;
@@ -1987,7 +2070,7 @@ function zombieAI(zb,dt,idx){
     zb.loseT+=dt;
     zb.tx=P.x; zb.tz=P.z; // 持续更新目标为玩家当前位置
     // 远距离加速冲刺追击
-    if(dist>25){ const sp=zb.spd*(night?1.4:1.2); zb.x+=dx/dist*sp*dt*0.7; zb.z+=dz/dist*sp*dt*0.7; }
+    if(dist>20){ const sp=zb.spd*(night?1.5:1.3); zb.x+=dx/dist*sp*dt*0.8; zb.z+=dz/dist*sp*dt*0.8; }
   }
   // hearing
   if(zb.state==='idle'||zb.state==='investigate'){
@@ -3348,14 +3431,19 @@ function playerAnim(dt){
     const aimNoise=Math.sin(G.time*3)*0.02; // 微小晃动模拟呼吸
     if(P.reloadT>0){
       // 换弹：双手下沉+左右摆动
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.4+Math.sin(G.time*10)*0.15,dt*12);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.5+Math.sin(G.time*10+0.5)*0.15,dt*12);
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.35+Math.sin(G.time*12)*0.18,dt*14);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.45+Math.sin(G.time*12+1.2)*0.18,dt*14);
+      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,0.15,dt*10);
+      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,-0.15,dt*10);
       pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0.2,dt*10);
       pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,-0.2,dt*10);
     } else {
       // 持枪瞄准：右臂前伸略低，左臂托枪身
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.9+rec+aimNoise,dt*18);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.75+rec*0.6+aimNoise,dt*18);
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.7+rec+aimNoise,dt*18);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.6+rec*0.5+aimNoise,dt*18);
+      // 右臂微内收持枪
+      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,-0.08,dt*12);
+      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,0.12,dt*12);
       pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,-0.12,dt*10);
       pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0.18,dt*10);
     }
@@ -3367,6 +3455,8 @@ function playerAnim(dt){
     pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,Math.sin(ph)*swingAmt,dt*15);
     pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0,dt*8);
     pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0,dt*8);
+    pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,0,dt*8);
+    pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,0,dt*8);
   }
   else {
     // 站立：手臂自然下垂
@@ -3374,6 +3464,8 @@ function playerAnim(dt){
     pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.05,dt*8);
     pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0,dt*8);
     pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0,dt*8);
+    pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,0,dt*8);
+    pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,0,dt*8);
   }
   // 装备切换动画：手臂快速下垂再抬起
   if(P.equipT>0){
@@ -3414,24 +3506,24 @@ function meleeAnim(kind){
   const f=1-P.swingT/P.swingMax, pa=P.parts, b=pa.body;
   const a=pa.rArm.rotation;
   if(kind==='sweep'){
-    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.3,-1.4,t*Math.PI/2); b.rotation.y=lerp(0,-0.5,t); pa.lArm.rotation.x=lerp(-0.3,-0.8,t); }
-    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(-1.4,-1.8,t*Math.PI/2); b.rotation.y=lerp(-0.5,0.8,t); pa.lArm.rotation.x=lerp(-0.8,-0.5,t); }
-    else { const t=(f-0.55)/0.45; a.x=lerp(-1.8,-0.3,t*t); b.rotation.y=lerp(0.8,0,t); pa.lArm.rotation.x=lerp(-0.5,-0.2,t); }
-    // 蓄力时身体微蹲（b.position.y 已由 playerAnim 设为 bobY-crouch）
-    if(f<0.3){ b.position.y=b.position.y*0.7-0.05; }
+    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.2,-1.3,t*Math.PI/2); b.rotation.y=lerp(0,-0.4,t); pa.lArm.rotation.x=lerp(-0.2,-0.7,t); }
+    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(-1.3,-1.7,t*Math.PI/2); b.rotation.y=lerp(-0.4,0.7,t); pa.lArm.rotation.x=lerp(-0.7,-0.4,t); }
+    else { const t=(f-0.55)/0.45; a.x=lerp(-1.7,-0.2,t*t); b.rotation.y=lerp(0.7,0,t); pa.lArm.rotation.x=lerp(-0.4,-0.1,t); }
+    b.position.y=b.position.y*0.8-0.03;
   } else if(kind==='chop'){
-    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.3,-2.5,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.3,-0.7,t); }
-    else if(f<0.5){ const t=(f-0.3)/0.2; a.x=lerp(-2.5,-2.7,t); pa.lArm.rotation.x=lerp(-0.7,-0.6,t); }
-    else { const t=(f-0.5)/0.5; a.x=lerp(-2.7,-0.3,t*t); pa.lArm.rotation.x=lerp(-0.6,-0.2,t); }
+    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.2,-2.3,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.2,-0.6,t); }
+    else if(f<0.5){ const t=(f-0.3)/0.2; a.x=lerp(-2.3,-2.5,t); pa.lArm.rotation.x=lerp(-0.6,-0.5,t); }
+    else { const t=(f-0.5)/0.5; a.x=lerp(-2.5,-0.2,t*t); pa.lArm.rotation.x=lerp(-0.5,-0.1,t); }
   } else if(kind==='bigswing'){
-    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.3,-2.7,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.3,-2.7,t*Math.PI/2); b.rotation.y=lerp(0,-0.4,t); }
-    else if(f<0.6){ const t=(f-0.3)/0.3; a.x=lerp(-2.7,-0.5,t*Math.PI/2); pa.lArm.rotation.x=lerp(-2.7,-0.5,t*Math.PI/2); b.rotation.y=lerp(-0.4,0.5,t); }
-    else { const t=(f-0.6)/0.4; a.x=lerp(-0.5,-0.3,t*t); pa.lArm.rotation.x=lerp(-0.5,-0.3,t*t); b.rotation.y=lerp(0.5,0,t); }
+    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.2,-2.5,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.2,-2.5,t*Math.PI/2); b.rotation.y=lerp(0,-0.35,t); }
+    else if(f<0.6){ const t=(f-0.3)/0.3; a.x=lerp(-2.5,-0.4,t*Math.PI/2); pa.lArm.rotation.x=lerp(-2.5,-0.4,t*Math.PI/2); b.rotation.y=lerp(-0.35,0.45,t); }
+    else { const t=(f-0.6)/0.4; a.x=lerp(-0.4,-0.2,t*t); pa.lArm.rotation.x=lerp(-0.4,-0.2,t*t); b.rotation.y=lerp(0.45,0,t); }
+    b.position.y=b.position.y*0.85;
   } else {
-    if(f<0.3) { const t=f/0.3; a.x=lerp(-0.2,-0.5,t*Math.PI/2); }
-    else if(f<0.55) { const t=(f-0.3)/0.25; a.x=lerp(-0.5,-1.6,t*Math.PI/2); }
-    else { const t=(f-0.55)/0.45; a.x=lerp(-1.6,-0.2,t*t); }
-    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.3,0.2);
+    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.15,-0.5,t*Math.PI/2); }
+    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(-0.5,-1.5,t*Math.PI/2); }
+    else { const t=(f-0.55)/0.45; a.x=lerp(-1.5,-0.15,t*t); }
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.2,0.15);
   }
 }
 
@@ -4589,7 +4681,7 @@ function toggleQuestPanel(){
       </div>`;
     }
     if(G.quests.length===0) html+='<div style="color:#A09884;padding:20px">'+T('暂无任务','No active quests')+'</div>';
-    p.innerHTML=html;
+    p.innerHTML=html+'<div style="text-align:center;margin-top:10px"><span class="btn" onclick="toggleQuestPanel()">'+T('关闭 [J/ESC]','Close [J/ESC]')+'</span></div>';
     p.classList.remove('hidden');
     G.paused=true;
   } else { p.classList.add('hidden'); G.paused=false; }
@@ -4838,6 +4930,13 @@ addEventListener('keydown',e=>{
     // Q/E 持续旋转相机（在update中处理）
     if(k==='b') quickBuild();
     if(k==='j'){ toggleQuestPanel(); AU.ui(); }
+    if(k==='Escape'){
+      // 关闭所有打开的面板
+      const panels=['questP','invP','craftP','mapP','helpP'];
+      let closed=false;
+      for(const pid of panels){ const el=$(pid); if(el&&!el.classList.contains('hidden')){ el.classList.add('hidden'); closed=true; } }
+      if(closed){ G.paused=false; }
+    }
     if(k==='n'){ showAttachUI(); AU.ui(); }
     if(k==='v'){ useClassSkill(); }
     if(k>='1'&&k<='4') equipHot(+k-1);
