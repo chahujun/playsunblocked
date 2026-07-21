@@ -381,7 +381,7 @@ const ITEMS={
  water:    {n:['净水','Water'],use:'thirst',v:42,stack:5,tip:['恢复 42 点饮水。','Restores 42 thirst.']},
  bandage:  {n:['绷带','Bandage'],use:'heal',v:22,inf:6,stack:5,tip:['恢复 22 HP，降低感染。','Heals 22 HP, reduces infection.']},
  medkit:   {n:['医疗包','Medkit'],use:'heal',v:55,inf:30,stack:3,tip:['恢复 55 HP，大幅降低感染。','Heals 55 HP, greatly reduces infection.']},
- antibio:   {n:['抗生素','Antibiotics'],use:'heal',v:0,inf:-60,stack:3,tip:['强力清除感染。','Strongly cures infection.']},
+ antibio:   {n:['抗生素','Antibiotics'],use:'heal',v:0,inf:60,stack:3,tip:['强力清除感染。','Strongly cures infection.']},
  hotmeal:  {n:['热食','Hot Meal'],use:'food',v:60,hp:12,stack:3,tip:['恢复 60 饱食与 12 HP。','Restores 60 food and 12 HP.']},
  cloth:    {n:['布料','Cloth'],stack:10,tip:['合成材料：绷带等。','Crafting material: bandages.']},
  bottle:   {n:['空瓶','Bottle'],stack:5,tip:['合成材料：净水/燃烧瓶等。','Material: water / molotov.']},
@@ -539,7 +539,8 @@ function bx(w,h,d,c,x,y,z,parent,shadow){ const m=new THREE.Mesh(BOX,mat(c)); m.
 const G={ state:'menu', diff:'normal', wave:0, kills:0, score:0, time:0, dayCount:1,
   cycleT:0.28, waveState:'rest', restT:6, spawnQ:0, spawned:0, spawnTick:0,
   shake:0, paused:false, bloodMoon:false, wasNight:false, boss:null,
-  combo:0, comboT:0, craftJob:null, supply:null, bannerT:0, blueprints:[], _hotSig:'' };
+  combo:0, comboT:0, craftJob:null, supply:null, bannerT:0, blueprints:[], _hotSig:'',
+  waveActiveT:0, stuckCheckT:0 };
 
 /* ================= world ================= */
 const obstacles=[];   // {x,z,hw,hd} AABB
@@ -3207,7 +3208,7 @@ function waveTypes(n){
 function startWave(n){
   G.wave=n; G.waveState='wave'; G.spawned=0;
   G.spawnQ=Math.round((3+n*1.8)*DIFF[G.diff].count*(G.bloodMoon?1.5:1));
-  G.spawnTick=0.5;
+  G.spawnTick=0.5; G.waveActiveT=0; G.stuckCheckT=0;
   AU.waveHorn();
   showBanner(T('第 '+n+' 波','WAVE '+n),'#E5DDC8');
   if(n%5===0) spawnBoss(n);
@@ -3237,6 +3238,7 @@ function spawnBrute(){
 }
 function updateWaves(dt){
   if(G.waveState==='wave'){
+    G.waveActiveT+=dt;
     G.spawnTick-=dt;
     if(G.spawnTick<=0&&G.spawned<G.spawnQ&&aliveZ()<MAX_Z){
       G.spawnTick=R(1.0,1.8);
@@ -3247,8 +3249,31 @@ function updateWaves(dt){
         if(spawnZombie(pick(waveTypes(G.wave)),x,z)) G.spawned++;
       }
     }
+    // 防卡机制：波次活跃超过90秒且剩余僵尸≤3只时，将远离玩家的僵尸传送到附近
+    if(G.waveActiveT>90&&aliveZ()<=3&&G.spawned>=G.spawnQ){
+      G.stuckCheckT+=dt;
+      if(G.stuckCheckT>3){
+        G.stuckCheckT=0;
+        for(const z of zombies){
+          if(z.dead) continue;
+          const dist=Math.hypot(P.x-z.x,P.z-z.z);
+          if(dist>40){
+            const ang=R(0,Math.PI*2), r=R(15,25);
+            z.x=clamp(P.x+Math.cos(ang)*r,-HALF+2,HALF-2);
+            z.z=clamp(P.z+Math.sin(ang)*r,-HALF+2,HALF-2);
+            if(z.mesh){ z.mesh.position.set(z.x,0,z.z); }
+            showMsg(T('僵尸从暗处涌来！','Zombies emerge from the shadows!'));
+          }
+        }
+      }
+    }
+    // 终极防卡：波次活跃超过3分钟，强制清除剩余僵尸
+    if(G.waveActiveT>180&&aliveZ()>0&&G.spawned>=G.spawnQ){
+      for(const z of zombies){ if(!z.dead){ z.hp=0; } }
+      showBanner(T('尸潮已被驱散','WAVE DISPERSED'),'#B18A45');
+    }
     if(G.spawned>=G.spawnQ&&aliveZ()===0){
-      G.waveState='rest'; G.restT=REST_T;
+      G.waveState='rest'; G.restT=REST_T; G.waveActiveT=0; G.stuckCheckT=0;
       updateQuestProgress('wave',1); // 波次任务
       showBanner(T('尸潮已清除','WAVE CLEARED'),'#B18A45');
       saveGame();
@@ -3322,7 +3347,7 @@ function updatePlayer(dt){
   if(P.grabT>0){ P.grabT-=dt; }
   const df=DIFF[G.diff];
   const drain=df.drain;
-  P.hunger-=0.012*dt*drain; P.thirst-=0.016*dt*drain;
+  P.hunger-=0.016*dt*drain; P.thirst-=0.022*dt*drain;
   if(P.hunger<12||P.thirst<12) P.hp-=0.15*dt;
   if(P.inf>=100) P.hp-=0.4*dt;
   // 自愈天赋
@@ -5531,6 +5556,7 @@ function newGame(from){
   G.cycleT=0.28; G.waveState='rest'; G.restT=8; G.spawnQ=0; G.spawned=0;
   G.paused=false; G.bloodMoon=false; G.wasNight=false; G.boss=null;
   G.combo=0; G.comboT=0; G.craftJob=null; G.bannerT=0;
+  G.waveActiveT=0; G.stuckCheckT=0;
   G.blueprints=[];
   G.weather='clear';
   G.eventT=0; G.eventCooldown=60;
