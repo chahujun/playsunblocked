@@ -819,11 +819,14 @@ function bridge(x,z,len,horiz){
 const enterableBuildings=[]; // {x,z,w,d,type,entered,interior}
 function spawnEnterable(x,z,type){
   let w,d,label,extColor,roofColor;
-  if(type==='police'){ w=9; d=7; label=T('警察局','Police Station'); extColor=0x4A5A6A; roofColor=0x3A4A5A; }
-  else if(type==='supermarket'){ w=10; d=8; label=T('超市','Supermarket'); extColor=0x6B6B6B; roofColor=0x5A5A5A; }
-  else if(type==='pharmacy'){ w=7; d=6; label=T('药房','Pharmacy'); extColor=0x7A8A7A; roofColor=0x6A7A6A; }
-  else if(type==='gunshop'){ w=6; d=5; label=T('枪店','Gun Shop'); extColor=0x5A4A3A; roofColor=0x4A3A2A; }
-  else { w=8; d=7; label=T('仓库','Warehouse'); extColor=0x6B5B40; roofColor=0x5A4A30; }
+  if(type==='police'){ w=14; d=10; label=T('警察局','Police Station'); extColor=0x4A5A6A; roofColor=0x3A4A5A; }
+  else if(type==='supermarket'){ w=16; d=12; label=T('超市','Supermarket'); extColor=0x6B6B6B; roofColor=0x5A5A5A; }
+  else if(type==='pharmacy'){ w=11; d=9; label=T('药房','Pharmacy'); extColor=0x7A8A7A; roofColor=0x6A7A6A; }
+  else if(type==='gunshop'){ w=10; d=8; label=T('枪店','Gun Shop'); extColor=0x5A4A3A; roofColor=0x4A3A2A; }
+  else if(type==='hospital'){ w=18; d=14; label=T('医院','Hospital'); extColor=0x8A8A8A; roofColor=0x7A7A7A; }
+  else if(type==='school'){ w=20; d=14; label=T('学校','School'); extColor=0x7A6A5A; roofColor=0x6A5A4A; }
+  else if(type==='mall'){ w=22; d=16; label=T('购物中心','Shopping Mall'); extColor=0x5A6A7A; roofColor=0x4A5A6A; }
+  else { w=14; d=10; label=T('仓库','Warehouse'); extColor=0x6B5B40; roofColor=0x5A4A30; }
   // 外壳建筑（进入后隐藏）
   const shell=new THREE.Group();
   const body=bx(w,4,d,extColor,0,2,0,scene,false); body.castShadow=true; shell.add(body);
@@ -889,7 +892,7 @@ function spawnInteriorZombie(x,z,type){
   const zt=type||'walker';
   const c=ZT[zt]||ZT.walker;
   const df=DIFF[G.diff];
-  const zb={x,z,hp:c.hp*df.hp,maxHp:c.hp*df.hp,spd:c.spd*df.spd,dmg:c.dmg*df.dmg,dir:0,atkCd:0,state:'chase',mesh:null,type:zt,c,flash:0};
+  const zb={x,z,hp:c.hp*df.hp,maxHp:c.hp*df.hp,spd:c.spd*df.spd*0.6,dmg:c.dmg*df.dmg*0.8,dir:0,atkCd:0,state:'chase',mesh:null,type:zt,c,flash:0};
   const g=new THREE.Group();
   const body=new THREE.Mesh(BOX,new THREE.MeshLambertMaterial({color:c.shirt}));
   body.scale.set(0.5,0.9,0.3); body.position.y=0.9; body.castShadow=true; g.add(body);
@@ -1343,6 +1346,13 @@ function buildWorld(){
   spawnEnterable(-100,-70,'warehouse');
   spawnEnterable(60,-95,'gunshop');
   spawnEnterable(-60,95,'pharmacy');
+  // 新增大型建筑
+  spawnEnterable(45,-50,'hospital');
+  spawnEnterable(-45,50,'school');
+  spawnEnterable(65,45,'mall');
+  spawnEnterable(-65,-45,'hospital');
+  spawnEnterable(110,-10,'school');
+  spawnEnterable(-110,10,'mall');
   // 医院区（东北远端）
   hospital(60,-55);
   // 军事哨站（西南远端）
