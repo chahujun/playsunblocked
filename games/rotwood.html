@@ -327,14 +327,14 @@ const AU={ctx:null,
 
 /* ================= config ================= */
 const DIFF={
- easy:  {hp:0.75,dmg:0.7,spd:0.9, count:0.75, drain:0.7, label:['简单','Easy']},
- normal:{hp:1.0, dmg:1.0,spd:1.0, count:1.0,  drain:1.0, label:['普通','Normal']},
- hard:  {hp:1.35,dmg:1.4,spd:1.1,count:1.3,  drain:1.25,label:['困难','Hard']}
+ easy:  {hp:0.65,dmg:0.6,spd:0.85,count:0.6, drain:0.6, label:['简单','Easy']},
+ normal:{hp:0.85,dmg:0.85,spd:0.95,count:0.8, drain:0.8, label:['普通','Normal']},
+ hard:  {hp:1.15,dmg:1.2,spd:1.05,count:1.1, drain:1.1, label:['困难','Hard']}
 };
 const MAP=240, HALF=MAP/2;
 const DAY_LEN=300;
-const MAX_Z=24;
-const REST_T=30;
+const MAX_Z=18;
+const REST_T=35;
 
 /* 游戏模式定义 */
 const MODES={
@@ -364,15 +364,15 @@ const WEAPONS={
   grenade:   {melee:0,dmg:0,rate:1.0,ammo:'grenade',mag:1,reload:0.5,range:18,noise:35,type:'throw',explode:1,explodeDmg:70,explodeR:3.5,n:['手榴弹','Grenade']}
 };
 const CLASSES={
-  doctor:{nameZh:'医生',nameEn:'Doctor',hp:90,speed:4.0,dmgMult:0.9,startW:'machete',
+  doctor:{nameZh:'医生',nameEn:'Doctor',hp:100,speed:4.0,dmgMult:0.9,startW:'machete',
     skill:{nameZh:'战地手术',nameEn:'Field Surgery',cd:14,descZh:'恢复40HP+15秒治疗效果翻倍+暂停感染蔓延',descEn:'Heal 40HP + 2x heal 15s + pause infection'},color:0x30483A},
-  police:{nameZh:'警察',nameEn:'Police',hp:110,speed:4.2,dmgMult:1.1,startW:'pistol',
+  police:{nameZh:'警察',nameEn:'Police',hp:125,speed:4.2,dmgMult:1.1,startW:'pistol',
     skill:{nameZh:'战术补给',nameEn:'Tactical Drop',cd:20,descZh:'呼叫弹药和食物补给箱（吸引僵尸）',descEn:'Call ammo+food crate (attracts zombies)'},color:0x2E3A4A},
-  firefighter:{nameZh:'消防员',nameEn:'Firefighter',hp:140,speed:3.6,dmgMult:0.95,startW:'axe',
+  firefighter:{nameZh:'消防员',nameEn:'Firefighter',hp:155,speed:3.6,dmgMult:0.95,startW:'axe',
     skill:{nameZh:'破障冲锋',nameEn:'Breach Charge',cd:10,descZh:'冲刺5米+击退并眩晕僵尸2秒',descEn:'Dash 5m + knockback + stun 2s'},color:0x743C38},
-  clerk:{nameZh:'职员',nameEn:'Clerk',hp:80,speed:4.5,dmgMult:1.0,startW:'bat',
+  clerk:{nameZh:'职员',nameEn:'Clerk',hp:95,speed:4.5,dmgMult:1.0,startW:'bat',
     skill:{nameZh:'拾荒直觉',nameEn:'Scavenger Sense',cd:16,descZh:'10秒透视40米内战利品+15秒拾取率提升',descEn:'10s reveal loot 40m + 15s boosted drops'},color:0x5B5C57},
-  civilian:{nameZh:'普通人',nameEn:'Civilian',hp:100,speed:4.0,dmgMult:1.0,startW:'bat',
+  civilian:{nameZh:'普通人',nameEn:'Civilian',hp:115,speed:4.0,dmgMult:1.0,startW:'bat',
     skill:{nameZh:'求生意志',nameEn:'Survival Will',cd:18,descZh:'瞬间恢复50体力+8秒体力回复3倍+免疫感染',descEn:'Instant +50 stamina + 8s 3x stamina regen + infection immune'},color:0xB18A45}
 };
 const ITEMS={
@@ -1856,7 +1856,7 @@ function killZombie(zb){
       checkAch('brute1');
     }
   }
-  else if(roll<(lootBoost?0.40:0.30)) dropLoot(zb.x,zb.z,pick(['can','water','bandage','cloth','wood']),1);
+  else if(roll<(lootBoost?0.45:0.35)) dropLoot(zb.x,zb.z,pick(['can','water','bandage','cloth','wood']),1);
   else if(roll<(lootBoost?0.75:0.60)) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(8,16));
   else if(roll<(lootBoost?0.90:0.75)) dropLoot(zb.x,zb.z,pick(['wood','cloth','nails','scrap','fuel']),RI(2,5));
   else if(zb.type==='survivor'&&Math.random()<(lootBoost?0.75:0.55)) dropLoot(zb.x,zb.z,pick(['crowbar','axe','pistol','machete','smg']),1);
@@ -2075,17 +2075,17 @@ function zombieAI(zb,dt,idx){
 
   /* ---- senses ---- */
   // 全图追击：僵尸一旦发现玩家就永远追击，感知范围大幅增加
-  const baseR=zb.c.scream?35:28;
+  const baseR=zb.c.scream?28:22;
   let see=false;
   if(P.hp>0){
-    if(night){ see=dist<baseR*1.5; }
+    if(night){ see=dist<baseR*1.3; }
     else if(dist<6) see=true;
     else if(dist<baseR){
       const fx=Math.sin(zb.dir), fz=Math.cos(zb.dir);
       see=((dx*fx+dz*fz)/(dist||1))>0.3; // 150 deg cone（更宽视野）
     }
     // 远距离也能听到枪声/脚步（只要不太远就有感知）
-    if(!see&&dist<55&&(P.moving||P.atkCd>0.2)) see=true;
+    if(!see&&dist<40&&(P.moving||P.atkCd>0.2)) see=true;
   }
   // 侦察兵隐身：僵尸看不到玩家
   if(P.cloakT>0) see=false;
@@ -2104,7 +2104,7 @@ function zombieAI(zb,dt,idx){
     zb.loseT+=dt;
     zb.tx=P.x; zb.tz=P.z; // 持续更新目标为玩家当前位置
     // 远距离加速冲刺追击
-    if(dist>20){ const sp=zb.spd*(night?1.5:1.3); zb.x+=dx/dist*sp*dt*0.8; zb.z+=dz/dist*sp*dt*0.8; }
+    if(dist>20){ const sp=zb.spd*(night?1.3:1.1); zb.x+=dx/dist*sp*dt*0.7; zb.z+=dz/dist*sp*dt*0.7; }
   }
   // hearing
   if(zb.state==='idle'||zb.state==='investigate'){
@@ -3206,7 +3206,7 @@ function waveTypes(n){
 }
 function startWave(n){
   G.wave=n; G.waveState='wave'; G.spawned=0;
-  G.spawnQ=Math.round((4+n*2.2)*DIFF[G.diff].count*(G.bloodMoon?1.6:1));
+  G.spawnQ=Math.round((3+n*1.8)*DIFF[G.diff].count*(G.bloodMoon?1.5:1));
   G.spawnTick=0.5;
   AU.waveHorn();
   showBanner(T('第 '+n+' 波','WAVE '+n),'#E5DDC8');
@@ -3239,7 +3239,7 @@ function updateWaves(dt){
   if(G.waveState==='wave'){
     G.spawnTick-=dt;
     if(G.spawnTick<=0&&G.spawned<G.spawnQ&&aliveZ()<MAX_Z){
-      G.spawnTick=R(0.7,1.4);
+      G.spawnTick=R(1.0,1.8);
       const batch=Math.min(RI(1,2),G.spawnQ-G.spawned);
       for(let i=0;i<batch;i++){
         const a=R(0,Math.PI*2), r=R(45,65);
@@ -3322,12 +3322,12 @@ function updatePlayer(dt){
   if(P.grabT>0){ P.grabT-=dt; }
   const df=DIFF[G.diff];
   const drain=df.drain;
-  P.hunger-=0.018*dt*drain; P.thirst-=0.024*dt*drain;
-  if(P.hunger<15||P.thirst<15) P.hp-=0.25*dt;
-  if(P.inf>=100) P.hp-=0.6*dt;
+  P.hunger-=0.012*dt*drain; P.thirst-=0.016*dt*drain;
+  if(P.hunger<12||P.thirst<12) P.hp-=0.15*dt;
+  if(P.inf>=100) P.hp-=0.4*dt;
   // 自愈天赋
     P.hp=clamp(P.hp,0,P.maxHp||100); P.hunger=clamp(P.hunger,0,100); P.thirst=clamp(P.thirst,0,100);
-  P.stam+=8*dt*(P.stamRegenT>0?3:1); P.stam=clamp(P.stam,0,P.maxStam||100);
+  P.stam+=10*dt*(P.stamRegenT>0?3:1); P.stam=clamp(P.stam,0,P.maxStam||100);
   if(P.stamRegenT>0) P.stamRegenT-=dt;
   P.inf=clamp(P.inf,0,100);
   P.rollCd=Math.max(0,P.rollCd-dt);
@@ -3443,7 +3443,7 @@ function updatePlayer(dt){
     if(Math.hypot(P.x-lo.x,P.z-lo.z)<1.8){ G._nearbyLoot=lo; break; }
   }
   // safe house regen
-  if(Math.hypot(P.x,P.z)<7){ P.hp=Math.min(P.maxHp||100,P.hp+0.8*dt); P.inf=Math.max(0,P.inf-0.35*dt); }
+  if(Math.hypot(P.x,P.z)<7){ P.hp=Math.min(P.maxHp||100,P.hp+1.2*dt); P.inf=Math.max(0,P.inf-0.5*dt); }
 }
 
 function playerAnim(dt){
