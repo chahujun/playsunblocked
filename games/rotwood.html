@@ -373,7 +373,7 @@ const CLASSES={
   clerk:{nameZh:'职员',nameEn:'Clerk',hp:80,speed:4.5,dmgMult:1.0,startW:'bat',
     skill:{nameZh:'拾荒直觉',nameEn:'Scavenger Sense',cd:16,descZh:'10秒透视40米内战利品+15秒拾取率提升',descEn:'10s reveal loot 40m + 15s boosted drops'},color:0x5B5C57},
   civilian:{nameZh:'普通人',nameEn:'Civilian',hp:100,speed:4.0,dmgMult:1.0,startW:'bat',
-    skill:{nameZh:'求生意志',nameEn:'Survival Will',cd:18,descZh:'8秒移速+50%+无限体力+免疫感染',descEn:'8s speed+50% + infinite stamina + infection immune'},color:0xB18A45}
+    skill:{nameZh:'求生意志',nameEn:'Survival Will',cd:18,descZh:'瞬间恢复50体力+8秒体力回复3倍+免疫感染',descEn:'Instant +50 stamina + 8s 3x stamina regen + infection immune'},color:0xB18A45}
 };
 const ITEMS={
  fists:    {n:['拳头','Fists'],weapon:1,stack:1,tip:['徒手攻击。','Unarmed attack.']},
@@ -2546,12 +2546,6 @@ let bPool=[];
 function shoot(){
   const wk=P.weapon||'fists';
   if(P.atkCd>0||P.rollT>0) return;
-  // 如果当前选中的是食物/医疗，左键使用
-  const sel=P.hot[P.hsel];
-  if(sel&&ITEMS[sel.id]&&(ITEMS[sel.id].use==='food'||ITEMS[sel.id].use==='thirst'||ITEMS[sel.id].use==='heal')){
-    useHotSlot(P.hsel);
-    return;
-  }
   // 非武器道具优先处理
   if(wk==='molotov'){ throwMolotov(); return; }
   if(wk==='barricade'){ buildBarricade('barricade'); return; }
@@ -3323,7 +3317,8 @@ function updatePlayer(dt){
   if(P.inf>=100) P.hp-=0.6*dt;
   // 自愈天赋
     P.hp=clamp(P.hp,0,P.maxHp||100); P.hunger=clamp(P.hunger,0,100); P.thirst=clamp(P.thirst,0,100);
-  P.stam+=8*dt; P.stam=clamp(P.stam,0,P.maxStam||100);
+  P.stam+=8*dt*(P.stamRegenT>0?3:1); P.stam=clamp(P.stam,0,P.maxStam||100);
+  if(P.stamRegenT>0) P.stamRegenT-=dt;
   P.inf=clamp(P.inf,0,100);
   P.rollCd=Math.max(0,P.rollCd-dt);
   P.invulnT=Math.max(0,P.invulnT-dt);
@@ -5136,7 +5131,7 @@ function equipHot(i){
   else if(it.use==='wire'){ P.weapon='wire'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
   else if(it.use==='sandbag'){ P.weapon='sandbag'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
   else if(it.use==='mine'){ P.weapon='mine'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
-  else if(it.use==='food'||it.use==='thirst'||it.use==='heal'){ P.hsel=i; refreshHud(); }
+  else if(it.use==='food'||it.use==='thirst'||it.use==='heal'){ useHotSlot(i); }
   refreshHud();
 }
 function quickSwap(){
@@ -5330,11 +5325,12 @@ function useClassSkill(){
         showMsg(T('拾荒直觉：透视10秒','Scavenger Sense: 10s reveal'));
         break;
       case 'civilian':
-        // 求生意志：8秒移速+50%+无限体力+免疫感染
-        P.frenzyT=8; P.infImmuneT=8;
+        // 求生意志：瞬间恢复50体力+8秒体力回复3倍+免疫感染
+        P.stam=Math.min(P.maxStam||100,P.stam+50);
+        P.stamRegenT=8; P.infImmuneT=8;
         bloodBurst(P.x,1,P.z,10,0xD6C29A);
         showRing(P.x,P.z,2.5,0xD6C29A,0.3,null);
-        showMsg(T('求生意志！','Survival Will!'));
+        showMsg(T('求生意志！体力恢复！','Survival Will! Stamina restored!'));
         break;
     }
   } catch(err){
