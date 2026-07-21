@@ -349,9 +349,9 @@ const WEAPONS={
  fists:  {melee:1,dmg:13, rate:0.42,range:1.7,arc:1.3,dur:Infinity,noise:0,anim:'punch',n:['拳头','Fists']},
  bat:    {melee:1,dmg:17,rate:0.48,range:2.1,arc:1.5,dur:40,noise:4,anim:'sweep',n:['棒球棍','Bat']},
  crowbar:{melee:1,dmg:22,rate:0.55,range:2.1,arc:1.2,dur:60,noise:4,anim:'chop', n:['撬棍','Crowbar']},
- axe:    {melee:1,dmg:30,rate:0.72,range:2.3,arc:1.6,dur:80,noise:4,anim:'bigswing',n:['斧头','Axe']},
+ axe:    {melee:1,dmg:30,rate:0.72,range:2.3,arc:1.6,dur:80,noise:4,anim:'bigswing',heavy:1,n:['斧头','Axe']},
  machete:{melee:1,dmg:19,rate:0.34,range:2.0,arc:1.4,dur:55,noise:4,anim:'sweep',n:['砍刀','Machete']},
- sledge: {melee:1,dmg:44,rate:0.95,range:2.2,arc:1.5,dur:70,noise:6,anim:'chop',kb:1.8,n:['大锤','Sledgehammer']},
+ sledge: {melee:1,dmg:44,rate:0.95,range:2.2,arc:1.5,dur:70,noise:6,anim:'chop',kb:1.8,heavy:1,n:['大锤','Sledgehammer']},
  pistol: {melee:0,dmg:24,rate:0.34,ammo:'ammo9', mag:12,reload:1.2,spread:0.035,range:34,noise:20,n:['手枪','Pistol']},
  shotgun:{melee:0,dmg:13,rate:0.95,ammo:'shell',mag:6, reload:2.1,spread:0.13, pellets:6,range:20,noise:30,n:['霰弹枪','Shotgun']},
  rifle:  {melee:0,dmg:32,rate:0.15,ammo:'ammo762',mag:20,reload:1.7,spread:0.025,auto:1,range:40,noise:26,n:['步枪','Rifle']},
@@ -385,7 +385,7 @@ const ITEMS={
  hotmeal:  {n:['热食','Hot Meal'],use:'food',v:60,hp:12,stack:3,tip:['恢复 60 饱食与 12 HP。','Restores 60 food and 12 HP.']},
  cloth:    {n:['布料','Cloth'],stack:10,tip:['合成材料：绷带等。','Crafting material: bandages.']},
  bottle:   {n:['空瓶','Bottle'],stack:5,tip:['合成材料：净水/燃烧瓶等。','Material: water / molotov.']},
- fuel:     {n:['燃料','Fuel'],stack:5,tip:['合成弹药、烹饪与加工。','Fuel for ammo & cooking.']},
+ fuel:     {n:['燃料','Fuel'],stack:20,tip:['合成弹药、烹饪与加工。','Fuel for ammo & cooking.']},
  wood:     {n:['木材','Wood'],stack:20,tip:['建造与合成的基础材料。','Basic building material.']},
  nails:    {n:['钉子','Nails'],stack:20,tip:['合成弹药与防御工事。','Material for ammo & defenses.']},
  scrap:    {n:['废金属','Scrap Metal'],stack:15,tip:['稀有材料：步枪弹等。','Rare material: rifle ammo.']},
@@ -416,7 +416,10 @@ const ITEMS={
   railgun:{n:['轨道炮','Railgun'],weapon:1,stack:1,tip:['穿透型高伤远程。','Piercing high-damage sniper.']},
   shotgun2:{n:['自动霰弹枪','Auto Shotgun'],weapon:1,stack:1,tip:['近距高速散射。','Rapid close-range spread.']},
   crossbow:{n:['十字弩','Crossbow'],weapon:1,stack:1,tip:['静音远程武器，低噪音高伤害，弩箭可回收。','Silent ranged, high damage, recoverable bolts.']},
-  grenade: {n:['手榴弹','Grenade'],weapon:1,stack:1,tip:['投掷后爆炸，范围伤害70。','Thrown explosive, 70 AoE damage.']}
+  grenade: {n:['手榴弹','Grenade'],weapon:1,stack:1,tip:['投掷后爆炸，范围伤害70。','Thrown explosive, 70 AoE damage.']},
+  backpack:  {n:['背包','Backpack'],use:'expand',stack:1,tip:['增加背包格子+2。','+2 inventory slots.']},
+  armor:     {n:['护甲','Armor'],use:'armor',stack:1,tip:['减少受到伤害30%。','Reduce damage taken 30%.']},
+  cooked_meat:{n:['熟肉','Cooked Meat'],use:'food',v:55,hp:10,stack:5,tip:['恢复55饱食+10HP。','Restores 55 food + 10HP.']}
 };
 const RECIPES=[
  {cat:'med', out:'bandage', qty:1, req:{cloth:2}, t:1.2},
@@ -455,7 +458,13 @@ const RECIPES=[
  {cat:'gear',out:'invExpand',qty:1,req:{cloth:3,nails:2,scrap:1}, t:3.0},
  {cat:'wpn',out:'crossbow',qty:1,req:{wood:4,scrap:3,nails:2,cloth:1}, t:4.0, bp:1},
  {cat:'ammo',out:'bolt',qty:5,req:{wood:2,scrap:1,nails:1}, t:1.5},
- {cat:'wpn',out:'grenade',qty:2,req:{scrap:3,fuel:1,nails:2}, t:3.0, bp:1}
+ {cat:'wpn',out:'grenade',qty:2,req:{scrap:3,fuel:1,nails:2}, t:3.0, bp:1},
+ // 额外合成配方
+ {cat:'tool',out:'crowbar',qty:1, req:{scrap:4,wood:1}, t:2.5},
+ {cat:'tool',out:'sledge', qty:1, req:{scrap:6,wood:3}, t:4.0},
+ {cat:'gear',out:'backpack',qty:1, req:{cloth:5,scrap:2,nails:2}, t:5.0},
+ {cat:'gear',out:'armor',  qty:1, req:{scrap:8,cloth:3,nails:3}, t:6.0},
+ {cat:'food',out:'cooked_meat',qty:1, req:{can:2,fuel:1}, t:2.0}
 ];
 const CRAFT_CATS=[['med','医疗','Medical'],['ammo','弹药','Ammo'],['def','防御','Defense'],['food','食物','Food'],['tool','工具','Tools'],['wpn','武器','Weapons'],['gear','装备','Gear']];
 
@@ -859,21 +868,32 @@ function enterBuilding(b){
   G._interiorZombies=[];
   G._interiorSpawnT=60; // 60秒后刷新下一波僵尸
   G._interiorWave=1;
+  const indoorTypes=['walker','runner','crawler','spitter','hunter'];
   const numZ=RI(2,4);
   const w=b.w-1, d=b.d-1;
   for(let i=0;i<numZ;i++){
     const zx=R(-w/2+0.5,w/2-0.5), zz=R(-d/2+0.5,-1); // 在房间后部
-    spawnInteriorZombie(zx,zz);
+    spawnInteriorZombie(zx,zz,pick(indoorTypes));
+  }
+  // 室内额外随机生成1-3只僵尸，增加搜刮难度
+  const extraZ=RI(1,3);
+  for(let i=0;i<extraZ;i++){
+    const zx=R(-w/2+0.5,w/2-0.5), zz=R(-d/2+0.5,d/2-1);
+    spawnInteriorZombie(zx,zz,pick(indoorTypes));
   }
   showBanner(T('进入 '+b.label,'Entered '+b.label),'#5A8A6A',1.5);
   showMsg(T('按 C 键离开建筑','Press C to exit building'));
 }
-function spawnInteriorZombie(x,z){
-  const zb={x,z,hp:40,maxHp:40,spd:1.5,dmg:8,dir:0,atkCd:0,state:'chase',mesh:null};
+function spawnInteriorZombie(x,z,type){
+  // 支持不同僵尸类型，使用ZT定义的属性
+  const zt=type||'walker';
+  const c=ZT[zt]||ZT.walker;
+  const df=DIFF[G.diff];
+  const zb={x,z,hp:c.hp*df.hp,maxHp:c.hp*df.hp,spd:c.spd*df.spd,dmg:c.dmg*df.dmg,dir:0,atkCd:0,state:'chase',mesh:null,type:zt,c,flash:0};
   const g=new THREE.Group();
-  const body=new THREE.Mesh(BOX,new THREE.MeshLambertMaterial({color:0x4A6A4A}));
+  const body=new THREE.Mesh(BOX,new THREE.MeshLambertMaterial({color:c.shirt}));
   body.scale.set(0.5,0.9,0.3); body.position.y=0.9; body.castShadow=true; g.add(body);
-  const head=new THREE.Mesh(BOX,new THREE.MeshLambertMaterial({color:0x6A8A6A}));
+  const head=new THREE.Mesh(BOX,new THREE.MeshLambertMaterial({color:c.skin}));
   head.scale.set(0.35,0.35,0.35); head.position.y=1.6; g.add(head);
   g.position.set(x,0,z); interiorScene.add(g);
   zb.mesh=g;
@@ -893,6 +913,7 @@ function updateInteriorZombies(dt){
       G._interiorWave=(G._interiorWave||1)+1;
       // 每波数量递增，最多8只
       const numZ=Math.min(2+G._interiorWave,8);
+      const waveTypes=['walker','runner','crawler','spitter','hunter','screamer'];
       // 从门窗涌入，生成在房间边缘
       for(let i=0;i<numZ;i++){
         const side=RI(0,2); // 0=左侧门, 1=右侧门, 2=后窗
@@ -900,7 +921,7 @@ function updateInteriorZombies(dt){
         if(side===0){ zx=-w/2+0.5; zz=R(-d/2+0.5,d/2-1); }
         else if(side===1){ zx=w/2-0.5; zz=R(-d/2+0.5,d/2-1); }
         else { zx=R(-w/2+0.5,w/2-0.5); zz=-d/2+0.5; }
-        spawnInteriorZombie(zx,zz);
+        spawnInteriorZombie(zx,zz,pick(waveTypes));
       }
       showBanner(T('第 '+G._interiorWave+' 波僵尸涌入！','Wave '+G._interiorWave+' zombies surge in!'),'#8A3A3A',1.5);
       G.shake=0.4; // 屏幕震动反馈
@@ -932,7 +953,7 @@ function updateInteriorZombies(dt){
     } else {
       // 攻击玩家
       zb.atkCd-=dt;
-      if(zb.atkCd<=0){ zb.atkCd=1.0; P.hp-=zb.dmg; G.shake=0.3; AU.hurt(); }
+      if(zb.atkCd<=0){ zb.atkCd=1.0; damagePlayer(zb.dmg,RI(3,8)); G.shake=0.3; }
     }
     zb.x=clamp(zb.x,-w/2+0.3,w/2-0.3);
     zb.z=clamp(zb.z,-d/2+0.3,d/2-0.3);
@@ -942,7 +963,7 @@ function updateInteriorZombies(dt){
   }
 }
 function spawnInteriorLoot(x,z){
-  const id=pick(['can','water','bandage','scrap','nails','ammo9']);
+  const id=pick(['can','water','bandage','scrap','nails','ammo9','fuel','shell']);
   G._interiorLoot=G._interiorLoot||[];
   const mesh=bx(0.3,0.3,0.3,0xD4A84B,x,0.15,z,interiorScene,false);
   G._interiorLoot.push({mesh,x,z,id,qty:1});
@@ -1700,19 +1721,22 @@ function setWeaponMesh(){
 
 /* ================= zombies ================= */
 const ZT={
- walker:  {hp:42, spd:1.7,dmg:9, scale:1.0,skin:0x7A8268,shirt:0x5E6353,pants:0x3E3E3A,score:10,n:['行尸','Walker']},
- runner:  {hp:30, spd:3.5,dmg:8, scale:0.95,skin:0x8A8A72,shirt:0x6B4A3A,pants:0x33322F,score:15,n:['疾行尸','Runner']},
- bloater: {hp:95, spd:1.1,dmg:12,scale:1.25,skin:0x8A9A6A,shirt:0x7A8A55,pants:0x4A4A42,explode:1,score:25,n:['肿胀尸','Bloater']},
- crawler: {hp:32, spd:1.0,dmg:7, scale:0.9,skin:0x7A8268,shirt:0x4E5348,pants:0x3A3A36,crawl:1,grab:1,score:12,n:['爬行尸','Crawler']},
- screamer:{hp:38, spd:2.1,dmg:7, scale:1.0,skin:0x9A8A7A,shirt:0x743C38,pants:0x3E3E3A,scream:1,score:15,n:['尖啸尸','Screamer']},
- tank:    {hp:230,spd:0.95,dmg:26,scale:1.45,skin:0x6A7260,shirt:0x4A4A42,pants:0x2E2D2A,stomp:1,score:60,n:['巨坦尸','Tank']},
- survivor:{hp:65, spd:2.3,dmg:15,scale:1.0,skin:0x8A7A68,shirt:0x30483A,pants:0x33322F,armed:1,score:30,n:['感染幸存者','Inf. Survivor']},
- brute:   {hp:480,spd:1.0,dmg:34,scale:1.7,skin:0x5E6656,shirt:0x3E3E3A,pants:0x2E2D2A,stomp:1,boss:1,score:300,n:['蛮兽','Brute']},
-  spitter: {hp:60, spd:1.5,dmg:12,scale:1.0,skin:0x6B8A4A,shirt:0x44AA44,pants:0x2E3E2A,ranged:1,score:35,n:['喷吐者','Spitter']},
-  brute2:  {hp:220,spd:1.3,dmg:28,scale:1.3,skin:0x664422,shirt:0x4A3A22,pants:0x2E2D2A,kb:0.2,score:60,n:['蛮兵','Brute Soldier']},
-  leaper:  {hp:55, spd:2.0,dmg:22,scale:0.9,skin:0x8A6A3A,shirt:0x5A4A2A,pants:0x3E3E2A,leap:1,score:40,n:['跳跃者','Leaper']},
-  necro:   {hp:90, spd:0.8,dmg:14,scale:1.1,skin:0x4A3A5A,shirt:0x2A2A3A,pants:0x1A1A2A,summon:1,score:55,n:['唤尸者','Necromancer']},
-  queen:   {hp:650,spd:0.7,dmg:30,scale:1.8,skin:0x5A3A6A,shirt:0x3A2A4A,pants:0x2A1A3A,queen:1,boss:1,score:400,n:['虫群女王','Swarm Queen']}
+ walker:  {hp:65, spd:2.2, dmg:14, scale:1.0, skin:0x6B8A6A, shirt:0x4A5A3A, pants:0x3A4A2A, score:10, n:['行尸','Walker']},
+ runner:  {hp:45, spd:4.5, dmg:12, scale:0.95, skin:0x7A9A6A, shirt:0x5A6A3A, pants:0x4A5A2A, score:15, n:['疾行尸','Runner']},
+ bloater: {hp:140, spd:1.4, dmg:18, scale:1.25, skin:0x8A9A6A, shirt:0x5A4A3A, pants:0x4A3A2A, explode:1, score:25, n:['肿胀尸','Bloater']},
+ crawler: {hp:48, spd:1.3, dmg:10, scale:0.9, skin:0x6B7A5A, shirt:0x4A5A4A, pants:0x3A4A3A, crawl:1, grab:1, score:12, n:['爬行尸','Crawler']},
+ screamer:{hp:55, spd:2.8, dmg:10, scale:1.0, skin:0x9A8A6A, shirt:0x6A5A3A, pants:0x5A4A2A, scream:1, score:15, n:['尖啸尸','Screamer']},
+ tank:    {hp:350, spd:1.3, dmg:38, scale:1.45, skin:0x5A6B5A, shirt:0x3A4A3A, pants:0x2A3A2A, stomp:1, score:60, n:['巨坦尸','Tank']},
+ survivor:{hp:95, spd:3.0, dmg:22, scale:1.0, skin:0x8A7A6A, shirt:0x5A4A3A, pants:0x4A3A2A, armed:1, score:30, n:['感染幸存者','Survivor']},
+ brute:   {hp:700, spd:1.4, dmg:50, scale:1.7, skin:0x4A5A4A, shirt:0x3A4A3A, pants:0x2A3A2A, stomp:1, boss:1, score:300, n:['蛮兽','Brute']},
+ spitter: {hp:85, spd:2.0, dmg:18, scale:1.0, skin:0x6B8A4A, shirt:0x44AA44, pants:0x2E3E2A, ranged:1, score:35, n:['喷吐者','Spitter']},
+ brute2:  {hp:320, spd:1.8, dmg:40, scale:1.3, skin:0x5A5A4A, shirt:0x3A3A2A, pants:0x2A2A1A, kb:0.2, score:60, n:['蛮兵','Brute2']},
+ leaper:  {hp:80, spd:2.8, dmg:32, scale:0.9, skin:0x7A8A5A, shirt:0x5A6A3A, pants:0x4A5A2A, leap:1, score:40, n:['跳跃者','Leaper']},
+ necro:   {hp:130, spd:1.1, dmg:20, scale:1.1, skin:0x6A5A7A, shirt:0x4A3A5A, pants:0x3A2A3A, summon:1, score:55, n:['唤尸者','Necromancer']},
+ queen:   {hp:900, spd:1.0, dmg:45, scale:1.8, skin:0x5A4A6A, shirt:0x3A2A4A, pants:0x2A1A3A, queen:1, boss:1, score:400, n:['虫群女王','Swarm Queen']},
+ // 新增远程僵尸
+ hunter:  {hp:70, spd:2.5, dmg:16, scale:1.0, skin:0x5A7A8A, shirt:0x3A5A6A, pants:0x2A4A5A, ranged:1, score:30, n:['猎手','Hunter']},
+ sniper:  {hp:55, spd:1.8, dmg:25, scale:0.95, skin:0x4A6A5A, shirt:0x2A4A3A, pants:0x1A3A2A, ranged:1, score:40, n:['狙击尸','Sniper Zombie']}
 };
 const zombies=[];
 let zid=0;
@@ -1824,17 +1848,17 @@ function killZombie(zb){
   }
   else if(roll<(lootBoost?0.40:0.30)) dropLoot(zb.x,zb.z,pick(['can','water','bandage','cloth','wood']),1);
   else if(roll<(lootBoost?0.75:0.60)) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(8,16));
-  else if(roll<(lootBoost?0.90:0.75)) dropLoot(zb.x,zb.z,pick(['wood','cloth','nails','scrap']),RI(2,5));
+  else if(roll<(lootBoost?0.90:0.75)) dropLoot(zb.x,zb.z,pick(['wood','cloth','nails','scrap','fuel']),RI(2,5));
   else if(zb.type==='survivor'&&Math.random()<(lootBoost?0.75:0.55)) dropLoot(zb.x,zb.z,pick(['crowbar','axe','pistol','machete','smg']),1);
   else if(zb.type==='tank') dropLoot(zb.x,zb.z,pick(['medkit','rifle','ammo762']),RI(2,6));
-  else if(zb.type==='spitter'&&Math.random()<(lootBoost?0.6:0.4)) dropLoot(zb.x,zb.z,pick(['fuel','flamethrower','shell','molotov']),1);
+  else if(zb.type==='spitter'&&Math.random()<(lootBoost?0.85:0.65)) dropLoot(zb.x,zb.z,pick(['fuel','flamethrower','shell','molotov']),1);
   else if(zb.type==='brute2') dropLoot(zb.x,zb.z,pick(['railgun','rocket','shotgun2','ammo762','medkit']),RI(1,3));
   // 拾荒直觉加成：额外材料掉落
   if(lootBoost && !zb.c.boss && Math.random()<0.5){
     dropLoot(zb.x+R(-0.6,0.6),zb.z+R(-0.6,0.6),pick(['scrap','nails','cloth','wood','ammo9']),RI(2,6));
   }
   // 蓝图掉落（基础蓝图低概率，高级蓝图后期/强敌掉落）
-  const advTypes=['brute2','tank','spitter'];
+  const advTypes=['brute2','tank','spitter','hunter','sniper'];
   const isAdv=advTypes.includes(zb.type);
   const bpChance=G.wave>=10?0.12:G.wave>=5?0.08:0.05;
   if(Math.random()<bpChance){
@@ -2101,18 +2125,29 @@ function zombieAI(zb,dt,idx){
   if(zb.spitting>0){
     zb.spitting-=dt;
     if(zb.spitting<=0){
-      // 发射酸液弹（敌方子弹）
       const tx=P.x-zb.x, tz=P.z-zb.z, td=Math.hypot(tx,tz)||1;
       const svx=tx/td, svz=tz/td;
-      fireBullet(zb.x,1.2,zb.z,svx,svz,14,zb.dmg,0,0,0,0,1);
-      // 标记为敌方子弹，用绿色
+      let range=14, dmg=zb.dmg, bcol=0x66DD44, bsize=0.15;
+      if(zb.type==='hunter'){ range=20; dmg=zb.dmg*0.8; bcol=0x44AAFF; bsize=0.12; }
+      else if(zb.type==='sniper'){ range=30; dmg=zb.dmg*1.5; bcol=0xFF6600; bsize=0.2; }
+      fireBullet(zb.x,1.2,zb.z,svx,svz,range,dmg,0,0,0,0,1);
       const lb=bullets[bullets.length-1];
-      if(lb){ lb.enemy=1; lb.m.material=mat(0x66DD44); lb.m.scale.set(0.15,0.15,0.15); }
+      if(lb){ lb.enemy=1; lb.m.material=mat(bcol); lb.m.scale.set(bsize,bsize,bsize); }
       AU.groan(dist);
     }
-  } else if(zb.c.ranged&&dist>4&&dist<14&&zb.spitCd<=0&&(zb.state==='chase'||zb.state==='attack')){
-    zb.spitting=0.6; zb.spitCd=R(2.5,4);
-    showRing(zb.x,zb.z,1.0,0x66DD44,0.5,null);
+  } else if(zb.c.ranged&&zb.spitCd<=0&&(zb.state==='chase'||zb.state==='attack')){
+    if(zb.type==='spitter'&&dist>4&&dist<14){
+      zb.spitting=0.6; zb.spitCd=R(2.5,4);
+      showRing(zb.x,zb.z,1.0,0x66DD44,0.5,null);
+    } else if(zb.type==='hunter'&&dist>6&&dist<20){
+      // 猎手：快速射击，射程远
+      zb.spitting=0.4; zb.spitCd=R(1.5,2.5);
+      showRing(zb.x,zb.z,0.8,0x4488AA,0.4,null);
+    } else if(zb.type==='sniper'&&dist>10&&dist<30){
+      // 狙击尸：高伤害远射程，蓄力长
+      zb.spitting=1.2; zb.spitCd=R(3,5);
+      showRing(zb.x,zb.z,1.2,0xFF4400,0.6,null);
+    }
   }
 
   /* ---- leaper jump attack ---- */
@@ -2601,7 +2636,15 @@ function shoot(){
   if(P.mags[wk]<=0) reload();
 }
 function meleeAtk(wk,w){
-  P.atkCd=w.rate*(P.frenzyT>0?0.65:1);
+  // 近战消耗体力
+  const stamCost=w.heavy?20:12;
+  if(P.stam<stamCost){
+    showMsg(T('体力不足！','Stamina too low!'));
+    return;
+  }
+  P.stam-=stamCost;
+  // 近战攻击CD（更长的基础冷却）
+  P.atkCd=w.rate*(P.frenzyT>0?0.7:1)*1.3;
   P.swingMax=Math.min(0.5,Math.max(0.32,w.rate*0.85));
   P.swingT=P.swingMax;
   P.meleeHitT=P.swingMax*0.36;
@@ -3152,8 +3195,9 @@ function waveTypes(n){
   if(n>=5) t.push('bloater','bloater','spitter','leaper');
   if(n>=6) t.push('survivor','survivor','spitter','leaper');
   if(n>=7) t.push('tank','brute2','necro');
-  if(n>=8) t.push('leaper','leaper','necro');
-  if(n>=9) t.push('tank','runner','screamer','brute2','spitter','necro');
+  if(n>=8) t.push('leaper','leaper','necro','hunter');
+  if(n>=9) t.push('tank','runner','screamer','brute2','spitter','necro','hunter','sniper');
+  if(n>=11) t.push('hunter','hunter','sniper','spitter','necro');
   return t;
 }
 function startWave(n){
@@ -3538,6 +3582,8 @@ function damagePlayer(dmg,inf){
     if(P.shield<=0) showMsg(T('护盾损坏！','Shield broken!'));
   }
   if(dmg<=0) return;
+  // 护甲减伤
+  if(P.armorRed>0) dmg*=(1-P.armorRed);
   P.hp-=dmg; P.hurtT=0.2;
   if(P.infImmuneT<=0&&P.infPauseT<=0) P.inf+=inf; // 免疫/暂停时不增加感染
   $('hurtFx').style.opacity='1';
@@ -3740,6 +3786,24 @@ function buildLootModel(g,id){
       bx(0.25,0.1,0.25,0x4A3A22,0,0.05,0,g);
       bx(0.06,0.06,0.06,0x743C38,0,0.13,0,g);
       break;
+    case 'backpack': // 背包：箱型包+背带
+      bx(0.3,0.35,0.2,0x4A5A3A,0,0.18,0,g);
+      bx(0.26,0.04,0.16,0x3A4A2A,0,0.36,0,g);
+      bx(0.04,0.25,0.04,0x3A4A2A,-0.12,0.18,0.08,g);
+      bx(0.04,0.25,0.04,0x3A4A2A,0.12,0.18,0.08,g);
+      break;
+    case 'armor': // 护甲：胸甲板
+      bx(0.32,0.4,0.16,0x5B5C57,0,0.2,0,g);
+      bx(0.28,0.05,0.14,0x8A8070,0,0.4,0,g);
+      bx(0.08,0.3,0.05,0x3A3A3A,-0.1,0.2,0.08,g);
+      bx(0.08,0.3,0.05,0x3A3A3A,0.1,0.2,0.08,g);
+      break;
+    case 'cooked_meat': // 熟肉：肉块+骨架
+      bx(0.25,0.15,0.2,0x8A5A3A,0,0.08,0,g);
+      bx(0.2,0.06,0.16,0xA86A3A,0,0.16,0,g);
+      bx(0.03,0.18,0.03,0xE5DDC8,-0.08,0.12,0,g);
+      bx(0.03,0.18,0.03,0xE5DDC8,0.08,0.12,0,g);
+      break;
     default: // 蓝图/未知：卷轴
       bx(0.2,0.22,0.04,0xD6C29A,0,0.11,0,g);
       bx(0.06,0.06,0.06,0xB18A45,0,0.23,0,g);
@@ -3818,11 +3882,12 @@ function updateLootEnts(dt){
   }
 }
 function spawnInitialLoot(){
-  const L=[['can',3],['water',3],['bandage',3],['cloth',3],['wood',4],['nails',3],['fuel',2],['bottle',3],
-    ['ammo9',6],['ammo9',6],['shell',4],['shell',4],['ammo762',5],['ammo762',5],
-    ['bat',1],['crowbar',1],['molotov',1],['barricade',2],['scrap',2],
+  const L=[['can',4],['water',4],['bandage',3],['cloth',2],['wood',2],['nails',3],['fuel',4],['bottle',3],
+    ['ammo9',5],['ammo9',5],['shell',4],['shell',4],['ammo762',4],['ammo762',4],
+    ['bat',1],['crowbar',1],['molotov',1],['barricade',2],['scrap',3],
     ['axe',1],['medkit',1],['machete',1],['hotmeal',1],
-    ['flamethrower',1],['rocket',1],['railgun',1],['shotgun2',1]];
+    ['flamethrower',1],['rocket',1],['railgun',1],['shotgun2',1],
+    ['antibio',1]];
   for(let i=0;i<lootSpots.length;i++){
     const s=lootSpots[i];
     // 外围loot点有更高概率和更好品质
@@ -3839,7 +3904,7 @@ function spawnInitialLoot(){
     }
     // 额外生存资源：增加末日生存感，每个loot点有概率生成生存材料
     if(Math.random()<0.45){
-      const res=pick(['wood','cloth','nails','scrap','bottle','fuel']);
+      const res=pick(['wood','cloth','nails','scrap','bottle','fuel','fuel','fuel']);
       dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),res,RI(2,6));
     }
   }
@@ -3900,7 +3965,7 @@ function openInv(){
       d.innerHTML=icon(s.id)+'<span class="qty">'+s.q+'</span>'+'<span class="nm">'+itemName(s.id)+'</span><span class="drop" title="'+T('丢弃','Drop')+'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C05848" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span>';
       d.onclick=()=>useInv(i);
       // 右键：消耗品直接使用，其他丢弃
-      d.oncontextmenu=(e)=>{ e.preventDefault(); const it=ITEMS[s.id]; if(it.use==='food'||it.use==='thirst'||it.use==='heal'){ consumeInv(i); } else { dropInvItem(i); } };
+      d.oncontextmenu=(e)=>{ e.preventDefault(); const it=ITEMS[s.id]; if(it.use==='food'||it.use==='thirst'||it.use==='heal'||it.use==='expand'||it.use==='armor'){ consumeInv(i); } else { dropInvItem(i); } };
       // 拖拽交换
       d.draggable=true;
       d.ondragstart=(e)=>{ dragSrc=i; e.dataTransfer.effectAllowed='move'; };
@@ -3948,6 +4013,8 @@ function consumeInv(i){
   if(it.use==='food'){ P.hunger=clamp(P.hunger+it.v,0,100); if(it.hp) P.hp=clamp(P.hp+it.hp*boost,0,100); AU.eat(); }
   else if(it.use==='thirst'){ P.thirst=clamp(P.thirst+it.v,0,100); AU.eat(); }
   else if(it.use==='heal'){ P.hp=clamp(P.hp+it.v*boost,0,100); P.inf=clamp(P.inf-(it.inf||0)*boost,0,100); AU.eat(); }
+  else if(it.use==='expand'){ P.invSlots=Math.min(16,(P.invSlots||8)+2); AU.craft(); showMsg(T('背包扩容！当前 '+P.invSlots+'/16 格','Bag expanded! '+P.invSlots+'/16 slots')); }
+  else if(it.use==='armor'){ P.armorRed=0.3; AU.craft(); showMsg(T('护甲装备！减伤30%。','Armor equipped! -30% damage.')); }
   else return false;
   s.q--; if(s.q<=0) P.inv[i]=null;
   openInv(); refreshHud();
@@ -5161,6 +5228,9 @@ const IC={
  sandbag:'<path d="M4 10c2-2 4-2 6 0s4 2 6 0M4 14c2-2 4-2 6 0s4 2 6 0M4 18c2-2 4-2 6 0s4 2 6 0M4 8v12M16 8v12"/>',
  mine:'<circle cx="12" cy="14" r="5"/><path d="M12 9V5M9 5h6M7 14h2M15 14h2M12 11v6"/>',
  invExpand:'<path d="M4 7h16v13H4zM4 7l3-3h10l3 3M9 12h6M9 15h4M4 20l-1 2M20 20l1 2"/>',
+ backpack:'<path d="M5 8h14v12H5zM5 8l2-3h10l2 3M9 12h6M9 15h4M8 8V5h8v3"/>',
+ armor:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4"/>',
+ cooked_meat:'<path d="M5 14c0-4 3-7 7-7s7 3 7 7M5 14h14M5 14c0 2 3 4 7 4s7-2 7-4M8 11c0-1 1-2 2-2M14 11c0-1 1-2 2-2"/>',
  can:'<path d="M7 5h10v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zM7 8h10M10 3h4"/>',
  water:'<path d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/>',
  bandage:'<path d="M4 9h16v6H4zM4 9l3-4h10l3 4M9 12h.01M15 12h.01M12 12h.01"/>',
@@ -5479,6 +5549,7 @@ function newGame(from){
     mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},hsel:3});
   P.inv=new Array(16).fill(null);
   P.invSlots=8; // 初始8格背包，需通过制作扩容到16
+  P.armorRed=0; // 重置护甲减伤
   P.hot=[null,null,null,{id:'fists',q:1}];
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
   // 应用职业属性
