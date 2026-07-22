@@ -15,6 +15,15 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
 #scaler{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center center;
   overflow:hidden;background:var(--navy);font-family:Georgia,'Times New Roman',serif;
   user-select:none;-webkit-user-select:none;touch-action:none}
+#rotateHint{display:none;position:absolute;inset:0;z-index:100;align-items:center;justify-content:center;
+  flex-direction:column;gap:12px;background:var(--navy);color:var(--off);font-family:Georgia,'Times New Roman',serif;
+  text-align:center;padding:28px}
+#rotatePhone{position:relative;width:54px;height:86px;border:3px solid var(--parch);border-radius:8px}
+#rotatePhone:after{content:'';position:absolute;left:50%;bottom:5px;width:6px;height:6px;border-radius:50%;
+  background:var(--parch);transform:translateX(-50%)}
+#rotateArrow{font-size:34px;line-height:1;color:var(--gold)}
+#rotateTitle{font-size:22px;letter-spacing:0}
+#rotateSub{font-size:13px;color:var(--parch);letter-spacing:0}
 #c{position:absolute;inset:0}
 #c canvas{display:block}
 .hidden{display:none !important}
@@ -39,11 +48,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
 @keyframes barBlink{50%{opacity:.4}}
 #infBox{display:flex;align-items:center;margin-top:4px;color:var(--red);font-size:13px}
 #infBox svg{margin-right:5px}
+#zoneHud{width:190px;margin-top:7px;padding:6px 8px;background:rgba(23,32,43,.74);border-left:3px solid var(--gold);
+  box-shadow:2px 2px 0 rgba(0,0,0,.28);color:var(--off)}
+#zoneName{font-size:11px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#threatLine{display:flex;align-items:center;gap:5px;margin-top:3px;color:var(--parch);font-size:10px}
+#threatDot{width:7px;height:7px;background:#5A8A6A;transform:rotate(45deg)}
+#threatDot.warn{background:var(--gold)} #threatDot.high{background:#C05848;box-shadow:0 0 6px rgba(192,88,72,.7)}
 #topCenter{position:absolute;top:10px;left:50%;transform:translateX(-50%);text-align:center;color:var(--off)}
 #waveTxt{font-size:20px;letter-spacing:2px;text-shadow:1px 1px 0 var(--char)}
 #dayTxt{font-size:13px;margin-top:3px;color:var(--parch);display:flex;align-items:center;justify-content:center;gap:6px}
+#modeInfo{font-size:12px;margin-top:2px;color:var(--paper);white-space:nowrap;text-shadow:1px 1px 0 var(--char)}
 #comboTxt{font-size:19px;color:var(--gold);margin-top:2px;letter-spacing:3px;text-shadow:1px 1px 0 var(--char);min-height:23px;font-weight:bold}
-#bossWrap{position:absolute;top:92px;left:50%;transform:translateX(-50%);width:420px;text-align:center}
+#bossWrap{position:absolute;top:106px;left:50%;transform:translateX(-50%);width:420px;text-align:center}
 #bossLbl{font-size:13px;color:#C05848;letter-spacing:3px;margin-bottom:3px;text-shadow:1px 1px 0 var(--char)}
 #bossBar{height:12px;background:var(--char);border:1.5px solid var(--iron);box-shadow:2px 2px 0 rgba(0,0,0,.35)}
 #bossFill{height:100%;width:100%;background:var(--red)}
@@ -54,12 +70,18 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
   pointer-events:none;z-index:15;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5)}
 #pickHint .pk{display:inline-block;background:#B18A45;color:#242321;font-weight:bold;padding:2px 8px;border-radius:4px;margin-right:6px}
 #questP{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:25;text-align:center;min-width:320px;pointer-events:auto}
+#questP .perkTitle,#attachP .perkTitle{color:#E5DDC8;font-size:22px;font-weight:bold;text-shadow:0 2px 2px #111;margin-bottom:10px}
 #questP .questCard{background:rgba(36,35,33,0.95);border:2px solid #5A6A4A;border-radius:8px;padding:12px 20px;margin:8px auto;max-width:380px}
 #questP .questName{font-size:17px;color:#E5DDC8;font-weight:bold;margin-bottom:6px}
 #questP .questBar{height:8px;background:#2A2A28;border-radius:4px;overflow:hidden;margin:6px 0}
 #questP .questFill{height:100%;background:linear-gradient(90deg,#5A8A6A,#7AAA8A);transition:width .3s}
 #questP .questDesc{font-size:13px;color:#A09884}
 #attachP{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:25;text-align:center;min-width:320px;pointer-events:auto;max-height:80vh;overflow-y:auto}
+#attachP .perkCard{background:rgba(36,35,33,.96);border:2px solid #5B5C57;border-radius:8px;padding:8px 16px;margin:6px auto;max-width:400px;color:#E5DDC8}
+#attachP .perkName{font-size:15px;font-weight:bold;color:#E5DDC8}
+#attachP .perkDesc{font-size:12px;color:#B9A47A;margin-top:3px}
+#attachP .perkCard[data-attachment]:not([data-attachment=""]),#attachClose{cursor:pointer}
+#attachP .perkCard[data-attachment]:not([data-attachment=""]):hover,#attachClose:hover{border-color:#B18A45;background:#302E2A}
 #dmgLayer{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:14}
 .dmgN{position:absolute;font-size:17px;font-weight:bold;color:#fff;text-shadow:1px 1px 0 var(--char);
   pointer-events:none;transform:translate(-50%,-50%);white-space:nowrap}
@@ -81,7 +103,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
 .hslot .qty{position:absolute;right:3px;top:1px;font-size:11px;color:var(--char)}
 .hslot .dwrap{position:absolute;left:4px;right:4px;bottom:3px;height:4px;background:var(--char)}
 .hslot .dfill{height:100%;background:var(--gold)}
-#msgTxt{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);color:var(--off);font-size:15px;
+#msgTxt{position:absolute;left:50%;bottom:136px;transform:translateX(-50%);color:var(--off);font-size:15px;
   text-shadow:1px 1px 0 var(--char);text-align:center;line-height:1.5}
 #hurtFx{position:absolute;inset:0;background:rgba(116,60,56,.32);opacity:0;pointer-events:none;z-index:15}
 #sideBtns{position:absolute;right:14px;top:196px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
@@ -153,6 +175,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
 #rollBtn{right:44px;bottom:206px}
 #relBtn{right:118px;bottom:190px}
 .ico{display:block}
+@media (orientation:portrait) and (max-width:900px){
+  #rotateHint{display:flex}
+}
+@media (orientation:landscape) and (max-height:500px){
+  #stats{transform:scale(1.3);transform-origin:top left}
+  #topCenter{top:14px;transform:translateX(-50%) scale(1.18);transform-origin:top center}
+  #mmBox{transform:scale(1.18);transform-origin:top right}
+  #wpnBox{transform:scale(1.2);transform-origin:bottom right}
+  #hotbar{transform:translateX(-50%) scale(1.2);transform-origin:bottom center}
+  #sideBtns{transform:scale(1.2);transform-origin:top right}
+  #msgTxt{bottom:142px;width:620px;font-size:18px}
+  #banner{font-size:40px}
+  #invP,#craftP{width:620px;max-height:650px;overflow-y:auto}
+  #questP,#attachP{min-width:520px;max-height:620px}
+  .ptitle{font-size:22px}.ctab{font-size:17px}.crow .cname{font-size:18px}.crow .creq{font-size:15px}
+  #menu .panel{width:680px;padding:22px 28px}
+  #menu #tut{display:none}
+  #menu #subtitle{font-size:18px;margin-bottom:10px}
+  #menu .mrow{margin:7px 0}
+  #menu .btn{font-size:18px;padding:8px 18px}
+  #menu #classSelect{margin:8px 0 !important}
+  #pause .panel,#dead .panel{width:560px}
+  #pause .btn,#dead .btn{font-size:20px;padding:11px 20px}
+}
 </style>
 </head>
 <body>
@@ -166,10 +212,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
       <div class="bar"><div class="fill th" id="fTh"></div><span class="bl" id="tTh"></span></div>
       <div class="bar"><div class="fill st" id="fSt"></div><span class="bl" id="tSt"></span></div>
       <div id="infBox"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 2.5C7.2 2.5 4 6.2 4 10.2c0 2.9 1.4 4.9 3 5.9V20h2v-2.2h2V20h2v-2.2h2V20h2v-3.9c1.6-1 3-3 3-5.9 0-4-3.2-7.7-8-7.7z" fill="none" stroke="#743C38" stroke-width="1.8"/><circle cx="9" cy="10" r="1.6" fill="#743C38"/><circle cx="15" cy="10" r="1.6" fill="#743C38"/></svg><span id="infTxt">0%</span></div>
+      <div id="zoneHud"><div id="zoneName"></div><div id="threatLine"><span id="threatDot"></span><span id="threatTxt"></span></div></div>
     </div>
     <div id="topCenter">
       <div id="waveTxt"></div>
       <div id="dayTxt"><span id="dayIco"></span><span id="dayLbl"></span></div>
+      <div id="modeInfo"></div>
       <div id="comboTxt"></div>
     </div>
     <div id="bossWrap" class="hidden"><div id="bossLbl"></div><div id="bossBar"><div id="bossFill"></div></div></div>
@@ -259,6 +307,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:var(--navy)}
     </div>
   </div>
   <div id="tip" class="hidden"></div>
+</div><div id="rotateHint" aria-live="polite">
+  <div id="rotatePhone"></div><div id="rotateArrow">&#8635;</div>
+  <div id="rotateTitle">请横屏游玩</div><div id="rotateSub">Rotate for landscape play</div>
 </div></div>
 <script>(function(){var s=document.getElementById('scaler');function r(){var a=document.getElementById('app');var w=a.clientWidth,h=a.clientHeight;var sc=Math.min(w/1280,h/720);s.style.transform='translate(-50%,-50%) scale('+sc+')';}window.addEventListener('resize',r);r();})();</script>
 <script type="importmap">
@@ -280,15 +331,18 @@ const V3=THREE.Vector3;
 function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
 /* ================= audio ================= */
-const AU={ctx:null,
- init(){ if(!this.ctx){ try{ this.ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+const AU={ctx:null,master:null,
+ init(){ if(!this.ctx){ try{ this.ctx=new (window.AudioContext||window.webkitAudioContext)();
+      this.master=this.ctx.createGain(); this.master.gain.value=typeof settings!=='undefined'?settings.vol:0.5;
+      this.master.connect(this.ctx.destination);
+    }catch(e){} }
    if(this.ctx&&this.ctx.state==='suspended') this.ctx.resume(); },
  tone(f,d,type,v,slide){ if(!this.ctx)return; const t=this.ctx.currentTime;
    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
    o.type=type||'sine'; o.frequency.setValueAtTime(f,t);
    if(slide) o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+d);
    g.gain.setValueAtTime(v||0.2,t); g.gain.exponentialRampToValueAtTime(0.001,t+d);
-   o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t+d+0.02); },
+    o.connect(g); g.connect(this.master||this.ctx.destination); o.start(t); o.stop(t+d+0.02); },
  noise(d,v,ff,q){ if(!this.ctx)return; const t=this.ctx.currentTime;
    const len=Math.max(1,Math.floor(this.ctx.sampleRate*d));
    const buf=this.ctx.createBuffer(1,len,this.ctx.sampleRate);
@@ -296,7 +350,7 @@ const AU={ctx:null,
    const src=this.ctx.createBufferSource(); src.buffer=buf;
    const fl=this.ctx.createBiquadFilter(); fl.type='lowpass'; fl.frequency.value=ff||1200; fl.Q.value=q||0.8;
    const g=this.ctx.createGain(); g.gain.setValueAtTime(v||0.3,t); g.gain.exponentialRampToValueAtTime(0.001,t+d);
-   src.connect(fl); fl.connect(g); g.connect(this.ctx.destination); src.start(t); },
+    src.connect(fl); fl.connect(g); g.connect(this.master||this.ctx.destination); src.start(t); },
  step(){ this.noise(0.05,0.10,700); },
  swing(){ this.noise(0.07,0.14,900); },
  hitF(){ this.tone(120,0.09,'triangle',0.30,70); this.noise(0.06,0.22,500); },
@@ -319,7 +373,9 @@ const AU={ctx:null,
  headshot(){ this.tone(1250,0.06,'square',0.20,320); this.noise(0.05,0.28,3000); },
  combo(n){ const f=520+Math.min(n,10)*55; this.tone(f,0.07,'square',0.13); setTimeout(()=>this.tone(f*1.26,0.08,'square',0.13),70); },
  supply(){ for(let i=0;i<3;i++) setTimeout(()=>this.tone(660+i*160,0.12,'triangle',0.16),i*95); },
- boss(){ this.tone(55,1.0,'sawtooth',0.35,38); this.noise(0.7,0.32,300); },
+  boss(){ this.tone(55,1.0,'sawtooth',0.35,38); this.noise(0.7,0.32,300); },
+  gun(){ this.noise(0.06,0.16,1900); this.tone(170,0.05,'square',0.08,95); },
+  slam(){ this.stomp(); },
  stomp(){ this.tone(70,0.3,'sine',0.42,36); this.noise(0.2,0.4,350); },
  spike(){ this.tone(900,0.04,'square',0.10,480); },
  breakW(){ this.noise(0.15,0.35,800); this.tone(140,0.12,'square',0.20,60); }
@@ -352,7 +408,9 @@ const WEAPONS={
  axe:    {melee:1,dmg:30,rate:0.72,range:2.3,arc:1.6,dur:80,noise:4,anim:'bigswing',heavy:1,n:['斧头','Axe']},
  machete:{melee:1,dmg:19,rate:0.34,range:2.0,arc:1.4,dur:55,noise:4,anim:'sweep',n:['砍刀','Machete']},
  sledge: {melee:1,dmg:44,rate:0.95,range:2.2,arc:1.5,dur:70,noise:6,anim:'chop',kb:1.8,heavy:1,n:['大锤','Sledgehammer']},
+ spear:  {melee:1,dmg:36,rate:0.68,range:3.25,arc:0.7,dur:95,noise:3,anim:'thrust',kb:0.9,n:['长矛','Spear']},
  pistol: {melee:0,dmg:24,rate:0.34,ammo:'ammo9', mag:12,reload:1.2,spread:0.035,range:34,noise:20,n:['手枪','Pistol']},
+ revolver:{melee:0,dmg:48,rate:0.52,ammo:'ammo9',mag:6,reload:1.75,spread:0.022,range:38,noise:27,n:['左轮手枪','Revolver']},
  shotgun:{melee:0,dmg:13,rate:0.95,ammo:'shell',mag:6, reload:2.1,spread:0.13, pellets:6,range:20,noise:30,n:['霰弹枪','Shotgun']},
  rifle:  {melee:0,dmg:32,rate:0.15,ammo:'ammo762',mag:20,reload:1.7,spread:0.025,auto:1,range:40,noise:26,n:['步枪','Rifle']},
  smg:    {melee:0,dmg:14,rate:0.085,ammo:'ammo9',mag:30,reload:1.6,spread:0.075,auto:1,range:26,noise:22,n:['冲锋枪','SMG']},
@@ -361,7 +419,7 @@ const WEAPONS={
   railgun:    {melee:0,dmg:120,rate:1.8,ammo:'ammo762',mag:5,reload:2.5,spread:0,range:50,noise:30,type:'rail',pierce:99,n:['轨道炮','Railgun']},
   shotgun2:  {melee:0,dmg:20,rate:0.7,ammo:'shell',mag:8,reload:2.0,spread:0.09,pellets:8,range:24,noise:28,n:['自动霰弹枪','Auto Shotgun']},
   crossbow:  {melee:0,dmg:55,rate:1.2,ammo:'bolt',mag:1,reload:1.8,spread:0,range:40,noise:3,type:'bolt',pierce:2,n:['十字弩','Crossbow'],silent:1},
-  grenade:   {melee:0,dmg:0,rate:1.0,ammo:'grenade',mag:1,reload:0.5,range:18,noise:35,type:'throw',explode:1,explodeDmg:70,explodeR:3.5,n:['手榴弹','Grenade']}
+   grenade:   {melee:0,dmg:0,rate:1.0,ammo:'grenade_round',mag:1,reload:0.5,range:18,noise:35,type:'throw',explode:1,explodeDmg:70,explodeR:3.5,n:['榴弹投掷器','Grenade Launcher']}
 };
 const CLASSES={
   doctor:{nameZh:'医生',nameEn:'Doctor',hp:100,speed:4.0,dmgMult:0.9,startW:'machete',
@@ -389,12 +447,13 @@ const ITEMS={
  wood:     {n:['木材','Wood'],stack:20,tip:['建造与合成的基础材料。','Basic building material.']},
  nails:    {n:['钉子','Nails'],stack:20,tip:['合成弹药与防御工事。','Material for ammo & defenses.']},
  scrap:    {n:['废金属','Scrap Metal'],stack:15,tip:['稀有材料：步枪弹等。','Rare material: rifle ammo.']},
+ resin:    {n:['腐化树脂','Tainted Resin'],stack:12,tip:['净化腐化巢穴获得的稀有强化材料。','Rare upgrade material recovered from corrupted nests.']},
  molotov:  {n:['燃烧瓶','Molotov'],use:'molotov',stack:3,tip:['投掷后小范围燃烧杀伤。','Throwable area fire damage.']},
  ammo9:    {n:['9mm弹','9mm Ammo'],stack:60,ammo:1,tip:['手枪/冲锋枪弹药。','Pistol / SMG ammo.']},
  shell:    {n:['霰弹','Shells'],stack:24,ammo:1,tip:['霰弹枪弹药。','Shotgun shells.']},
  ammo762:  {n:['步枪弹','Rifle Ammo'],stack:60,ammo:1,tip:['步枪弹药。','Rifle ammo.']},
   bolt:     {n:['弩箭','Bolts'],stack:15,ammo:1,tip:['十字弩专用箭矢，可回收。','Crossbow bolts, recoverable.']},
-  grenade:  {n:['手榴弹','Grenade'],stack:5,ammo:1,tip:['投掷爆炸武器。','Thrown explosive.']},
+  grenade_round:{n:['榴弹','Grenade Round'],stack:8,ammo:1,tip:['榴弹投掷器使用的爆炸弹药。','Explosive ammunition for the grenade launcher.']},
  barricade:{n:['木栅栏','Barricade'],use:'build',stack:10,tip:['阻挡僵尸的木质路障（耐久80）。','Wooden blocker, HP 80.']},
  rbarricade:{n:['加固栅栏','Reinf. Barricade'],use:'build2',stack:10,tip:['更坚固的路障（耐久180）。','Sturdier blocker, HP 180.']},
  spikes:   {n:['钉刺陷阱','Spike Trap'],use:'spikes',stack:5,tip:['刺伤踩上去的僵尸（耐久100）。','Damages zombies, HP 100.']},
@@ -407,7 +466,9 @@ const ITEMS={
  axe:{n:['斧头','Axe'],weapon:1,stack:1,tip:['近战武器，大回环挥砍。','Melee weapon, heavy arcs.']},
  machete:{n:['砍刀','Machete'],weapon:1,stack:1,tip:['近战武器，攻速快伤害中。','Fast melee, medium damage.']},
  sledge:{n:['大锤','Sledgehammer'],weapon:1,stack:1,tip:['近战武器，慢速高伤强击退。','Slow heavy melee, big knockback.']},
+ spear:{n:['长矛','Spear'],weapon:1,stack:1,tip:['长距离突刺，可在安全距离压制敌人。','Long-reaching thrust weapon for controlling space.']},
  pistol:{n:['手枪','Pistol'],weapon:1,stack:1,tip:['枪械：中距单发。','Firearm: mid-range semi-auto.']},
+ revolver:{n:['左轮手枪','Revolver'],weapon:1,stack:1,tip:['高威力六发手枪，适合处理装甲目标。','High-powered six-shot sidearm for armored targets.']},
  shotgun:{n:['霰弹枪','Shotgun'],weapon:1,stack:1,tip:['枪械：近距散射。','Firearm: close-range spread.']},
  rifle:{n:['步枪','Rifle'],weapon:1,stack:1,tip:['枪械：远距全自动。','Firearm: long-range auto.']},
   smg:{n:['冲锋枪','SMG'],weapon:1,stack:1,tip:['枪械：近距高速扫射。','Firearm: rapid close spray.']},
@@ -416,18 +477,22 @@ const ITEMS={
   railgun:{n:['轨道炮','Railgun'],weapon:1,stack:1,tip:['穿透型高伤远程。','Piercing high-damage sniper.']},
   shotgun2:{n:['自动霰弹枪','Auto Shotgun'],weapon:1,stack:1,tip:['近距高速散射。','Rapid close-range spread.']},
   crossbow:{n:['十字弩','Crossbow'],weapon:1,stack:1,tip:['静音远程武器，低噪音高伤害，弩箭可回收。','Silent ranged, high damage, recoverable bolts.']},
-  grenade: {n:['手榴弹','Grenade'],weapon:1,stack:1,tip:['投掷后爆炸，范围伤害70。','Thrown explosive, 70 AoE damage.']},
+  grenade: {n:['榴弹投掷器','Grenade Launcher'],weapon:1,stack:1,tip:['投掷延时榴弹，造成范围伤害。','Launches timed grenades for area damage.']},
   backpack:  {n:['背包','Backpack'],use:'expand',stack:1,tip:['增加背包格子+2。','+2 inventory slots.']},
   armor:     {n:['护甲','Armor'],use:'armor',stack:1,tip:['减少受到伤害30%。','Reduce damage taken 30%.']},
+  plated_armor:{n:['树脂复合甲','Resin-Plated Armor'],use:'armor2',stack:1,tip:['减少受到伤害45%，并降低感染增长。','Reduces damage by 45% and infection gain.']},
+  purifier:  {n:['树脂净化剂','Resin Purifier'],use:'purifier',v:18,inf:100,stack:3,tip:['恢复少量生命并彻底清除感染。','Restores some health and clears all infection.']},
   cooked_meat:{n:['熟肉','Cooked Meat'],use:'food',v:55,hp:10,stack:5,tip:['恢复55饱食+10HP。','Restores 55 food + 10HP.']}
 };
 const RECIPES=[
  {cat:'med', out:'bandage', qty:1, req:{cloth:2}, t:1.2},
  {cat:'med', out:'medkit',  qty:1, req:{bandage:2,bottle:1}, t:2.2},
  {cat:'med', out:'antibio', qty:1, req:{cloth:1,water:1}, t:2.0},
+ {cat:'med', out:'purifier',qty:1, req:{resin:2,antibio:1,bottle:1},t:3.0},
  {cat:'ammo',out:'ammo9',   qty:20,req:{nails:1,fuel:1}, t:1.2},
  {cat:'ammo',out:'shell',   qty:12,req:{nails:2,fuel:1}, t:1.4},
  {cat:'ammo',out:'ammo762', qty:15,req:{scrap:1,fuel:1}, t:1.5},
+ {cat:'ammo',out:'grenade_round',qty:2,req:{scrap:3,fuel:1,nails:2},t:3.0},
  {cat:'def', out:'barricade', qty:1,req:{wood:3}, t:1.5},
  {cat:'def', out:'rbarricade',qty:1,req:{wood:2,nails:2}, t:2.0},
  {cat:'def', out:'spikes',  qty:1, req:{wood:2,nails:3}, t:2.0},
@@ -438,11 +503,13 @@ const RECIPES=[
  {cat:'tool',out:'bat',     qty:1, req:{wood:3,nails:1}, t:2.0},
  {cat:'tool',out:'machete', qty:1, req:{scrap:3,wood:1}, t:3.0},
  {cat:'tool',out:'axe',     qty:1, req:{wood:2,scrap:2}, t:2.5},
+ {cat:'tool',out:'spear',   qty:1, req:{wood:4,scrap:2,resin:1},t:3.2},
  // 枪械合成（需要蓝图解锁）
  {cat:'wpn', out:'pistol',  qty:1, req:{scrap:5,nails:3,fuel:1}, t:5.0, bp:'bp_pistol'},
  {cat:'wpn', out:'smg',     qty:1, req:{scrap:8,nails:5,fuel:2}, t:7.0, bp:'bp_smg'},
  {cat:'wpn', out:'shotgun', qty:1, req:{scrap:10,nails:6,wood:2}, t:8.0, bp:'bp_shotgun'},
  {cat:'wpn', out:'rifle',   qty:1, req:{scrap:12,nails:8,fuel:3}, t:10.0, bp:'bp_rifle'},
+ {cat:'wpn', out:'revolver',qty:1, req:{scrap:8,nails:4,resin:2},t:7.0,bp:'bp_revolver'},
  // 高级武器蓝图（后期解锁）
  {cat:'wpn', out:'flamethrower', qty:1, req:{scrap:15,nails:5,fuel:8}, t:12.0, bp:'bp_flame'},
  {cat:'wpn', out:'rocket',  qty:1, req:{scrap:20,nails:8,fuel:5}, t:15.0, bp:'bp_rocket'},
@@ -456,14 +523,15 @@ const RECIPES=[
  {cat:'def', out:'sentry',  qty:1, req:{scrap:5,nails:3,ammo9:10}, t:5.0, bp:'bp_turret'},
  // 背包扩容（增加2格背包空间）
  {cat:'gear',out:'invExpand',qty:1,req:{cloth:3,nails:2,scrap:1}, t:3.0},
- {cat:'wpn',out:'crossbow',qty:1,req:{wood:4,scrap:3,nails:2,cloth:1}, t:4.0, bp:1},
+ {cat:'wpn',out:'crossbow',qty:1,req:{wood:4,scrap:3,nails:2,cloth:1}, t:4.0},
  {cat:'ammo',out:'bolt',qty:5,req:{wood:2,scrap:1,nails:1}, t:1.5},
- {cat:'wpn',out:'grenade',qty:2,req:{scrap:3,fuel:1,nails:2}, t:3.0, bp:1},
+ {cat:'wpn',out:'grenade',qty:1,req:{scrap:10,nails:5,wood:2},t:8.0,bp:'bp_grenade'},
  // 额外合成配方
  {cat:'tool',out:'crowbar',qty:1, req:{scrap:4,wood:1}, t:2.5},
  {cat:'tool',out:'sledge', qty:1, req:{scrap:6,wood:3}, t:4.0},
  {cat:'gear',out:'backpack',qty:1, req:{cloth:5,scrap:2,nails:2}, t:5.0},
  {cat:'gear',out:'armor',  qty:1, req:{scrap:8,cloth:3,nails:3}, t:6.0},
+ {cat:'gear',out:'plated_armor',qty:1,req:{armor:1,resin:4,scrap:6},t:8.0},
  {cat:'food',out:'cooked_meat',qty:1, req:{can:2,fuel:1}, t:2.0}
 ];
 const CRAFT_CATS=[['med','医疗','Medical'],['ammo','弹药','Ammo'],['def','防御','Defense'],['food','食物','Food'],['tool','工具','Tools'],['wpn','武器','Weapons'],['gear','装备','Gear']];
@@ -525,6 +593,7 @@ const BOX=new THREE.BoxGeometry(1,1,1);
 const CYL=new THREE.CylinderGeometry(0.5,0.5,1,7);
 const CONE=new THREE.ConeGeometry(0.6,1,7);
 const PYR=new THREE.ConeGeometry(0.72,1,4);
+const SPH=new THREE.SphereGeometry(0.5,8,6);
 const RINGU=new THREE.RingGeometry(0.86,1,32);
 const CIR=new THREE.CircleGeometry(1,20);
 const MATC={};
@@ -534,6 +603,11 @@ function bmat(c,op){ const k=c+'_'+(op||1); if(!BMATC[k]) BMATC[k]=new THREE.Mes
 function bx(w,h,d,c,x,y,z,parent,shadow){ const m=new THREE.Mesh(BOX,mat(c)); m.scale.set(w,h,d);
   m.position.set(x||0,y||0,z||0); if(shadow!==false){m.castShadow=true;} m.receiveShadow=true;
   (parent||scene).add(m); return m; }
+function cy(w,h,c,x,y,z,parent,rx,ry,rz){ const m=new THREE.Mesh(CYL,mat(c)); m.scale.set(w,h,w);
+  m.position.set(x||0,y||0,z||0); m.rotation.set(rx||0,ry||0,rz||0); m.castShadow=true;
+  (parent||scene).add(m); return m; }
+function sph(w,h,d,c,x,y,z,parent){ const m=new THREE.Mesh(SPH,mat(c)); m.scale.set(w,h,d);
+  m.position.set(x||0,y||0,z||0); m.castShadow=true; (parent||scene).add(m); return m; }
 
 /* ================= game state ================= */
 const G={ state:'menu', diff:'normal', wave:0, kills:0, score:0, time:0, dayCount:1,
@@ -554,6 +628,7 @@ const firePools=[];   // {x,z,r,life,dmg,tickT}
 const lamps=[];
 const lootSpots=[];
 const lootEnts=[];    // {m,x,z,id,qty,bob}
+const corruptionNests=[];
 
 function addObstacle(x,z,hw,hd){ obstacles.push({x,z,hw,hd}); }
 
@@ -599,6 +674,145 @@ function bush(x,z){
   const b=new THREE.Mesh(CONE,mat(pick([0x30483A,0x3A5644,0x4A5A3E])));
   b.scale.set(R(0.9,1.5),R(0.6,1.0),R(0.9,1.5)); b.position.set(x,0.3,z);
   b.castShadow=true; scene.add(b);
+}
+
+function spawnSawmill(cx,cz){
+  // A compact landmark with guaranteed wood and metal salvage.
+  const yard=bx(22,0.05,16,0x5A4A35,cx,0.03,cz,scene,false); yard.castShadow=false;
+  const shed=bx(9,3.4,7,0x6A5945,cx-4,1.7,cz); addObstacle(cx-4,cz,4.6,3.6);
+  const roof=bx(10,0.35,8,0x3F3F3A,cx-4,3.65,cz); roof.rotation.z=0.08;
+  const blade=new THREE.Mesh(new THREE.CylinderGeometry(1.25,1.25,0.12,20),mat(0x8A8C84));
+  blade.rotation.z=Math.PI/2; blade.position.set(cx+3.5,1.4,cz-1); blade.castShadow=true; scene.add(blade);
+  bx(4.5,0.65,1.1,0x4A3A28,cx+3.5,0.34,cz-1); addObstacle(cx+3.5,cz-1,2.3,0.65);
+  for(let i=0;i<5;i++){
+    const lx=cx-8+i*3.6;
+    const log=new THREE.Mesh(CYL,mat(0x6B4D32)); log.scale.set(0.55,2.2,0.55);
+    log.rotation.z=Math.PI/2; log.position.set(lx,0.55,cz+5); log.castShadow=true; scene.add(log);
+  }
+  lootSpots.push({x:cx-7,z:cz-4},{x:cx+5,z:cz+3},{x:cx+8,z:cz-3});
+}
+
+function spawnFieldClinic(cx,cz){
+  const pad=bx(20,0.04,15,0x5A6255,cx,0.025,cz,scene,false); pad.receiveShadow=true;
+  for(const ox of [-5,1]){
+    const tent=new THREE.Group(); tent.position.set(cx+ox,0,cz+1.5); scene.add(tent);
+    bx(5.2,2.4,4.2,0xB5AD92,0,1.2,0,tent);
+    const roof=new THREE.Mesh(PYR,mat(0x8D866E)); roof.scale.set(5.7,1.25,4.7);
+    roof.position.y=3.0; roof.rotation.y=Math.PI/4; roof.castShadow=true; tent.add(roof);
+    bx(1.2,1.8,0.12,0x30483A,0,0.9,-2.15,tent,false);
+    addObstacle(cx+ox,cz+1.5,2.7,2.2);
+  }
+  car(cx+6.5,cz-2.5,0xD8D3C4,true);
+  const mast=cy(0.1,5.5,0x5B5C57,cx-8,2.75,cz-4,scene);
+  mast.castShadow=true;
+  bx(1.5,1.1,0.1,0xE5DDC8,cx-7.25,4.6,cz-4,scene,false);
+  bx(0.58,0.18,0.13,0x743C38,cx-7.25,4.6,cz-4.08,scene,false);
+  bx(0.18,0.58,0.13,0x743C38,cx-7.25,4.6,cz-4.08,scene,false);
+  for(let i=0;i<4;i++) bx(0.75,0.5,0.65,0x6B5B40,cx-8+i*1.1,0.25,cz+5,scene);
+  G.fieldClinic={x:cx,z:cz};
+  lootSpots.push({x:cx-8,z:cz+4},{x:cx+6,z:cz+3},{x:cx+7,z:cz-5},{x:cx-1,z:cz-4});
+}
+
+function spawnCorruptionNest(x,z,label,theme){
+  const g=new THREE.Group();
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(1.8,2.4,0.5,9),mat(0x3C2E29));
+  base.position.y=0.25; g.add(base);
+  for(let i=0;i<7;i++){
+    const a=i/7*Math.PI*2;
+    const root=bx(0.25,0.25,2.6,0x443228,Math.sin(a)*1.6,0.2,Math.cos(a)*1.6,g,false);
+    root.rotation.y=a; root.rotation.z=R(-0.12,0.12);
+  }
+  const coreMat=new THREE.MeshLambertMaterial({color:0x7A3A55,emissive:0x35152A,emissiveIntensity:0.9});
+  const core=new THREE.Mesh(new THREE.IcosahedronGeometry(0.8,1),coreMat);
+  core.position.y=1.25; core.castShadow=true; g.add(core);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(2.2,2.65,24),new THREE.MeshBasicMaterial({color:0xA04A68,transparent:true,opacity:0.42,side:THREE.DoubleSide}));
+  ring.rotation.x=-Math.PI/2; ring.position.y=0.04; g.add(ring);
+  g.position.set(x,0,z); scene.add(g);
+  for(let i=0;i<8;i++){
+    const a=i/8*Math.PI*2+0.22,r=R(3.2,5.2);
+    const pod=sph(R(0.18,0.34),R(0.22,0.48),R(0.18,0.34),pick([0x543342,0x633949,0x45342F]),Math.cos(a)*r,R(0.12,0.26),Math.sin(a)*r,g);
+    pod.rotation.z=R(-0.35,0.35);
+  }
+  if(theme==='convoy'){
+    car(x-6,z+2,0x464A45,false); car(x+5,z-3,0x573B34,true);
+    for(let i=0;i<3;i++) bx(0.8,0.55,0.7,0x5B4A35,x-2+i*1.1,0.28,z+5,scene);
+  } else if(theme==='grove'){
+    for(let i=0;i<7;i++){
+      const a=i/7*Math.PI*2,r=R(5.5,7.2);
+      const stump=cy(R(0.25,0.42),R(0.5,1.1),0x47372C,x+Math.cos(a)*r,R(0.25,0.55),z+Math.sin(a)*r,scene,0,0,R(-0.16,0.16));
+      stump.castShadow=true;
+    }
+  } else {
+    for(let i=0;i<4;i++) bx(1.0,0.35,0.75,0x51402E,x-3+i*1.9,0.18,z+4.5,scene);
+  }
+  corruptionNests.push({mesh:g,core,ring,x,z,label,theme,cleansed:false,cleansing:false,progress:0,ambush:false});
+}
+
+function setNestCleansed(n,cleansed){
+  n.cleansed=!!cleansed; n.cleansing=false; n.progress=0; n.ambush=!!cleansed;
+  n.core.material.color.setHex(cleansed?0x58785A:0x7A3A55);
+  n.core.material.emissive.setHex(cleansed?0x17351C:0x35152A);
+  n.ring.material.color.setHex(cleansed?0x5A8A6A:0xA04A68);
+  n.ring.material.opacity=cleansed?0.16:0.42;
+}
+
+function resetCorruptionNests(saved){
+  let count=0;
+  corruptionNests.forEach((n,i)=>{ const done=!!(saved&&saved[i]); setNestCleansed(n,done); if(done) count++; });
+  G.nestsCleansed=count; G._nearNest=null;
+}
+
+function startNestCleansing(){
+  const n=G._nearNest;
+  if(!n||n.cleansed) return false;
+  n.cleansing=true;
+  if(!n.ambush){
+    n.ambush=true;
+    for(let i=0;i<4;i++){
+      const a=i/4*Math.PI*2+R(-0.3,0.3),r=R(6,9);
+      spawnZombie(pick(G.wave>=8?['lurker','armored','runner']:['lurker','runner','walker']),n.x+Math.cos(a)*r,n.z+Math.sin(a)*r);
+    }
+    showBanner(T('巢穴被惊动！守住净化区域','NEST AWAKENED! Hold the area'),'#A04A68',2);
+  }
+  return true;
+}
+
+function completeNest(n){
+  setNestCleansed(n,true); G.nestsCleansed=(G.nestsCleansed||0)+1;
+  dropLoot(n.x+0.8,n.z,'resin',RI(2,4));
+  dropLoot(n.x-0.8,n.z,'wood',RI(2,4));
+  if(!(G.blueprints||[]).includes('bp_revolver')){
+    G.blueprints.push('bp_revolver');
+    showMsg(T('获得蓝图：左轮手枪','Blueprint unlocked: Revolver'));
+  }
+  updateQuestProgress('purify',1);
+  showBanner(T('腐化巢穴已净化','CORRUPTED NEST PURIFIED'),'#5A8A6A',2.4);
+  if(G.nestsCleansed===corruptionNests.length&&!G.wardenDefeated&&(!G.boss||G.boss.dead)&&!zombies.some(z=>!z.dead&&z.type==='warden')){
+    spawnWardenAt(n.x+8,n.z);
+  }
+  saveGame();
+}
+
+function updateCorruptionNests(dt){
+  G._nearNest=null;
+  if(G.inBuilding) return;
+  let nearest=Infinity;
+  for(const n of corruptionNests){
+    n.core.rotation.y+=dt*(n.cleansed?0.4:1.8);
+    n.core.position.y=1.25+Math.sin(G.time*2+n.x)*0.12;
+    const d=Math.hypot(P.x-n.x,P.z-n.z);
+    if(!n.cleansed&&d<3.2&&d<nearest){ nearest=d; G._nearNest=n; }
+    if(n.cleansing&&!n.cleansed){
+      if(d<4.2) n.progress+=dt;
+      else n.progress=Math.max(0,n.progress-dt*1.5);
+      n.ring.material.opacity=0.3+Math.sin(G.time*8)*0.16;
+      if(n.progress>=5) completeNest(n);
+    }
+  }
+  if((G.nestsCleansed||0)===corruptionNests.length&&corruptionNests.length&&!G.wardenDefeated&&(!G.boss||G.boss.dead)&&!zombies.some(z=>!z.dead&&z.type==='warden')){
+    const n=corruptionNests[corruptionNests.length-1];
+    spawnWardenAt(n.x+8,n.z);
+  }
 }
 function house(x,z,w,d){
   const h=R(3.0,3.8), wc=pick([0xB9A47A,0xD6C29A,0x9A8B6A]);
@@ -1596,6 +1810,13 @@ function buildWorld(){
     if(!bad) spawnExpBarrel(x,z);
   }
 
+  // Western sawmill and three corruption sites form the new exploration loop.
+  spawnSawmill(-88,86);
+  spawnFieldClinic(-87,-86);
+  spawnCorruptionNest(-78,77,T('锯木场巢穴','Sawmill Nest'),'sawmill');
+  spawnCorruptionNest(88,88,T('车队巢穴','Convoy Nest'),'convoy');
+  spawnCorruptionNest(86,-88,T('林地巢穴','Grove Nest'),'grove');
+
   // safe house
   const sh=bx(5,2.6,4,0x8C8070,-5,1.3,-5); sh.castShadow=true;
   const shr=new THREE.Mesh(PYR,mat(0x30483A)); shr.scale.set(5.6,1.4,4.6);
@@ -1621,11 +1842,11 @@ function buildWorld(){
 
 /* ================= player ================= */
 const P={ x:0,z:6, hp:100,maxHp:100,hunger:100,thirst:100,stam:100,inf:0,
-  spd:5.2, dir:0, moving:false, sprint:false, grabT:0,
+  spd:5.2, dir:0, moving:false, sprint:false, moveFwd:0,moveStrafe:0,grabT:0,
   atkCd:0, swingT:0, swingMax:0.45, meleeHitT:0, meleeHitW:null,
   reloadT:0, reloadMax:1, stepT:0, hurtT:0, crouchT:0, recoilT:0, mzT:0,
   rollT:0, rollCd:0, invulnT:0, rollDx:0, rollDz:1, kbx:0, kbz:0,
-  weapon:'fists', lastWpn:null, mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},
+  weapon:'fists', lastWpn:null, mags:{pistol:0,revolver:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0,crossbow:0,grenade:0},
   inv:new Array(16).fill(null), invSlots:8, hot:[null,null,null,{id:'fists',q:1}], hsel:3,
   aimX:0, aimZ:1, mesh:null, parts:{}, wmesh:null, deadAnim:0,
   dmgMult:1, classId:'civilian', classColor:0xD6C29A, skillCd:0, skillName:null,
@@ -1637,8 +1858,15 @@ function buildPlayer(){
   const body=new THREE.Group(); g.add(body);
   const skin=0xD6C29A, shirt=0x743C38, pants=0x2E2D2A;
   const torso=bx(0.62,0.72,0.34,shirt,0,1.06,0,body);
-  const head=bx(0.4,0.4,0.38,skin,0,1.66,0,body);
-  bx(0.42,0.14,0.4,0x4A3A28,0,1.86,0,body); // hair
+  bx(0.66,0.2,0.38,0x423C35,0,1.24,0,body); // reinforced shoulder yoke
+  bx(0.64,0.09,0.37,0x2A2926,0,0.72,0,body); // belt
+  bx(0.12,0.13,0.09,0xB18A45,0,0.72,-0.2,body); // belt buckle
+  const head=new THREE.Group(); head.position.set(0,1.66,0); body.add(head);
+  bx(0.4,0.4,0.38,skin,0,0,0,head);
+  bx(0.42,0.14,0.4,0x4A3A28,0,0.2,0,head); // hair
+  bx(0.065,0.045,0.025,0x242321,-0.1,0.04,-0.2,head,false);
+  bx(0.065,0.045,0.025,0x242321,0.1,0.04,-0.2,head,false);
+  bx(0.07,0.08,0.05,0xC5AA82,0,-0.03,-0.215,head,false);
   const lArm=new THREE.Group(); lArm.position.set(-0.41,1.36,0); body.add(lArm);
   bx(0.17,0.62,0.17,shirt,0,-0.26,0,lArm);
   bx(0.15,0.16,0.15,skin,0,-0.6,0,lArm);
@@ -1647,14 +1875,22 @@ function buildPlayer(){
   bx(0.15,0.16,0.15,skin,0,-0.6,0,rArm);
   const lLeg=new THREE.Group(); lLeg.position.set(-0.17,0.72,0); body.add(lLeg);
   bx(0.22,0.7,0.24,pants,0,-0.36,0,lLeg);
+  bx(0.24,0.16,0.38,0x262522,0,-0.7,-0.08,lLeg);
   const rLeg=new THREE.Group(); rLeg.position.set(0.17,0.72,0); body.add(rLeg);
   bx(0.22,0.7,0.24,pants,0,-0.36,0,rLeg);
+  bx(0.24,0.16,0.38,0x262522,0,-0.7,-0.08,rLeg);
+  const pack=new THREE.Group(); pack.position.set(0,1.12,0.24); body.add(pack);
+  bx(0.48,0.55,0.2,0x3D4937,0,0,0,pack);
+  bx(0.38,0.16,0.22,0x536047,0,-0.2,0.01,pack);
+  bx(0.06,0.48,0.04,0x252B24,-0.2,0,-0.12,pack);
+  bx(0.06,0.48,0.04,0x252B24,0.2,0,-0.12,pack);
+  cy(0.12,0.36,0x5A4934,0.3,-0.04,0,pack,0,0,0.12);
   g.traverse(o=>{if(o.isMesh)o.castShadow=true;});
   scene.add(g);
-  P.mesh=g; P.parts={body,lArm,rArm,lLeg,rLeg,torso,head};
+  P.mesh=g; P.parts={body,lArm,rArm,lLeg,rLeg,torso,head,pack};
 }
 function setWeaponMesh(){
-  if(P.wmesh){ P.parts.rArm.remove(P.wmesh); P.wmesh.traverse(o=>{if(o.isMesh){o.geometry.dispose&&o.geometry.dispose();}}); P.wmesh=null; }
+  if(P.wmesh){ P.parts.rArm.remove(P.wmesh); P.wmesh=null; }
   const wk=P.weapon||'fists';
   const w=WEAPONS[wk];
   let m=null;
@@ -1684,15 +1920,21 @@ function setWeaponMesh(){
       m=new THREE.Group();
       m.add(bx(0.08,0.95,0.08,0x6B5B40,0,-0.8,-0.3));
       m.add(bx(0.3,0.2,0.2,0x5B5C57,0,-1.2,-0.3));
+    } else if(wk==='spear'){
+      m=new THREE.Group();
+      m.add(bx(0.06,1.25,0.06,0x6B4D32,0,-0.9,-0.3));
+      const tip=new THREE.Mesh(CONE,mat(0xA7AAA2)); tip.scale.set(0.14,0.35,0.14);
+      tip.position.set(0,-1.68,-0.3); tip.rotation.z=Math.PI; m.add(tip);
     }
   } else {
     // 枪械
-    if(wk==='pistol'){
+    if(wk==='pistol'||wk==='revolver'){
       m=new THREE.Group();
       m.add(bx(0.07,0.14,0.26,0x2A2A2A,0,-0.62,-0.42)); // 枪身
       m.add(bx(0.05,0.05,0.1,0x1A1A1A,0,-0.6,-0.58)); // 枪管
       m.add(bx(0.06,0.18,0.08,0x3A2A1A,0,-0.56,-0.32)); // 握把
       m.add(bx(0.03,0.02,0.03,0x1A1A1A,0,-0.53,-0.5)); // 准星
+      if(wk==='revolver') m.add(bx(0.12,0.12,0.12,0x65665F,0,-0.62,-0.42));
     } else if(wk==='smg'){
       m=new THREE.Group();
       m.add(bx(0.08,0.14,0.5,0x33322F,0,-0.62,-0.45)); // 枪身
@@ -1729,7 +1971,35 @@ function setWeaponMesh(){
       m.add(bx(0.12,0.12,0.5,0x884422,0,-0.62,-0.45));
       m.add(bx(0.1,0.2,0.1,0x444444,0,-0.6,-0.2)); // 罐体
       m.add(bx(0.04,0.04,0.25,0x242321,0,-0.62,-0.75)); // 喷嘴
+    } else if(wk==='crossbow'){
+      m=new THREE.Group();
+      m.add(bx(0.07,0.09,0.72,0x493622,0,-0.62,-0.5));
+      m.add(bx(0.62,0.05,0.06,0x5B5C57,0,-0.62,-0.78));
+      m.add(bx(0.04,0.04,0.8,0xB9A47A,0,-0.57,-0.58));
+      m.add(bx(0.06,0.2,0.08,0x2C2924,0,-0.7,-0.25));
+      const bow=new THREE.Mesh(new THREE.TorusGeometry(0.31,0.025,5,16,Math.PI),mat(0x75654A));
+      bow.rotation.set(Math.PI/2,Math.PI/2,0); bow.position.set(0,-0.62,-0.77); m.add(bow);
+    } else if(wk==='grenade'){
+      m=new THREE.Group();
+      cy(0.2,0.78,0x3E4439,0,-0.61,-0.54,m,Math.PI/2,0,0);
+      cy(0.13,0.22,0x242822,0,-0.61,-0.97,m,Math.PI/2,0,0);
+      bx(0.08,0.2,0.1,0x302B25,0,-0.73,-0.24,m);
+      bx(0.08,0.09,0.28,0x604A30,0,-0.62,-0.12,m);
+      cy(0.2,0.16,0x5B5C57,0,-0.72,-0.5,m,0,0,0);
     }
+  }
+  if(m&&w&&!w.melee){
+    const mods=getAttachments(wk);
+    if(mods.muzzle==='suppressor') cy(0.07,0.3,0x232522,0,-0.61,-1.02,m,Math.PI/2,0,0);
+    if(mods.muzzle==='compensator') bx(0.1,0.09,0.18,0x555852,0,-0.61,-0.96,m);
+    if(mods.grip==='scope'){
+      cy(0.08,0.3,0x242724,0,-0.49,-0.63,m,Math.PI/2,0,0);
+      bx(0.04,0.08,0.16,0x4C514B,0,-0.53,-0.63,m);
+    } else if(mods.grip==='laser'){
+      bx(0.05,0.05,0.2,0x27322C,0.08,-0.68,-0.72,m);
+      bx(0.025,0.025,0.025,0xC04038,0.08,-0.68,-0.83,m,false);
+    } else if(mods.grip==='foregrip') bx(0.07,0.18,0.08,0x292B28,0,-0.73,-0.6,m);
+    if(mods.mag==='extmag') bx(0.08,0.26,0.09,0x30322F,0,-0.76,-0.46,m);
   }
   if(m){ m.traverse(o=>{if(o.isMesh)o.castShadow=true;});
     P.parts.rArm.add(m); P.wmesh=m; }
@@ -1752,7 +2022,10 @@ const ZT={
  queen:   {hp:900, spd:1.0, dmg:45, scale:1.8, skin:0x5A4A6A, shirt:0x3A2A4A, pants:0x2A1A3A, queen:1, boss:1, score:400, n:['虫群女王','Swarm Queen']},
  // 新增远程僵尸
  hunter:  {hp:70, spd:2.5, dmg:16, scale:1.0, skin:0x5A7A8A, shirt:0x3A5A6A, pants:0x2A4A5A, ranged:1, score:30, n:['猎手','Hunter']},
- sniper:  {hp:55, spd:1.8, dmg:25, scale:0.95, skin:0x4A6A5A, shirt:0x2A4A3A, pants:0x1A3A2A, ranged:1, score:40, n:['狙击尸','Sniper Zombie']}
+ sniper:  {hp:55, spd:1.8, dmg:25, scale:0.95, skin:0x4A6A5A, shirt:0x2A4A3A, pants:0x1A3A2A, ranged:1, score:40, n:['狙击尸','Sniper Zombie']},
+ armored: {hp:190,spd:1.55,dmg:28,scale:1.15,skin:0x59665A,shirt:0x343C3A,pants:0x292E2D,armored:1,score:65,n:['装甲尸','Armored Infected']},
+ lurker:  {hp:72,spd:3.2,dmg:24,scale:0.86,skin:0x485B48,shirt:0x25362B,pants:0x1E2922,lurker:1,score:45,n:['潜伏者','Lurker']},
+ warden:  {hp:1250,spd:1.2,dmg:52,scale:1.9,skin:0x52634B,shirt:0x2D392D,pants:0x222B23,warden:1,stomp:1,boss:1,score:550,n:['腐木守卫','Grave Warden']}
 };
 const zombies=[];
 let zid=0;
@@ -1764,6 +2037,7 @@ function makeZombieMesh(t){
   const torso=bx(0.62*s,(c.crawl?0.5:0.72)*s,0.36*s,c.shirt,0,torsoY,c.crawl?0.1:0,g);
   if(c.crawl) torso.rotation.x=0.5;
   const head=bx(0.4*s,0.4*s,0.38*s,c.skin,0,c.crawl?0.62:legH+0.98*s,c.crawl?0.42:0,g);
+  head.userData.baseY=head.position.y;
   const e1=bx(0.07,0.05,0.03,0xB13A32,-0.09*s,(c.crawl?0.66:legH+1.02*s),(c.crawl?0.62:0.2),g,false);
   const e2=bx(0.07,0.05,0.03,0xB13A32,0.09*s,(c.crawl?0.66:legH+1.02*s),(c.crawl?0.62:0.2),g,false);
   e1.castShadow=false; e2.castShadow=false;
@@ -1777,14 +2051,81 @@ function makeZombieMesh(t){
   const rLeg=new THREE.Group(); rLeg.position.set(0.16*s,c.crawl?0.3:legH,c.crawl?-0.15:0); g.add(rLeg);
   bx(0.2*s,legH*s,0.22*s,c.pants,0,-legH*s/2,0,rLeg);
   if(c.armed){ const wp=bx(0.07,0.7,0.07,0x5B5C57,0,-0.5,-0.25,rArm); wp.rotation.x=0.4; }
-  if(t==='tank'){ bx(0.7*s,0.2*s,0.4*s,c.skin,0,torsoY+0.3,0,g); }
+  if(c.ranged){
+    bx(0.08*s,0.1*s,0.58*s,0x343733,0,-0.48*s,0.02*s,rArm);
+    bx(0.06*s,0.2*s,0.08*s,0x292B28,0,-0.62*s,0.18*s,rArm);
+  }
+  if(t==='tank'||t==='brute'||t==='brute2'){
+    bx(0.76*s,0.22*s,0.46*s,c.skin,0,torsoY+0.31*s,0,g);
+    bx(0.28*s,0.38*s,0.28*s,0x3B403A,-0.44*s,torsoY+0.2*s,0,g);
+    bx(0.28*s,0.38*s,0.28*s,0x3B403A,0.44*s,torsoY+0.2*s,0,g);
+  }
+  if(t==='bloater'){
+    sph(0.82*s,1.0*s,0.7*s,0x768257,0,torsoY-0.05*s,0.08*s,g);
+    bx(0.3*s,0.1*s,0.12*s,0x9A6A4A,0,torsoY-0.05*s,0.4*s,g,false);
+  }
+  let sacs=null,jaw=null,core=null;
+  if(t==='spitter'){
+    const s1=sph(0.34*s,0.42*s,0.28*s,0x5F8D4A,-0.25*s,torsoY+0.05*s,0.25*s,g);
+    const s2=sph(0.34*s,0.42*s,0.28*s,0x75A353,0.25*s,torsoY+0.05*s,0.25*s,g);
+    s1.userData.baseScale=s1.scale.clone(); s2.userData.baseScale=s2.scale.clone();
+    sacs=[s1,s2];
+  }
+  if(t==='screamer'){
+    jaw=bx(0.28*s,0.16*s,0.25*s,0x382723,0,head.position.y-0.2*s,0.17*s,g);
+    jaw.userData.baseScaleY=jaw.scale.y;
+    const horn=new THREE.Mesh(CONE,mat(0x8B7B62)); horn.scale.set(0.12*s,0.32*s,0.12*s);
+    horn.position.set(0,head.position.y+0.34*s,0); horn.rotation.z=0.25; g.add(horn);
+  }
+  if(t==='hunter'||t==='sniper'){
+    const hood=new THREE.Mesh(CONE,mat(t==='sniper'?0x263B32:0x304C55));
+    hood.scale.set(0.42*s,0.45*s,0.42*s); hood.position.set(0,head.position.y+0.18*s,0); g.add(hood);
+    bx(0.5*s,0.1*s,0.1*s,0x5B4A35,0,torsoY+0.44*s,0.16*s,g);
+  }
+  if(t==='necro'){
+    cy(0.08*s,1.5*s,0x4A362E,0,-0.72*s,0.22*s,rArm,0,0,0.18);
+    sph(0.22*s,0.22*s,0.22*s,0x75558A,0,-1.48*s,0.22*s,rArm);
+  }
+  if(t==='queen'){
+    sph(1.0*s,0.72*s,1.25*s,0x493652,0,torsoY-0.05*s,0.48*s,g);
+    for(const sx of [-1,1]) for(let i=0;i<2;i++){
+      const leg=cy(0.08*s,0.8*s,0x35283E,sx*(0.48+i*0.12)*s,torsoY-0.2*s,(i?0.3:-0.1)*s,g,0,0,sx*(0.65+i*0.18));
+      leg.castShadow=true;
+    }
+  }
+  if(c.armored){
+    bx(0.72*s,0.52*s,0.16*s,0x555B58,0,torsoY+0.06*s,0.22*s,g);
+    bx(0.32*s,0.2*s,0.44*s,0x666B66,-0.36*s,torsoY+0.34*s,0,g);
+    bx(0.32*s,0.2*s,0.44*s,0x666B66,0.36*s,torsoY+0.34*s,0,g);
+  }
+  if(c.lurker){
+    torso.rotation.x=0.38;
+    bx(0.16*s,0.3*s,0.16*s,0x344B39,-0.18*s,torsoY+0.55*s,0,g);
+    bx(0.16*s,0.3*s,0.16*s,0x344B39,0.18*s,torsoY+0.55*s,0,g);
+    for(const arm of [lArm,rArm]) for(let i=-1;i<=1;i++){
+      const claw=new THREE.Mesh(CONE,mat(0x79806E)); claw.scale.set(0.055*s,0.23*s,0.055*s);
+      claw.position.set(i*0.055*s,-0.68*s,0.04*s); claw.rotation.x=Math.PI; arm.add(claw);
+    }
+  }
   if(c.boss){
     bx(0.4*s,0.22*s,0.44*s,0x4A4A42,-0.32*s,torsoY+0.42*s,0,g);
     bx(0.4*s,0.22*s,0.44*s,0x4A4A42,0.32*s,torsoY+0.42*s,0,g);
     bx(0.5*s,0.16*s,0.2*s,0x743C38,0,torsoY+0.1*s,0.2*s,g);
   }
+  if(c.warden){
+    const coreMat=new THREE.MeshLambertMaterial({color:0x8A566E,emissive:0x35152A,emissiveIntensity:1.1});
+    core=new THREE.Mesh(SPH,coreMat); core.scale.set(0.27*s,0.31*s,0.18*s);
+    core.position.set(0,torsoY+0.08*s,0.24*s); core.castShadow=true; g.add(core);
+    for(let i=0;i<6;i++){
+      const a=(i/5-0.5)*1.7;
+      const root=new THREE.Mesh(CONE,mat(0x4B392E)); root.scale.set(0.11*s,(0.55+Math.abs(a)*0.2)*s,0.11*s);
+      root.position.set(Math.sin(a)*0.33*s,head.position.y+0.48*s,Math.cos(a)*0.08*s);
+      root.rotation.z=-a*0.8; g.add(root);
+    }
+    bx(0.96*s,0.18*s,0.44*s,0x343A33,0,torsoY+0.43*s,0,g);
+  }
   g.traverse(o=>{if(o.isMesh)o.castShadow=true;});
-  g.userData.parts={lArm,rArm,lLeg,rLeg,torso};
+  g.userData.parts={lArm,rArm,lLeg,rLeg,torso,head,sacs,jaw,core};
   return g;
 }
 
@@ -1820,6 +2161,7 @@ function killZombie(zb){
   updateQuestProgress('killZ',1);
   if(zb.type==='runner') updateQuestProgress('killRun',1);
   if(zb.type==='spitter') updateQuestProgress('killSpit',1);
+  if(zb.type==='armored') updateQuestProgress('killArmored',1);
   if(zb._headshot) updateQuestProgress('headshot',1);
   // XP 经验值
   const xpGain=zb.c.boss?100:zb.c.score||10;
@@ -1851,7 +2193,14 @@ function killZombie(zb){
     dropLoot(zb.x,zb.z,'medkit',1);
     dropLoot(zb.x+0.8,zb.z,pick(['ammo762','shell','ammo9']),RI(10,16));
     dropLoot(zb.x-0.8,zb.z,pick(['rifle','smg','sledge']),1);
-    if(zb.c.queen){
+    if(zb.c.warden){
+      G.wardenDefeated=true;
+      dropLoot(zb.x,zb.z+0.8,'resin',RI(5,8));
+      dropLoot(zb.x,zb.z-0.8,pick(['revolver','spear','plated_armor']),1);
+      if(!(G.blueprints||[]).includes('bp_grenade')) G.blueprints.push('bp_grenade');
+      checkAch('warden1');
+      showBanner(T('腐木守卫被击败！','GRAVE WARDEN SLAIN!'),'#D4A84B',3);
+    } else if(zb.c.queen){
       // 虫群女王额外掉落
       dropLoot(zb.x,zb.z+0.8,'railgun',1);
       dropLoot(zb.x,zb.z-0.8,'medkit',1);
@@ -1878,10 +2227,10 @@ function killZombie(zb){
   const isAdv=advTypes.includes(zb.type);
   const bpChance=G.wave>=10?0.12:G.wave>=5?0.08:0.05;
   if(Math.random()<bpChance){
-    const bps=['bp_pistol','bp_smg','bp_shotgun','bp_rifle'];
+    const bps=['bp_pistol','bp_smg','bp_shotgun','bp_rifle','bp_revolver'];
     // 高级蓝图：10波后或强敌才掉
     if(G.wave>=10||isAdv){
-      bps.push('bp_flame','bp_rocket','bp_rail','bp_shotgun2','bp_mine','bp_turret');
+      bps.push('bp_flame','bp_rocket','bp_rail','bp_shotgun2','bp_mine','bp_turret','bp_grenade');
     }
     const bp=pick(bps);
     if(!(G.blueprints||[]).includes(bp)){
@@ -1895,7 +2244,7 @@ function killZombie(zb){
 function bpName(bp){
   const m={bp_pistol:['手枪蓝图','Pistol BP'],bp_smg:['冲锋枪蓝图','SMG BP'],bp_shotgun:['霰弹枪蓝图','Shotgun BP'],bp_rifle:['步枪蓝图','Rifle BP'],
     bp_flame:['喷火器蓝图','Flamethrower BP'],bp_rocket:['火箭筒蓝图','Rocket BP'],bp_rail:['电磁炮蓝图','Railgun BP'],bp_shotgun2:['战斗霰弹枪蓝图','Combat Shotgun BP'],
-    bp_mine:['地雷蓝图','Land Mine BP'],bp_turret:['炮台蓝图','Sentry Turret BP']};
+    bp_mine:['地雷蓝图','Land Mine BP'],bp_turret:['炮台蓝图','Sentry Turret BP'],bp_revolver:['左轮手枪蓝图','Revolver BP'],bp_grenade:['榴弹投掷器蓝图','Grenade Launcher BP']};
   return T((m[bp]||['蓝图','Blueprint'])[0],(m[bp]||['Blueprint','Blueprint'])[1]);
 }
 
@@ -1906,6 +2255,11 @@ function hitZombie(zb,dmg,fx,fz,kb,crit){
     spawnDmg(zb.x,2.2,zb.z,'BLOCK',0);
     showRing(zb.x,zb.z,1.5,0xAA6AE0,0.3,null);
     return;
+  }
+  if(zb.c.armored){
+    const reduced=dmg*(crit?0.78:0.58);
+    if(dmg-reduced>5) spawnDmg(zb.x,2.25,zb.z,T('护甲','ARMOR'),0);
+    dmg=reduced;
   }
   zb.hp-=dmg; zb.flash=0.12;
   AU.hitF();
@@ -2049,6 +2403,14 @@ function zombieAI(zb,dt,idx){
 
   const dx=P.x-zb.x, dz=P.z-zb.z;
   const dist=Math.hypot(dx,dz);
+  if(zb.c.lurker){
+    if(!zb.revealed&&dist<9){
+      zb.revealed=1; enterChase(zb); zb.lungeCd=0;
+      showRing(zb.x,zb.z,1.8,0x5A8A6A,0.35,null);
+    }
+    const targetScale=zb.revealed?1:0.58;
+    zb.mesh.scale.y=lerp(zb.mesh.scale.y,targetScale,dt*8);
+  }
   // 玩家在建筑内时，僵尸在门外徘徊（不追入室内）
   if(G.inBuilding){
     const b=G.inBuilding;
@@ -2131,8 +2493,8 @@ function zombieAI(zb,dt,idx){
 
   /* ---- runner lunge ---- */
   zb.lungeCd=Math.max(0,zb.lungeCd-dt);
-  if(zb.type==='runner'&&zb.state==='chase'&&zb.lungeT<=0&&zb.lungeCd<=0&&dist>3&&dist<5){
-    zb.lungeT=0.34; zb.lungeCd=4; zb.lungeHit=0;
+  if((zb.type==='runner'||zb.c.lurker)&&zb.state==='chase'&&zb.lungeT<=0&&zb.lungeCd<=0&&dist>3&&dist<(zb.c.lurker?8:5)){
+    zb.lungeT=zb.c.lurker?0.46:0.34; zb.lungeCd=zb.c.lurker?5:4; zb.lungeHit=0;
     zb.ldx=dx/(dist||1); zb.ldz=dz/(dist||1);
   }
 
@@ -2184,7 +2546,7 @@ function zombieAI(zb,dt,idx){
       if(zb.leaping<=0){
         zb._yJump=0;
         // 落地伤害
-        if(dist<2.5) hitPlayer(zb.dmg*1.5);
+        if(dist<2.5) damagePlayer(zb.dmg*1.5,4);
         AU.slam(dist);
         // 落地粒子
         for(let p=0;p<6;p++) spawnP(zb.x,R(0.1,0.5),zb.z,R(-1,1),R(1,2),R(-1,1),0.3,8,0.02,0x8A6A3A);
@@ -2243,6 +2605,36 @@ function zombieAI(zb,dt,idx){
     }
   }
 
+  /* ---- Grave Warden: armored summons, root strike and enrage ---- */
+  if(zb.c.warden){
+    if(!zb.enraged&&zb.hp<zb.maxhp*0.5){
+      zb.enraged=1; zb.spd*=1.35; zb.dmg*=1.25;
+      showBanner(T('腐木守卫进入狂暴！','GRAVE WARDEN ENRAGED!'),'#C05848',2);
+    }
+    zb.wSumCd=Math.max(0,(zb.wSumCd??2)-dt);
+    if(zb.wSumCd<=0&&zombies.length<MAX_Z-2){
+      zb.wSumCd=zb.enraged?6:8;
+      for(let i=0;i<2;i++){
+        const a=i*Math.PI+R(-0.4,0.4),r=R(2.5,4);
+        spawnZombie(i===0?'armored':'lurker',zb.x+Math.cos(a)*r,zb.z+Math.sin(a)*r);
+      }
+      showRing(zb.x,zb.z,4,0x52634B,0.7,null);
+    }
+    zb.rootCd=Math.max(0,(zb.rootCd??3)-dt);
+    if(zb.rootStrikeT>0){
+      zb.rootStrikeT-=dt;
+      if(zb.rootStrikeT<=0){
+        const rd=Math.hypot(P.x-zb.rootX,P.z-zb.rootZ);
+        for(let i=0;i<10;i++) spawnP(zb.rootX+R(-1.5,1.5),0.2,zb.rootZ+R(-1.5,1.5),0,R(2,5),0,0.45,12,0.07,0x52634B);
+        if(rd<2.7) damagePlayer(zb.dmg*0.7,8);
+        AU.stomp();
+      }
+    } else if(zb.rootCd<=0&&dist>4&&dist<18){
+      zb.rootCd=zb.enraged?4:6; zb.rootStrikeT=0.85; zb.rootX=P.x; zb.rootZ=P.z;
+      showRing(zb.rootX,zb.rootZ,2.7,0x7A3A55,0.85,null);
+    }
+  }
+
   /* ---- state behaviors ---- */
   let mvx=0, mvz=0;
   let spd=zb.spd*(night?1.28:1)*(bmNight?1.15:1);
@@ -2293,7 +2685,7 @@ function zombieAI(zb,dt,idx){
   // lunge motion override
   if(zb.lungeT>0){
     zb.lungeT-=dt;
-    mvx=zb.ldx*2.6; mvz=zb.ldz*2.6; spd=zb.spd*1.4;
+    mvx=zb.ldx*(zb.c.lurker?3.2:2.6); mvz=zb.ldz*(zb.c.lurker?3.2:2.6); spd=zb.spd*1.4;
     if(!zb.lungeHit&&dist<1.3){ zb.lungeHit=1; damagePlayer(zb.dmg*1.3,RI(3,6)); }
   }
   if(P.grabT>0&&zb.c.grab) spd*=1.1;
@@ -2331,13 +2723,28 @@ function zombieAI(zb,dt,idx){
   zb.mesh.rotation.y=zb.dir;
   /* ---- animation ---- */
   zb.ph+=dt*(2+spd*2.2);
-  const pa=zb.mesh.userData.parts, sw=Math.sin(zb.ph)*0.5;
+  const pa=zb.mesh.userData.parts;
+  const gait=zb.type==='runner'||zb.c.lurker?0.78:zb.c.armored||zb.c.warden?0.34:0.5;
+  const sw=Math.sin(zb.ph)*gait;
   if(!zb.c.crawl){
     pa.lLeg.rotation.x=sw; pa.rLeg.rotation.x=-sw;
-    pa.torso.rotation.z=Math.sin(zb.ph*0.5)*0.09;       // shamble sway
-    pa.torso.rotation.x=zb.type==='runner'?0.32:0;      // runner lean
+    pa.torso.rotation.z=Math.sin(zb.ph*0.5)*(zb.c.armored?0.035:0.09);
+    pa.torso.rotation.x=zb.type==='runner'?0.32:zb.c.lurker?0.42:0;
   }
-  if(zb.atkAnimT>0){ zb.atkAnimT-=dt;
+  if(pa.head) pa.head.position.y=pa.head.userData.baseY+Math.abs(Math.sin(zb.ph))*0.035*zb.c.scale;
+  if(pa.sacs){
+    const pulse=1+Math.sin(G.time*5+zb.ph)*0.12;
+    pa.sacs[0].scale.copy(pa.sacs[0].userData.baseScale).multiplyScalar(pulse);
+    pa.sacs[1].scale.copy(pa.sacs[1].userData.baseScale).multiplyScalar(2-pulse);
+  }
+  if(pa.jaw) pa.jaw.scale.y=pa.jaw.userData.baseScaleY*(zb.c.scream&&zb.screaming>0?1.8:1+Math.abs(Math.sin(zb.ph))*0.18);
+  if(pa.core){
+    const pulse=1+Math.sin(G.time*6)*0.12+(zb.rootStrikeT>0?0.3:0);
+    pa.core.scale.set(0.27*zb.c.scale*pulse,0.31*zb.c.scale*pulse,0.18*zb.c.scale*pulse);
+  }
+  if(zb.rootStrikeT>0){
+    pa.lArm.rotation.x=-2.75; pa.rArm.rotation.x=-2.75;
+  } else if(zb.atkAnimT>0){ zb.atkAnimT-=dt;
     pa.lArm.rotation.x=-2.2; pa.rArm.rotation.x=-2.2;   // lunge swipe
   } else if(zb.stomping>0){
     pa.lArm.rotation.x=-2.9; pa.rArm.rotation.x=-2.9;   // raise for stomp
@@ -2505,6 +2912,7 @@ function muzzleFlash(wk){
   else if(wk==='rifle'){ mzColor=0xE8C98A; sz=0.28; coneSz=0.18; intensity=2.6; pcount=4; }
   else if(wk==='smg'){ mzColor=0xE8D08A; sz=0.22; coneSz=0.14; intensity=2.2; pcount=3; }
   else if(wk==='pistol'){ mzColor=0xE8C98A; sz=0.2; coneSz=0.12; intensity=2.0; pcount=2; }
+  else if(wk==='revolver'){ mzColor=0xFFD08A; sz=0.28; coneSz=0.18; intensity=2.8; pcount=4; }
   mzLight.color.set(mzColor);
   mzLight.position.set(mx,1.4,mz); mzLight.intensity=intensity;
   mzQuad.material.color.set(mzColor); mzQuad.scale.set(sz,sz,sz);
@@ -2641,6 +3049,7 @@ function shoot(){
     const sx=(Math.random()-0.5)*spread, sz=(Math.random()-0.5)*spread;
     const dir=new V3(P.aimX,0,P.aimZ).normalize().add(new V3(sx,0,sz)).normalize();
     fireBullet(P.x,1.4,P.z,dir.x,dir.z,w.range*att.range,w.dmg*dmgMult);
+    if(wk==='revolver'&&bullets.length) bullets[bullets.length-1].armorPierce=1;
   }
   P.kbx-=P.aimX*0.12; P.kbz-=P.aimZ*0.12;
   if(P.mags[wk]<=0) reload();
@@ -2820,6 +3229,7 @@ function updateBullets(dt){
       if(Math.abs(b.x-z.x)<rr&&Math.abs(b.z-z.z)<rr){
         let dmg=b.dmg, crit=false;
         if(Math.random()<0.15){ dmg*=2; crit=true; AU.headshot(); }
+        if(b.armorPierce&&z.c.armored) dmg*=1.55;
         // 穿透：可击中多个目标
         if(b.pierce>0){
           if(!b.hitZ)b.hitZ=[];
@@ -3208,6 +3618,9 @@ function waveTypes(n){
   if(n>=8) t.push('leaper','leaper','necro','hunter');
   if(n>=9) t.push('tank','runner','screamer','brute2','spitter','necro','hunter','sniper');
   if(n>=11) t.push('hunter','hunter','sniper','spitter','necro');
+  if(n>=8) t.push('lurker','lurker');
+  if(n>=10) t.push('armored');
+  if(n>=13) t.push('armored','armored','lurker');
   return t;
 }
 function startWave(n){
@@ -3219,9 +3632,23 @@ function startWave(n){
   if(n%5===0) spawnBoss(n);
 }
 function spawnBoss(n){
-  // 每10波出现虫群女王，其他boss波出现蛮兽
-  if(n%10===0&&n>=10){ spawnQueen(); }
+  // Every 15th wave is the Warden, every 10th is the Queen.
+  if(n%15===0){ spawnWarden(); }
+  else if(n%10===0&&n>=10){ spawnQueen(); }
   else { spawnBrute(); }
+}
+function spawnWarden(){
+  const a=R(0,Math.PI*2),r=R(48,60);
+  spawnWardenAt(clamp(Math.cos(a)*r,-HALF+3,HALF-3),clamp(Math.sin(a)*r,-HALF+3,HALF-3));
+}
+function spawnWardenAt(x,z){
+  const zb=spawnZombie('warden',x,z);
+  if(zb){
+    G.boss=zb; AU.boss();
+    showBanner(T('腐木守卫苏醒了！','THE GRAVE WARDEN AWAKENS!'),'#52634B',2.8);
+    showMsg(T('躲开根刺，先清除它召唤的装甲尸。','Avoid root strikes and control its armored summons.'));
+  }
+  return zb;
 }
 function spawnQueen(){
   const a=R(0,Math.PI*2), r=R(48,60);
@@ -3429,7 +3856,7 @@ function updatePlayer(dt){
   if(P.rollT>0){
     P.rollT-=dt;
     P.x+=P.rollDx*9.2*dt; P.z+=P.rollDz*9.2*dt;
-    P.moving=true;
+    P.moving=true; P.moveFwd=1; P.moveStrafe=0;
   } else {
     // WASD基于角色朝向（鼠标控制方向）：W=前进，S=后退，A=左移，D=右移
     let fwd=0, strafe=0;
@@ -3440,11 +3867,12 @@ function updatePlayer(dt){
     if(len>0.2){
       const spd=P.spd*(P.sprint&&P.stam>3?1.55:1)*(P.frenzyT>0?1.5:1);
       fwd/=len; strafe/=len;
+      P.moveFwd=fwd; P.moveStrafe=strafe;
       // 基于角色朝向计算移动方向（P.dir由鼠标updateAim控制）
       const cosD=Math.cos(P.dir), sinD=Math.sin(P.dir);
       // 前进方向 = (sin(dir), cos(dir))，左移方向 = (cos(dir), -sin(dir))
-      const mx=sinD*fwd+cosD*strafe;
-      const mz=cosD*fwd-sinD*strafe;
+      let mx=sinD*fwd+cosD*strafe;
+      let mz=cosD*fwd-sinD*strafe;
       if(P.sprint&&P.stam>3&&P.frenzyT<=0) P.stam-=18*dt;
       if(P.grabT>0){ mx*=0.55; mz*=0.55; }
       P.x+=mx*spd*dt; P.z+=mz*spd*dt;
@@ -3453,7 +3881,7 @@ function updatePlayer(dt){
       P.moving=true;
       P.stepT-=dt;
       if(P.stepT<=0){ P.stepT=P.sprint?0.26:0.42; AU.step(); }
-    } else { P.moving=false; }
+    } else { P.moving=false; P.moveFwd=0; P.moveStrafe=0; }
   }
   resolveCollision(P,0.35);
   P.mesh.position.set(P.x,0,P.z);
@@ -3474,6 +3902,9 @@ function updatePlayer(dt){
   }
   // safe house regen
   if(Math.hypot(P.x,P.z)<7){ P.hp=Math.min(P.maxHp||100,P.hp+1.2*dt); P.inf=Math.max(0,P.inf-0.5*dt); }
+  if(G.fieldClinic&&Math.hypot(P.x-G.fieldClinic.x,P.z-G.fieldClinic.z)<8){
+    P.hp=Math.min(P.maxHp||100,P.hp+0.65*dt); P.inf=Math.max(0,P.inf-0.25*dt);
+  }
 }
 
 function playerAnim(dt){
@@ -3487,6 +3918,7 @@ function playerAnim(dt){
   if(P.moving&&P.rollT<=0) bobY=Math.abs(Math.sin(ph))*0.07;
   if(P.crouchT>0) crouch=0.22*Math.min(1,P.crouchT/0.45);
   b.rotation.x=lean+rollA;
+  b.rotation.z=lerp(b.rotation.z||0,P.rollT>0?0:-P.moveStrafe*(sprint?0.16:0.09),dt*10);
   b.position.y=bobY-crouch;
   const w=WEAPONS[P.weapon];
   const swinging=P.swingT>0&&w&&w.melee;
@@ -3505,26 +3937,29 @@ function playerAnim(dt){
   }
   else if(swinging){ meleeAnim(w.anim); }
   else if(w&&!w.melee){
-    // 持枪姿势：双臂前伸略向下，模拟双手握枪
+    // Weapon-specific aim silhouettes keep sidearms, long guns and heavy weapons distinct.
     const rec=P.recoilT>0?0.4:0;
     const aimNoise=Math.sin(G.time*3)*0.02; // 微小晃动模拟呼吸
+    const sidearm=P.weapon==='pistol'||P.weapon==='revolver';
+    const heavy=['rocket','flamethrower','grenade','railgun'].includes(P.weapon);
     if(P.reloadT>0){
-      // 换弹：双手下沉+左右摆动
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.35+Math.sin(G.time*12)*0.18,dt*14);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.45+Math.sin(G.time*12+1.2)*0.18,dt*14);
-      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,0.15,dt*10);
-      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,-0.15,dt*10);
-      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0.2,dt*10);
-      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,-0.2,dt*10);
+      const rp=1-P.reloadT/(P.reloadMax||1);
+      const dip=Math.sin(clamp(rp,0,1)*Math.PI);
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.35+dip*0.28,dt*14);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.62+dip*0.46,dt*14);
+      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,0.18*dip,dt*10);
+      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,-0.42*dip,dt*10);
+      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0.24*dip,dt*10);
+      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,-0.42*dip,dt*10);
     } else {
-      // 持枪瞄准：右臂前伸略低，左臂托枪身
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.7+rec+aimNoise,dt*18);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.6+rec*0.5+aimNoise,dt*18);
-      // 右臂微内收持枪
-      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,-0.08,dt*12);
-      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,0.12,dt*12);
-      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,-0.12,dt*10);
-      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0.18,dt*10);
+      const rx=sidearm?-0.92:(heavy?-0.54:-0.7);
+      const lx=sidearm?-0.82:(heavy?-0.48:-0.62);
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,rx+rec+aimNoise,dt*18);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,lx+rec*0.5+aimNoise,dt*18);
+      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,sidearm?-0.16:-0.08,dt*12);
+      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,sidearm?0.28:(heavy?0.22:0.12),dt*12);
+      pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,sidearm?-0.2:-0.12,dt*10);
+      pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,sidearm?0.32:(heavy?0.25:0.18),dt*10);
     }
   }
   else if(P.moving){
@@ -3570,11 +4005,23 @@ function playerAnim(dt){
   if(!P.moving&&P.rollT<=0&&!swinging){
     b.rotation.y=lerp(b.rotation.y,0,dt*6);
   }
+  if(P.wmesh){
+    const reloadDip=P.reloadT>0?Math.sin((1-P.reloadT/(P.reloadMax||1))*Math.PI):0;
+    const recoilKick=P.recoilT>0?0.13:0;
+    P.wmesh.position.y=lerp(P.wmesh.position.y||0,reloadDip*0.12,dt*18);
+    P.wmesh.position.z=lerp(P.wmesh.position.z||0,recoilKick+reloadDip*0.08,dt*22);
+    P.wmesh.rotation.x=lerp(P.wmesh.rotation.x||0,reloadDip*0.34,dt*16);
+    P.wmesh.rotation.z=lerp(P.wmesh.rotation.z||0,reloadDip*0.28,dt*16);
+  }
   // 头部微转动（看向瞄准方向）
   if(pa.head){
-    if(!P.moving&&P.rollT<=0){
-      pa.head.rotation.y=lerp(pa.head.rotation.y||0,Math.sin(P.dir)*0.15,dt*4);
-    }
+    const scan=P.moving?P.moveStrafe*0.1:Math.sin(G.time*0.7)*0.08;
+    pa.head.rotation.y=lerp(pa.head.rotation.y||0,scan,dt*4);
+    pa.head.rotation.x=lerp(pa.head.rotation.x||0,(w&&!w.melee)?-0.08:0,dt*5);
+  }
+  if(pa.pack){
+    pa.pack.rotation.x=lerp(pa.pack.rotation.x||0,sprint?-0.16:0,dt*8);
+    pa.pack.rotation.z=lerp(pa.pack.rotation.z||0,P.moving?Math.sin(ph)*0.035:0,dt*8);
   }
   // 呼吸效果
   if(!P.moving&&P.rollT<=0&&!swinging){
@@ -3598,6 +4045,11 @@ function meleeAnim(kind){
     else if(f<0.6){ const t=(f-0.3)/0.3; a.x=lerp(-2.5,-0.4,t*Math.PI/2); pa.lArm.rotation.x=lerp(-2.5,-0.4,t*Math.PI/2); b.rotation.y=lerp(-0.35,0.45,t); }
     else { const t=(f-0.6)/0.4; a.x=lerp(-0.4,-0.2,t*t); pa.lArm.rotation.x=lerp(-0.4,-0.2,t*t); b.rotation.y=lerp(0.45,0,t); }
     b.position.y=b.position.y*0.85;
+  } else if(kind==='thrust'){
+    if(f<0.35){ const t=f/0.35; a.x=lerp(-0.2,-1.9,t); b.rotation.y=lerp(0,-0.18,t); }
+    else if(f<0.58){ const t=(f-0.35)/0.23; a.x=lerp(-1.9,-0.35,t); b.rotation.y=lerp(-0.18,0.22,t); }
+    else { const t=(f-0.58)/0.42; a.x=lerp(-0.35,-0.2,t); b.rotation.y=lerp(0.22,0,t); }
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,a.x+0.15,0.35);
   } else {
     if(f<0.3){ const t=f/0.3; a.x=lerp(-0.15,-0.5,t*Math.PI/2); }
     else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(-0.5,-1.5,t*Math.PI/2); }
@@ -3620,7 +4072,7 @@ function damagePlayer(dmg,inf){
   // 护甲减伤
   if(P.armorRed>0) dmg*=(1-P.armorRed);
   P.hp-=dmg; P.hurtT=0.2;
-  if(P.infImmuneT<=0&&P.infPauseT<=0) P.inf+=inf; // 免疫/暂停时不增加感染
+  if(P.infImmuneT<=0&&P.infPauseT<=0) P.inf+=inf*(P.armorRed>=0.45?0.5:1);
   $('hurtFx').style.opacity='1';
   setTimeout(()=>$('hurtFx').style.opacity='0',180);
   G.shake=Math.max(G.shake,0.18);
@@ -3664,6 +4116,9 @@ function removeFromHot(ix,n){ const s=P.hot[ix]; if(!s) return; s.q-=n||1; if(s.
 function dropLoot(x,z,id,q){
   const g=new THREE.Group();
   buildLootModel(g,id);
+  const glowCol=WEAPONS[id]?0xB18A45:(id==='medkit'||id==='purifier'?0x6B9A74:(id==='resin'||id==='plated_armor'?0x9A5272:0x6A765F));
+  const marker=new THREE.Mesh(new THREE.RingGeometry(0.32,0.42,18),bmat(glowCol,0.55));
+  marker.rotation.x=-Math.PI/2; marker.position.y=0.025; marker.material.side=THREE.DoubleSide; g.add(marker);
   g.position.set(x,0,z); g.traverse(o=>{if(o.isMesh)o.castShadow=true;});
   scene.add(g);
   lootEnts.push({mesh:g,x,z,id,qty:q||1,bob:R(0,6)});
@@ -3709,26 +4164,27 @@ function buildLootModel(g,id){
   switch(id){
     // ---- 食物/饮水 ----
     case 'can': // 罐头：矮圆柱+顶部拉环
-      bx(0.28,0.35,0.28,0x8A7A5A,0,0.18,0,g);
-      bx(0.28,0.04,0.28,0xB9A47A,0,0.37,0,g);
+      cy(0.28,0.35,0x8A7A5A,0,0.18,0,g);
+      cy(0.3,0.04,0xB9A47A,0,0.37,0,g);
       bx(0.06,0.03,0.06,0x5B5C57,0,0.40,0,g);
       break;
     case 'water': // 净水：透明蓝瓶+盖
-      bx(0.18,0.5,0.18,0x4A7A8A,0,0.25,0,g);
-      bx(0.1,0.12,0.1,0x5B5C57,0,0.55,0,g);
+      cy(0.18,0.46,0x4A7A8A,0,0.23,0,g);
+      cy(0.11,0.12,0x4A7A8A,0,0.52,0,g);
+      cy(0.12,0.05,0x5B5C57,0,0.60,0,g);
       break;
     case 'hotmeal': // 热食：浅碗+食物
       bx(0.35,0.1,0.35,0xD6C29A,0,0.05,0,g);
       bx(0.26,0.08,0.26,0x8A5A35,0,0.12,0,g);
       break;
     case 'bottle': // 空瓶：细长瓶身+瓶颈
-      bx(0.15,0.45,0.15,0x5A7A55,0,0.23,0,g);
-      bx(0.07,0.15,0.07,0x5A7A55,0,0.53,0,g);
+      cy(0.16,0.42,0x5A7A55,0,0.21,0,g);
+      cy(0.08,0.17,0x5A7A55,0,0.5,0,g);
       break;
     // ---- 医疗 ----
     case 'bandage': // 绷带：白色卷
-      bx(0.18,0.18,0.18,0xE5DDC8,0,0.09,0,g);
-      bx(0.14,0.02,0.14,0xB9A47A,0,0.19,0,g);
+      cy(0.2,0.18,0xE5DDC8,0,0.09,0,g,Math.PI/2,0,0);
+      cy(0.09,0.19,0xB9A47A,0,0.09,0,g,Math.PI/2,0,0);
       break;
     case 'medkit': // 医疗包：红箱+白十字
       bx(0.32,0.2,0.24,0x743C38,0,0.1,0,g);
@@ -3760,9 +4216,13 @@ function buildLootModel(g,id){
       bx(0.12,0.08,0.12,0x8A8070,0.08,0.18,0.04,g);
       bx(0.08,0.06,0.1,0x6B6B65,-0.06,0.16,-0.03,g);
       break;
+    case 'resin':
+      sph(0.28,0.2,0.25,0x7A3A55,0,0.1,0,g);
+      sph(0.14,0.24,0.14,0xA05A78,0.08,0.23,0.02,g);
+      break;
     case 'fuel': // 燃料：油桶
-      bx(0.2,0.32,0.2,0x743C38,0,0.16,0,g);
-      bx(0.16,0.04,0.16,0x5B5C57,0,0.34,0,g);
+      cy(0.22,0.34,0x743C38,0,0.17,0,g);
+      cy(0.18,0.04,0x5B5C57,0,0.35,0,g);
       bx(0.05,0.06,0.05,0xB18A45,0,0.38,0,g);
       break;
     // ---- 弹药 ----
@@ -3777,6 +4237,11 @@ function buildLootModel(g,id){
     case 'ammo762': // 步枪弹盒：棕盒
       bx(0.28,0.14,0.2,0x6B5B40,0,0.07,0,g);
       bx(0.24,0.02,0.16,0x5B5C57,0,0.15,0,g);
+      break;
+    case 'grenade_round':
+      cy(0.18,0.28,0x3A4A2A,0,0.14,0,g);
+      cy(0.13,0.06,0xB18A45,0,0.31,0,g);
+      { const nose=new THREE.Mesh(CONE,mat(0x4D5946)); nose.scale.set(0.12,0.13,0.12); nose.position.y=0.405; g.add(nose); }
       break;
     // ---- 投掷物 ----
     case 'molotov': // 燃烧瓶：瓶+布芯
@@ -3818,8 +4283,8 @@ function buildLootModel(g,id){
       bx(0.26,0.13,0.18,0x9A8A6A,0,0.21,0,g);
       break;
     case 'mine': // 地雷：圆盘+触发器
-      bx(0.25,0.1,0.25,0x4A3A22,0,0.05,0,g);
-      bx(0.06,0.06,0.06,0x743C38,0,0.13,0,g);
+      cy(0.3,0.1,0x4A3A22,0,0.05,0,g);
+      cy(0.09,0.06,0x743C38,0,0.13,0,g);
       break;
     case 'backpack': // 背包：箱型包+背带
       bx(0.3,0.35,0.2,0x4A5A3A,0,0.18,0,g);
@@ -3832,6 +4297,16 @@ function buildLootModel(g,id){
       bx(0.28,0.05,0.14,0x8A8070,0,0.4,0,g);
       bx(0.08,0.3,0.05,0x3A3A3A,-0.1,0.2,0.08,g);
       bx(0.08,0.3,0.05,0x3A3A3A,0.1,0.2,0.08,g);
+      break;
+    case 'plated_armor':
+      bx(0.34,0.42,0.17,0x435746,0,0.21,0,g);
+      bx(0.3,0.08,0.15,0x7A3A55,0,0.42,0,g);
+      bx(0.08,0.32,0.05,0x242F27,-0.11,0.2,0.09,g);
+      bx(0.08,0.32,0.05,0x242F27,0.11,0.2,0.09,g);
+      break;
+    case 'purifier':
+      bx(0.14,0.3,0.14,0x5A8A6A,0,0.15,0,g);
+      bx(0.1,0.06,0.1,0xE5DDC8,0,0.33,0,g);
       break;
     case 'cooked_meat': // 熟肉：肉块+骨架
       bx(0.25,0.15,0.2,0x8A5A3A,0,0.08,0,g);
@@ -3868,9 +4343,18 @@ function buildWeaponLoot(g,id){
       bx(0.08,0.6,0.08,0x6B5B40,0,0.3,0,g);
       bx(0.3,0.18,0.12,0x5B5C57,0,0.62,0,g);
       break;
+    case 'spear':
+      bx(0.06,1.0,0.06,0x6B4D32,0,0.5,0,g);
+      { const tip=new THREE.Mesh(CONE,mat(0xA7AAA2)); tip.scale.set(0.15,0.35,0.15); tip.position.y=1.17; g.add(tip); }
+      break;
     case 'pistol': // 手枪：枪身+握把
       bx(0.06,0.1,0.3,0x33322F,0,0.15,-0.05,g);
       bx(0.06,0.18,0.08,0x242321,0,0.05,0.08,g);
+      break;
+    case 'revolver':
+      bx(0.07,0.11,0.38,0x555650,0,0.16,-0.03,g);
+      bx(0.13,0.13,0.13,0x777870,0,0.15,0.02,g);
+      bx(0.07,0.2,0.09,0x4A3324,0,0.04,0.12,g);
       break;
     case 'shotgun': // 霰弹枪：长枪管+枪托
       bx(0.08,0.1,0.6,0x4A3A22,0,0.15,0.1,g);
@@ -3903,6 +4387,18 @@ function buildWeaponLoot(g,id){
       bx(0.08,0.1,0.5,0x33322F,0,0.15,0.08,g);
       bx(0.14,0.14,0.1,0x5B5C57,0,0.1,-0.05,g);
       bx(0.08,0.14,0.18,0x6B5B40,0,0.1,-0.25,g);
+      break;
+    case 'crossbow':
+      bx(0.07,0.09,0.78,0x493622,0,0.18,0,g);
+      bx(0.68,0.05,0.06,0x6B6D67,0,0.2,0.26,g);
+      bx(0.04,0.04,0.86,0xB9A47A,0,0.25,0.02,g);
+      { const bow=new THREE.Mesh(new THREE.TorusGeometry(0.34,0.025,5,16,Math.PI),mat(0x75654A)); bow.rotation.x=Math.PI/2; bow.position.set(0,0.2,0.28); g.add(bow); }
+      break;
+    case 'grenade':
+      cy(0.2,0.78,0x3E4439,0,0.22,0,g,Math.PI/2,0,0);
+      cy(0.13,0.2,0x242822,0,0.22,0.43,g,Math.PI/2,0,0);
+      bx(0.09,0.2,0.11,0x302B25,0,0.05,-0.18,g);
+      cy(0.22,0.16,0x5B5C57,0,0.08,0.02,g);
       break;
     default:
       bx(0.1,0.15,0.5,0x33322F,0,0.18,0,g);
@@ -4000,7 +4496,7 @@ function openInv(){
       d.innerHTML=icon(s.id)+'<span class="qty">'+s.q+'</span>'+'<span class="nm">'+itemName(s.id)+'</span><span class="drop" title="'+T('丢弃','Drop')+'"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#C05848" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></span>';
       d.onclick=()=>useInv(i);
       // 右键：消耗品直接使用，其他丢弃
-      d.oncontextmenu=(e)=>{ e.preventDefault(); const it=ITEMS[s.id]; if(it.use==='food'||it.use==='thirst'||it.use==='heal'||it.use==='expand'||it.use==='armor'){ consumeInv(i); } else { dropInvItem(i); } };
+      d.oncontextmenu=(e)=>{ e.preventDefault(); const it=ITEMS[s.id]; if(['food','thirst','heal','expand','armor','armor2','purifier'].includes(it.use)){ consumeInv(i); } else { dropInvItem(i); } };
       // 拖拽交换
       d.draggable=true;
       d.ondragstart=(e)=>{ dragSrc=i; e.dataTransfer.effectAllowed='move'; };
@@ -4017,8 +4513,8 @@ function openInv(){
     g.appendChild(d);
   }
   $('invHint').innerHTML=T(
-    '左键放入快捷栏；右键使用/丢弃；点击垃圾桶丢弃到地上 | 按 F 拾取地上物品 | 背包 '+slots+'/12格',
-    'L-click to hotbar; R-click use/drop; click trash to drop | Press F to pick up | Bag '+slots+'/12 slots');
+    '左键放入快捷栏；右键使用/丢弃；点击垃圾桶丢弃到地上 | 按 F 拾取地上物品 | 背包 '+slots+'/16格',
+    'L-click to hotbar; R-click use/drop; click trash to drop | Press F to pick up | Bag '+slots+'/16 slots');
   $('invP').classList.remove('hidden');
   updatePanelsPos();
 }
@@ -4045,11 +4541,13 @@ function consumeInv(i){
   const s=P.inv[i]; if(!s) return false;
   const it=ITEMS[s.id];
   const boost=P.healBoostT>0?2:1; // 医生技能：治疗效果翻倍
-  if(it.use==='food'){ P.hunger=clamp(P.hunger+it.v,0,100); if(it.hp) P.hp=clamp(P.hp+it.hp*boost,0,100); AU.eat(); }
+  if(it.use==='food'){ P.hunger=clamp(P.hunger+it.v,0,100); if(it.hp) P.hp=clamp(P.hp+it.hp*boost,0,P.maxHp||100); AU.eat(); }
   else if(it.use==='thirst'){ P.thirst=clamp(P.thirst+it.v,0,100); AU.eat(); }
-  else if(it.use==='heal'){ P.hp=clamp(P.hp+it.v*boost,0,100); P.inf=clamp(P.inf-(it.inf||0)*boost,0,100); AU.eat(); }
+  else if(it.use==='heal'){ P.hp=clamp(P.hp+it.v*boost,0,P.maxHp||100); P.inf=clamp(P.inf-(it.inf||0)*boost,0,100); AU.eat(); }
   else if(it.use==='expand'){ P.invSlots=Math.min(16,(P.invSlots||8)+2); AU.craft(); showMsg(T('背包扩容！当前 '+P.invSlots+'/16 格','Bag expanded! '+P.invSlots+'/16 slots')); }
   else if(it.use==='armor'){ P.armorRed=0.3; AU.craft(); showMsg(T('护甲装备！减伤30%。','Armor equipped! -30% damage.')); }
+  else if(it.use==='armor2'){ P.armorRed=0.45; AU.craft(); showMsg(T('树脂复合甲已装备：减伤45%，感染增长减半。','Resin-plated armor equipped: -45% damage, half infection gain.')); }
+  else if(it.use==='purifier'){ P.hp=clamp(P.hp+it.v*boost,0,P.maxHp||100); P.inf=0; AU.eat(); showMsg(T('感染已彻底净化。','Infection fully purged.')); }
   else return false;
   s.q--; if(s.q<=0) P.inv[i]=null;
   openInv(); refreshHud();
@@ -4136,6 +4634,28 @@ function closePanels(){ $('invP').classList.add('hidden'); $('craftP').classList
 function updatePanelsPos(){}
 
 /* ================= HUD ================= */
+function getZoneInfo(){
+  if(G.inBuilding) return T('建筑内部','Building Interior');
+  if(Math.hypot(P.x,P.z)<12) return T('幸存者安全区','Survivor Safe Zone');
+  if(G.fieldClinic&&Math.hypot(P.x-G.fieldClinic.x,P.z-G.fieldClinic.z)<18) return T('西南野战诊所','Southwest Field Clinic');
+  for(const n of corruptionNests){ if(Math.hypot(P.x-n.x,P.z-n.z)<18) return n.label+(n.cleansed?T(' · 已净化',' · Purified'):T(' · 腐化',' · Corrupted')); }
+  if(P.x<-68&&P.z>64) return T('西部锯木场','West Sawmill');
+  if(Math.abs(P.x)<38&&Math.abs(P.z)<38) return T('腐木镇中心','Rotwood Center');
+  if(P.z<-58) return T('南部林区','South Woods');
+  if(P.z>58) return T('北部公路','North Highway');
+  if(P.x<-52) return T('西部住宅区','West Residences');
+  if(P.x>52) return T('东部工业区','East Industrial');
+  return T('腐木镇郊区','Rotwood Outskirts');
+}
+function refreshZoneHud(){
+  $('zoneName').textContent=getZoneInfo();
+  let close=0;
+  for(const z of zombies) if(!z.dead&&Math.hypot(P.x-z.x,P.z-z.z)<16) close++;
+  const bossNear=G.boss&&!G.boss.dead&&Math.hypot(P.x-G.boss.x,P.z-G.boss.z)<28;
+  const high=bossNear||close>=4, warn=!high&&(close>0||G.bloodMoon);
+  $('threatDot').className=high?'high':warn?'warn':'';
+  $('threatTxt').textContent=high?T('高危 · 敌人 ','High Threat · ')+close:warn?T('警戒 · 敌人 ','Caution · ')+close:T('区域稳定','Area Stable');
+}
 function refreshHud(){
   $('fHp').style.width=(P.hp/(P.maxHp||100)*100)+'%'; $('tHp').textContent='HP '+Math.ceil(P.hp)+(P.shield>0?' (+'+Math.ceil(P.shield)+')':'');
   $('fHu').style.width=P.hunger+'%'; $('tHu').textContent=T('饱食 ','Food ')+Math.ceil(P.hunger);
@@ -4146,6 +4666,7 @@ function refreshHud(){
   $('fTh').parentElement.classList.toggle('warn',P.thirst<25);
   $('fSt').parentElement.classList.toggle('warn',P.stam<25);
   $('infTxt').textContent=Math.round(P.inf)+'%';
+  refreshZoneHud();
   $('killTxt').textContent=T('击杀 ','Kills ')+G.kills;
   $('scoreTxt').textContent=T('得分 ','Score ')+G.score;
   $('comboTxt').textContent=G.combo>=3?('x'+G.combo+' COMBO'):'';
@@ -4181,14 +4702,8 @@ function refreshHud(){
   } else if(G.mode==='endless'){
     modeInfo=T('无尽模式','Endless Mode');
   }
-  if(modeInfo){
-    if(!$('modeInfo')){
-      const el=document.createElement('div'); el.id='modeInfo';
-      el.style.cssText='position:absolute;top:36px;left:50%;transform:translateX(-50%);font-size:13px;color:#B9A47A;text-align:center;pointer-events:none;white-space:nowrap;';
-      elHud.appendChild(el);
-    }
-    $('modeInfo').textContent=modeInfo;
-  }
+  $('modeInfo').textContent=modeInfo;
+  $('modeInfo').classList.toggle('hidden',!modeInfo);
   // 室内僵尸刷新倒计时
   if(G.inBuilding&&G._interiorSpawnT!==undefined&&G._interiorSpawnT!==null){
     if(!$('interiorTimer')){
@@ -4207,7 +4722,7 @@ function refreshHud(){
   const bw=$('bossWrap');
   if(G.boss&&!G.boss.dead&&G.boss.hp>0){
     bw.classList.remove('hidden');
-    $('bossLbl').textContent=T('蛮兽 BRUTE','BRUTE');
+    $('bossLbl').textContent=LANG==='en'?G.boss.c.n[1].toUpperCase():G.boss.c.n[0];
     $('bossFill').style.width=(clamp(G.boss.hp/G.boss.maxhp,0,1)*100)+'%';
   } else bw.classList.add('hidden');
   // hotbar - 只在数据变化时重建DOM（修复每帧重建导致点击丢失）
@@ -4291,7 +4806,15 @@ function refreshHud(){
   // 拾取/交易/搜查/进入建筑提示
   const ph=$('pickHint');
   if(ph){
-    if(G._nearBuilding&&!G.inBuilding&&G.state==='play'&&!G.paused){
+    if(G._nearNest&&!G.inBuilding&&G.state==='play'&&!G.paused){
+      const n=G._nearNest;
+      if(n.cleansing){
+        ph.innerHTML='<span class="pk">F</span>'+T('守住净化区域 ','Hold purification zone ')+Math.min(100,Math.floor(n.progress/5*100))+'%';
+      } else {
+        ph.innerHTML='<span class="pk">F</span>'+T('净化 '+n.label,'Purify '+n.label);
+      }
+      ph.classList.remove('hidden');
+    } else if(G._nearBuilding&&!G.inBuilding&&G.state==='play'&&!G.paused){
       const b=G._nearBuilding;
       ph.innerHTML='<span class="pk">C</span>'+T('进入 '+b.label,'Enter '+b.label);
       ph.classList.remove('hidden');
@@ -4372,6 +4895,20 @@ function drawMinimap(){
   if(G.supply){ c.fillStyle='#B18A45';
     c.fillRect((G.supply.x+HALF)*sc-3,(G.supply.z+HALF)*sc-3,6,6);
     c.strokeStyle='#E5DDC8'; c.strokeRect((G.supply.x+HALF)*sc-3,(G.supply.z+HALF)*sc-3,6,6); }
+  if(G.fieldClinic){
+    const fx=(G.fieldClinic.x+HALF)*sc, fz=(G.fieldClinic.z+HALF)*sc;
+    c.fillStyle='#E5DDC8'; c.fillRect(fx-4,fz-1.2,8,2.4); c.fillRect(fx-1.2,fz-4,2.4,8);
+    c.strokeStyle='#743C38'; c.lineWidth=0.8; c.strokeRect(fx-4.5,fz-4.5,9,9);
+  }
+  c.fillStyle='#B18A45';
+  c.fillRect((-88+HALF)*sc-3,(86+HALF)*sc-3,6,6);
+  c.fillStyle='#242321'; c.fillRect((-88+HALF)*sc-1,(86+HALF)*sc-1,2,2);
+  // Corruption nests: magenta while active, green after purification.
+  for(const n of corruptionNests){
+    const ns=n.cleansed?4:5+Math.sin(G.time*5)*1.2;
+    c.fillStyle=n.cleansed?'#5A8A6A':'#A04A68';
+    c.fillRect((n.x+HALF)*sc-ns/2,(n.z+HALF)*sc-ns/2,ns,ns);
+  }
   // 商人
   if(G.trader){
     const ts=5+Math.sin(Date.now()/300)*1;
@@ -4540,7 +5077,7 @@ function triggerAirdrop(){
   // 附加弹药
   if(WEAPONS[w]&&!WEAPONS[w].melee){
     const ammoMap={pistol:'ammo9',smg:'ammo9',shotgun:'shell',rifle:'ammo762'};
-    if(ammoMap[w]) dropLoot(x+1,z,ammoMap[w],R(10,30));
+    if(ammoMap[w]) dropLoot(x+1,z,ammoMap[w],RI(10,30));
   }
   showBanner(T('武器空投！','WEAPON DROP!'),'#D4A84B',1.5);
   showMsg(T('附近发现了武器补给！','Weapon supplies found nearby!'));
@@ -4562,7 +5099,7 @@ function triggerCacheStash(){
   // 随机资源堆
   const x=clamp(P.x+R(-10,10),-HALF+3,HALF-3), z=clamp(P.z+R(-10,10),-HALF+3,HALF-3);
   const mats=['scrap','wood','nails','cloth','fuel','bottle'];
-  for(let i=0;i<3;i++) dropLoot(x+R(-1,1),z+R(-1,1),pick(mats),R(2,5));
+  for(let i=0;i<3;i++) dropLoot(x+R(-1,1),z+R(-1,1),pick(mats),RI(2,5));
   showMsg(T('发现了一个物资藏匿点！','Found a hidden cache!'));
 }
 /* ================= achievements ================= */
@@ -4577,6 +5114,8 @@ const ACH={
   brute1:  {n:['屠夫','The Butcher'],         desc:['击杀第一只蛮兽','Kill your first Brute'],  rew:{medkit:1,ammo762:15}},
   survive3:{n:['三日求生','3-Day Survivor'],  desc:['存活3天','Survive 3 days'],                rew:{can:3,water:2}},
   survive7:{n:['一周纪念','Weekiversary'],    desc:['存活7天','Survive 7 days'],                rew:{bandage:5,scrap:8}},
+  nest3:   {n:['林地净化者','Grove Cleanser'],desc:['净化全部腐化巢穴','Purify all corruption nests'],rew:{resin:4,medkit:1}},
+  warden1:{n:['守墓人终结者','Warden Breaker'],desc:['击败腐木守卫','Defeat the Grave Warden'],rew:{ammo762:30,grenade_round:4}},
 };
 function checkAch(id){
   if(G.achievements[id]) return;
@@ -4599,6 +5138,7 @@ function updateAchievements(){
   if(G.wave>=20) checkAch('wave20');
   if(G.dayCount>=3) checkAch('survive3');
   if(G.dayCount>=7) checkAch('survive7');
+  if((G.nestsCleansed||0)>=corruptionNests.length&&corruptionNests.length) checkAch('nest3');
 }
 /* ================= NPC trader ================= */
 const TRADER_DEALS=[
@@ -4678,7 +5218,7 @@ const ATTACHMENTS={
   foregrip:  {n:['前握把','Foregrip'],        d:['散布-30%','Spread -30%'],                cost:{scrap:4},         slot:'grip'},
   scope:     {n:['瞄准镜','Scope'],           d:['射程+50%','Range +50%'],                 cost:{scrap:7,nails:3}, slot:'grip'},
 };
-function getAttachments(wk){ return G.attachments[wk]||{}; }
+function getAttachments(wk){ G.attachments=G.attachments||{}; return G.attachments[wk]||{}; }
 function hasAttachment(wk,slot){ return getAttachments(wk)[slot]||null; }
 function applyAttachmentEffects(wk,w){
   const a=getAttachments(wk);
@@ -4693,8 +5233,8 @@ function applyAttachmentEffects(wk,w){
 }
 function showAttachUI(){
   const wk=P.weapon;
-  const w=ITEMS[wk];
-  if(!w||!w.ranged){ showMsg(T('当前武器无法改装','Current weapon cannot be modified')); return; }
+  const wd=WEAPONS[wk],w=ITEMS[wk];
+  if(!wd||wd.melee||!w){ showMsg(T('当前武器无法改装','Current weapon cannot be modified')); return; }
   const a=getAttachments(wk);
   let html='<div class="perkTitle">'+T('武器改装 - ','Weapon Mods - ')+T(w.n[0],w.n[1])+'</div>';
   for(const slot of ['muzzle','mag','grip']){
@@ -4707,16 +5247,21 @@ function showAttachUI(){
       const owned=cur===id;
       const costStr=Object.entries(att.cost).map(([k,v])=>`${v} ${itemName(k)}`).join(' + ');
       const canBuy=!owned&&hasCost(att.cost);
-      html+=`<div class="perkCard" style="${owned?'border-color:#5A8A6A;':''}" ${canBuy?`onclick="buyAttachment('${wk}','${id}')"`:''}>
+      html+=`<div class="perkCard" data-attachment="${canBuy?id:''}" style="${owned?'border-color:#5A8A6A;':''}">
         <div class="perkName">${T(att.n[0],att.n[1])} ${owned?'<span style="color:#5A8A6A">✓</span>':''}</div>
         <div class="perkDesc">${T(att.d[0],att.d[1])} · ${costStr}</div>
       </div>`;
     }
     html+='</div>';
   }
-  html+=`<div class="perkCard" onclick="$('attachP').classList.add('hidden');G.paused=false;" style="border-color:#8A3A3A;margin-top:12px"><div class="perkName">${T('关闭','Close')}</div></div>`;
+  html+=`<div class="perkCard" id="attachClose" style="border-color:#8A3A3A;margin-top:12px"><div class="perkName">${T('关闭','Close')}</div></div>`;
   const p=$('attachP');
   p.innerHTML=html; p.classList.remove('hidden');
+  for(const card of p.querySelectorAll('[data-attachment]')){
+    const id=card.dataset.attachment;
+    if(id) card.onclick=()=>buyAttachment(wk,id);
+  }
+  $('attachClose').onclick=()=>{ p.classList.add('hidden'); G.paused=false; };
   G.paused=true;
 }
 function buyAttachment(wk,id){
@@ -4729,8 +5274,8 @@ function buyAttachment(wk,id){
   showMsg(T('安装了 '+att.n[0],'Installed '+att.n[1]));
   showAttachUI();
 }
-function hasCost(cost){ for(const k in cost){ if((P.inv[k]||0)<cost[k]) return false; } return true; }
-function spendCost(cost){ for(const k in cost){ P.inv[k]-=cost[k]; } refreshHud(); }
+function hasCost(cost){ for(const k in cost){ if(invCount(k)<cost[k]) return false; } return true; }
+function spendCost(cost){ for(const k in cost) removeItem(k,cost[k]); refreshHud(); }
 /* ================= daily quest system ================= */
 const QUEST_POOL=[
   {id:'killZ',  desc:['击杀 {n} 只僵尸','Kill {n} zombies'],         n:[15,25],   rew:{id:'ammo9',q:20},  xp:30},
@@ -4741,6 +5286,8 @@ const QUEST_POOL=[
   {id:'survive',desc:['存活 {n} 分钟','Survive {n} minutes'],         n:[3,5],     rew:{id:'can',q:3},     xp:25},
   {id:'headshot',desc:['爆头击杀 {n} 只僵尸','Headshot {n} zombies'],  n:[5,10],    rew:{id:'ammo762',q:10},xp:35},
   {id:'craft',  desc:['合成 {n} 件物品','Craft {n} items'],           n:[2,4],     rew:{id:'nails',q:5},   xp:20},
+  {id:'purify', desc:['净化 {n} 个腐化巢穴','Purify {n} corruption nests'],n:[1,2],rew:{id:'resin',q:2},xp:45},
+  {id:'killArmored',desc:['击杀 {n} 只装甲尸','Kill {n} armored infected'],n:[2,5],rew:{id:'grenade_round',q:3},xp:40},
 ];
 function rollQuests(){
   G.quests=[]; G.questKills={}; G.questLoot={};
@@ -4755,7 +5302,7 @@ function rollQuests(){
   showBanner(T('新每日任务！按J查看','New Daily Quests! Press J'),'#5A8A6A',2);
 }
 function updateQuestProgress(type,n){
-  for(const q of G.quests){
+  for(const q of (G.quests||[])){
     if(q.done) continue;
     if(q.id===type){ q.progress=Math.min(q.target,q.progress+n); if(q.progress>=q.target){ q.done=true; claimQuest(q); } }
   }
@@ -4783,7 +5330,10 @@ function toggleQuestPanel(){
       </div>`;
     }
     if(G.quests.length===0) html+='<div style="color:#A09884;padding:20px">'+T('暂无任务','No active quests')+'</div>';
-    p.innerHTML=html+'<div style="text-align:center;margin-top:10px"><span class="btn" onclick="toggleQuestPanel()">'+T('关闭 [J/ESC]','Close [J/ESC]')+'</span></div>';
+    p.innerHTML=html;
+    const closeWrap=document.createElement('div'); closeWrap.style.cssText='text-align:center;margin-top:10px';
+    const closeBtn=document.createElement('span'); closeBtn.className='btn'; closeBtn.textContent=T('关闭 [J/ESC]','Close [J/ESC]');
+    closeBtn.onclick=()=>toggleQuestPanel(); closeWrap.appendChild(closeBtn); p.appendChild(closeWrap);
     p.classList.remove('hidden');
     G.paused=true;
   } else { p.classList.add('hidden'); G.paused=false; }
@@ -4933,7 +5483,7 @@ function updateDayNight(dt){
 }
 
 /* ================= supply drop ================= */
-function spawnSupply(){
+function spawnSupply(silent){
   if(G.supply){ scene.remove(G.supply.mesh); G.supply=null; }
   let x=0,z=0,ok=false;
   for(let t=0;t<10&&!ok;t++){
@@ -4951,7 +5501,7 @@ function spawnSupply(){
   g.traverse(o=>{if(o.isMesh&&o.material!==beam.material)o.castShadow=true;});
   scene.add(g);
   G.supply={mesh:g,x,z,beam};
-  showMsg(T('补给空投已落地！查看小地图金点。','Supply drop landed! Check the gold dot.'));
+  if(!silent) showMsg(T('补给空投已落地！查看小地图金点。','Supply drop landed! Check the gold dot.'));
   AU.supply();
 }
 function updateSupply(dt){
@@ -4989,13 +5539,16 @@ const SAVE_KEY='rotwood_save_v2', BEST_KEY='rotwood_best_v1';
 function saveGame(){
   if(G.state!=='play') return;
   const data={
-    v:2, diff:G.diff, wave:G.wave, kills:G.kills, score:G.score, time:G.time, day:G.dayCount, cyc:G.cycleT,
-    waveState:G.waveState, restT:G.restT, spawnQ:G.spawnQ, spawned:G.spawned,
+    v:3, diff:G.diff, wave:G.wave, kills:G.kills, score:G.score, time:G.time, day:G.dayCount, cyc:G.cycleT,
+    waveState:G.waveState, restT:G.restT, spawnQ:G.spawnQ, spawned:G.spawned,spawnTick:G.spawnTick,
     blueprints:G.blueprints,
+    weather:G.weather,bloodMoon:G.bloodMoon,eventT:G.eventT,eventCooldown:G.eventCooldown,achievements:G.achievements,
+    attachments:G.attachments,quests:G.quests,questLootCount:G.questLootCount||0,
+    nests:corruptionNests.map(n=>n.cleansed),wardenDefeated:!!G.wardenDefeated,
     mode:G.mode, labHp:G.labHp, labProgress:G.labProgress, extractX:G.extractX, extractZ:G.extractZ,
     p:{x:P.x,z:P.z,hp:P.hp,hu:P.hunger,th:P.thirst,st:P.stam,inf:P.inf,weapon:P.weapon,hsel:P.hsel,
        mags:P.mags,inv:P.inv,hot:P.hot,invSlots:P.invSlots||8,
-       classId:P.classId||'civilian',skillCd:P.skillCd||0,shield:P.shield||0}
+       classId:P.classId||'civilian',skillCd:P.skillCd||0,shield:P.shield||0,armorRed:P.armorRed||0}
   };
   try{ localStorage.setItem(SAVE_KEY,JSON.stringify(data)); }catch(e){}
 }
@@ -5034,10 +5587,10 @@ addEventListener('keydown',e=>{
     if(k==='j'){ toggleQuestPanel(); AU.ui(); }
     if(k==='Escape'){
       // 关闭所有打开的面板
-      const panels=['questP','invP','craftP','mapP','helpP'];
+      const panels=['questP','attachP','invP','craftP','mapP','helpP'];
       let closed=false;
       for(const pid of panels){ const el=$(pid); if(el&&!el.classList.contains('hidden')){ el.classList.add('hidden'); closed=true; } }
-      if(closed){ G.paused=false; }
+      if(closed){ G.paused=false; return; }
     }
     if(k==='n'){ showAttachUI(); AU.ui(); }
     if(k==='v'){ useClassSkill(); }
@@ -5052,14 +5605,14 @@ addEventListener('keydown',e=>{
         let did=trySearchInterior();
         if(!did) pickupInteriorLoot();
       }
+      else if(G._nearNest){ startNestCleansing(); }
       else if(G._nearSearch){ trySearch(); }
       else if(G._nearTrader){ tryTrade(); }
       else if(G._nearbyLoot){ pickupLoot(G._nearbyLoot); }
       else { const s=P.hot[P.hsel]; if(s&&ITEMS[s.id]&&ITEMS[s.id].use==='food') useHotFood(); }
     }
     if(k==='Escape'||k==='p'){
-      if(!$('invP').classList.contains('hidden')||!$('craftP').classList.contains('hidden')) closePanels();
-      else togglePause();
+      togglePause();
     }
   }
 });
@@ -5171,7 +5724,7 @@ function equipHot(i){
   else if(it.use==='wire'){ P.weapon='wire'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
   else if(it.use==='sandbag'){ P.weapon='sandbag'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
   else if(it.use==='mine'){ P.weapon='mine'; P.atkCd=0; P.reloadT=0; setWeaponMesh(); AU.ui(); }
-  else if(it.use==='food'||it.use==='thirst'||it.use==='heal'){ useHotSlot(i); }
+  else if(['food','thirst','heal','purifier','armor','armor2','expand'].includes(it.use)){ useHotSlot(i); }
   refreshHud();
 }
 function quickSwap(){
@@ -5183,11 +5736,21 @@ function quickSwap(){
 function useHotSlot(i){
   const s=P.hot[i]; if(!s) return;
   const it=ITEMS[s.id];
-  if(it.use==='food'){ P.hunger=clamp(P.hunger+it.v,0,100); if(it.hp) P.hp=clamp(P.hp+it.hp,0,100); AU.eat(); }
+  if(it.use==='food'){ P.hunger=clamp(P.hunger+it.v,0,100); if(it.hp) P.hp=clamp(P.hp+it.hp,0,P.maxHp||100); AU.eat(); }
   else if(it.use==='thirst'){ P.thirst=clamp(P.thirst+it.v,0,100); AU.eat(); }
-  else if(it.use==='heal'){ P.hp=clamp(P.hp+it.v,0,100); P.inf=clamp(P.inf-it.inf,0,100); AU.eat(); }
+  else if(it.use==='heal'){ P.hp=clamp(P.hp+it.v,0,P.maxHp||100); P.inf=clamp(P.inf-(it.inf||0),0,100); AU.eat(); }
+  else if(it.use==='purifier'){ P.hp=clamp(P.hp+it.v,0,P.maxHp||100); P.inf=0; AU.eat(); }
+  else if(it.use==='armor'){ P.armorRed=0.3; AU.craft(); }
+  else if(it.use==='armor2'){ P.armorRed=0.45; AU.craft(); }
+  else if(it.use==='expand'){ P.invSlots=Math.min(16,(P.invSlots||8)+2); AU.craft(); }
   else return;
-  removeFromHot(i,1); refreshHud();
+  removeFromHot(i,1);
+  if(!P.hot[i]){
+    const wi=hotIndex(P.weapon);
+    if(wi>=0) P.hsel=wi;
+    else { P.weapon='fists'; P.hsel=3; setWeaponMesh(); }
+  }
+  refreshHud();
 }
 function useHotFood(){ useHotSlot(P.hsel); }
 function quickBuild(){
@@ -5243,7 +5806,9 @@ const IC={
  axe:'<path d="M7 21L13 9M12 4c3-1.5 7 .5 8 3.5-2.5 1-6 1-8-1z"/>',
  machete:'<path d="M5 19L13 9c3-3.5 7-4 7-4s0 4.5-2.5 7L10 19zM5 19l2 2"/>',
  sledge:'<path d="M8 21L14 10M11 4l8 2.5-1.2 4L10 8z"/>',
+ spear:'<path d="M5 21L17 6M15 4l5-2-2 5M7 16l2 2"/>',
  pistol:'<path d="M4 8h13v5H9l-1 6H5l1-6H4z"/>',
+ revolver:'<path d="M4 8h13v5H9l-1 6H5l1-6H4zM12 8v5M17 9h3"/>',
  shotgun:'<path d="M3 13l9-8M12 5h7M12 13h5M7 17l4-4"/>',
  rifle:'<path d="M3 15l10-9M10 7h11M11 15h8M6 20l4-5M14 11v6"/>',
  smg:'<path d="M3 10h13M12 8l7-1v6l-7-1M9 10v7M15 10l1 5"/>',
@@ -5253,6 +5818,7 @@ const IC={
   shotgun2:'<path d="M3 13l9-8M12 5h7M12 13h5M7 17l4-4M16 5l4 1M16 9l4-1"/>',
   crossbow:'<path d="M5 5l14 14M5 19L19 5M12 2v4M10 4l4 0M12 18v4"/>',
   grenade:'<path d="M12 2v3M9 4l6 0M7 7a5 5 0 0 0 0 10h10a5 5 0 0 0 0-10M7 10h3v4H7M13 10h3v4h-3"/>',
+  grenade_round:'<path d="M9 21V9l3-5 3 5v12M9 17h6M10 8h4"/>',
   bolt:'<path d="M12 2L8 10l4-2 4 2zM12 22l-4-8 4 2 4-2zM6 12l2 0M16 12l2 0"/>',
  molotov:'<path d="M10 3h4M11 3v4l-3 4v7a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-7l-3-4V3M9 13h6"/>',
  barricade:'<path d="M4 18V8M12 18V8M20 18V8M3 10h18M3 15h18"/>',
@@ -5265,6 +5831,8 @@ const IC={
  invExpand:'<path d="M4 7h16v13H4zM4 7l3-3h10l3 3M9 12h6M9 15h4M4 20l-1 2M20 20l1 2"/>',
  backpack:'<path d="M5 8h14v12H5zM5 8l2-3h10l2 3M9 12h6M9 15h4M8 8V5h8v3"/>',
  armor:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4"/>',
+ plated_armor:'<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM8 9h8M8 13h8"/>',
+ purifier:'<path d="M9 3h6M10 3v5l-3 5v7h10v-7l-3-5V3M9 15h6"/>',
  cooked_meat:'<path d="M5 14c0-4 3-7 7-7s7 3 7 7M5 14h14M5 14c0 2 3 4 7 4s7-2 7-4M8 11c0-1 1-2 2-2M14 11c0-1 1-2 2-2"/>',
  can:'<path d="M7 5h10v14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zM7 8h10M10 3h4"/>',
  water:'<path d="M12 3s-6 7-6 11a6 6 0 0 0 12 0c0-4-6-11-6-11z"/>',
@@ -5276,6 +5844,7 @@ const IC={
  wood:'<path d="M4 16h13v4H4zM7 12h13v4H7zM10 8h10v4H10z"/>',
  nails:'<path d="M7 3v13M7 3L5 5M7 3l2 2M7 16l-1.5 5M7 16l1.5 5M13 6v10M13 6l-2 2M13 6l2 2M13 16l-1.5 5M13 16l1.5 5M19 4v12M19 4l-2 2M19 4l2 2M19 16l-1.5 5M19 16l1.5 5"/>',
  scrap:'<circle cx="12" cy="12" r="3.2"/><path d="M12 4v3M12 17v3M4 12h3M17 12h3M6.5 6.5l2 2M15.5 15.5l2 2M17.5 6.5l-2 2M8.5 15.5l-2 2"/>',
+ resin:'<path d="M12 3l6 7-2 9H8l-2-9zM9 11l3-3 3 3-3 5z"/>',
  ammo9:'<path d="M8 20V9a4 5 0 0 1 8 0v11M8 20h8M8 17h8"/>',
  shell:'<path d="M8 20V8a4 4 0 0 1 8 0v12M8 20h8M8 15h8M10 5h4"/>',
  ammo762:'<path d="M7 20V10l5-6 5 6v10M7 20h10M7 16h10"/>',
@@ -5540,6 +6109,8 @@ function resetWorldState(){
   lootEnts.length=0;
   for(const b of bullets){ b.m.visible=false; if(b.m.parent) b.m.parent.remove(b.m); bPool.push(b.m); }
   bullets.length=0;
+  for(const g of grenades){ if(g.m&&g.m.parent) g.m.parent.remove(g.m); }
+  grenades.length=0;
   noises.length=0;
   firePools.length=0;
   if(G.supply){ scene.remove(G.supply.mesh); G.supply=null; }
@@ -5554,6 +6125,8 @@ function resetWorldState(){
   for(const d of dmgPool){ d.life=0; d.el.style.display='none'; }
   for(const b of hpPool){ b.ttl=0; b.brd.visible=b.bg.visible=b.fill.visible=false; }
   mzLight.intensity=0; mzQuad.visible=false; mzCone.visible=false;
+  for(const pid of ['questP','attachP']){ const p=$(pid); if(p) p.classList.add('hidden'); }
+  G._nearNest=null;
 }
 function newGame(from){
   resetWorldState();
@@ -5572,6 +6145,8 @@ function newGame(from){
   G.ally=null; G.allyRescue=null;
   G.inBuilding=null; G._interior=null; G._interiorSearchables=null; G._interiorZombies=null; G._interiorLoot=null; G._interiorSpawnT=null; G._interiorWave=null;
   G.attachments={};
+  G.wardenDefeated=false;
+  resetCorruptionNests();
   G.mode=selectedMode;
   G.victory=false;
   rollQuests(); // 初始任务
@@ -5583,7 +6158,7 @@ function newGame(from){
   Object.assign(P,{x:0,z:6,hp:100,hunger:100,thirst:100,stam:100,inf:0,dir:0,grabT:0,
     atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
     rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,weapon:'fists',lastWpn:null,deadAnim:0,equipT:0,
-    mags:{pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},hsel:3});
+    mags:{pistol:0,revolver:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0,crossbow:0,grenade:0},hsel:3});
   P.inv=new Array(16).fill(null);
   P.invSlots=8; // 初始8格背包，需通过制作扩容到16
   P.armorRed=0; // 重置护甲减伤
@@ -5614,9 +6189,9 @@ function newGame(from){
   }
   setWeaponMesh();
   spawnInitialLoot();
-  for(let i=0;i<4;i++){ const a=R(0,Math.PI*2),r=R(18,26);
+  for(let i=0;i<2;i++){ const a=R(0,Math.PI*2),r=R(32,38);
     spawnZombie('walker',Math.cos(a)*r,Math.sin(a)*r); }
-  spawnSupply();
+  spawnSupply(true);
   // 模式特定设置
   if(G.mode==='survival'){
     // 生存模式：15天后出现撤离点
@@ -5634,7 +6209,6 @@ function newGame(from){
   elHud.classList.remove('hidden');
   closePanels();
   refreshHud();
-  showMsg(T('找到物资，撑过夜晚。','Scavenge. Survive the night.'));
   saveGame();
 }
 function dieGame(){
@@ -5671,10 +6245,18 @@ function continueGame(){
   G.state='play'; G.diff=s.diff||'normal'; G.wave=s.wave||0; G.kills=s.kills||0;
   G.score=s.score||0;
   G.time=s.time||0; G.dayCount=s.day||1; G.cycleT=(s.cyc!==undefined)?s.cyc:0.28;
-  G.waveState=s.waveState||'rest'; G.restT=s.restT||8; G.spawnQ=s.spawnQ||0; G.spawned=s.spawned||0;
-  G.paused=false; G.bloodMoon=false; G.wasNight=false; G.boss=null;
+  G.waveState=s.waveState||'rest'; G.restT=s.restT??8; G.spawnQ=s.spawnQ||0; G.spawned=s.spawned||0; G.spawnTick=s.spawnTick??0.5;
+  G.paused=false; G.bloodMoon=!!s.bloodMoon; G.wasNight=nightFactor()>0.5; G.boss=null;
   G.combo=0; G.comboT=0; G.craftJob=null; G.bannerT=0;
   G.blueprints=s.blueprints||[];
+  G.weather=s.weather||'clear'; G.eventT=s.eventT||0; G.eventCooldown=s.eventCooldown||60;
+  G.achievements=s.achievements||{}; G.attachments=s.attachments||{};
+  G.quests=Array.isArray(s.quests)?s.quests:[]; G.questKills={}; G.questLoot={}; G.questLootCount=s.questLootCount||0;
+  G.trader=null; G.traderT=0; G.ally=null; G.allyRescue=null;
+  G.inBuilding=null; G._interior=null; G._interiorSearchables=null; G._interiorZombies=null; G._interiorLoot=null; G._interiorSpawnT=null; G._interiorWave=null;
+  G.wardenDefeated=!!s.wardenDefeated;
+  resetCorruptionNests(s.nests);
+  if(G.quests.length===0) rollQuests();
   G.mode=s.mode||'endless';
   G.labHp=s.labHp||1000; G.labMaxHp=1000; G.labProgress=s.labProgress||0; G.labTarget=30;
   G.labMesh=null; G.extractMesh=null; G.extractT=0;
@@ -5686,10 +6268,10 @@ function continueGame(){
     spawnExtractionPoint();
   }
   Object.assign(P,{x:s.p.x,z:s.p.z,hp:s.p.hp,hunger:s.p.hu,thirst:s.p.th,stam:s.p.st,inf:s.p.inf,
-    weapon:s.p.weapon||'fists',hsel:s.p.hsel||0,mags:Object.assign({pistol:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0},s.p.mags||{}),
+    weapon:s.p.weapon||'fists',hsel:s.p.hsel||0,mags:Object.assign({pistol:0,revolver:0,shotgun:0,rifle:0,smg:0,flamethrower:0,rocket:0,railgun:0,shotgun2:0,crossbow:0,grenade:0},s.p.mags||{}),
     inv:s.p.inv||new Array(16).fill(null),hot:s.p.hot||[null,null,null,{id:'fists',q:1}],invSlots:s.p.invSlots||8,
     dir:0,grabT:0,atkCd:0,swingT:0,meleeHitT:0,meleeHitW:null,reloadT:0,stepT:0,hurtT:0,crouchT:0,recoilT:0,mzT:0,
-    rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,lastWpn:null,deadAnim:0});
+    rollT:0,rollCd:0,invulnT:0,kbx:0,kbz:0,lastWpn:null,deadAnim:0,armorRed:s.p.armorRed||0});
   // 恢复职业属性
   const cid=s.p.classId||'civilian';
   const cls=CLASSES[cid]||CLASSES.civilian;
@@ -5703,8 +6285,7 @@ function continueGame(){
   P.mesh.rotation.x=0; P.parts.body.rotation.set(0,0,0); P.parts.body.position.y=0;
   setWeaponMesh();
   spawnInitialLoot();
-  for(let i=0;i<3;i++){ const a=R(0,Math.PI*2),r=R(16,24);
-    spawnZombie('walker',Math.cos(a)*r,Math.sin(a)*r); }
+  // The restored wave state will repopulate enemies; do not spawn a free ambush on load.
   $('menu').classList.add('hidden'); $('dead').classList.add('hidden'); $('pause').classList.add('hidden');
   elHud.classList.remove('hidden');
   closePanels();
@@ -5749,6 +6330,7 @@ function loop(){
       updateEvents(dt);
       updateAchievements();
       updateTrader(dt);
+      updateCorruptionNests(dt);
       updateSearchables(dt);
       updateAlly(dt);
       updateEnterable(dt);
@@ -5897,12 +6479,12 @@ function setupMenu(){
     '<b>R</b> 装填 · <b>C</b> 进入/离开建筑 · <b>F</b> 搜查/拾取/吃食物 · <b>H</b> 合成 · <b>Tab</b> 快速切换武器 · <b>Q/E</b> 旋转视角 · <b>滚轮</b> 切换快捷栏 · <b>1-4</b> 快捷栏<br>'+
     '<b>I</b> 背包 · <b>H</b> 合成 · <b>B</b> 快速建造 · <b>N</b> 武器改装 · <b>V</b> 职业技能 · <b>J</b> 任务 · <b>Esc/P</b> 暂停<br>'+
     '白天搜刮物资，夜晚抵御尸潮。枪械噪音会吸引僵尸！<br>'+
-    '每第 4 夜为<b style="color:#743C38">血月</b>，每第 5 波出现<b style="color:#743C38">蛮兽</b>。每天清晨有补给空投。',
+    '每第 4 夜为<b style="color:#743C38">血月</b>，每第 5 波出现 Boss，第 15 波会出现<b style="color:#52634B">腐木守卫</b>。每天清晨有补给空投。',
     '<b>WASD</b> move · <b>Shift</b> sprint · <b>Space</b> dodge roll · <b>Mouse</b> aim/attack<br>'+
     '<b>R</b> reload · <b>C</b> enter/exit building · <b>F</b> search/pick/eat · <b>H</b> crafting · <b>Tab</b> quick-swap weapon · <b>Q/E</b> rotate camera · <b>Wheel</b> cycle hotbar · <b>1-4</b> hotbar<br>'+
     '<b>I</b> inventory · <b>H</b> crafting · <b>B</b> quick build · <b>N</b> weapon mods · <b>V</b> class skill · <b>J</b> quests · <b>Esc/P</b> pause<br>'+
     'Scavenge by day, hold the line by night. Gunfire noise attracts zombies!<br>'+
-    'Every 3rd night is a <b style="color:#743C38">Blood Moon</b>; a <b style="color:#743C38">Brute</b> comes every 5th wave. Supply drops land each dawn.');
+    'Every 4th night is a <b style="color:#743C38">Blood Moon</b>; a boss comes every 5th wave, including the <b style="color:#52634B">Grave Warden</b> on wave 15. Supply drops land each dawn.');
   const b=getBest();
   $('bestTxt').textContent=b?T('最佳纪录：第 '+b.wave+' 波 / 击杀 '+b.kills+' / 得分 '+(b.score||0)+' / 存活 '+fmtTime(b.time),
     'Best: wave '+b.wave+' / kills '+b.kills+' / score '+(b.score||0)+' / '+fmtTime(b.time)):'';
