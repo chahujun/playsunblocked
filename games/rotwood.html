@@ -587,6 +587,10 @@ sun.shadow.camera.top=125; sun.shadow.camera.bottom=-125;
 sun.shadow.camera.far=340; sun.shadow.bias=-0.002;
 scene.add(sun); scene.add(sun.target);
 const amb=new THREE.AmbientLight(0xffffff,0.12); scene.add(amb);
+const flashlight=new THREE.SpotLight(0xFFF1C4,0,34,Math.PI/7,0.42,1.25);
+flashlight.castShadow=false;
+const flashlightTarget=new THREE.Object3D();
+scene.add(flashlight); scene.add(flashlightTarget); flashlight.target=flashlightTarget;
 
 /* shared geometry / material cache */
 const BOX=new THREE.BoxGeometry(1,1,1);
@@ -625,6 +629,7 @@ const spikesArr=[];   // {m,x,z,hw,hd,hp}
 const wireArr=[];     // {m,x,z,hw,hd,hp}
 const mineArr=[];     // {m,x,z,hw,hd}
 const firePools=[];   // {x,z,r,life,dmg,tickT}
+const acidPools=[];   // {x,z,r,life,dmg,tickT}
 const lamps=[];
 const lootSpots=[];
 const lootEnts=[];    // {m,x,z,id,qty,bob}
@@ -1049,37 +1054,36 @@ function spawnEnterable(x,z,type){
   roof.scale.set(w*1.08,1.5,d*1.08); roof.position.set(0,4.75,0); roof.rotation.y=Math.PI/4;
   roof.castShadow=true; shell.add(roof);
   // 门（绿色发光标识可进入）
-  const door=bx(2,3,0.15,0x2A5A3A,0,1.5,-d/2-0.02,shell,false);
+  const door=bx(2,3,0.15,0x2A5A3A,0,1.5,d/2+0.02,shell,false);
   // 门上方金色标记
-  bx(2.5,0.4,0.15,0xD4A84B,0,3.2,-d/2-0.02,shell,false);
+  bx(2.5,0.4,0.15,0xD4A84B,0,3.2,d/2+0.02,shell,false);
   // 窗户
   for(const s of [-1,1]){
-    const winMesh=bx(1.2,1.2,0.15,0x2E3A45,s*w/3,2.5,-d/2+0.02,shell,false);
+    const winMesh=bx(1.2,1.2,0.15,0x2E3A45,s*w/3,2.5,d/2+0.02,shell,false);
     windowGlow.push(winMesh);
   }
   shell.position.set(x,0,z); scene.add(shell);
-  // 障碍物：只在左右两侧和后方设置，门前留通道让玩家可以靠近
+  // Four collision walls with a centered doorway on the camera-facing side.
   addObstacle(x-w/2-0.3,z,0.3,d/2); // 左墙
   addObstacle(x+w/2+0.3,z,0.3,d/2); // 右墙
   addObstacle(x,z-d/2-0.3,w/2,0.3);  // 后墙
-  enterableBuildings.push({x,z,w,d,type,label,entered:false,door,shell});
+  const frontHalf=w/4-0.65;
+  addObstacle(x-(w/4+0.65),z+d/2+0.3,frontHalf,0.3);
+  addObstacle(x+(w/4+0.65),z+d/2+0.3,frontHalf,0.3);
+  const doorX=x, doorZ=z+d/2+1.15;
+  enterableBuildings.push({x,z,w,d,type,label,entered:false,door,shell,doorX,doorZ});
 }
 function enterBuilding(b){
-  if(G.inBuilding) return;
+  if(G.inBuilding||(G.buildingCd||0)>0) return;
   G.inBuilding=b;
+  G.buildingCd=0.8;
   G._prevPos={x:P.x,z:P.z};
   // 隐藏建筑外壳
   b.shell.visible=false;
   // 在独立室内场景中构建内部
   buildInterior(b);
   // 玩家位置重置到室内门口
-  P.x=0; P.z=b.d/2-1;
-  // 清除附近僵尸（它们不应该跟着进室内）
-  for(let i=zombies.length-1;i>=0;i--){
-    if(Math.hypot(zombies[i].x-G._prevPos.x,zombies[i].z-G._prevPos.z)<15){
-      scene.remove(zombies[i].mesh); zombies.splice(i,1);
-    }
-  }
+  P.x=0; P.z=b.d/2-1.4; P.kbx=0; P.kbz=0; P.rollT=0;
   // 添加玩家模型到室内场景
   if(P.mesh) interiorScene.add(P.mesh);
   // 生成室内僵尸（根据建筑面积决定数量）
@@ -1110,6 +1114,13 @@ function spawnInteriorZombie(x,z,type){
   const zt=type||'walker';
   const c=ZT[zt]||ZT.walker;
   const df=DIFF[G.diff];
+  if(blockedInteriorAt(x,z,0.45)){
+    const w=G.inBuilding.w-1,d=G.inBuilding.d-1;
+    for(let tries=0;tries<30;tries++){
+      const nx=R(-w/2+0.7,w/2-0.7),nz=R(-d/2+0.7,d/2-2);
+      if(!blockedInteriorAt(nx,nz,0.45)){ x=nx; z=nz; break; }
+    }
+  }
   const zb={x,z,hp:c.hp*df.hp,maxHp:c.hp*df.hp,spd:c.spd*df.spd*0.6,dmg:c.dmg*df.dmg*0.8,dir:0,atkCd:0,state:'chase',mesh:null,type:zt,c,flash:0};
   const g=new THREE.Group();
   const body=new THREE.Mesh(BOX,new THREE.MeshLambertMaterial({color:c.shirt}));
@@ -1171,15 +1182,19 @@ function updateInteriorZombies(dt){
     const dx=P.x-zb.x, dz=P.z-zb.z;
     const dist=Math.hypot(dx,dz)||1;
     if(dist>0.8){
+      const dirX=dx/dist,dirZ=dz/dist,sv=steerInterior(zb.x,zb.z,dirX,dirZ,0.34);
       const sp=zb.spd*dt;
-      zb.x+=dx/dist*sp; zb.z+=dz/dist*sp;
+      zb.x+=sv[0]*sp; zb.z+=sv[1]*sp;
     } else {
       // 攻击玩家
       zb.atkCd-=dt;
       if(zb.atkCd<=0){ zb.atkCd=1.0; damagePlayer(zb.dmg,RI(3,8)); G.shake=0.3; }
     }
-    zb.x=clamp(zb.x,-w/2+0.3,w/2-0.3);
-    zb.z=clamp(zb.z,-d/2+0.3,d/2-0.3);
+    for(const other of G._interiorZombies){ if(other===zb) continue;
+      const sx=zb.x-other.x,sz=zb.z-other.z,sd=Math.hypot(sx,sz);
+      if(sd<0.65&&sd>0.001){ zb.x+=sx/sd*dt; zb.z+=sz/sd*dt; }
+    }
+    resolveInteriorCollision(zb,0.34);
     zb.dir=Math.atan2(dx,dz);
     zb.mesh.position.set(zb.x,0,zb.z);
     zb.mesh.rotation.y=zb.dir;
@@ -1192,9 +1207,10 @@ function spawnInteriorLoot(x,z){
   G._interiorLoot.push({mesh,x,z,id,qty:1});
 }
 function exitBuilding(){
-  if(!G.inBuilding) return;
+  if(!G.inBuilding||(G.buildingCd||0)>0) return;
   // 移除室内场景所有物体
   if(G._interior){ for(const m of G._interior) interiorScene.remove(m); G._interior=null; }
+  G._interiorObstacles=null;
   // 恢复建筑外壳显示
   G.inBuilding.shell.visible=true;
   // 玩家模型移回主场景
@@ -1205,14 +1221,23 @@ function exitBuilding(){
   G._interiorSpawnT=undefined; G._interiorWave=undefined; // 清除刷新计时器
   // 恢复玩家位置（在门外）
   const b=G.inBuilding;
-  P.x=b.x; P.z=b.z+b.d/2+2;
+  const outside=findOpenPosition(b.doorX,b.doorZ+0.8,0.45);
+  P.x=outside.x; P.z=outside.z; P.kbx=0; P.kbz=0; P.rollT=0;
   showMsg(T('离开了建筑','Left the building'));
   G.inBuilding=null;
+  G.buildingCd=0.8;
 }
 function buildInterior(b){
   G._interior=[];
+  G._interiorObstacles=[];
   // addM: 确保mesh加入interiorScene和清理数组（bx已自动加入interiorScene，这里只做去重+push）
   const addM=(m)=>{ if(G._interior.indexOf(m)<0) G._interior.push(m); return m; };
+  const furn=(fw,fh,fd,col,x,y,z,solid=true)=>{
+    const m=addM(bx(fw,fh,fd,col,x,y,z,interiorScene,false));
+    if(solid) G._interiorObstacles.push({x,z,hw:fw/2,hd:fd/2});
+    return m;
+  };
+  const interiorBlocked=(x,z,rad)=>G._interiorObstacles.some(o=>Math.abs(x-o.x)<o.hw+rad&&Math.abs(z-o.z)<o.hd+rad);
   const w=b.w-1, d=b.d-1; // 内部略小
   // 地板（浅色木地板）
   const floor=new THREE.Mesh(new THREE.PlaneGeometry(w,d),mat(0x6B6052));
@@ -1228,6 +1253,12 @@ function buildInterior(b){
   // 前墙（分两段，中间留门）—— 降低到1.5高度，避免遮挡俯视角相机视野
   addM(bx(w/2-1,1.5,0.2,wallC,-(w/4+0.5),0.75,d/2,interiorScene,false));
   addM(bx(w/2-1,1.5,0.2,wallC,(w/4+0.5),0.75,d/2,interiorScene,false));
+  // Baseboards, doorway mat and ceiling beams add scale without blocking movement.
+  furn(w-0.4,0.12,0.12,0x51483D,0,0.08,-d/2+0.12,false);
+  furn(0.12,0.12,d-0.4,0x51483D,-w/2+0.12,0.08,0,false);
+  furn(0.12,0.12,d-0.4,0x51483D,w/2-0.12,0.08,0,false);
+  furn(2.2,0.04,1.1,0x4D3F35,0,0.05,d/2-1.0,false);
+  for(const bx0 of [-w/4,w/4]) furn(0.12,0.12,d-0.5,0x6A5C4B,bx0,wallH-0.2,0,false);
   // 内部灯光（多个点光源，确保全屋照亮）
   const il=new THREE.PointLight(0xFFE8C0,2.5,25,1.0); il.position.set(0,wallH-0.3,0); interiorScene.add(il); addM(il);
   const il2=new THREE.PointLight(0xFFE0A0,2.0,20,1.0); il2.position.set(-w/4,wallH-0.3,-d/4); interiorScene.add(il2); addM(il2);
@@ -1235,67 +1266,100 @@ function buildInterior(b){
   // 根据类型布置内部
   if(b.type==='police'){
     // 警察局：办公桌+武器柜+证据柜
-    addM(bx(2,1,1,0x5A4A3A,-w/3,0.5,0,interiorScene,false));
-    addM(bx(1.5,2,0.6,0x3A3A38,w/3,1,d/4,interiorScene,false));
+    furn(2,1,1,0x5A4A3A,-w/3,0.5,0);
+    furn(1.5,2,0.6,0x3A3A38,w/3,1,d/4);
     G._interiorGunCab=true;
-    addM(bx(1.5,2,0.6,0x4A4A38,w/3,1,-d/4,interiorScene,false));
-    addM(bx(0.5,0.5,0.5,0x3A3A38,-w/3,0.25,-1,interiorScene,false));
+    furn(1.5,2,0.6,0x4A4A38,w/3,1,-d/4);
+    furn(0.5,0.5,0.5,0x3A3A38,-w/3,0.25,-1);
+    furn(0.7,0.45,0.08,0x1F2529,-w/3,1.18,-0.18,false);
+    furn(0.45,0.04,0.32,0xD8D0BE,-w/3-0.45,1.03,0.15,false);
   } else if(b.type==='supermarket'){
     // 超市：货架+收银台
     for(let i=0;i<3;i++){
-      addM(bx(0.6,2,3,0x5A5A52,-w/3+i*(w/3),1,0,interiorScene,false));
+      furn(0.6,2,3,0x5A5A52,-w/3+i*(w/3),1,0);
       for(let j=0;j<3;j++){
         addM(bx(0.5,0.1,2.5,pick([0x8A6A3A,0x4A6A4A,0x6A4A4A]),-w/3+i*(w/3),0.5+j*0.6,0,interiorScene,false));
       }
     }
-    addM(bx(2,1,0.8,0x4A5A6A,0,0.5,-d/3,interiorScene,false));
+    furn(2,1,0.8,0x4A5A6A,0,0.5,-d/3);
+    for(let i=-1;i<=1;i++) furn(0.22,0.18,0.35,pick([0xA04A3A,0xD1A34B,0x5E8B55]),i*0.48,1.1,-d/3,false);
   } else if(b.type==='pharmacy'){
     // 药房：药柜+柜台+药品架
     for(let i=0;i<2;i++){
-      addM(bx(1.2,2.5,0.5,0xE8E0D0,-w/3+i*(w/1.5),1.25,-d/3,interiorScene,false));
+      furn(1.2,2.5,0.5,0xE8E0D0,-w/3+i*(w/1.5),1.25,-d/3);
     }
-    addM(bx(2,1,0.8,0x7A8A7A,0,0.5,d/3,interiorScene,false));
+    furn(2,1,0.8,0x7A8A7A,0,0.5,d/3);
+    for(let i=-2;i<=2;i++) furn(0.12,0.22,0.12,pick([0xD5D8CF,0x6F9D78,0xB47770]),i*0.3,1.12,d/3,false);
   } else if(b.type==='gunshop'){
     // 枪店：武器展示柜+弹药架
-    addM(bx(3,1.2,0.6,0x4A3828,0,0.6,-d/3,interiorScene,false));
+    furn(3,1.2,0.6,0x4A3828,0,0.6,-d/3);
     addM(bx(3,0.8,0.1,0x4A6A8A,0,1.2,-d/3+0.3,interiorScene,false));
     G._interiorGunCab=true;
-    addM(bx(2,2,0.4,0x3A3A38,w/3,1,d/3,interiorScene,false));
+    furn(2,2,0.4,0x3A3A38,w/3,1,d/3);
   } else if(b.type==='house'){
     // 居民屋：床+衣柜+餐桌+电视+厨房
-    addM(bx(1.5,0.5,2,0x4A5A6A,-w/3,0.25,-d/4,interiorScene,false));
+    furn(1.5,0.5,2,0x4A5A6A,-w/3,0.25,-d/4);
     addM(bx(0.5,0.3,0.5,0xE5DDC8,-w/3,0.65,-d/4+0.8,interiorScene,false));
-    addM(bx(1.2,2,0.5,0x5A4A3A,w/3,1,-d/3,interiorScene,false));
-    addM(bx(1.2,0.8,0.8,0x6B5B40,0,0.4,d/4,interiorScene,false));
-    addM(bx(0.4,0.5,0.4,0x5A4A30,-0.5,0.25,d/4,interiorScene,false));
-    addM(bx(0.4,0.5,0.4,0x5A4A30,0.5,0.25,d/4,interiorScene,false));
-    addM(bx(1.5,0.6,0.4,0x3A3A38,0,0.3,-d/2+0.3,interiorScene,false));
+    furn(1.2,2,0.5,0x5A4A3A,w/3,1,-d/3);
+    furn(1.2,0.8,0.8,0x6B5B40,0,0.4,d/4);
+    furn(0.4,0.5,0.4,0x5A4A30,-0.5,0.25,d/4);
+    furn(0.4,0.5,0.4,0x5A4A30,0.5,0.25,d/4);
+    furn(1.5,0.6,0.4,0x3A3A38,0,0.3,-d/2+0.3);
     addM(bx(1.0,0.6,0.1,0x1A1A18,0,0.9,-d/2+0.25,interiorScene,false));
-    addM(bx(1.5,0.9,0.5,0x6B6B6B,w/3,0.45,d/3,interiorScene,false));
+    furn(1.5,0.9,0.5,0x6B6B6B,w/3,0.45,d/3);
+    furn(0.7,0.04,0.45,0x7A2F2A,0,0.83,d/4,false);
   } else if(b.type==='shop'){
     // 商店：货架+柜台+展示架
     for(let i=0;i<2;i++){
-      addM(bx(0.6,2,2.5,0x5A5A52,-w/3+i*(w/1.5),1,0,interiorScene,false));
+      furn(0.6,2,2.5,0x5A5A52,-w/3+i*(w/1.5),1,0);
       for(let j=0;j<3;j++){
         addM(bx(0.5,0.1,2.3,pick([0x8A6A3A,0x4A6A4A,0x6A4A4A,0x8A4A3A]),-w/3+i*(w/1.5),0.5+j*0.55,0,interiorScene,false));
       }
     }
-    addM(bx(2,1,0.7,0x4A5A6A,0,0.5,-d/3,interiorScene,false));
-    addM(bx(1.2,0.8,0.6,0x4A6A8A,w/3,0.4,d/3,interiorScene,false));
+    furn(2,1,0.7,0x4A5A6A,0,0.5,-d/3);
+    furn(1.2,0.8,0.6,0x4A6A8A,w/3,0.4,d/3);
+  } else if(b.type==='hospital'){
+    for(let i=0;i<3;i++){
+      const hz=-d/3+i*d/3;
+      furn(2.2,0.55,0.95,0xD8DDE0,-w/4,0.35,hz);
+      furn(0.55,0.18,0.8,0xB9C9D4,-w/4-0.7,0.7,hz,false);
+      furn(0.55,0.8,0.45,0x6C777A,w/4,0.4,hz);
+    }
+    furn(2.5,1,0.75,0x71878A,0,0.5,-d/2+1.2);
+    furn(0.7,0.5,0.08,0x263B42,0,1.15,-d/2+1.2,false);
+  } else if(b.type==='school'){
+    for(let row=0;row<3;row++) for(let col=-1;col<=1;col++){
+      furn(1.1,0.65,0.6,0x6B503A,col*2.2,0.35,-d/3+row*1.8);
+      furn(0.8,0.7,0.18,0x554131,col*2.2,0.5,-d/3+row*1.8+0.65);
+    }
+    furn(5,1.8,0.12,0x263A32,0,1.75,-d/2+0.2,false);
+    furn(2.2,0.9,0.8,0x6A4E35,0,0.45,d/3);
+  } else if(b.type==='mall'){
+    for(const mx of [-w/3,w/3]){
+      furn(2.8,1.05,1.5,0x5E6468,mx,0.55,-d/4);
+      furn(2.8,0.12,1.5,0x9A7651,mx,1.12,-d/4,false);
+    }
+    furn(3.2,0.65,0.7,0x4F5D55,0,0.35,d/4);
+    for(let i=-2;i<=2;i++) furn(0.35,0.55,0.35,pick([0x8E4A45,0x4E7A69,0xB08A50]),i*0.55,0.95,d/4,false);
+    furn(1.8,0.45,0.8,0x674D3B,0,0.25,0);
   } else {
     // 仓库：货架+箱子
     for(let i=0;i<2;i++){
-      addM(bx(0.8,2.5,2,0x5A4A30,-w/4+i*(w/2),1.25,0,interiorScene,false));
+      furn(0.8,2.5,2,0x5A4A30,-w/4+i*(w/2),1.25,0);
     }
     for(let i=0;i<4;i++){
-      addM(bx(0.8,0.8,0.8,pick([0x6B5B40,0x5A4A30]),R(-w/3,w/3),0.4,R(-d/3,d/3),interiorScene,false));
+      furn(0.8,0.8,0.8,pick([0x6B5B40,0x5A4A30]),R(-w/3,w/3),0.4,R(-d/3,d/3));
     }
   }
   // 内部可搜查容器
   G._interiorSearchables=[];
-  const numSearch=RI(2,4);
+  const numSearch=RI(2,3);
   for(let i=0;i<numSearch;i++){
-    const sx=R(-w/2+1,w/2-1), sz=R(-d/2+1,d/2-1);
+    let sx=0,sz=0;
+    for(let tries=0;tries<24;tries++){
+      const tx=R(-w/2+1,w/2-1),tz=R(-d/2+1,d/2-1.5);
+      if(!interiorBlocked(tx,tz,0.75)&&Math.hypot(tx,tz-(d/2-1.4))>2.2){ sx=tx; sz=tz; break; }
+    }
     const stype=pick(['crate','cabinet','locker']);
     let mesh;
     if(stype==='crate'){
@@ -1305,7 +1369,8 @@ function buildInterior(b){
     } else {
       mesh=bx(0.8,2,0.5,0x4A6A5A,sx,1,sz,interiorScene,false); addM(mesh);
     }
-    const loot=b.type==='gunshop'?pick(['ammo9','ammo762','shell','rifle','pistol','smg']):
+    G._interiorObstacles.push({x:sx,z:sz,hw:stype==='crate'?0.4:0.38,hd:stype==='crate'?0.4:0.3});
+    const loot=b.type==='gunshop'?(Math.random()<0.14?pick(['pistol','smg','shotgun']):pick(['ammo9','ammo762','shell','scrap'])):
               b.type==='pharmacy'?pick(['medkit','bandage','water']):
               b.type==='police'?pick(['ammo9','ammo762','shell','bandage','medkit','crowbar']):
               b.type==='supermarket'?pick(['can','water','cloth','scrap']):
@@ -1314,6 +1379,31 @@ function buildInterior(b){
               pick(['scrap','nails','wood','can','water']);
     G._interiorSearchables.push({mesh,x:sx,z:sz,type:stype,searched:false,loot});
   }
+}
+function blockedInteriorAt(x,z,rad){
+  return (G._interiorObstacles||[]).some(o=>Math.abs(x-o.x)<o.hw+rad&&Math.abs(z-o.z)<o.hd+rad);
+}
+function resolveInteriorCollision(ent,rad){
+  if(!G.inBuilding) return;
+  const w=G.inBuilding.w-1,d=G.inBuilding.d-1;
+  ent.x=clamp(ent.x,-w/2+rad,w/2-rad); ent.z=clamp(ent.z,-d/2+rad,d/2-rad);
+  for(let pass=0;pass<2;pass++) for(const o of G._interiorObstacles||[]){
+    const dx=ent.x-o.x,dz=ent.z-o.z,ox=Math.abs(dx)-o.hw,oz=Math.abs(dz)-o.hd;
+    if(ox<rad&&oz<rad){
+      const penX=rad-ox,penZ=rad-oz;
+      if(penX<penZ) ent.x=o.x+Math.sign(dx||1)*(o.hw+rad);
+      else ent.z=o.z+Math.sign(dz||1)*(o.hd+rad);
+    }
+  }
+  ent.x=clamp(ent.x,-w/2+rad,w/2-rad); ent.z=clamp(ent.z,-d/2+rad,d/2-rad);
+}
+function steerInterior(x,z,mvx,mvz,rad){
+  if(!blockedInteriorAt(x+mvx*0.9,z+mvz*0.9,rad)) return [mvx,mvz];
+  for(const a of [Math.PI/4,-Math.PI/4,Math.PI/2,-Math.PI/2,Math.PI*3/4,-Math.PI*3/4]){
+    const ca=Math.cos(a),sa=Math.sin(a),rx=mvx*ca-mvz*sa,rz=mvx*sa+mvz*ca;
+    if(!blockedInteriorAt(x+rx*0.9,z+rz*0.9,rad)) return [rx,rz];
+  }
+  return [0,0];
 }
 function trySearchInterior(){
   if(!G.inBuilding||!G._interiorSearchables) return false;
@@ -1333,11 +1423,13 @@ function trySearchInterior(){
   return false;
 }
 function updateEnterable(dt){
+  G.buildingCd=Math.max(0,(G.buildingCd||0)-dt);
   if(G.inBuilding){
     // 限制玩家在室内
     const w=G.inBuilding.w-1, d=G.inBuilding.d-1;
     P.x=clamp(P.x,-w/2+0.5,w/2-0.5);
     P.z=clamp(P.z,-d/2+0.5,d/2-0.5);
+    resolveInteriorCollision(P,0.35);
     // 检查附近可搜查容器
     G._nearSearch=null;
     for(const s of G._interiorSearchables||[]){
@@ -1354,8 +1446,8 @@ function updateEnterable(dt){
   // 检查是否在可进入建筑门口
   G._nearBuilding=null;
   for(const b of enterableBuildings){
-    const dist=Math.hypot(P.x-b.x,P.z-b.z);
-    if(dist<3.5){ G._nearBuilding=b; break; }
+    const dist=Math.hypot(P.x-b.doorX,P.z-b.doorZ);
+    if(dist<2.35){ G._nearBuilding=b; break; }
   }
 }
 function pickupInteriorLoot(){
@@ -1841,6 +1933,8 @@ function buildWorld(){
 }
 
 /* ================= player ================= */
+// Gameplay vectors use +Z as forward, while the handcrafted player mesh faces local -Z.
+const PLAYER_MODEL_YAW_OFFSET=Math.PI;
 const P={ x:0,z:6, hp:100,maxHp:100,hunger:100,thirst:100,stam:100,inf:0,
   spd:5.2, dir:0, moving:false, sprint:false, moveFwd:0,moveStrafe:0,grabT:0,
   atkCd:0, swingT:0, swingMax:0.45, meleeHitT:0, meleeHitW:null,
@@ -2009,13 +2103,16 @@ function setWeaponMesh(){
 const ZT={
  walker:  {hp:65, spd:2.2, dmg:14, scale:1.0, skin:0x6B8A6A, shirt:0x4A5A3A, pants:0x3A4A2A, score:10, n:['行尸','Walker']},
  runner:  {hp:45, spd:4.5, dmg:12, scale:0.95, skin:0x7A9A6A, shirt:0x5A6A3A, pants:0x4A5A2A, score:15, n:['疾行尸','Runner']},
- bloater: {hp:140, spd:1.4, dmg:18, scale:1.25, skin:0x8A9A6A, shirt:0x5A4A3A, pants:0x4A3A2A, explode:1, score:25, n:['肿胀尸','Bloater']},
+ bloater: {hp:140, spd:1.4, dmg:18, scale:1.25, skin:0x8A9A6A, shirt:0x5A4A3A, pants:0x4A3A2A, explode:1,explodeR:4.2,explodeDmg:34,score:25,n:['肿胀尸','Bloater']},
+ bomber:  {hp:78,spd:2.75,dmg:16,scale:1.08,skin:0x93734D,shirt:0x7A332D,pants:0x3B3028,explode:1,bomber:1,explodeR:5.0,explodeDmg:48,score:42,n:['自爆尸','Bomber']},
  crawler: {hp:48, spd:1.3, dmg:10, scale:0.9, skin:0x6B7A5A, shirt:0x4A5A4A, pants:0x3A4A3A, crawl:1, grab:1, score:12, n:['爬行尸','Crawler']},
  screamer:{hp:55, spd:2.8, dmg:10, scale:1.0, skin:0x9A8A6A, shirt:0x6A5A3A, pants:0x5A4A2A, scream:1, score:15, n:['尖啸尸','Screamer']},
  tank:    {hp:350, spd:1.3, dmg:38, scale:1.45, skin:0x5A6B5A, shirt:0x3A4A3A, pants:0x2A3A2A, stomp:1, score:60, n:['巨坦尸','Tank']},
  survivor:{hp:95, spd:3.0, dmg:22, scale:1.0, skin:0x8A7A6A, shirt:0x5A4A3A, pants:0x4A3A2A, armed:1, score:30, n:['感染幸存者','Survivor']},
  brute:   {hp:700, spd:1.4, dmg:50, scale:1.7, skin:0x4A5A4A, shirt:0x3A4A3A, pants:0x2A3A2A, stomp:1, boss:1, score:300, n:['蛮兽','Brute']},
  spitter: {hp:85, spd:2.0, dmg:18, scale:1.0, skin:0x6B8A4A, shirt:0x44AA44, pants:0x2E3E2A, ranged:1, score:35, n:['喷吐者','Spitter']},
+ acid:    {hp:105,spd:1.85,dmg:16,scale:1.04,skin:0x82A84D,shirt:0x3F7138,pants:0x273C29,ranged:1,acid:1,score:48,n:['酸液尸','Acid Infected']},
+ storm:   {hp:125,spd:2.15,dmg:20,scale:1.06,skin:0x667E9C,shirt:0x344E72,pants:0x263449,storm:1,score:58,n:['闪电尸','Storm Infected']},
  brute2:  {hp:320, spd:1.8, dmg:40, scale:1.3, skin:0x5A5A4A, shirt:0x3A3A2A, pants:0x2A2A1A, kb:0.2, score:60, n:['蛮兵','Brute2']},
  leaper:  {hp:80, spd:2.8, dmg:32, scale:0.9, skin:0x7A8A5A, shirt:0x5A6A3A, pants:0x4A5A2A, leap:1, score:40, n:['跳跃者','Leaper']},
  necro:   {hp:130, spd:1.1, dmg:20, scale:1.1, skin:0x6A5A7A, shirt:0x4A3A5A, pants:0x3A2A3A, summon:1, score:55, n:['唤尸者','Necromancer']},
@@ -2051,7 +2148,7 @@ function makeZombieMesh(t){
   const rLeg=new THREE.Group(); rLeg.position.set(0.16*s,c.crawl?0.3:legH,c.crawl?-0.15:0); g.add(rLeg);
   bx(0.2*s,legH*s,0.22*s,c.pants,0,-legH*s/2,0,rLeg);
   if(c.armed){ const wp=bx(0.07,0.7,0.07,0x5B5C57,0,-0.5,-0.25,rArm); wp.rotation.x=0.4; }
-  if(c.ranged){
+  if(c.ranged&&!c.acid){
     bx(0.08*s,0.1*s,0.58*s,0x343733,0,-0.48*s,0.02*s,rArm);
     bx(0.06*s,0.2*s,0.08*s,0x292B28,0,-0.62*s,0.18*s,rArm);
   }
@@ -2064,12 +2161,23 @@ function makeZombieMesh(t){
     sph(0.82*s,1.0*s,0.7*s,0x768257,0,torsoY-0.05*s,0.08*s,g);
     bx(0.3*s,0.1*s,0.12*s,0x9A6A4A,0,torsoY-0.05*s,0.4*s,g,false);
   }
+  if(c.bomber){
+    sph(0.62*s,0.72*s,0.58*s,0x86413B,0,torsoY,0.08*s,g);
+    for(let i=0;i<3;i++) bx(0.48*s,0.055*s,0.6*s,0xD05A38,0,torsoY+(i-1)*0.2*s,0.08*s,g,false);
+  }
   let sacs=null,jaw=null,core=null;
-  if(t==='spitter'){
+  if(t==='spitter'||c.acid){
     const s1=sph(0.34*s,0.42*s,0.28*s,0x5F8D4A,-0.25*s,torsoY+0.05*s,0.25*s,g);
     const s2=sph(0.34*s,0.42*s,0.28*s,0x75A353,0.25*s,torsoY+0.05*s,0.25*s,g);
     s1.userData.baseScale=s1.scale.clone(); s2.userData.baseScale=s2.scale.clone();
     sacs=[s1,s2];
+  }
+  if(c.storm){
+    const stormMat=new THREE.MeshLambertMaterial({color:0x76A9D8,emissive:0x244C78,emissiveIntensity:1.5});
+    core=new THREE.Mesh(SPH,stormMat); core.scale.set(0.22*s,0.28*s,0.15*s);
+    core.position.set(0,torsoY+0.08*s,0.25*s); core.castShadow=true; g.add(core);
+    const coil=new THREE.Mesh(new THREE.TorusGeometry(0.32*s,0.035*s,5,14),new THREE.MeshBasicMaterial({color:0xA8D8FF}));
+    coil.position.set(0,torsoY+0.08*s,0.28*s); g.add(coil);
   }
   if(t==='screamer'){
     jaw=bx(0.28*s,0.16*s,0.25*s,0x382723,0,head.position.y-0.2*s,0.17*s,g);
@@ -2132,18 +2240,21 @@ function makeZombieMesh(t){
 function spawnZombie(type,x,z){
   if(zombies.length>=MAX_Z&&!ZT[type].boss) return null;
   const c=ZT[type], df=DIFF[G.diff];
+  const open=findOpenPosition(x,z,0.5*c.scale);
+  x=open.x; z=open.z;
   const mesh=makeZombieMesh(type);
   mesh.position.set(x,-1.2,z);
   scene.add(mesh);
   const zb={ id:zid++, type, c, mesh,
     x, z, hp:c.hp*df.hp, maxhp:c.hp*df.hp,
     spd:c.spd*df.spd, dmg:c.dmg*df.dmg,
-    state:'idle', dir:R(0,Math.PI*2), idleT:R(1,3), atkCd:0, atkAnimT:0,
+    state:'chase', dir:R(0,Math.PI*2), idleT:R(1,3), atkCd:0, atkAnimT:0,
     tx:0, tz:0, invT:0, lastX:0, lastZ:0, loseT:0,
     flash:0, dead:0, deadT:0, ph:R(0,6), groanT:R(2,9), screamed:0,
     stomping:0, stompCd:R(1,3), lungeT:0, lungeCd:0, lungeHit:0, ldx:0, ldz:0,
     rise:1.0, kbx:0, kbz:0, spkCd:0,
-    spitCd:R(2,4), spitting:0, spitHit:0 };
+    spitCd:R(2,4), spitting:0, spitHit:0, fusing:0, fuseT:0, stormCd:R(2.5,5), stormT:0,
+    stuckT:0, stuckX:x, stuckZ:z };
   zombies.push(zb);
   return zb;
 }
@@ -2160,7 +2271,7 @@ function killZombie(zb){
   // 任务进度
   updateQuestProgress('killZ',1);
   if(zb.type==='runner') updateQuestProgress('killRun',1);
-  if(zb.type==='spitter') updateQuestProgress('killSpit',1);
+  if(zb.type==='spitter'||zb.type==='acid') updateQuestProgress('killSpit',1);
   if(zb.type==='armored') updateQuestProgress('killArmored',1);
   if(zb._headshot) updateQuestProgress('headshot',1);
   // XP 经验值
@@ -2174,17 +2285,18 @@ function killZombie(zb){
   if(G.combo>=2) AU.combo(G.combo);
   bloodBurst(zb.x,1.0,zb.z,10);
   if(zb.c.explode){
+    const blastR=zb.c.explodeR||4.2, blastDmg=zb.c.explodeDmg||34;
     AU.explode();
     bloodBurst(zb.x,1.2,zb.z,26,0x7A8A55);
-    showRing(zb.x,zb.z,4.2,0xC04038,0.3,null);
+    showRing(zb.x,zb.z,blastR,0xC04038,0.3,null);
     const dp=Math.hypot(P.x-zb.x,P.z-zb.z);
-    if(dp<4.2){ damagePlayer(34*(1-dp/5.5),0); G.shake=Math.max(G.shake,0.5); }
+    if(dp<blastR){ damagePlayer(blastDmg*(1-dp/(blastR+1.3)),0); G.shake=Math.max(G.shake,0.5); }
     for(const o of zombies){ if(o!==zb&&!o.dead){
       const d=Math.hypot(o.x-zb.x,o.z-zb.z);
-      if(d<4.2) hitZombie(o,55,zb.x,zb.z,0.5);
+      if(d<blastR) hitZombie(o,blastDmg*1.25,zb.x,zb.z,0.5);
     }}
     for(let i=barricades.length-1;i>=0;i--){ const b=barricades[i];
-      if(Math.hypot(b.x-zb.x,b.z-zb.z)<4.2) damageBarricade(b,80,i); }
+      if(Math.hypot(b.x-zb.x,b.z-zb.z)<blastR) damageBarricade(b,blastDmg*1.7,i); }
   }
   // drops - 拾荒直觉技能提升掉落率
   const lootBoost=P.lootBonusT>0;
@@ -2211,19 +2323,19 @@ function killZombie(zb){
       checkAch('brute1');
     }
   }
-  else if(roll<(lootBoost?0.45:0.35)) dropLoot(zb.x,zb.z,pick(['can','water','bandage','cloth','wood']),1);
-  else if(roll<(lootBoost?0.75:0.60)) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(8,16));
-  else if(roll<(lootBoost?0.90:0.75)) dropLoot(zb.x,zb.z,pick(['wood','cloth','nails','scrap','fuel']),RI(2,5));
-  else if(zb.type==='survivor'&&Math.random()<(lootBoost?0.75:0.55)) dropLoot(zb.x,zb.z,pick(['crowbar','axe','pistol','machete','smg']),1);
-  else if(zb.type==='tank') dropLoot(zb.x,zb.z,pick(['medkit','rifle','ammo762']),RI(2,6));
-  else if(zb.type==='spitter'&&Math.random()<(lootBoost?0.85:0.65)) dropLoot(zb.x,zb.z,pick(['fuel','flamethrower','shell','molotov']),1);
-  else if(zb.type==='brute2') dropLoot(zb.x,zb.z,pick(['railgun','rocket','shotgun2','ammo762','medkit']),RI(1,3));
+  else if(roll<(lootBoost?0.28:0.18)) dropLoot(zb.x,zb.z,pick(['can','water','bandage','cloth','wood']),1);
+  else if(roll<(lootBoost?0.46:0.31)) dropLoot(zb.x,zb.z,pick(['ammo9','shell','ammo762','scrap']),RI(3,8));
+  else if(roll<(lootBoost?0.60:0.42)) dropLoot(zb.x,zb.z,pick(['wood','cloth','nails','scrap','fuel']),RI(1,3));
+  else if(zb.type==='survivor'&&Math.random()<(lootBoost?0.28:0.16)) dropLoot(zb.x,zb.z,pick(['crowbar','axe','pistol','machete']),1);
+  else if(zb.type==='tank'&&Math.random()<0.32) dropLoot(zb.x,zb.z,pick(['medkit','ammo762','scrap']),RI(1,4));
+  else if((zb.type==='spitter'||zb.type==='acid')&&Math.random()<(lootBoost?0.34:0.2)) dropLoot(zb.x,zb.z,pick(['fuel','shell','molotov']),1);
+  else if(zb.type==='brute2'&&Math.random()<0.38) dropLoot(zb.x,zb.z,pick(['ammo762','medkit','scrap']),RI(1,3));
   // 拾荒直觉加成：额外材料掉落
-  if(lootBoost && !zb.c.boss && Math.random()<0.5){
-    dropLoot(zb.x+R(-0.6,0.6),zb.z+R(-0.6,0.6),pick(['scrap','nails','cloth','wood','ammo9']),RI(2,6));
+  if(lootBoost && !zb.c.boss && Math.random()<0.24){
+    dropLoot(zb.x+R(-0.6,0.6),zb.z+R(-0.6,0.6),pick(['scrap','nails','cloth','wood','ammo9']),RI(1,3));
   }
   // 蓝图掉落（基础蓝图低概率，高级蓝图后期/强敌掉落）
-  const advTypes=['brute2','tank','spitter','hunter','sniper'];
+  const advTypes=['brute2','tank','spitter','acid','storm','bomber','hunter','sniper'];
   const isAdv=advTypes.includes(zb.type);
   const bpChance=G.wave>=10?0.12:G.wave>=5?0.08:0.05;
   if(Math.random()<bpChance){
@@ -2289,6 +2401,32 @@ function blockedAt(x,z,rad){
   for(const o of obstacles){ if(Math.abs(x-o.x)<o.hw+rad&&Math.abs(z-o.z)<o.hd+rad) return true; }
   for(const o of circles){ const dx=x-o.x,dz=z-o.z; if(dx*dx+dz*dz<(o.r+rad)*(o.r+rad)) return true; }
   return false;
+}
+function findOpenPosition(x,z,rad){
+  x=clamp(x,-HALF+2,HALF-2); z=clamp(z,-HALF+2,HALF-2);
+  if(!blockedAt(x,z,rad)) return {x,z};
+  for(const r of [1.5,2.5,4,6,9]){
+    for(let i=0;i<16;i++){
+      const a=i*Math.PI/8, nx=clamp(x+Math.cos(a)*r,-HALF+2,HALF-2), nz=clamp(z+Math.sin(a)*r,-HALF+2,HALF-2);
+      if(!blockedAt(nx,nz,rad)) return {x:nx,z:nz};
+    }
+  }
+  return {x:clamp(P.x+R(-18,18),-HALF+2,HALF-2),z:clamp(P.z+R(-18,18),-HALF+2,HALF-2)};
+}
+function unstickZombie(zb){
+  const rad=0.46*zb.c.scale;
+  let best=null, bestD=Infinity;
+  for(const r of [1.5,2.5,4,6]) for(let i=0;i<16;i++){
+    const a=i*Math.PI/8, nx=clamp(zb.x+Math.cos(a)*r,-HALF+2,HALF-2), nz=clamp(zb.z+Math.sin(a)*r,-HALF+2,HALF-2);
+    if(blockedAt(nx,nz,rad)) continue;
+    const d=Math.hypot(P.x-nx,P.z-nz);
+    if(d<bestD){ bestD=d; best={x:nx,z:nz}; }
+  }
+  if(!best){
+    const a=R(0,Math.PI*2), r=R(14,22);
+    best=findOpenPosition(P.x+Math.cos(a)*r,P.z+Math.sin(a)*r,rad);
+  }
+  zb.x=best.x; zb.z=best.z; zb.kbx=0; zb.kbz=0; zb.stuckT=0; zb.stuckX=zb.x; zb.stuckZ=zb.z;
 }
 function steer(zb,mvx,mvz){
   const rad=0.42*zb.c.scale;
@@ -2415,7 +2553,7 @@ function zombieAI(zb,dt,idx){
   if(G.inBuilding){
     const b=G.inBuilding;
     // 僵尸移动到建筑门口附近后停下
-    const doorX=b.x, doorZ=b.z+b.d/2+1;
+    const doorX=b.doorX, doorZ=b.doorZ;
     const ddx=doorX-zb.x, ddz=doorZ-zb.z;
     const ddist=Math.hypot(ddx,ddz);
     if(ddist>2){
@@ -2423,10 +2561,17 @@ function zombieAI(zb,dt,idx){
       const mv=steer(zb,ddx/ddist*sp,ddz/ddist*sp);
       zb.x+=mv[0]*dt; zb.z+=mv[1]*dt;
     }
+    resolveCollision(zb,0.42*zb.c.scale);
     zb.dir=Math.atan2(b.x-zb.x,b.z-zb.z);
+    zb.mesh.position.set(zb.x,0,zb.z);
     zb.mesh.rotation.y=zb.dir;
     // 不攻击玩家
     return;
+  }
+  // Outdoor infected acquire the player globally and never lose the trail.
+  if(P.hp>0&&G.mode!=='defense'){
+    if(zb.state!=='attack') zb.state='chase';
+    zb.lastX=P.x; zb.lastZ=P.z; zb.loseT=0;
   }
   // 保卫模式：部分僵尸优先攻击研究所
   let targetX=P.x, targetZ=P.z;
@@ -2468,16 +2613,46 @@ function zombieAI(zb,dt,idx){
     if(zb.state!=='chase'&&zb.state!=='attack') enterChase(zb);
     zb.lastX=P.x; zb.lastZ=P.z; zb.loseT=0;
   } else if(zb.state==='chase'||zb.state==='attack'){
-    // 僵尸永不放弃追击，持续向玩家最后已知位置移动
+    // 僵尸永不放弃追击，持续向玩家当前的位置移动。
     zb.loseT+=dt;
-    zb.tx=P.x; zb.tz=P.z; // 持续更新目标为玩家当前位置
-    // 远距离加速冲刺追击
-    if(dist>20){ const sp=zb.spd*(night?1.3:1.1); zb.x+=dx/dist*sp*dt*0.7; zb.z+=dz/dist*sp*dt*0.7; }
+    zb.tx=P.x; zb.tz=P.z;
   }
   // hearing
   if(zb.state==='idle'||zb.state==='investigate'){
     for(const n of noises){ const nd=Math.hypot(n.x-zb.x,n.z-zb.z);
       if(nd<n.r){ zb.state='investigate'; zb.tx=n.x; zb.tz=n.z; zb.invT=5; break; } }
+  }
+
+  /* ---- bomber proximity fuse ---- */
+  if(zb.c.bomber){
+    if(!zb.fusing&&dist<2.8){
+      zb.fusing=1; zb.fuseT=0.85;
+      showRing(zb.x,zb.z,zb.c.explodeR||5,0xE25836,0.85,null);
+      showMsg(T('自爆尸即将爆炸！','Bomber is about to detonate!'));
+    }
+    if(zb.fusing){
+      zb.fuseT-=dt;
+      if(Math.random()<dt*20) spawnP(zb.x,R(0.5,1.7),zb.z,R(-0.4,0.4),R(1,3),R(-0.4,0.4),0.3,10,0.06,0xFF7A3A);
+      if(zb.fuseT<=0){ zb.hp=0; killZombie(zb); return; }
+    }
+  }
+
+  /* ---- storm infected telegraphed lightning ---- */
+  if(zb.c.storm){
+    zb.stormCd=Math.max(0,zb.stormCd-dt);
+    if(zb.stormT>0){
+      zb.stormT-=dt;
+      if(zb.stormT<=0){
+        const lx=zb.stormX, lz=zb.stormZ;
+        for(let i=0;i<12;i++) spawnP(lx+R(-0.12,0.12),0.25+i*0.38,lz+R(-0.12,0.12),R(-0.3,0.3),R(0,1),R(-0.3,0.3),0.35,4,0.055,0xA8D8FF);
+        showRing(lx,lz,2.5,0x79BFFF,0.22,null);
+        if(Math.hypot(P.x-lx,P.z-lz)<2.5){ damagePlayer(zb.dmg*1.25,4); P.stam=Math.max(0,P.stam-24); P.kbx*=0.35; P.kbz*=0.35; }
+        G.shake=Math.max(G.shake,0.22); zb.stormCd=R(4.5,7);
+      }
+    } else if(zb.stormCd<=0&&dist>3&&dist<22&&(zb.state==='chase'||zb.state==='attack')){
+      zb.stormT=0.78; zb.stormX=P.x; zb.stormZ=P.z;
+      showRing(zb.stormX,zb.stormZ,2.5,0x79BFFF,0.78,null);
+    }
   }
 
   /* ---- stomp (tank / brute) ---- */
@@ -2506,15 +2681,19 @@ function zombieAI(zb,dt,idx){
       const tx=P.x-zb.x, tz=P.z-zb.z, td=Math.hypot(tx,tz)||1;
       const svx=tx/td, svz=tz/td;
       let range=14, dmg=zb.dmg, bcol=0x66DD44, bsize=0.15;
-      if(zb.type==='hunter'){ range=20; dmg=zb.dmg*0.8; bcol=0x44AAFF; bsize=0.12; }
+      if(zb.c.acid){ range=18; dmg=zb.dmg; bcol=0x8DDF42; bsize=0.2; }
+      else if(zb.type==='hunter'){ range=20; dmg=zb.dmg*0.8; bcol=0x44AAFF; bsize=0.12; }
       else if(zb.type==='sniper'){ range=30; dmg=zb.dmg*1.5; bcol=0xFF6600; bsize=0.2; }
       fireBullet(zb.x,1.2,zb.z,svx,svz,range,dmg,0,0,0,0,1);
       const lb=bullets[bullets.length-1];
-      if(lb){ lb.enemy=1; lb.m.material=mat(bcol); lb.m.scale.set(bsize,bsize,bsize); }
+      if(lb){ lb.enemy=1; lb.acid=zb.c.acid?1:0; lb.m.material=mat(bcol); lb.m.scale.set(bsize,bsize,bsize); }
       AU.groan(dist);
     }
   } else if(zb.c.ranged&&zb.spitCd<=0&&(zb.state==='chase'||zb.state==='attack')){
-    if(zb.type==='spitter'&&dist>4&&dist<14){
+    if(zb.c.acid&&dist>5&&dist<18){
+      zb.spitting=0.75; zb.spitCd=R(3,4.8);
+      showRing(zb.x,zb.z,1.15,0x8DDF42,0.65,null);
+    } else if(zb.type==='spitter'&&dist>4&&dist<14){
       zb.spitting=0.6; zb.spitCd=R(2.5,4);
       showRing(zb.x,zb.z,1.0,0x66DD44,0.5,null);
     } else if(zb.type==='hunter'&&dist>6&&dist<20){
@@ -2718,6 +2897,16 @@ function zombieAI(zb,dt,idx){
   for(const o of zombies){ if(o===zb||o.dead) continue;
     const sx=zb.x-o.x, sz=zb.z-o.z, sd=Math.hypot(sx,sz);
     if(sd<0.8&&sd>0.001){ zb.x+=sx/sd*dt*1.2; zb.z+=sz/sd*dt*1.2; } }
+  // Separation can push an infected into a wall, so resolve once more and recover stalled agents.
+  resolveCollision(zb,0.42*zb.c.scale);
+  if(zb.state==='chase'&&dist>2.5){
+    zb.stuckT+=dt;
+    if(zb.stuckT>=1.2){
+      const moved=Math.hypot(zb.x-zb.stuckX,zb.z-zb.stuckZ);
+      if(moved<0.22||blockedAt(zb.x,zb.z,0.36*zb.c.scale)) unstickZombie(zb);
+      else { zb.stuckT=0; zb.stuckX=zb.x; zb.stuckZ=zb.z; }
+    }
+  } else { zb.stuckT=0; zb.stuckX=zb.x; zb.stuckZ=zb.z; }
 
   zb.mesh.position.set(zb.x,0,zb.z);
   zb.mesh.rotation.y=zb.dir;
@@ -3163,6 +3352,7 @@ function fireBullet(x,y,z,vx,vz,range,dmg,explode,explodeDmg,explodeR,pierce,isF
 function updateBullets(dt){
   for(let i=bullets.length-1;i>=0;i--){
     const b=bullets[i]; const spd=b.isFlame?18:28;
+    if(b.enemy&&G.inBuilding){ killBullet(i); continue; }
     const dx=b.vx*spd*dt, dz=b.vz*spd*dt; b.dist+=Math.hypot(dx,dz);
     b.x+=dx; b.z+=dz;
     b.m.position.set(b.x,b.y,b.z);
@@ -3175,6 +3365,7 @@ function updateBullets(dt){
       }
     }
     if(b.dist>b.rng){
+      if(b.enemy&&b.acid) spawnAcidPool(b.x,b.z);
       // 火焰弹飞行结束时产生小爆裂特效
       if(b.isFlame){
         for(let p=0;p<4;p++){
@@ -3193,6 +3384,7 @@ function updateBullets(dt){
         for(let p=0;p<6;p++){
           spawnP(b.x,1.4,b.z,R(-1,1),R(0,2),R(-1,1),0.4,12,0.06,0x66DD44);
         }
+        if(b.acid) spawnAcidPool(b.x,b.z);
         killBullet(i); continue;
       }
       // 敌方子弹不检测僵尸命中，只检测障碍物
@@ -3200,7 +3392,7 @@ function updateBullets(dt){
       for(let bi=barricades.length-1;bi>=0;bi--){
         const bb=barricades[bi]; if(Math.abs(b.x-bb.x)<bb.hw&&Math.abs(b.z-bb.z)<bb.hd){
           damageBarricade(bb,b.dmg*0.6,bi); hitObs=true; break; } }
-      if(hitObs) killBullet(i);
+      if(hitObs){ if(b.acid) spawnAcidPool(b.x,b.z); killBullet(i); }
       continue;
     }
     let hit=false;
@@ -3317,8 +3509,8 @@ function explodeBullet(b){
 }
 function killBullet(i){
   const b=bullets[i]; b.m.visible=false;
-  // 从子弹所在的场景中移除（室内或室外）
-  (G.inBuilding?interiorScene:scene).remove(b.m);
+  // A projectile can outlive a scene transition, so remove it from its actual parent.
+  if(b.m.parent) b.m.parent.remove(b.m);
   bPool.push(b.m); bullets.splice(i,1);
 }
 function reload(){
@@ -3610,14 +3802,14 @@ function damageDefense(arr,idx,dmg,msg){
 function waveTypes(n){
   const t=['walker','walker','walker'];
   if(n>=2) t.push('runner','runner');
-  if(n>=3) t.push('crawler');
-  if(n>=4) t.push('screamer');
-  if(n>=5) t.push('bloater','bloater','spitter','leaper');
-  if(n>=6) t.push('survivor','survivor','spitter','leaper');
+  if(n>=3) t.push('crawler','bomber');
+  if(n>=4) t.push('screamer','acid');
+  if(n>=5) t.push('bloater','bomber','spitter','acid','leaper');
+  if(n>=6) t.push('survivor','spitter','acid','storm','leaper');
   if(n>=7) t.push('tank','brute2','necro');
   if(n>=8) t.push('leaper','leaper','necro','hunter');
   if(n>=9) t.push('tank','runner','screamer','brute2','spitter','necro','hunter','sniper');
-  if(n>=11) t.push('hunter','hunter','sniper','spitter','necro');
+  if(n>=11) t.push('hunter','hunter','sniper','spitter','acid','storm','bomber','necro');
   if(n>=8) t.push('lurker','lurker');
   if(n>=10) t.push('armored');
   if(n>=13) t.push('armored','armored','lurker');
@@ -3722,7 +3914,7 @@ function resolveCollision(ent,rad){
   const mapLimit=HALF-1.0;
   ent.x=clamp(ent.x,-mapLimit,mapLimit); ent.z=clamp(ent.z,-mapLimit,mapLimit);
   // 矩形障碍物：基于穿透深度的分轴碰撞解决
-  for(const o of obstacles){
+  for(let pass=0;pass<2;pass++) for(const o of obstacles){
     const dx=ent.x-o.x, dz=ent.z-o.z;
     const ox=Math.abs(dx)-o.hw, oz=Math.abs(dz)-o.hd;
     if(ox<rad&&oz<rad){
@@ -3736,7 +3928,7 @@ function resolveCollision(ent,rad){
       }
     }
   }
-  for(const o of circles){ const dx=ent.x-o.x, dz=ent.z-o.z, d=Math.hypot(dx,dz);
+  for(let pass=0;pass<2;pass++) for(const o of circles){ const dx=ent.x-o.x, dz=ent.z-o.z, d=Math.hypot(dx,dz);
     if(d<rad+o.r&&d>0.001){ const p=(rad+o.r)/d; ent.x=o.x+dx*p; ent.z=o.z+dz*p; } }
   for(const b of barricades){
     const dx=ent.x-b.x, dz=ent.z-b.z;
@@ -3883,9 +4075,10 @@ function updatePlayer(dt){
       if(P.stepT<=0){ P.stepT=P.sprint?0.26:0.42; AU.step(); }
     } else { P.moving=false; P.moveFwd=0; P.moveStrafe=0; }
   }
-  resolveCollision(P,0.35);
+  if(G.inBuilding) resolveInteriorCollision(P,0.35);
+  else resolveCollision(P,0.35);
   P.mesh.position.set(P.x,0,P.z);
-  P.mesh.rotation.y=P.dir;
+  P.mesh.rotation.y=P.dir+PLAYER_MODEL_YAW_OFFSET;
 
   // timers
   P.atkCd=Math.max(0,P.atkCd-dt);
@@ -3912,7 +4105,7 @@ function playerAnim(dt){
   const sprint=P.sprint&&P.moving&&P.stam>3;
   const ph=G.time*(sprint?10.5:7);
   let lean=0, rollA=0, bobY=0, crouch=0;
-  if(sprint) lean=0.22;
+  if(sprint) lean=-0.22;
   if(P.hurtT>0) lean-=0.35*(P.hurtT/0.2);
   if(P.rollT>0) rollA=-(1-P.rollT/0.35)*Math.PI*2;
   if(P.moving&&P.rollT<=0) bobY=Math.abs(Math.sin(ph))*0.07;
@@ -3937,7 +4130,8 @@ function playerAnim(dt){
   }
   else if(swinging){ meleeAnim(w.anim); }
   else if(w&&!w.melee){
-    // Weapon-specific aim silhouettes keep sidearms, long guns and heavy weapons distinct.
+    // The player mesh faces local -Z: positive X pitch raises an arm toward the face.
+    // Keep sidearms, long guns and heavy weapons distinct without bending elbows backward.
     const rec=P.recoilT>0?0.4:0;
     const aimNoise=Math.sin(G.time*3)*0.02; // 微小晃动模拟呼吸
     const sidearm=P.weapon==='pistol'||P.weapon==='revolver';
@@ -3945,19 +4139,19 @@ function playerAnim(dt){
     if(P.reloadT>0){
       const rp=1-P.reloadT/(P.reloadMax||1);
       const dip=Math.sin(clamp(rp,0,1)*Math.PI);
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.35+dip*0.28,dt*14);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.62+dip*0.46,dt*14);
-      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,0.18*dip,dt*10);
-      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,-0.42*dip,dt*10);
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,0.35-dip*0.28,dt*14);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,0.62-dip*0.46,dt*14);
+      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,-0.18*dip,dt*10);
+      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,0.42*dip,dt*10);
       pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0.24*dip,dt*10);
       pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,-0.42*dip,dt*10);
     } else {
-      const rx=sidearm?-0.92:(heavy?-0.54:-0.7);
-      const lx=sidearm?-0.82:(heavy?-0.48:-0.62);
-      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,rx+rec+aimNoise,dt*18);
-      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,lx+rec*0.5+aimNoise,dt*18);
-      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,sidearm?-0.16:-0.08,dt*12);
-      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,sidearm?0.28:(heavy?0.22:0.12),dt*12);
+      const rx=sidearm?0.92:(heavy?0.54:0.7);
+      const lx=sidearm?0.82:(heavy?0.48:0.62);
+      pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,rx-rec-aimNoise,dt*18);
+      pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,lx-rec*0.5-aimNoise,dt*18);
+      pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,sidearm?0.16:0.08,dt*12);
+      pa.lArm.rotation.y=lerp(pa.lArm.rotation.y||0,sidearm?-0.28:(heavy?-0.22:-0.12),dt*12);
       pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,sidearm?-0.2:-0.12,dt*10);
       pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,sidearm?0.32:(heavy?0.25:0.18),dt*10);
     }
@@ -3974,8 +4168,8 @@ function playerAnim(dt){
   }
   else {
     // 站立：手臂自然下垂
-    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,-0.05,dt*8);
-    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.05,dt*8);
+    pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,0.05,dt*8);
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,0.05,dt*8);
     pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0,dt*8);
     pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0,dt*8);
     pa.rArm.rotation.y=lerp(pa.rArm.rotation.y||0,0,dt*8);
@@ -3984,7 +4178,7 @@ function playerAnim(dt){
   // 装备切换动画：手臂快速下垂再抬起
   if(P.equipT>0){
     const f=P.equipT/0.25;
-    const dropAmt=-1.2*f;
+    const dropAmt=1.2*f;
     pa.rArm.rotation.x=lerp(pa.rArm.rotation.x,dropAmt,dt*20);
     pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,dropAmt,dt*20);
     P.equipT-=dt;
@@ -3995,7 +4189,7 @@ function playerAnim(dt){
       pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,-0.15,dt*8);
       pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0.15,dt*8);
       // 后坐力时身体微后仰
-      if(P.recoilT>0){ b.rotation.x=lerp(b.rotation.x,lean-0.05,dt*12); }
+      if(P.recoilT>0){ b.rotation.x=lerp(b.rotation.x,lean+0.05,dt*12); }
     } else {
       pa.rArm.rotation.z=lerp(pa.rArm.rotation.z||0,0,dt*8);
       pa.lArm.rotation.z=lerp(pa.lArm.rotation.z||0,0,dt*8);
@@ -4032,29 +4226,52 @@ function meleeAnim(kind){
   const f=1-P.swingT/P.swingMax, pa=P.parts, b=pa.body;
   const a=pa.rArm.rotation;
   if(kind==='sweep'){
-    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.2,-1.3,t*Math.PI/2); b.rotation.y=lerp(0,-0.4,t); pa.lArm.rotation.x=lerp(-0.2,-0.7,t); }
-    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(-1.3,-1.7,t*Math.PI/2); b.rotation.y=lerp(-0.4,0.7,t); pa.lArm.rotation.x=lerp(-0.7,-0.4,t); }
-    else { const t=(f-0.55)/0.45; a.x=lerp(-1.7,-0.2,t*t); b.rotation.y=lerp(0.7,0,t); pa.lArm.rotation.x=lerp(-0.4,-0.1,t); }
+    if(f<0.3){ const t=f/0.3; a.x=lerp(0.2,1.3,t*Math.PI/2); b.rotation.y=lerp(0,-0.4,t); pa.lArm.rotation.x=lerp(0.2,0.7,t); }
+    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(1.3,1.7,t*Math.PI/2); b.rotation.y=lerp(-0.4,0.7,t); pa.lArm.rotation.x=lerp(0.7,0.4,t); }
+    else { const t=(f-0.55)/0.45; a.x=lerp(1.7,0.2,t*t); b.rotation.y=lerp(0.7,0,t); pa.lArm.rotation.x=lerp(0.4,0.1,t); }
     b.position.y=b.position.y*0.8-0.03;
   } else if(kind==='chop'){
-    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.2,-2.3,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.2,-0.6,t); }
-    else if(f<0.5){ const t=(f-0.3)/0.2; a.x=lerp(-2.3,-2.5,t); pa.lArm.rotation.x=lerp(-0.6,-0.5,t); }
-    else { const t=(f-0.5)/0.5; a.x=lerp(-2.5,-0.2,t*t); pa.lArm.rotation.x=lerp(-0.5,-0.1,t); }
+    if(f<0.3){ const t=f/0.3; a.x=lerp(0.2,2.3,t*Math.PI/2); pa.lArm.rotation.x=lerp(0.2,0.6,t); }
+    else if(f<0.5){ const t=(f-0.3)/0.2; a.x=lerp(2.3,2.5,t); pa.lArm.rotation.x=lerp(0.6,0.5,t); }
+    else { const t=(f-0.5)/0.5; a.x=lerp(2.5,0.2,t*t); pa.lArm.rotation.x=lerp(0.5,0.1,t); }
   } else if(kind==='bigswing'){
-    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.2,-2.5,t*Math.PI/2); pa.lArm.rotation.x=lerp(-0.2,-2.5,t*Math.PI/2); b.rotation.y=lerp(0,-0.35,t); }
-    else if(f<0.6){ const t=(f-0.3)/0.3; a.x=lerp(-2.5,-0.4,t*Math.PI/2); pa.lArm.rotation.x=lerp(-2.5,-0.4,t*Math.PI/2); b.rotation.y=lerp(-0.35,0.45,t); }
-    else { const t=(f-0.6)/0.4; a.x=lerp(-0.4,-0.2,t*t); pa.lArm.rotation.x=lerp(-0.4,-0.2,t*t); b.rotation.y=lerp(0.45,0,t); }
+    if(f<0.3){ const t=f/0.3; a.x=lerp(0.2,2.5,t*Math.PI/2); pa.lArm.rotation.x=lerp(0.2,2.5,t*Math.PI/2); b.rotation.y=lerp(0,-0.35,t); }
+    else if(f<0.6){ const t=(f-0.3)/0.3; a.x=lerp(2.5,0.4,t*Math.PI/2); pa.lArm.rotation.x=lerp(2.5,0.4,t*Math.PI/2); b.rotation.y=lerp(-0.35,0.45,t); }
+    else { const t=(f-0.6)/0.4; a.x=lerp(0.4,0.2,t*t); pa.lArm.rotation.x=lerp(0.4,0.2,t*t); b.rotation.y=lerp(0.45,0,t); }
     b.position.y=b.position.y*0.85;
   } else if(kind==='thrust'){
-    if(f<0.35){ const t=f/0.35; a.x=lerp(-0.2,-1.9,t); b.rotation.y=lerp(0,-0.18,t); }
-    else if(f<0.58){ const t=(f-0.35)/0.23; a.x=lerp(-1.9,-0.35,t); b.rotation.y=lerp(-0.18,0.22,t); }
-    else { const t=(f-0.58)/0.42; a.x=lerp(-0.35,-0.2,t); b.rotation.y=lerp(0.22,0,t); }
-    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,a.x+0.15,0.35);
+    if(f<0.35){ const t=f/0.35; a.x=lerp(0.2,1.9,t); b.rotation.y=lerp(0,-0.18,t); }
+    else if(f<0.58){ const t=(f-0.35)/0.23; a.x=lerp(1.9,0.35,t); b.rotation.y=lerp(-0.18,0.22,t); }
+    else { const t=(f-0.58)/0.42; a.x=lerp(0.35,0.2,t); b.rotation.y=lerp(0.22,0,t); }
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,a.x-0.15,0.35);
   } else {
-    if(f<0.3){ const t=f/0.3; a.x=lerp(-0.15,-0.5,t*Math.PI/2); }
-    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(-0.5,-1.5,t*Math.PI/2); }
-    else { const t=(f-0.55)/0.45; a.x=lerp(-1.5,-0.15,t*t); }
-    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,-0.2,0.15);
+    if(f<0.3){ const t=f/0.3; a.x=lerp(0.15,0.5,t*Math.PI/2); }
+    else if(f<0.55){ const t=(f-0.3)/0.25; a.x=lerp(0.5,1.5,t*Math.PI/2); }
+    else { const t=(f-0.55)/0.45; a.x=lerp(1.5,0.15,t*t); }
+    pa.lArm.rotation.x=lerp(pa.lArm.rotation.x,0.2,0.15);
+  }
+}
+function spawnAcidPool(x,z){
+  acidPools.push({x,z,r:2.7,life:6,dmg:7,tickT:0});
+  showRing(x,z,2.7,0x78B83D,0.35,null);
+  for(let i=0;i<10;i++){
+    const a=R(0,Math.PI*2),r=R(0,2.5);
+    spawnP(x+Math.cos(a)*r,R(0.15,0.5),z+Math.sin(a)*r,R(-0.3,0.3),R(0.2,1),R(-0.3,0.3),0.5,6,0.055,0x91D447);
+  }
+}
+function updateAcidPools(dt){
+  for(let i=acidPools.length-1;i>=0;i--){
+    const a=acidPools[i]; a.life-=dt; a.tickT+=dt;
+    if(a.tickT>=0.5){
+      a.tickT=0;
+      const d=Math.hypot(P.x-a.x,P.z-a.z);
+      if(!G.inBuilding&&d<a.r) damagePlayer(a.dmg*(1-d/a.r),4);
+      for(let p=0;p<4;p++){
+        const ang=R(0,Math.PI*2),r=R(0,a.r);
+        spawnP(a.x+Math.cos(ang)*r,R(0.1,0.35),a.z+Math.sin(ang)*r,R(-0.15,0.15),R(0.15,0.65),R(-0.15,0.15),0.45,5,0.05,0x84C447);
+      }
+    }
+    if(a.life<=0) acidPools.splice(i,1);
   }
 }
 
@@ -4413,30 +4630,24 @@ function updateLootEnts(dt){
   }
 }
 function spawnInitialLoot(){
-  const L=[['can',4],['water',4],['bandage',3],['cloth',2],['wood',2],['nails',3],['fuel',4],['bottle',3],
-    ['ammo9',5],['ammo9',5],['shell',4],['shell',4],['ammo762',4],['ammo762',4],
-    ['bat',1],['crowbar',1],['molotov',1],['barricade',2],['scrap',3],
-    ['axe',1],['medkit',1],['machete',1],['hotmeal',1],
-    ['flamethrower',1],['rocket',1],['railgun',1],['shotgun2',1],
-    ['antibio',1]];
+  const common=[['can',3],['water',3],['bandage',2],['cloth',2],['wood',2],['nails',2],['fuel',3],['bottle',2],
+    ['ammo9',4],['shell',3],['ammo762',3],['molotov',1],['barricade',1],['scrap',2],['medkit',1],['hotmeal',1],['antibio',1]];
+  const weapons=['bat','crowbar','axe','machete','pistol','revolver','shotgun','smg','rifle'];
   for(let i=0;i<lootSpots.length;i++){
     const s=lootSpots[i];
-    // 外围loot点有更高概率和更好品质
     const dist=Math.hypot(s.x,s.z);
-    const chance=dist>30?0.92:0.8;
+    const chance=dist>30?0.62:0.48;
     if(Math.random()<chance){
-      const e=pick(L);
-      dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),e[0],e[1]?RI(1,e[1]):1);
+      if(Math.random()<(dist>35?0.08:0.035)) dropLoot(s.x+R(-1.2,1.2),s.z+R(-1.2,1.2),pick(weapons),1);
+      else { const e=pick(common); dropLoot(s.x+R(-1.2,1.2),s.z+R(-1.2,1.2),e[0],RI(1,e[1])); }
     }
-    // 额外弹药拾取点：每个loot点有概率再额外生成一份弹药
-    if(Math.random()<0.35){
+    if(Math.random()<0.12){
       const am=pick(['ammo9','shell','ammo762']);
-      dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),am,RI(4,10));
+      dropLoot(s.x+R(-1.2,1.2),s.z+R(-1.2,1.2),am,RI(3,7));
     }
-    // 额外生存资源：增加末日生存感，每个loot点有概率生成生存材料
-    if(Math.random()<0.45){
-      const res=pick(['wood','cloth','nails','scrap','bottle','fuel','fuel','fuel']);
-      dropLoot(s.x+R(-1.5,1.5),s.z+R(-1.5,1.5),res,RI(2,6));
+    if(Math.random()<0.16){
+      const res=pick(['wood','cloth','nails','scrap','bottle','fuel']);
+      dropLoot(s.x+R(-1.2,1.2),s.z+R(-1.2,1.2),res,RI(1,3));
     }
   }
 }
@@ -4869,14 +5080,14 @@ function drawMinimap(){
     if(z.dead) continue;
     // 追击中的僵尸更亮+脉动
     const chasing=z.state==='chase'||z.state==='attack';
-    const baseCol=z.c.boss?'#C05848':(z.c.explode?'#8A9A6A':(z.c.ranged?'#6B8A4A':(z.type==='brute2'?'#886633':'#A4382E')));
+    const baseCol=z.c.boss?'#C05848':(z.c.storm?'#6DB9FF':(z.c.acid?'#91D447':(z.c.bomber?'#FF7A3A':(z.c.explode?'#8A9A6A':(z.c.ranged?'#6B8A4A':(z.type==='brute2'?'#886633':'#A4382E'))))));
     if(chasing){
       c.fillStyle='#FF2222';
       const ps=3+pulse*2;
       c.fillRect((z.x+HALF)*sc-ps/2,(z.z+HALF)*sc-ps/2,ps,ps);
     }
     c.fillStyle=chasing?'#FF6644':baseCol;
-    const s=z.c.boss?4:(z.type==='brute2'||z.type==='tank'?3.5:2.5);
+    const s=z.c.boss?4:(z.type==='brute2'||z.type==='tank'?3.5:(z.c.storm||z.c.acid||z.c.bomber?3:2.5));
     c.fillRect((z.x+HALF)*sc-s/2,(z.z+HALF)*sc-s/2,s,s);
   }
   for(const lo of lootEnts){
@@ -4962,15 +5173,18 @@ function drawMinimap(){
   }
   for(const b of barricades){ c.fillStyle='#8A6A42';
     c.fillRect((b.x+HALF)*sc-2,(b.z+HALF)*sc-2,4,4); }
-  c.fillStyle='#E5DDC8';
-  c.fillRect((P.x+HALF)*sc-2.5,(P.z+HALF)*sc-2.5,5,5);
-  // 玩家朝向指示
   const px=(P.x+HALF)*sc, py=(P.z+HALF)*sc;
-  c.strokeStyle='#FFD700'; c.lineWidth=2;
+  const fx=Math.sin(P.dir), fz=Math.cos(P.dir), sx=fz, sz=-fx;
+  const playerPulse=7+Math.sin(G.time*5)*0.8;
+  c.strokeStyle='rgba(255,220,105,0.55)'; c.lineWidth=1.2;
+  c.beginPath(); c.arc(px,py,playerPulse,0,Math.PI*2); c.stroke();
+  c.fillStyle='#FFD45C'; c.strokeStyle='#171A1D'; c.lineWidth=2;
   c.beginPath();
-  c.moveTo(px,py);
-  c.lineTo(px+Math.sin(P.dir)*8,py+Math.cos(P.dir)*8);
-  c.stroke();
+  c.moveTo(px+fx*9,py+fz*9);
+  c.lineTo(px-fx*4+sx*5,py-fz*4+sz*5);
+  c.lineTo(px-fx*4-sx*5,py-fz*4-sz*5);
+  c.closePath(); c.fill(); c.stroke();
+  c.fillStyle='#F4F0E6'; c.beginPath(); c.arc(px,py,1.8,0,Math.PI*2); c.fill();
   c.strokeStyle='#5B5C57'; c.strokeRect(0,0,S,S);
 }
 
@@ -5480,6 +5694,10 @@ function updateDayNight(dt){
     else { w.material=mat(0x2E3A45); }
   }
   for(const l of lamps){ l.li.intensity=night*1.5; l.head.material=mat(night>0.5?0xE8C98A:0xD6C29A); }
+  const flashlightOn=night>0.28&&G.state==='play'&&!G.inBuilding&&P.hp>0;
+  flashlight.intensity=flashlightOn?lerp(0.6,4.2,night):0;
+  flashlight.position.set(P.x,1.45,P.z);
+  flashlightTarget.position.set(P.x+Math.sin(P.dir)*15,0.65,P.z+Math.cos(P.dir)*15);
 }
 
 /* ================= supply drop ================= */
@@ -5595,7 +5813,7 @@ addEventListener('keydown',e=>{
     if(k==='n'){ showAttachUI(); AU.ui(); }
     if(k==='v'){ useClassSkill(); }
     if(k>='1'&&k<='4') equipHot(+k-1);
-    if(k==='c'){ // C键：进入/离开建筑
+    if(k==='c'&&(G.buildingCd||0)<=0){ // C键：进入/离开建筑
       if(G._nearBuilding&&!G.inBuilding){ enterBuilding(G._nearBuilding); }
       else if(G.inBuilding){ exitBuilding(); }
     }
@@ -6087,6 +6305,7 @@ function resetWorldState(){
   if(G.inBuilding){
     if(P.mesh&&P.mesh.parent===interiorScene){ interiorScene.remove(P.mesh); scene.add(P.mesh); }
     if(G._interior){ for(const m of G._interior) interiorScene.remove(m); G._interior=null; }
+    G._interiorObstacles=null;
     if(G._interiorZombies){ for(const z of G._interiorZombies) interiorScene.remove(z.mesh); G._interiorZombies=null; }
     if(G._interiorLoot){ for(const l of G._interiorLoot) interiorScene.remove(l.mesh); G._interiorLoot=null; }
     G._interiorSpawnT=null; G._interiorWave=null;
@@ -6112,7 +6331,7 @@ function resetWorldState(){
   for(const g of grenades){ if(g.m&&g.m.parent) g.m.parent.remove(g.m); }
   grenades.length=0;
   noises.length=0;
-  firePools.length=0;
+  firePools.length=0; acidPools.length=0;
   if(G.supply){ scene.remove(G.supply.mesh); G.supply=null; }
   // 清理模式mesh
   if(G.labMesh){ disposeMesh(G.labMesh); scene.remove(G.labMesh); G.labMesh=null; }
@@ -6143,7 +6362,7 @@ function newGame(from){
   G.trader=null; G.traderT=0;
   G.quests=[]; G.questKills={}; G.questLoot={};
   G.ally=null; G.allyRescue=null;
-  G.inBuilding=null; G._interior=null; G._interiorSearchables=null; G._interiorZombies=null; G._interiorLoot=null; G._interiorSpawnT=null; G._interiorWave=null;
+  G.inBuilding=null; G._interior=null; G._interiorObstacles=null; G._interiorSearchables=null; G._interiorZombies=null; G._interiorLoot=null; G._interiorSpawnT=null; G._interiorWave=null;
   G.attachments={};
   G.wardenDefeated=false;
   resetCorruptionNests();
@@ -6253,7 +6472,7 @@ function continueGame(){
   G.achievements=s.achievements||{}; G.attachments=s.attachments||{};
   G.quests=Array.isArray(s.quests)?s.quests:[]; G.questKills={}; G.questLoot={}; G.questLootCount=s.questLootCount||0;
   G.trader=null; G.traderT=0; G.ally=null; G.allyRescue=null;
-  G.inBuilding=null; G._interior=null; G._interiorSearchables=null; G._interiorZombies=null; G._interiorLoot=null; G._interiorSpawnT=null; G._interiorWave=null;
+  G.inBuilding=null; G._interior=null; G._interiorObstacles=null; G._interiorSearchables=null; G._interiorZombies=null; G._interiorLoot=null; G._interiorSpawnT=null; G._interiorWave=null;
   G.wardenDefeated=!!s.wardenDefeated;
   resetCorruptionNests(s.nests);
   if(G.quests.length===0) rollQuests();
@@ -6318,6 +6537,7 @@ function loop(){
       updateMuzzle(dt);
       updateHpBars();
       updateFirePools(dt);
+      updateAcidPools(dt);
       updateGrenades(dt);
       updatePlacePreview();
       // 防御工事HP条渐隐
